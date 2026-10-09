@@ -1,0 +1,55 @@
+{
+  "common": {
+    "loading": "Cargando…",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "error": "Algo salió mal, inténtalo de nuevo"
+  },
+  "auth": {
+    "welcome": "Bienvenido a Kuulis",
+    "email": "Correo",
+    "password": "Contraseña",
+    "fullName": "Nombre",
+    "login": "Entrar",
+    "register": "Crear cuenta",
+    "logout": "Cerrar sesión",
+    "noAccount": "¿No tienes cuenta? Regístrate",
+    "haveAccount": "¿Ya tienes cuenta? Entra",
+    "forgot": "¿Olvidaste tu contraseña?",
+    "resetTitle": "Recuperar contraseña",
+    "resetSend": "Enviar enlace",
+    "resetSent": "Si el correo existe, te enviamos un enlace para restablecer la contraseña."
+  },
+  "tabs": {
+    "home": "Inicio",
+    "notifications": "Notificaciones",
+    "profile": "Perfil"
+  },
+  "home": {
+    "greeting": "Hola, {{name}}",
+    "verifyEmail": "Confirma tu correo para activar todas las funciones.",
+    "resend": "Reenviar correo",
+    "realtime": "Tiempo real: {{status}}"
+  },
+  "notifications": {
+    "empty": "No tienes notificaciones",
+    "markAll": "Marcar todo como leído"
+  },
+  "profile": {
+    "language": "Idioma",
+    "environment": "Entorno",
+    "version": "Versión"
+  },
+  "validation": {
+    "email": "Correo no válido",
+    "password": "Mínimo 8 caracteres",
+    "required": "Campo obligatorio"
+  },
+  "errors": {
+    "invalid_credentials": "Correo o contraseña incorrectos",
+    "email_taken": "Ese correo ya está registrado",
+    "account_disabled": "Tu cuenta está desactivada",
+    "http_429": "Demasiados intentos, espera un momento",
+    "network": "Sin conexión con el servidor"
+  }
+}

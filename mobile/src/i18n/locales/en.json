@@ -1,0 +1,55 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "retry": "Retry",
+    "save": "Save",
+    "error": "Something went wrong, please try again"
+  },
+  "auth": {
+    "welcome": "Welcome to Kuulis",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Name",
+    "login": "Sign in",
+    "register": "Create account",
+    "logout": "Sign out",
+    "noAccount": "No account? Sign up",
+    "haveAccount": "Already have an account? Sign in",
+    "forgot": "Forgot your password?",
+    "resetTitle": "Reset password",
+    "resetSend": "Send link",
+    "resetSent": "If the email exists, we sent you a link to reset your password."
+  },
+  "tabs": {
+    "home": "Home",
+    "notifications": "Notifications",
+    "profile": "Profile"
+  },
+  "home": {
+    "greeting": "Hi, {{name}}",
+    "verifyEmail": "Confirm your email to unlock every feature.",
+    "resend": "Resend email",
+    "realtime": "Realtime: {{status}}"
+  },
+  "notifications": {
+    "empty": "You have no notifications",
+    "markAll": "Mark all as read"
+  },
+  "profile": {
+    "language": "Language",
+    "environment": "Environment",
+    "version": "Version"
+  },
+  "validation": {
+    "email": "Invalid email",
+    "password": "At least 8 characters",
+    "required": "Required"
+  },
+  "errors": {
+    "invalid_credentials": "Wrong email or password",
+    "email_taken": "That email is already registered",
+    "account_disabled": "Your account is disabled",
+    "http_429": "Too many attempts, please wait",
+    "network": "Cannot reach the server"
+  }
+}
