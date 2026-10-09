@@ -12,11 +12,11 @@ Supuesto: una misma persona podría tener cuenta de pasajero y de motorizado (do
 ## Flujo del pasajero (decidido: pedir y ver costo en USD; el detalle es supuesto)
 1. Abre la app y ve el mapa con su ubicación.
 2. Elige destino (búsqueda o pin en el mapa).
-3. Ve el **precio en dólares**, la distancia y el tiempo estimado.
+3. Ve el **precio en dólares** (fijado por Kuulis, no negociable), la distancia y el tiempo estimado.
 4. Confirma y pide el viaje.
 5. Ve "buscando motorizado"; cuando uno acepta, ve su nombre, foto, moto, placa y ubicación en vivo.
 6. El motorizado llega, empieza el viaje y el pasajero lo sigue en el mapa.
-7. Llega al destino y **paga directamente al motorizado**.
+7. Llega al destino y **paga directamente al motorizado** el monto de la app, con el método que acordaron.
 8. Califica al motorizado.
 
 ## Flujo del motorizado (decidido: esperar la solicitud; el detalle es supuesto)
@@ -26,7 +26,8 @@ Supuesto: una misma persona podría tener cuenta de pasajero y de motorizado (do
 4. Va a buscar al pasajero, inicia el viaje y lo termina.
 5. Recibe el pago directo del pasajero.
 6. Ve sus ganancias del mes y la cuota que le toca según los tramos.
-7. Paga la suscripción en **USDT** (detalles en `business-model.md`).
+7. Recarga su **billetera** con USDT (mínimo 5) y la cuota se descuenta de ahí (detalles en `business-model.md`).
+8. Si no paga, tiene 1 semana de gracia; después deja de recibir viajes hasta pagar.
 
 ## Flujo del admin (supuesto)
 - Aprobar o rechazar motorizados.
