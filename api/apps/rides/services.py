@@ -142,8 +142,10 @@ def _ensure_participant(ride: Ride, user: User) -> None:
 
 
 def _check_area(config: AppConfig, *points: tuple[float, float]) -> None:
+    """Every point must fall inside one service area, the same one (no trips between cities)."""
+    area = config.area_at(*points[0])
     for lat, lng in points:
-        if not config.service_area.contains(lat, lng):
+        if area is None or not area.contains(lat, lng):
             raise OutsideServiceAreaError(details={"lat": lat, "lng": lng})
 
 

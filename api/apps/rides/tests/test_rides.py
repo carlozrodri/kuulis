@@ -104,6 +104,35 @@ async def test_quote_errors(client, passenger):
     assert response.json()["error"]["code"] == "vehicle_type_not_enabled"
 
 
+async def test_quote_in_a_second_city(client, passenger, admin_headers):
+    caracas = AppConfig().service_areas[0].model_dump()
+    valencia = {
+        "name": "Valencia",
+        "min_lat": 39.4,
+        "max_lat": 39.55,
+        "min_lng": -0.45,
+        "max_lng": -0.3,
+    }
+    response = await client.patch(
+        f"{API}/admin/config", json={"service_areas": [caracas, valencia]}, headers=admin_headers
+    )
+    assert response.status_code == 200, response.text
+    pickup = {"lat": 39.4699, "lng": -0.3763, "address": "Plaza del Ayuntamiento"}
+    dropoff = {"lat": 39.4592, "lng": -0.3532, "address": "Ciudad de las Artes"}
+    response = await client.post(
+        f"{API}/rides/quote",
+        json={"pickup": pickup, "dropoff": dropoff, "vehicle_type": "moto"},
+        headers=passenger.headers,
+    )
+    assert response.status_code == 200, response.text
+    response = await client.post(
+        f"{API}/rides/quote",
+        json={"pickup": PICKUP, "dropoff": dropoff, "vehicle_type": "moto"},
+        headers=passenger.headers,
+    )
+    assert response.json()["error"]["code"] == "outside_service_area"
+
+
 async def test_request_errors(client, passenger, user_headers):
     quote = (
         await client.post(

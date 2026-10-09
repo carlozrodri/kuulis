@@ -133,7 +133,7 @@ export interface AppConfig {
   surge_manual_multiplier?: string
   fare_rounding?: string
   payment_methods?: PaymentMethod[]
-  service_area?: ServiceArea
+  service_areas?: ServiceArea[]
   offer_timeout_seconds?: number
   search_radius_m?: number[]
   search_timeout_seconds?: number
@@ -161,6 +161,7 @@ export interface SurgeRule {
 }
 
 export interface ServiceArea {
+  name: string
   min_lat: number
   max_lat: number
   min_lng: number

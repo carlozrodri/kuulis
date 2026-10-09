@@ -311,7 +311,7 @@
     "storage_disabled": "File uploads aren't available right now.",
     "upload_failed": "The file couldn't be uploaded. Check your connection and try again.",
     "quote_expired": "The price expired. Here's an updated one.",
-    "outside_service_area": "For now we only operate in Caracas. Choose a point inside the city.",
+    "outside_service_area": "We don't operate here yet. Choose a point inside a city we serve (pickup and destination in the same city).",
     "payment_method_invalid": "That payment method isn't available. Choose another.",
     "ride_already_active": "You already have a ride in progress.",
     "rating_required": "Rate your last ride before requesting another one.",

@@ -1,5 +1,8 @@
 from apps.config import services
+from apps.config.models import AppSetting
+from apps.config.schemas import AppConfig
 from kuulis.core.cache import cache_get
+from kuulis.core.db import SessionLocal
 
 DEFAULTS = {
     "driver_min_age": 21,
@@ -23,7 +26,9 @@ DEFAULTS = {
     "surge_manual_multiplier": "1.00",
     "fare_rounding": "0.10",
     "payment_methods": ["cash_usd", "pago_movil", "binance", "zelle", "cash_ves"],
-    "service_area": {"min_lat": 10.35, "max_lat": 10.56, "min_lng": -67.1, "max_lng": -66.7},
+    "service_areas": [
+        {"name": "Caracas", "min_lat": 10.35, "max_lat": 10.56, "min_lng": -67.1, "max_lng": -66.7}
+    ],
     "offer_timeout_seconds": 15,
     "search_radius_m": [2000, 4000, 7000],
     "search_timeout_seconds": 180,
@@ -79,7 +84,8 @@ async def test_admin_config_validation(client, admin_headers):
         {"payment_methods": []},
         {"payment_methods": ["bitcoin"]},
         {"search_radius_m": [4000, 2000]},
-        {"service_area": {"min_lat": 11, "max_lat": 10, "min_lng": -67, "max_lng": -66}},
+        {"service_areas": [{"min_lat": 11, "max_lat": 10, "min_lng": -67, "max_lng": -66}]},
+        {"service_areas": []},
         {"surge_rules": [{"days": [7], "start": "07:00", "end": "09:00", "multiplier": "1.2"}]},
         {"surge_rules": [{"days": [0], "start": "7am", "end": "09:00", "multiplier": "1.2"}]},
         {"search_timeout_seconds": 30, "offer_timeout_seconds": 60},
@@ -114,3 +120,34 @@ async def test_admin_updates_ride_config(client, admin_headers):
     assert body["surge_rules"][0]["multiplier"] == "1.50"
     assert body["surge_manual_multiplier"] == "1.20"
     assert (await client.get("/api/v1/config/public")).json() == body
+
+
+VALENCIA = {
+    "name": "Valencia",
+    "min_lat": 39.4,
+    "max_lat": 39.55,
+    "min_lng": -0.45,
+    "max_lng": -0.3,
+}
+
+
+async def test_admin_adds_a_service_area(client, admin_headers):
+    areas = [*DEFAULTS["service_areas"], VALENCIA]
+    response = await client.patch(
+        "/api/v1/admin/config", json={"service_areas": areas}, headers=admin_headers
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["service_areas"] == areas
+    config = AppConfig.model_validate(response.json())
+    assert config.area_at(39.47, -0.376).name == "Valencia"
+    assert config.area_at(10.49, -66.85).name == "Caracas"
+    assert config.area_at(40.4, -3.7) is None
+
+
+async def test_legacy_single_service_area_is_migrated(client):
+    legacy = {"min_lat": 10.4, "max_lat": 10.5, "min_lng": -67.0, "max_lng": -66.8}
+    async with SessionLocal() as session:
+        session.add(AppSetting(key="service_area", value=legacy))
+        await session.commit()
+    body = (await client.get("/api/v1/config/public")).json()
+    assert body["service_areas"] == [{"name": "Caracas", **legacy}]

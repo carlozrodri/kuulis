@@ -96,11 +96,19 @@ function removeRadius(index: number) {
   form.search_radius_m.splice(index, 1)
 }
 
-const areaRectangles = computed<MapRectangle[]>(() => {
-  const a = form.service_area
+// ---- Service areas (one box per city) --------------------------------------------------------
+
+function addArea() {
+  // A small box around Caracas to start from; the admin moves it to the new city.
+  form.service_areas.push({ name: '', min_lat: 10.45, max_lat: 10.52, min_lng: -66.95, max_lng: -66.8 })
+}
+function removeArea(index: number) {
+  form.service_areas.splice(index, 1)
+}
+function areaRectangles(a: SettingsForm['service_areas'][number]): MapRectangle[] {
   if (![a.min_lat, a.max_lat, a.min_lng, a.max_lng].every(Number.isFinite)) return []
   return [{ id: 'area', bounds: [[a.min_lat, a.min_lng], [a.max_lat, a.max_lng]], color: MAP_COLORS.serviceArea }]
-})
+}
 
 const moneyFormat = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
 const multiplierFormat = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
@@ -437,52 +445,89 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
               {{ t('settings.area.help') }}
             </p>
           </template>
-          <div class="space-y-4">
-            <div class="grid gap-4 sm:grid-cols-2">
-              <UFormField :label="t('settings.area.minLat')">
-                <UInputNumber
-                  v-model="form.service_area.min_lat"
-                  :min="-90"
-                  :max="90"
-                  :step="0.01"
-                  :format-options="coordFormat"
-                  :disabled="readOnly"
+          <div class="space-y-6">
+            <div
+              v-for="(area, index) in form.service_areas"
+              :key="index"
+              class="space-y-4 border-b border-(--ui-border) pb-6 last:border-b-0 last:pb-0"
+            >
+              <div class="flex items-end gap-2">
+                <UFormField
+                  :label="t('settings.area.name')"
+                  class="flex-1"
+                >
+                  <UInput
+                    v-model="area.name"
+                    :maxlength="60"
+                    :placeholder="t('settings.area.namePlaceholder')"
+                    :disabled="readOnly"
+                    class="w-full"
+                  />
+                </UFormField>
+                <UButton
+                  v-if="!readOnly && form.service_areas.length > 1"
+                  icon="i-lucide-trash-2"
+                  color="neutral"
+                  variant="ghost"
+                  :aria-label="t('settings.area.remove')"
+                  @click="removeArea(index)"
                 />
-              </UFormField>
-              <UFormField :label="t('settings.area.maxLat')">
-                <UInputNumber
-                  v-model="form.service_area.max_lat"
-                  :min="-90"
-                  :max="90"
-                  :step="0.01"
-                  :format-options="coordFormat"
-                  :disabled="readOnly"
-                />
-              </UFormField>
-              <UFormField :label="t('settings.area.minLng')">
-                <UInputNumber
-                  v-model="form.service_area.min_lng"
-                  :min="-180"
-                  :max="180"
-                  :step="0.01"
-                  :format-options="coordFormat"
-                  :disabled="readOnly"
-                />
-              </UFormField>
-              <UFormField :label="t('settings.area.maxLng')">
-                <UInputNumber
-                  v-model="form.service_area.max_lng"
-                  :min="-180"
-                  :max="180"
-                  :step="0.01"
-                  :format-options="coordFormat"
-                  :disabled="readOnly"
-                />
-              </UFormField>
+              </div>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <UFormField :label="t('settings.area.minLat')">
+                  <UInputNumber
+                    v-model="area.min_lat"
+                    :min="-90"
+                    :max="90"
+                    :step="0.01"
+                    :format-options="coordFormat"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+                <UFormField :label="t('settings.area.maxLat')">
+                  <UInputNumber
+                    v-model="area.max_lat"
+                    :min="-90"
+                    :max="90"
+                    :step="0.01"
+                    :format-options="coordFormat"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+                <UFormField :label="t('settings.area.minLng')">
+                  <UInputNumber
+                    v-model="area.min_lng"
+                    :min="-180"
+                    :max="180"
+                    :step="0.01"
+                    :format-options="coordFormat"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+                <UFormField :label="t('settings.area.maxLng')">
+                  <UInputNumber
+                    v-model="area.max_lng"
+                    :min="-180"
+                    :max="180"
+                    :step="0.01"
+                    :format-options="coordFormat"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+              </div>
+              <div class="h-56">
+                <MapView :rectangles="areaRectangles(area)" />
+              </div>
             </div>
-            <div class="h-64">
-              <MapView :rectangles="areaRectangles" />
-            </div>
+            <UButton
+              v-if="!readOnly && form.service_areas.length < 20"
+              icon="i-lucide-plus"
+              color="neutral"
+              variant="outline"
+              size="sm"
+              :label="t('settings.area.add')"
+              @click="addArea"
+            />
           </div>
         </UCard>
 

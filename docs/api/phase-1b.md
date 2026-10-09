@@ -13,7 +13,7 @@ Los textos de error no se traducen en la API: los clientes traducen por `code`.
 | `surge_manual_multiplier` | `"1.00"` | Recargo manual global (demanda alta), 1.00–3.00 |
 | `fare_rounding` | `"0.10"` | Redondeo hacia arriba del precio final |
 | `payment_methods` | `["cash_usd", "pago_movil", "binance", "zelle", "cash_ves"]` | Métodos que el pasajero puede elegir |
-| `service_area` | `{"min_lat": 10.35, "max_lat": 10.56, "min_lng": -67.10, "max_lng": -66.70}` | Caja de Caracas; fuera de ella no hay viajes |
+| `service_areas` | `[{"name": "Caracas", "min_lat": 10.35, "max_lat": 10.56, "min_lng": -67.10, "max_lng": -66.70}]` | Una caja por ciudad (1 a 20). Fuera de ellas no hay viajes y el origen y el destino deben caer en la misma ciudad. Reemplaza al antiguo `service_area` (si quedó guardado, se lee como Caracas) |
 | `offer_timeout_seconds` | `15` | Tiempo que tiene el motorizado para aceptar |
 | `search_radius_m` | `[2000, 4000, 7000]` | Radios de búsqueda sucesivos |
 | `search_timeout_seconds` | `180` | Tiempo máximo buscando antes de `no_drivers` |
@@ -30,7 +30,7 @@ Si no hay `OSRM_URL`, la ruta se estima con distancia en línea recta × 1,3 a 2
 
 | Método | Ruta | Parámetros | Respuesta |
 | --- | --- | --- | --- |
-| GET | `/geo/search` | `q`, `lat?`, `lng?` | `[{name, address, lat, lng}]` limitado al área de servicio |
+| GET | `/geo/search` | `q`, `lat?`, `lng?` | `[{name, address, lat, lng}]` limitado a la ciudad que contiene `lat/lng` (la primera si no hay) |
 | GET | `/geo/reverse` | `lat`, `lng` | `{name, address, lat, lng}` |
 
 ## Cotizar y pedir (pasajero)

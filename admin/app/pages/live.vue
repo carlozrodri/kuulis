@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AppConfig, OnlineDriver, Page, Ride } from '~/types/api'
+import type { AppConfig, OnlineDriver, Page, Ride, ServiceArea } from '~/types/api'
 import type { MapLine, MapMarker, MapRectangle } from '~/utils/geo'
 
 const { t, te, locale } = useI18n()
@@ -12,7 +12,8 @@ const STALE_MS = 60_000
 
 const drivers = ref<OnlineDriver[]>([])
 const rides = ref<Ride[]>([])
-const serviceArea = ref<AppConfig['service_area'] | null>(null)
+const serviceAreas = ref<ServiceArea[]>([])
+const areaName = ref<string | undefined>()
 const loading = ref(false)
 const loaded = ref(false)
 const loadError = ref<string | null>(null)
@@ -55,7 +56,8 @@ onMounted(() => {
   document.addEventListener('visibilitychange', onVisibility)
   // The service area is only context for the map; ignore failures.
   request<AppConfig>('/admin/config').then((c) => {
-    serviceArea.value = c.service_area ?? null
+    serviceAreas.value = c.service_areas ?? []
+    areaName.value = serviceAreas.value[0]?.name
   }).catch(() => {})
 })
 onBeforeUnmount(() => {
@@ -161,10 +163,19 @@ const lines = computed<MapLine[]>(() => {
   return result
 })
 
+// With several cities the map shows one at a time (one box around Caracas and Valencia is the ocean).
+const area = computed(() => serviceAreas.value.find(a => a.name === areaName.value) ?? null)
+const areaItems = computed(() => serviceAreas.value.map(a => ({ label: a.name, value: a.name })))
+const inArea = (lat: number, lng: number) => {
+  const a = area.value
+  return !a || (lat >= a.min_lat && lat <= a.max_lat && lng >= a.min_lng && lng <= a.max_lng)
+}
+const areaMarkers = computed(() => markers.value.filter(m => inArea(m.lat, m.lng)))
+
 const rectangles = computed<MapRectangle[]>(() => {
-  const area = serviceArea.value
-  if (!area) return []
-  return [{ id: 'area', bounds: [[area.min_lat, area.min_lng], [area.max_lat, area.max_lng]], color: MAP_COLORS.serviceArea }]
+  const a = area.value
+  if (!a) return []
+  return [{ id: 'area', bounds: [[a.min_lat, a.min_lng], [a.max_lat, a.max_lng]], color: MAP_COLORS.serviceArea }]
 })
 
 const tabs = computed(() => [
@@ -186,6 +197,14 @@ const sortedDrivers = computed(() =>
           <UDashboardSidebarCollapse />
         </template>
         <template #right>
+          <USelect
+            v-if="areaItems.length > 1"
+            v-model="areaName"
+            :items="areaItems"
+            :aria-label="t('live.city')"
+            size="sm"
+            class="w-36"
+          />
           <span
             v-if="lastUpdated"
             class="hidden text-xs text-(--ui-text-muted) sm:inline"
@@ -256,7 +275,8 @@ const sortedDrivers = computed(() =>
       <div class="flex min-h-[32rem] flex-1 flex-col gap-4 lg:flex-row">
         <div class="relative h-[28rem] min-w-0 flex-1 lg:h-auto">
           <MapView
-            :markers="markers"
+            :key="areaName ?? 'all'"
+            :markers="areaMarkers"
             :lines="lines"
             :rectangles="rectangles"
             :selected="selected"

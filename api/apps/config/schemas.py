@@ -92,6 +92,7 @@ class SurgeRule(BaseModel):
 
 
 class ServiceArea(BaseModel):
+    name: str = Field(default="Caracas", min_length=1, max_length=60)
     min_lat: float = Field(ge=-90, le=90)
     max_lat: float = Field(ge=-90, le=90)
     min_lng: float = Field(ge=-180, le=180)
@@ -128,8 +129,10 @@ def _default_fares() -> dict[VehicleType, FareConfig]:
     }
 
 
-def _default_area() -> ServiceArea:
-    return ServiceArea(min_lat=10.35, max_lat=10.56, min_lng=-67.10, max_lng=-66.70)
+def _default_areas() -> list[ServiceArea]:
+    return [
+        ServiceArea(name="Caracas", min_lat=10.35, max_lat=10.56, min_lng=-67.10, max_lng=-66.70)
+    ]
 
 
 Radius = Annotated[int, Field(ge=100, le=50_000)]
@@ -178,7 +181,9 @@ class AppConfig(BaseModel):
     payment_methods: list[PaymentMethod] = Field(
         default_factory=lambda: list(PaymentMethod), min_length=1
     )
-    service_area: ServiceArea = Field(default_factory=_default_area)
+    service_areas: list[ServiceArea] = Field(
+        default_factory=_default_areas, min_length=1, max_length=20
+    )
     offer_timeout_seconds: int = Field(default=15, ge=5, le=120)
     search_radius_m: list[Radius] = Field(
         default_factory=lambda: [2000, 4000, 7000], min_length=1, max_length=6
@@ -208,6 +213,9 @@ class AppConfig(BaseModel):
     def min_year(self, vehicle_type: VehicleType) -> int:
         return self.vehicle_min_year.get(vehicle_type, 0)
 
+    def area_at(self, lat: float, lng: float) -> ServiceArea | None:
+        return next((area for area in self.service_areas if area.contains(lat, lng)), None)
+
 
 class AppConfigUpdate(BaseModel):
     """Partial update. ``vehicle_min_year`` and ``fares`` are merged per vehicle type."""
@@ -222,7 +230,7 @@ class AppConfigUpdate(BaseModel):
     surge_manual_multiplier: Multiplier | None = None
     fare_rounding: Rounding | None = None
     payment_methods: list[PaymentMethod] | None = Field(default=None, min_length=1)
-    service_area: ServiceArea | None = None
+    service_areas: list[ServiceArea] | None = Field(default=None, min_length=1, max_length=20)
     offer_timeout_seconds: int | None = Field(default=None, ge=5, le=120)
     search_radius_m: list[Radius] | None = Field(default=None, min_length=1, max_length=6)
     search_timeout_seconds: int | None = Field(default=None, ge=30, le=1800)

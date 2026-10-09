@@ -18,9 +18,10 @@ async def search(
     lat: Annotated[float | None, Query(ge=-90, le=90)] = None,
     lng: Annotated[float | None, Query(ge=-180, le=180)] = None,
 ) -> list[GeoResult]:
-    """Address search limited to the service area (biased to ``lat/lng`` when given)."""
+    """Address search limited to the service area around ``lat/lng`` (the first area otherwise)."""
     config = await get_app_config(session)
-    return await clients.search(q, config.service_area, lat, lng)
+    area = config.area_at(lat, lng) if lat is not None and lng is not None else None
+    return await clients.search(q, area or config.service_areas[0], lat, lng)
 
 
 @router.get("/reverse", response_model=GeoResult)

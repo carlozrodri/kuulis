@@ -33,7 +33,11 @@ class ConfigInvalidError(AppError):
 async def _load(session: AsyncSession) -> dict:
     rows = (await session.execute(select(AppSetting.key, AppSetting.value))).all()
     defaults = AppConfig().model_dump(mode="json")
-    stored = {key: value for key, value in rows if key in AppConfig.model_fields}
+    raw = dict(rows)
+    if "service_area" in raw and "service_areas" not in raw:
+        # Before multi-city support the config held a single box (Caracas).
+        raw["service_areas"] = [{"name": "Caracas"} | raw["service_area"]]
+    stored = {key: value for key, value in raw.items() if key in AppConfig.model_fields}
     try:
         return AppConfig.model_validate(defaults | stored).model_dump(mode="json")
     except ValidationError:

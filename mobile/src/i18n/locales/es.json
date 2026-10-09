@@ -311,7 +311,7 @@
     "storage_disabled": "La subida de archivos no está disponible por ahora.",
     "upload_failed": "No se pudo subir el archivo. Revisa tu conexión e inténtalo de nuevo.",
     "quote_expired": "El precio venció. Te mostramos uno actualizado.",
-    "outside_service_area": "Por ahora solo operamos en Caracas. Elige un punto dentro de la ciudad.",
+    "outside_service_area": "Todavía no operamos aquí. Elige un punto dentro de una ciudad donde estemos (origen y destino en la misma ciudad).",
     "payment_method_invalid": "Ese método de pago no está disponible. Elige otro.",
     "ride_already_active": "Ya tienes un viaje en curso.",
     "rating_required": "Califica tu último viaje antes de pedir otro.",

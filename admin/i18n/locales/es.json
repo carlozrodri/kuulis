@@ -211,10 +211,11 @@
       "surgeTooMany": "Máximo 50 reglas de recargo.",
       "manualMultiplier": "El recargo manual va de 1,00 a 3,00.",
       "paymentMethods": "Habilita al menos un método de pago.",
-      "serviceArea": "Área de servicio: los mínimos deben ser menores que los máximos.",
+      "serviceArea": "Área de servicio «{name}»: falta el nombre o los mínimos no son menores que los máximos.",
       "radii": "Radios: de 1 a 6 valores entre 100 y 50.000 m, de menor a mayor.",
       "timeouts": "Los tiempos deben ser mayores que cero.",
-      "searchShorterThanOffer": "El tiempo de búsqueda no puede ser menor que el de cada oferta."
+      "searchShorterThanOffer": "El tiempo de búsqueda no puede ser menor que el de cada oferta.",
+      "serviceAreaCount": "Debe haber entre 1 y 20 ciudades."
     },
     "fares": {
       "title": "Tarifas",
@@ -247,11 +248,15 @@
     },
     "area": {
       "title": "Área de servicio",
-      "help": "Caja de coordenadas; fuera de ella no se pueden pedir viajes.",
+      "help": "Una caja de coordenadas por ciudad; fuera de ellas no se pueden pedir viajes, y el origen y el destino deben estar en la misma ciudad.",
       "minLat": "Latitud mínima (sur)",
       "maxLat": "Latitud máxima (norte)",
       "minLng": "Longitud mínima (oeste)",
-      "maxLng": "Longitud máxima (este)"
+      "maxLng": "Longitud máxima (este)",
+      "name": "Ciudad",
+      "namePlaceholder": "Ej. Caracas",
+      "add": "Agregar ciudad",
+      "remove": "Quitar ciudad"
     },
     "dispatch": {
       "title": "Asignación de viajes",
@@ -404,6 +409,7 @@
     "openDriver": "Ver perfil",
     "lastSeen": "visto {ago}",
     "secondsAgo": "hace {n} s",
-    "minutesAgo": "hace {n} min"
+    "minutesAgo": "hace {n} min",
+    "city": "Ciudad"
   }
 }

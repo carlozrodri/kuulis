@@ -1,11 +1,11 @@
-export type Role = 'user' | 'staff' | 'admin';
+export type Role = "user" | "staff" | "admin";
 
 export interface User {
   id: string;
   email: string;
   full_name: string;
   role: Role;
-  locale: 'es' | 'en';
+  locale: "es" | "en";
   avatar_key: string | null;
   is_active: boolean;
   is_verified: boolean;
@@ -42,20 +42,25 @@ export interface AppNotification {
 
 // ── Phase 1A: configuration and drivers (docs/api/phase-1a.md) ──
 
-export type VehicleType = 'moto' | 'car';
+export type VehicleType = "moto" | "car";
 
 export type DocumentKind =
-  | 'id_card'
-  | 'rif'
-  | 'drivers_license'
-  | 'medical_certificate'
-  | 'vehicle_registration'
-  | 'selfie'
-  | 'vehicle_photo';
+  | "id_card"
+  | "rif"
+  | "drivers_license"
+  | "medical_certificate"
+  | "vehicle_registration"
+  | "selfie"
+  | "vehicle_photo";
 
-export type DocumentStatus = 'pending' | 'approved' | 'rejected';
+export type DocumentStatus = "pending" | "approved" | "rejected";
 
-export type DriverStatus = 'draft' | 'pending_review' | 'approved' | 'rejected' | 'suspended';
+export type DriverStatus =
+  | "draft"
+  | "pending_review"
+  | "approved"
+  | "rejected"
+  | "suspended";
 
 export interface AppConfig extends RideConfig {
   driver_min_age: number;
@@ -135,14 +140,19 @@ export interface VehicleInput {
 export interface PresignResponse {
   key: string;
   upload_url: string;
-  method: 'PUT';
+  method: "PUT";
   headers: Record<string, string>;
   expires_in: number;
 }
 
 // ── Phase 1B: rides (docs/api/phase-1b.md) ──
 
-export type PaymentMethod = 'cash_usd' | 'pago_movil' | 'binance' | 'zelle' | 'cash_ves';
+export type PaymentMethod =
+  | "cash_usd"
+  | "pago_movil"
+  | "binance"
+  | "zelle"
+  | "cash_ves";
 
 /** Public configuration keys added in 1B (all optional: older servers may not send them). */
 export interface RideConfig {
@@ -150,7 +160,13 @@ export interface RideConfig {
   offer_timeout_seconds?: number;
   search_timeout_seconds?: number;
   quote_ttl_seconds?: number;
-  service_area?: { min_lat: number; max_lat: number; min_lng: number; max_lng: number };
+  service_areas?: {
+    name: string;
+    min_lat: number;
+    max_lat: number;
+    min_lng: number;
+    max_lng: number;
+  }[];
   surge_manual_multiplier?: string;
 }
 
@@ -183,15 +199,15 @@ export interface Quote {
 }
 
 export type RideStatus =
-  | 'searching'
-  | 'driver_assigned'
-  | 'driver_arrived'
-  | 'in_progress'
-  | 'completed'
-  | 'cancelled_by_passenger'
-  | 'cancelled_by_driver'
-  | 'cancelled_by_admin'
-  | 'no_drivers';
+  | "searching"
+  | "driver_assigned"
+  | "driver_arrived"
+  | "in_progress"
+  | "completed"
+  | "cancelled_by_passenger"
+  | "cancelled_by_driver"
+  | "cancelled_by_admin"
+  | "no_drivers";
 
 export interface RideRating {
   stars: number;
@@ -210,7 +226,12 @@ export interface RideDriver {
   first_name: string;
   rating: number | string | null;
   photo_url: string | null;
-  vehicle: { brand: string; model: string; color: string; plate: string } | null;
+  vehicle: {
+    brand: string;
+    model: string;
+    color: string;
+    plate: string;
+  } | null;
 }
 
 export interface DriverLocation extends LatLng {

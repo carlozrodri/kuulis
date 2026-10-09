@@ -211,10 +211,11 @@
       "surgeTooMany": "At most 50 surge rules.",
       "manualMultiplier": "The manual surge must be between 1.00 and 3.00.",
       "paymentMethods": "Enable at least one payment method.",
-      "serviceArea": "Service area: minimums must be lower than maximums.",
+      "serviceArea": "Service area \"{name}\": the name is missing or the minimums are not lower than the maximums.",
       "radii": "Radii: 1 to 6 values between 100 and 50,000 m, in increasing order.",
       "timeouts": "Timeouts must be greater than zero.",
-      "searchShorterThanOffer": "The search time cannot be shorter than each offer's time."
+      "searchShorterThanOffer": "The search time cannot be shorter than each offer's time.",
+      "serviceAreaCount": "There must be between 1 and 20 cities."
     },
     "fares": {
       "title": "Fares",
@@ -247,11 +248,15 @@
     },
     "area": {
       "title": "Service area",
-      "help": "Coordinate box; rides cannot be requested outside it.",
+      "help": "One coordinate box per city; rides cannot be requested outside them, and pickup and drop-off must be in the same city.",
       "minLat": "Minimum latitude (south)",
       "maxLat": "Maximum latitude (north)",
       "minLng": "Minimum longitude (west)",
-      "maxLng": "Maximum longitude (east)"
+      "maxLng": "Maximum longitude (east)",
+      "name": "City",
+      "namePlaceholder": "e.g. Caracas",
+      "add": "Add city",
+      "remove": "Remove city"
     },
     "dispatch": {
       "title": "Dispatch",
@@ -404,6 +409,7 @@
     "openDriver": "Open profile",
     "lastSeen": "seen {ago}",
     "secondsAgo": "{n} s ago",
-    "minutesAgo": "{n} min ago"
+    "minutesAgo": "{n} min ago",
+    "city": "City"
   }
 }

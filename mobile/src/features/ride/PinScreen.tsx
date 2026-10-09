@@ -50,7 +50,7 @@ export function PinScreen() {
   }, [center]);
 
   const loading = !!center && resolved !== center;
-  const inside = center ? inServiceArea(center, config.service_area) : true;
+  const inside = center ? inServiceArea(center, config.service_areas) : true;
 
   const confirm = () => {
     if (!place) return;

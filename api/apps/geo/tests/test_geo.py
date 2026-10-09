@@ -5,7 +5,7 @@ from apps.config.schemas import AppConfig
 from apps.geo import clients
 from kuulis.settings import settings
 
-AREA = AppConfig().service_area
+AREA = AppConfig().service_areas[0]
 
 
 @pytest.fixture

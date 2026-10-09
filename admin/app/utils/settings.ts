@@ -16,7 +16,7 @@ export interface SettingsForm {
   surge_manual_multiplier: number
   fare_rounding: string
   payment_methods: PaymentMethod[]
-  service_area: ServiceArea
+  service_areas: ServiceArea[]
   offer_timeout_seconds: number
   search_radius_m: number[]
   search_timeout_seconds: number
@@ -44,7 +44,7 @@ export function defaultSettings(): SettingsForm {
     surge_manual_multiplier: 1,
     fare_rounding: '0.10',
     payment_methods: [...PAYMENT_METHODS],
-    service_area: { min_lat: 10.35, max_lat: 10.56, min_lng: -67.1, max_lng: -66.7 },
+    service_areas: [{ name: 'Caracas', min_lat: 10.35, max_lat: 10.56, min_lng: -67.1, max_lng: -66.7 }],
     offer_timeout_seconds: 15,
     search_radius_m: [2000, 4000, 7000],
     search_timeout_seconds: 180,
@@ -89,7 +89,7 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
     surge_manual_multiplier: num(config.surge_manual_multiplier, d.surge_manual_multiplier),
     fare_rounding: rounding,
     payment_methods: [...(config.payment_methods ?? d.payment_methods)],
-    service_area: { ...d.service_area, ...config.service_area },
+    service_areas: (config.service_areas?.length ? config.service_areas : d.service_areas).map(area => ({ ...area })),
     offer_timeout_seconds: config.offer_timeout_seconds ?? d.offer_timeout_seconds,
     search_radius_m: [...(config.search_radius_m ?? d.search_radius_m)],
     search_timeout_seconds: config.search_timeout_seconds ?? d.search_timeout_seconds,
@@ -120,12 +120,13 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
     surge_manual_multiplier: money(form.surge_manual_multiplier),
     fare_rounding: form.fare_rounding,
     payment_methods: PAYMENT_METHODS.filter(m => form.payment_methods.includes(m)),
-    service_area: {
-      min_lat: Number(form.service_area.min_lat),
-      max_lat: Number(form.service_area.max_lat),
-      min_lng: Number(form.service_area.min_lng),
-      max_lng: Number(form.service_area.max_lng),
-    },
+    service_areas: form.service_areas.map(area => ({
+      name: area.name.trim(),
+      min_lat: Number(area.min_lat),
+      max_lat: Number(area.max_lat),
+      min_lng: Number(area.min_lng),
+      max_lng: Number(area.max_lng),
+    })),
     offer_timeout_seconds: form.offer_timeout_seconds,
     search_radius_m: form.search_radius_m.map(Number),
     search_timeout_seconds: form.search_timeout_seconds,
@@ -164,10 +165,14 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
   if (!(form.surge_manual_multiplier >= SURGE_MIN && form.surge_manual_multiplier <= SURGE_MAX)) issues.push({ key: 'manualMultiplier' })
   if (form.surge_rules.length > 50) issues.push({ key: 'surgeTooMany' })
   if (!form.payment_methods.length) issues.push({ key: 'paymentMethods' })
-  const a = form.service_area
-  const coordsOk = [a.min_lat, a.max_lat].every(v => Number.isFinite(v) && Math.abs(v) <= 90)
-    && [a.min_lng, a.max_lng].every(v => Number.isFinite(v) && Math.abs(v) <= 180)
-  if (!coordsOk || a.min_lat >= a.max_lat || a.min_lng >= a.max_lng) issues.push({ key: 'serviceArea' })
+  if (!form.service_areas.length || form.service_areas.length > 20) issues.push({ key: 'serviceAreaCount' })
+  form.service_areas.forEach((a, index) => {
+    const coordsOk = [a.min_lat, a.max_lat].every(v => Number.isFinite(v) && Math.abs(v) <= 90)
+      && [a.min_lng, a.max_lng].every(v => Number.isFinite(v) && Math.abs(v) <= 180)
+    if (!a.name.trim() || !coordsOk || a.min_lat >= a.max_lat || a.min_lng >= a.max_lng) {
+      issues.push({ key: 'serviceArea', params: { name: a.name.trim() || String(index + 1) } })
+    }
+  })
   const radii = form.search_radius_m
   if (!radii.length || radii.length > 6 || radii.some(r => !Number.isFinite(r) || r < 100 || r > 50_000) || radii.some((r, i) => i > 0 && r <= radii[i - 1]!)) {
     issues.push({ key: 'radii' })
