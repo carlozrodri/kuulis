@@ -92,7 +92,28 @@
       }
     },
     "whereToHint": "Search your destination to see the price",
-    "activeRide": "You have a ride in progress"
+    "activeRide": "You have a ride in progress",
+    "earned": "Earned in {{month}}",
+    "trips_one": "{{count}} ride",
+    "trips_other": "{{count}} rides",
+    "openWallet": "Opens your wallet",
+    "fee": {
+      "thisMonth": "This month's fee: {{amount}}",
+      "estimated": "Estimated fee: {{amount}}",
+      "chargePill": "Charged {{date}}",
+      "pending": "Pending fee: {{amount}}",
+      "duePill": "Due {{date}}",
+      "overdue": "Overdue fee: {{amount}}",
+      "blockedPill": "Blocked"
+    },
+    "blocked": {
+      "title": "You can't get rides",
+      "body": "You have an overdue fee of {{amount}}. Top up your wallet: the fee is charged automatically and you can go online right away.",
+      "bodyNoAmount": "You have an overdue fee. Top up your wallet: the fee is charged automatically and you can go online right away.",
+      "details": "See details in your wallet"
+    },
+    "pendingFee": "{{amount}} fee pending. Top up by {{date}} to keep getting rides.",
+    "pendingFeeNoDate": "{{amount}} fee pending. Top up to keep getting rides."
   },
   "notifications": {
     "empty": "No notifications",
@@ -326,7 +347,14 @@
     "ride_not_completed": "The ride hasn't finished yet.",
     "rating_already_submitted": "You already rated this ride.",
     "promotion_invalid": "That promo code is not valid.",
-    "promotion_unavailable": "The promotion ran out. Check the updated price."
+    "promotion_unavailable": "The promotion ran out. Check the updated price.",
+    "binance_pay_id_taken": "That Binance Pay ID is already registered to another account.",
+    "too_many_pending_top_ups": "You already have 3 top-up notices waiting. Wait until we confirm one.",
+    "insufficient_balance": "Not enough balance.",
+    "transfer_limit_exceeded": "That's over your monthly transfer limit. You can send up to {{available}} USDT more this month.",
+    "recipient_not_found": "We couldn't find a Kuulis driver with that email or phone.",
+    "transfer_to_self": "You can't transfer balance to yourself.",
+    "subscription_overdue": "You have an overdue fee. Top up your wallet to go online again."
   },
   "map": {
     "recenter": "Recenter map"
@@ -637,11 +665,10 @@
     "balanceA11y": "Available balance: {{amount}} {{currency}}",
     "topUp": "Top up",
     "transfer": "Transfer",
-    "soon": "Soon",
     "promoInfo": "When a passenger uses a promotion, you collect the discounted amount and Kuulis refunds you the difference here when the ride ends.",
     "movements": "Activity",
     "empty": "No activity yet",
-    "emptyBody": "Kuulis refunds for rides with promotions will show up here.",
+    "emptyBody": "Your top-ups, transfers, fees and Kuulis promo refunds will show up here.",
     "entryA11y": "{{title}}, {{amount}} {{currency}}, {{date}}",
     "openRide": "Opens the ride",
     "kind": {
@@ -651,7 +678,209 @@
         "subtitle": "Kuulis refunds you the discount",
         "subtitleNamed": "Kuulis refunds you the {{name}} discount"
       },
-      "other": "Transaction"
+      "other": "Transaction",
+      "top_up": {
+        "title": "Binance Pay top-up",
+        "reference": "Order {{reference}}"
+      },
+      "transfer_in": {
+        "title": "Transfer from {{name}}",
+        "titleNoName": "Transfer received"
+      },
+      "transfer_out": {
+        "title": "Transfer to {{name}}",
+        "titleNoName": "Transfer sent"
+      },
+      "subscription_fee": {
+        "title": "{{month}} fee",
+        "titleNoMonth": "Monthly fee"
+      },
+      "adjustment": {
+        "title": "Kuulis adjustment"
+      }
+    },
+    "topUpNow": "Top up now",
+    "copyLabel": "Copy {{label}}",
+    "pendingTopUps_one": "You have 1 top-up waiting for confirmation",
+    "pendingTopUps_other": "You have {{count}} top-ups waiting for confirmation",
+    "pendingTopUpsBody": "We'll let you know when it reaches your balance.",
+    "sub": {
+      "loadError": "We couldn't load your fee. {{error}}",
+      "history": "Fee history",
+      "tierRange": "the {{from}} to {{to}} tier",
+      "tierTop": "the over {{from}} tier",
+      "earned": "You earned {{earnings}} in {{month}}.",
+      "earnedTier": "You earned {{earnings}} in {{month}}, so you're in {{tier}}.",
+      "pendingTitle": "Fee charged on {{date}}",
+      "pendingMany_one": "{{count}} pending fee",
+      "pendingMany_other": "{{count}} pending fees",
+      "missingUntil": "You're {{amount}} USDT short. Top up by {{date}}.",
+      "missing": "You're {{amount}} USDT short. Top up to pay your fee.",
+      "covered": "Your balance covers it: the fee will be charged in a few minutes.",
+      "thisMonth": "This month's fee",
+      "freeUntil": "Free until {{date}}",
+      "freeBody": "You're in your free months: no fee. You've earned {{earnings}} in {{month}} so far.",
+      "wouldPay": "Without the free period you'd pay {{fee}} for {{tier}}.",
+      "monthly": "Monthly fee",
+      "freeMonthsPill": "3 months free",
+      "howItWorks": "After that you pay based on what you earn each month, starting at $0. A month with no rides is free.",
+      "estimated": "Estimated {{month}} fee",
+      "soFarTier": "You've earned {{earnings}} in {{month}}: so far that's {{tier}}.",
+      "noEarnings": "No rides in {{month}} yet. A month with no rides has no fee.",
+      "chargedOn": "Charged from your balance on {{date}}.",
+      "chargedOnShort": "Charged from your balance on {{date}}. Today you'd be {{amount}} USDT short.",
+      "blocked": {
+        "title": "Account blocked",
+        "body": "You have an overdue fee of {{amount}}. You can't go online or get rides until you pay it.",
+        "bodySince": "Your {{amount}} fee was due on {{date}}. You can't go online or get rides until you pay it.",
+        "topUp": "Top up at least {{amount}} USDT: the fee is charged automatically and you're unblocked right away."
+      }
     }
+  },
+  "topUp": {
+    "title": "Top up",
+    "subtitle": "Send USDT with Binance Pay to Kuulis' account. No fees, instant.",
+    "kuulisPayId": "Kuulis Pay ID",
+    "copied": "Pay ID copied",
+    "accountName": "Account name",
+    "minimum": "Minimum {{amount}} USDT",
+    "onlyUsdt": "USDT only",
+    "unavailableTitle": "Top-ups aren't available yet",
+    "unavailable": "Kuulis hasn't set up its Binance Pay account yet. Try again later or contact support.",
+    "howTo": "How to top up",
+    "step1": "Open Binance and go to Pay → Send.",
+    "step2": "Paste Kuulis' Pay ID ({{payId}}) and check the name is {{name}}.",
+    "step3": "Send {{min}} USDT or more from your account (Pay ID {{payerId}}).",
+    "step4Auto": "Done: your balance is credited automatically within minutes.",
+    "step4Manual": "Tap \"I've paid\" to let us know and we'll confirm your payment.",
+    "autoTitle": "Automatic confirmation",
+    "autoBody": "We detect your payment because it comes from your Binance Pay ID ({{payerId}}). Always pay from that account. If it doesn't show up within 15 minutes, tell us with \"I've paid\".",
+    "manualTitle": "Manual confirmation",
+    "manualBody": "An admin reviews every payment, usually within a few hours. Tell us with \"I've paid\" and the order ID so we can find it fast.",
+    "yourId": "Your Binance Pay ID",
+    "yourIdA11y": "Your Binance Pay ID: {{id}}",
+    "changeId": "Change",
+    "paid": "I've paid",
+    "paidHint": "Let us know you sent the payment",
+    "history": "Your top-ups",
+    "historyEmpty": "No top-ups yet.",
+    "more": "Show more",
+    "status": {
+      "pending": "Pending",
+      "completed": "Credited",
+      "rejected": "Rejected",
+      "unmatched": "Under review"
+    },
+    "statusHint": {
+      "pending": "Waiting for the payment",
+      "completed": "Added to your balance",
+      "rejected": "We couldn't confirm it",
+      "unmatched": "An admin is reviewing it"
+    },
+    "binance": {
+      "title": "Your Binance Pay ID",
+      "subtitleAuto": "We use it to recognize your payments and credit them automatically, without you telling us.",
+      "subtitleManual": "We use it to recognize your payments and confirm them faster.",
+      "label": "Binance Pay ID",
+      "hint": "Numbers only, 6 to 20 digits.",
+      "invalid": "Enter your Binance Pay ID: numbers only, 6 to 20 digits.",
+      "continue": "Save and continue",
+      "saved": "Binance Pay ID saved",
+      "whereTitle": "Where do I find it?",
+      "where1": "Open the Binance app and tap Pay.",
+      "where2": "Tap Receive.",
+      "where3": "Copy the number shown as Pay ID and paste it here.",
+      "whereNote": "It isn't your email, your UID or a wallet address.",
+      "privacy": "We only use it to identify your top-ups. We'll never ask for your Binance passwords or codes."
+    },
+    "notify": {
+      "title": "I've paid",
+      "subtitle": "Tell us how much you sent so we can find your payment.",
+      "amount": "Amount sent (USDT)",
+      "amountHint": "Minimum {{amount}} USDT. Enter the exact amount you sent.",
+      "amountInvalid": "Enter a valid amount, for example 5.00",
+      "belowMin": "The minimum top-up is {{amount}} USDT",
+      "reference": "Binance order ID (optional)",
+      "referencePlaceholder": "For example 2849310573821",
+      "referenceHint": "You'll find it in the payment details, in your Binance Pay history.",
+      "submit": "Send notice",
+      "noteAuto": "If the payment already arrived, it's credited automatically even if you don't tell us.",
+      "noteManual": "An admin confirms the payment and we'll notify you. You can have up to 3 notices waiting for confirmation."
+    },
+    "sent": {
+      "title": "Notice sent!",
+      "bodyAuto": "If your payment already reached Kuulis, your balance will update within minutes. We'll send you a notification.",
+      "bodyManual": "An admin will confirm your payment and we'll notify you when it's in your balance.",
+      "done": "Back to wallet",
+      "history": "See my top-ups"
+    }
+  },
+  "transfer": {
+    "title": "Transfer",
+    "subtitle": "Send balance to another Kuulis driver. It's instant and can't be reversed.",
+    "amountTitle": "How much?",
+    "confirmTitle": "Confirm the transfer",
+    "canSend": "You can send up to",
+    "limitUsed": "This month you've sent {{sent}} of {{limit}} USDT",
+    "balanceLine": "Your balance: {{balance}} USDT. Only what you send counts toward the limit.",
+    "noBalanceTitle": "No balance to transfer",
+    "noBalance": "Top up your wallet and then you can send balance to another driver.",
+    "limitReachedTitle": "You've reached this month's limit",
+    "limitReached": "You've already sent {{limit}} USDT this month. You can transfer again on the 1st.",
+    "query": "Driver's email or phone",
+    "queryPlaceholder": "luis@email.com or 0412 123 4567",
+    "queryHint": "Enter it in full, exactly as they registered it in Kuulis.",
+    "queryInvalid": "Enter a valid email or mobile number",
+    "search": "Search",
+    "recipient": "To",
+    "change": "Change",
+    "amount": "Amount",
+    "max": "Max {{amount}}",
+    "amountInvalid": "Enter a valid amount, for example 3.00",
+    "amountOverBalance": "Not enough balance. Your balance is {{balance}} USDT.",
+    "amountOverLimit": "That's over your monthly limit. You can send up to {{available}} USDT more this month.",
+    "availableHint": "You can send up to {{max}} USDT (balance {{balance}} · {{available}} left this month).",
+    "balanceHint": "Your balance: {{balance}} USDT.",
+    "note": "Note (optional)",
+    "notePlaceholder": "For example: for the fee",
+    "noteHint_one": "{{count}} character left",
+    "noteHint_other": "{{count}} characters left",
+    "youSend": "You're sending",
+    "to": "to {{name}}",
+    "balanceAfter": "Your balance after",
+    "leftThisMonth": "Left to send this month",
+    "final": "Double-check the name: transfers are instant and can't be reversed.",
+    "send": "Send {{amount}} USDT",
+    "doneTitle": "Transfer sent!",
+    "doneBody": "You sent {{amount}} USDT to {{name}}. It's already in their wallet and we notified them."
+  },
+  "charges": {
+    "title": "Fees",
+    "subtitle": "Charged on the 1st of each month based on what you earned the month before.",
+    "empty": "No fees yet",
+    "emptyBody": "Your first fee is calculated on the 1st of the month after your first rides.",
+    "status": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "waived": "Not charged"
+    },
+    "statusHint": {
+      "paid": "Taken from your balance",
+      "pending": "Top up to pay it",
+      "waived": "Kuulis didn't charge it"
+    },
+    "dueOn": "Due {{date}}",
+    "paidOn": "Paid on {{date}}",
+    "freePeriod": "Month within your free months",
+    "freePill": "Free period",
+    "noFee": "Earnings in a no-fee tier",
+    "waivedReason": "Waived: {{reason}}",
+    "howTitle": "How is the fee calculated?",
+    "howBody": "Based on what you earn in the month (the prices of your completed rides):",
+    "tierUpTo": "Up to {{to}}",
+    "tierRange": "{{from}} to {{to}}",
+    "tierAbove": "Over {{from}}",
+    "yourTier": "Your tier",
+    "howNote": "A month with no rides is free. Your first 3 months from your first ride are free. If your balance falls short, you have 7 days to top up."
   }
 }

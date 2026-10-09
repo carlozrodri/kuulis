@@ -29,9 +29,10 @@ it('every static translation key used in src exists in es', () => {
   walk(path.join(__dirname, '..', 'src'));
   const known = new Set(keys(es));
   const missing = files.flatMap((file) =>
-    [...fs.readFileSync(file, 'utf8').matchAll(/\bt\(\s*'([a-zA-Z0-9_.]+)'/g)]
+    [...fs.readFileSync(file, 'utf8').matchAll(/\bt\(\s*['"]([a-zA-Z0-9_.]+)['"]/g)]
       .map((m) => m[1])
-      .filter((key) => !known.has(key)),
+      // Plural keys exist only with their suffixes (trips_one / trips_other).
+      .filter((key) => !known.has(key) && !known.has(`${key}_other`)),
   );
   expect(missing).toEqual([]);
 });

@@ -348,14 +348,30 @@ export interface RidePromotion {
   code: string | null;
 }
 
+/** Monthly transfer allowance: only what the driver sends counts (docs/api/phase-1d.md). */
+export interface TransferAllowance {
+  limit: string;
+  sent_this_month: string;
+  available: string;
+}
+
 /** GET /wallet/me. */
 export interface Wallet {
   balance: string;
   currency: string;
+  // Phase 1D (optional: older servers do not send them).
+  binance_pay_id?: string | null;
+  transfer?: TransferAllowance | null;
 }
 
-/** 1C only has `promo_credit`; 1D adds top-ups, transfers and fees. */
-export type WalletEntryKind = "promo_credit" | (string & {});
+export type WalletEntryKind =
+  | "promo_credit"
+  | "top_up"
+  | "transfer_in"
+  | "transfer_out"
+  | "subscription_fee"
+  | "adjustment"
+  | (string & {});
 
 /** GET /wallet/me/entries (newest first). */
 export interface WalletEntry {
@@ -367,7 +383,91 @@ export interface WalletEntry {
   ride_id: string | null;
   /** For `promo_credit`: the promotion name. */
   description: string | null;
-  /** For `promo_credit`: {passenger_name}. */
+  /**
+   * By kind: `promo_credit` {passenger_name}; `top_up` {method, reference}; `transfer_*` {counterpart_name,
+   * note}; `subscription_fee` {month}; `adjustment` {reason}.
+   */
   details?: Record<string, unknown> | null;
   created_at: string;
+}
+
+// ── Phase 1D: top-ups, transfers and the monthly subscription (docs/api/phase-1d.md) ──
+
+/** GET /wallet/top-up-info: where the driver sends USDT. */
+export interface TopUpInfo {
+  method: "binance_pay";
+  /** Kuulis' Binance Pay ID ("" when the admin has not configured it yet). */
+  pay_id: string;
+  account_name: string;
+  min_amount: string;
+  /** True when payments are matched automatically by the payer's Binance Pay ID. */
+  automatic: boolean;
+}
+
+export type TopUpStatus = "pending" | "completed" | "rejected" | "unmatched";
+
+/** GET /wallet/me/top-ups (paginated). */
+export interface TopUp {
+  id: string;
+  status: TopUpStatus;
+  amount: string;
+  method: "binance_pay";
+  /** Binance order ID the driver typed. */
+  reference: string | null;
+  payer_binance_id: string | null;
+  payer_name: string | null;
+  note: string | null;
+  created_at: string;
+  completed_at: string | null;
+  rejection_reason: string | null;
+}
+
+/** GET /wallet/recipients?q=: a driver who can receive a transfer (short name such as "Luis G."). */
+export interface Recipient {
+  user_id: string;
+  name: string;
+}
+
+/** `details` of a 409 transfer_limit_exceeded. */
+export type TransferLimitDetails = TransferAllowance;
+
+/** One step of the fee schedule: the fee applies when the month's earnings are above `above`. */
+export interface FeeTier {
+  above: string;
+  fee: string;
+}
+
+export type ChargeStatus = "paid" | "pending" | "waived";
+
+/** A monthly subscription charge (created on the 1st for the previous month). */
+export interface Charge {
+  id: string;
+  /** The month the earnings belong to ("2026-10"). */
+  month: string;
+  earnings: string;
+  fee: string;
+  status: ChargeStatus;
+  /** The whole month fell in the driver's free period. */
+  free_period: boolean;
+  due_at: string | null;
+  paid_at: string | null;
+  waived_reason: string | null;
+}
+
+/** GET /wallet/me/subscription: the current month (Caracas time). */
+export interface SubscriptionSummary {
+  month: string;
+  earnings: string;
+  estimated_fee: string;
+  /** End of the free period; null until the first completed trip. */
+  free_until: string | null;
+  in_free_period: boolean;
+  tiers: FeeTier[];
+  next_charge_at: string | null;
+  pending: Charge[];
+  overdue: boolean;
+  /** Past the grace week with a pending charge: cannot go online nor receive offers. */
+  blocked: boolean;
+  /** Not in the written contract: completed trips this month, shown when the API sends it. */
+  trips?: number | null;
 }

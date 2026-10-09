@@ -6,7 +6,7 @@ import { Platform } from 'react-native';
 
 import { DRIVER_QUERY_KEY, isDriverNotification } from '@/hooks/useDriver';
 import { rideKeys } from '@/hooks/useRides';
-import { isWalletNotification, walletKeys } from '@/hooks/useWallet';
+import { isSubscriptionNotification, isWalletNotification, refreshSubscription, refreshWallet } from '@/hooks/useWallet';
 import { api } from '@/lib/api';
 import { config } from '@/lib/config';
 
@@ -44,7 +44,10 @@ export function usePushNotifications(enabled: boolean) {
         void queryClient.invalidateQueries({ queryKey: rideKeys.all });
         void queryClient.invalidateQueries({ queryKey: rideKeys.driverState });
       }
-      if (isWalletNotification(data)) void queryClient.invalidateQueries({ queryKey: walletKeys.all });
+      // Wallet pushes (top-up credited or rejected, transfer received) and subscription pushes (fee charged, due
+      // tomorrow, blocked) refresh the balance, the fee card and whether the driver may go online.
+      if (isWalletNotification(data)) refreshWallet(queryClient);
+      if (isSubscriptionNotification(data)) refreshSubscription(queryClient);
     };
     const received = Notifications.addNotificationReceivedListener((n) => handle(n.request.content.data));
     const opened = Notifications.addNotificationResponseReceivedListener((r) => handle(r.notification.request.content.data));

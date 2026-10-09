@@ -11,47 +11,43 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
-import { CircleX, HandCoins, Info, Wallet } from "@/components/icons";
+import {
+  ArrowUpRight,
+  CircleX,
+  HandCoins,
+  Hourglass,
+  Info,
+  Plus,
+  Wallet,
+} from "@/components/icons";
 import {
   Button,
   EmptyState,
+  ListRow,
   Notice,
   Skeleton,
   TAB_BAR_SPACE,
   Txt,
 } from "@/components/ui";
-import { useWallet, useWalletEntries } from "@/hooks/useWallet";
+import { useEntryText } from "@/features/wallet/format";
+import {
+  goToTopUp,
+  SubscriptionCard,
+} from "@/features/wallet/SubscriptionCard";
+import {
+  useSubscription,
+  useTopUps,
+  useWallet,
+  useWalletEntries,
+} from "@/hooks/useWallet";
 import { apiErrorMessage } from "@/i18n";
 import { formatAmount, formatSignedAmount, parseAmount } from "@/lib/money";
 import type { WalletEntry } from "@/lib/types";
 import { fonts, radius, space, useTheme } from "@/theme";
 
-/** Text for a movement: "Promoción · viaje de Ana M." / "Kuulis te reintegra el descuento · Bienvenida". */
-function useEntryText() {
-  const { t } = useTranslation();
-  return (entry: WalletEntry) => {
-    if (entry.kind === "promo_credit") {
-      const passenger = entry.details?.passenger_name;
-      return {
-        title:
-          typeof passenger === "string" && passenger.trim()
-            ? t("wallet.kind.promo_credit.title", { name: passenger.trim() })
-            : t("wallet.kind.promo_credit.titleNoName"),
-        subtitle: entry.description
-          ? t("wallet.kind.promo_credit.subtitleNamed", {
-              name: entry.description,
-            })
-          : t("wallet.kind.promo_credit.subtitle"),
-      };
-    }
-    // Kinds from later phases (top-ups, transfers, fees) until the app knows them.
-    return { title: t("wallet.kind.other"), subtitle: null };
-  };
-}
-
 /**
- * Driver wallet (read-only in phase 1C): balance card and movements. Recargar / Transferir arrive in 1D, so
- * they show as disabled "Pronto" buttons.
+ * Driver wallet: balance card with Recargar / Transferir, the monthly fee card (Motorizado-Billetera),
+ * pending top-up notices and the movements.
  */
 export function WalletScreen() {
   const { t, i18n } = useTranslation();
@@ -59,8 +55,13 @@ export function WalletScreen() {
   const insets = useSafeAreaInsets();
   const wallet = useWallet();
   const entries = useWalletEntries();
+  const subscription = useSubscription();
+  const topUps = useTopUps();
   const entryText = useEntryText();
   const items = entries.data?.pages.flatMap((page) => page.items) ?? [];
+  const pendingTopUps = (topUps.data?.pages[0]?.items ?? []).filter(
+    (topUp) => topUp.status === "pending",
+  );
 
   const refreshing =
     (wallet.isRefetching || entries.isRefetching) &&
@@ -68,6 +69,8 @@ export function WalletScreen() {
   const refresh = () => {
     void wallet.refetch();
     void entries.refetch();
+    void subscription.refetch();
+    void topUps.refetch();
   };
 
   const renderItem = ({
@@ -182,9 +185,37 @@ export function WalletScreen() {
               error={wallet.isError ? apiErrorMessage(wallet.error) : null}
               onRetry={() => void wallet.refetch()}
             />
-            <Notice tone="info" icon={Info}>
-              {t("wallet.promoInfo")}
-            </Notice>
+            <SubscriptionCard
+              summary={subscription.data}
+              balance={wallet.data?.balance}
+              loading={subscription.isPending}
+              error={subscription.isError ? subscription.error : null}
+              onRetry={() => void subscription.refetch()}
+            />
+            {pendingTopUps.length ? (
+              <View
+                style={{
+                  backgroundColor: theme.surface,
+                  borderRadius: radius.card,
+                  paddingHorizontal: space.md,
+                }}
+              >
+                <ListRow
+                  icon={Hourglass}
+                  iconTone="warning"
+                  title={t("wallet.pendingTopUps", {
+                    count: pendingTopUps.length,
+                  })}
+                  subtitle={t("wallet.pendingTopUpsBody")}
+                  onPress={goToTopUp}
+                />
+              </View>
+            ) : null}
+            {items.some((item) => item.kind === "promo_credit") ? (
+              <Notice tone="info" icon={Info}>
+                {t("wallet.promoInfo")}
+              </Notice>
+            ) : null}
             <Txt
               variant="subtitle"
               accessibilityRole="header"
@@ -235,7 +266,7 @@ export function WalletScreen() {
   );
 }
 
-/** Green card with the balance and the (not yet available) Recargar / Transferir buttons, as in the design. */
+/** Green card with the balance and the Recargar / Transferir buttons, as in the design. */
 function BalanceCard({
   balance,
   currency,
@@ -320,57 +351,57 @@ function BalanceCard({
         </View>
       </View>
       <View style={styles.cardActions}>
-        <SoonButton label={t("wallet.topUp")} filled />
-        <SoonButton label={t("wallet.transfer")} />
+        <CardButton
+          label={t("wallet.topUp")}
+          icon={Plus}
+          filled
+          onPress={goToTopUp}
+        />
+        <CardButton
+          label={t("wallet.transfer")}
+          icon={ArrowUpRight}
+          onPress={() => router.push("/wallet/transfer")}
+        />
       </View>
     </View>
   );
 }
 
-function SoonButton({ label, filled }: { label: string; filled?: boolean }) {
-  const { t } = useTranslation();
+function CardButton({
+  label,
+  icon: ButtonIcon,
+  filled,
+  onPress,
+}: {
+  label: string;
+  icon: typeof Plus;
+  filled?: boolean;
+  onPress: () => void;
+}) {
   const theme = useTheme();
+  const color = filled ? theme.onAccent : theme.onHero;
   return (
-    <View
-      accessible
+    <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${label}, ${t("wallet.soon")}`}
-      accessibilityState={{ disabled: true }}
-      style={[
-        styles.soon,
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.action,
         filled
-          ? { backgroundColor: theme.accent, opacity: 0.55 }
-          : { borderWidth: 1.5, borderColor: "rgba(255,255,255,0.4)" },
+          ? { backgroundColor: theme.accent }
+          : {
+              borderWidth: 1.5,
+              borderColor: "rgba(255,255,255,0.5)",
+              backgroundColor: pressed ? "rgba(255,255,255,0.12)" : undefined,
+            },
+        { transform: [{ scale: pressed ? 0.97 : 1 }] },
       ]}
     >
-      <Txt
-        style={[
-          styles.soonLabel,
-          { color: filled ? theme.onAccent : theme.onHero },
-          !filled && { opacity: 0.75 },
-        ]}
-        numberOfLines={1}
-      >
+      <ButtonIcon size={18} color={color} strokeWidth={2.4} />
+      <Txt style={[styles.actionLabel, { color }]} numberOfLines={1}>
         {label}
       </Txt>
-      <View
-        style={[
-          styles.soonBadge,
-          {
-            backgroundColor: filled
-              ? "rgba(58,42,0,0.14)"
-              : "rgba(255,255,255,0.16)",
-          },
-        ]}
-      >
-        <Txt
-          variant="micro"
-          style={{ color: filled ? theme.onAccent : theme.onHero }}
-        >
-          {t("wallet.soon")}
-        </Txt>
-      </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -398,7 +429,7 @@ const styles = StyleSheet.create({
   },
   currency: { fontFamily: fonts.extrabold, fontSize: 18 },
   cardActions: { flexDirection: "row", gap: 10 },
-  soon: {
+  action: {
     flex: 1,
     height: 48,
     borderRadius: radius.pill,
@@ -408,12 +439,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: space.sm,
   },
-  soonLabel: { fontFamily: fonts.extrabold, fontSize: 14 },
-  soonBadge: {
-    borderRadius: radius.pill,
-    paddingHorizontal: 7,
-    paddingVertical: 1,
-  },
+  actionLabel: { fontFamily: fonts.extrabold, fontSize: 14 },
   entry: {
     flexDirection: "row",
     alignItems: "center",

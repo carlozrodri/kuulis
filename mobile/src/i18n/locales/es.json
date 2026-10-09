@@ -92,7 +92,28 @@
       }
     },
     "whereToHint": "Busca tu destino para ver el precio",
-    "activeRide": "Tienes un viaje en curso"
+    "activeRide": "Tienes un viaje en curso",
+    "earned": "Ganado en {{month}}",
+    "trips_one": "{{count}} viaje",
+    "trips_other": "{{count}} viajes",
+    "openWallet": "Abre tu billetera",
+    "fee": {
+      "thisMonth": "Cuota de este mes: {{amount}}",
+      "estimated": "Cuota estimada: {{amount}}",
+      "chargePill": "Se cobra el {{date}}",
+      "pending": "Cuota pendiente: {{amount}}",
+      "duePill": "Vence el {{date}}",
+      "overdue": "Cuota vencida: {{amount}}",
+      "blockedPill": "Bloqueado"
+    },
+    "blocked": {
+      "title": "No puedes recibir viajes",
+      "body": "Tienes una cuota vencida de {{amount}}. Recarga tu billetera: la cuota se cobra sola y podrás conectarte de inmediato.",
+      "bodyNoAmount": "Tienes una cuota vencida. Recarga tu billetera: la cuota se cobra sola y podrás conectarte de inmediato.",
+      "details": "Ver detalle en la billetera"
+    },
+    "pendingFee": "Cuota de {{amount}} pendiente. Recarga antes del {{date}} para seguir recibiendo viajes.",
+    "pendingFeeNoDate": "Cuota de {{amount}} pendiente. Recarga para seguir recibiendo viajes."
   },
   "notifications": {
     "empty": "No tienes notificaciones",
@@ -326,7 +347,14 @@
     "ride_not_completed": "El viaje aún no ha terminado.",
     "rating_already_submitted": "Ya calificaste este viaje.",
     "promotion_invalid": "Ese código promocional no es válido.",
-    "promotion_unavailable": "La promoción se agotó. Revisa el precio actualizado."
+    "promotion_unavailable": "La promoción se agotó. Revisa el precio actualizado.",
+    "binance_pay_id_taken": "Ese Binance Pay ID ya está registrado en otra cuenta.",
+    "too_many_pending_top_ups": "Ya tienes 3 avisos de recarga por confirmar. Espera a que confirmemos alguno.",
+    "insufficient_balance": "No tienes saldo suficiente.",
+    "transfer_limit_exceeded": "Supera tu límite mensual de transferencias. Este mes puedes enviar hasta {{available}} USDT más.",
+    "recipient_not_found": "No encontramos un motorizado Kuulis con ese correo o teléfono.",
+    "transfer_to_self": "No puedes transferirte saldo a ti mismo.",
+    "subscription_overdue": "Tienes una cuota vencida. Recarga tu billetera para volver a conectarte."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -637,11 +665,10 @@
     "balanceA11y": "Saldo disponible: {{amount}} {{currency}}",
     "topUp": "Recargar",
     "transfer": "Transferir",
-    "soon": "Pronto",
     "promoInfo": "Cuando un pasajero usa una promoción, le cobras el monto con descuento y Kuulis te reintegra la diferencia aquí al terminar el viaje.",
     "movements": "Movimientos",
     "empty": "Aún no tienes movimientos",
-    "emptyBody": "Aquí verás los reintegros de Kuulis por los viajes con promoción.",
+    "emptyBody": "Aquí verás tus recargas, transferencias, cuotas y los reintegros de Kuulis por viajes con promoción.",
     "entryA11y": "{{title}}, {{amount}} {{currency}}, {{date}}",
     "openRide": "Abre el viaje",
     "kind": {
@@ -651,7 +678,209 @@
         "subtitle": "Kuulis te reintegra el descuento",
         "subtitleNamed": "Kuulis te reintegra el descuento de {{name}}"
       },
-      "other": "Movimiento"
+      "other": "Movimiento",
+      "top_up": {
+        "title": "Recarga Binance Pay",
+        "reference": "Orden {{reference}}"
+      },
+      "transfer_in": {
+        "title": "Transferencia de {{name}}",
+        "titleNoName": "Transferencia recibida"
+      },
+      "transfer_out": {
+        "title": "Transferencia a {{name}}",
+        "titleNoName": "Transferencia enviada"
+      },
+      "subscription_fee": {
+        "title": "Cuota de {{month}}",
+        "titleNoMonth": "Cuota mensual"
+      },
+      "adjustment": {
+        "title": "Ajuste de Kuulis"
+      }
+    },
+    "topUpNow": "Recargar ahora",
+    "copyLabel": "Copiar {{label}}",
+    "pendingTopUps_one": "Tienes 1 aviso de recarga por confirmar",
+    "pendingTopUps_other": "Tienes {{count}} avisos de recarga por confirmar",
+    "pendingTopUpsBody": "Te avisamos cuando se acredite en tu saldo.",
+    "sub": {
+      "loadError": "No pudimos cargar tu cuota. {{error}}",
+      "history": "Historial de cuotas",
+      "tierRange": "el tramo de {{from}} a {{to}}",
+      "tierTop": "el tramo de más de {{from}}",
+      "earned": "Ganaste {{earnings}} en {{month}}.",
+      "earnedTier": "Ganaste {{earnings}} en {{month}}, así que te toca {{tier}}.",
+      "pendingTitle": "Cuota del {{date}}",
+      "pendingMany_one": "{{count}} cuota pendiente",
+      "pendingMany_other": "{{count}} cuotas pendientes",
+      "missingUntil": "Te faltan {{amount}} USDT. Tienes hasta el {{date}} para recargar.",
+      "missing": "Te faltan {{amount}} USDT. Recarga para pagar tu cuota.",
+      "covered": "Tu saldo ya alcanza: la cuota se cobra sola en unos minutos.",
+      "thisMonth": "Cuota de este mes",
+      "freeUntil": "Gratis hasta {{date}}",
+      "freeBody": "Estás en tus meses gratis: no pagas cuota. Llevas {{earnings}} ganados en {{month}}.",
+      "wouldPay": "Sin el periodo gratis pagarías {{fee}} por {{tier}}.",
+      "monthly": "Cuota mensual",
+      "freeMonthsPill": "3 meses gratis",
+      "howItWorks": "Después pagas según lo que ganes cada mes, desde $0. Un mes sin viajes no paga.",
+      "estimated": "Cuota estimada de {{month}}",
+      "soFarTier": "Llevas {{earnings}} ganados en {{month}}: por ahora te toca {{tier}}.",
+      "noEarnings": "Aún no tienes viajes en {{month}}. Un mes sin viajes no paga cuota.",
+      "chargedOn": "Se cobra de tu saldo el {{date}}.",
+      "chargedOnShort": "Se cobra de tu saldo el {{date}}. Hoy te faltarían {{amount}} USDT.",
+      "blocked": {
+        "title": "Cuenta bloqueada",
+        "body": "Tienes {{amount}} de cuota vencida. Hasta que la pagues no puedes conectarte ni recibir viajes.",
+        "bodySince": "Tu cuota de {{amount}} venció el {{date}}. Hasta que la pagues no puedes conectarte ni recibir viajes.",
+        "topUp": "Recarga al menos {{amount}} USDT: la cuota se cobra sola y te desbloqueamos al instante."
+      }
     }
+  },
+  "topUp": {
+    "title": "Recargar",
+    "subtitle": "Envía USDT por Binance Pay a la cuenta de Kuulis. Sin comisión y al instante.",
+    "kuulisPayId": "Pay ID de Kuulis",
+    "copied": "Pay ID copiado",
+    "accountName": "A nombre de",
+    "minimum": "Mínimo {{amount}} USDT",
+    "onlyUsdt": "Solo USDT",
+    "unavailableTitle": "Recargas no disponibles por ahora",
+    "unavailable": "Kuulis todavía no configuró su cuenta de Binance Pay. Inténtalo más tarde o escríbenos a soporte.",
+    "howTo": "Cómo recargar",
+    "step1": "Abre Binance y entra en Pay → Enviar.",
+    "step2": "Pega el Pay ID de Kuulis ({{payId}}) y verifica que el nombre sea {{name}}.",
+    "step3": "Envía {{min}} USDT o más desde tu cuenta (Pay ID {{payerId}}).",
+    "step4Auto": "Listo: tu saldo se acredita solo en unos minutos.",
+    "step4Manual": "Toca «Ya pagué» para avisarnos y confirmamos tu pago.",
+    "autoTitle": "Confirmación automática",
+    "autoBody": "Detectamos tu pago porque sale de tu Binance Pay ID ({{payerId}}). Paga siempre desde esa cuenta. Si en 15 minutos no aparece, avísanos con «Ya pagué».",
+    "manualTitle": "Confirmación manual",
+    "manualBody": "Un administrador revisa cada pago, normalmente en pocas horas. Avísanos con «Ya pagué» y el ID de la orden para ubicarlo rápido.",
+    "yourId": "Tu Binance Pay ID",
+    "yourIdA11y": "Tu Binance Pay ID: {{id}}",
+    "changeId": "Cambiar",
+    "paid": "Ya pagué",
+    "paidHint": "Avísanos que enviaste el pago",
+    "history": "Tus recargas",
+    "historyEmpty": "Aún no tienes recargas.",
+    "more": "Ver más",
+    "status": {
+      "pending": "Por confirmar",
+      "completed": "Acreditada",
+      "rejected": "Rechazada",
+      "unmatched": "En revisión"
+    },
+    "statusHint": {
+      "pending": "Esperando el pago",
+      "completed": "Sumada a tu saldo",
+      "rejected": "No pudimos confirmarla",
+      "unmatched": "Un administrador la está revisando"
+    },
+    "binance": {
+      "title": "Tu Binance Pay ID",
+      "subtitleAuto": "Con él reconocemos tus pagos y los acreditamos solos, sin que tengas que avisarnos.",
+      "subtitleManual": "Con él reconocemos tus pagos y los confirmamos más rápido.",
+      "label": "Binance Pay ID",
+      "hint": "Solo números, de 6 a 20 dígitos.",
+      "invalid": "Escribe tu Binance Pay ID: solo números, de 6 a 20 dígitos.",
+      "continue": "Guardar y continuar",
+      "saved": "Binance Pay ID guardado",
+      "whereTitle": "¿Dónde lo encuentro?",
+      "where1": "Abre la app de Binance y toca Pay.",
+      "where2": "Toca Recibir.",
+      "where3": "Copia el número que aparece como Pay ID y pégalo aquí.",
+      "whereNote": "No es tu correo, tu UID ni una dirección de billetera.",
+      "privacy": "Solo lo usamos para identificar tus recargas. Nunca te pediremos claves ni códigos de Binance."
+    },
+    "notify": {
+      "title": "Ya pagué",
+      "subtitle": "Cuéntanos cuánto enviaste para ubicar tu pago.",
+      "amount": "Monto enviado (USDT)",
+      "amountHint": "Mínimo {{amount}} USDT. Escribe el monto exacto que enviaste.",
+      "amountInvalid": "Escribe un monto válido, por ejemplo 5.00",
+      "belowMin": "La recarga mínima es {{amount}} USDT",
+      "reference": "ID de la orden de Binance (opcional)",
+      "referencePlaceholder": "Por ejemplo 2849310573821",
+      "referenceHint": "Lo ves en el detalle del pago, en el historial de Binance Pay.",
+      "submit": "Enviar aviso",
+      "noteAuto": "Si el pago ya llegó, se acredita solo aunque no nos avises.",
+      "noteManual": "Un administrador confirma el pago y te avisamos por notificación. Puedes tener hasta 3 avisos por confirmar."
+    },
+    "sent": {
+      "title": "¡Aviso enviado!",
+      "bodyAuto": "Si tu pago ya llegó a Kuulis, tu saldo se actualizará en unos minutos. Te avisamos por notificación.",
+      "bodyManual": "Un administrador confirmará tu pago y te avisaremos por notificación cuando esté en tu saldo.",
+      "done": "Volver a la billetera",
+      "history": "Ver mis recargas"
+    }
+  },
+  "transfer": {
+    "title": "Transferir",
+    "subtitle": "Envía saldo a otro motorizado Kuulis. Es inmediato y no se puede revertir.",
+    "amountTitle": "¿Cuánto envías?",
+    "confirmTitle": "Confirma la transferencia",
+    "canSend": "Puedes enviar hasta",
+    "limitUsed": "Este mes enviaste {{sent}} de {{limit}} USDT",
+    "balanceLine": "Tu saldo: {{balance}} USDT. Solo cuenta para el límite lo que envías.",
+    "noBalanceTitle": "No tienes saldo para transferir",
+    "noBalance": "Recarga tu billetera y luego podrás enviar saldo a otro motorizado.",
+    "limitReachedTitle": "Llegaste al límite del mes",
+    "limitReached": "Ya enviaste {{limit}} USDT este mes. Podrás transferir de nuevo el día 1.",
+    "query": "Correo o teléfono del motorizado",
+    "queryPlaceholder": "luis@correo.com o 0412 123 4567",
+    "queryHint": "Escríbelo completo, tal como lo registró en Kuulis.",
+    "queryInvalid": "Escribe un correo o un número de celular válido",
+    "search": "Buscar",
+    "recipient": "Para",
+    "change": "Cambiar",
+    "amount": "Monto",
+    "max": "Máximo {{amount}}",
+    "amountInvalid": "Escribe un monto válido, por ejemplo 3.00",
+    "amountOverBalance": "No tienes saldo suficiente. Tu saldo es {{balance}} USDT.",
+    "amountOverLimit": "Supera tu límite mensual. Este mes puedes enviar hasta {{available}} USDT más.",
+    "availableHint": "Puedes enviar hasta {{max}} USDT (saldo {{balance}} · te quedan {{available}} este mes).",
+    "balanceHint": "Tu saldo: {{balance}} USDT.",
+    "note": "Nota (opcional)",
+    "notePlaceholder": "Por ejemplo: para la cuota",
+    "noteHint_one": "Te queda {{count}} carácter",
+    "noteHint_other": "Te quedan {{count}} caracteres",
+    "youSend": "Vas a enviar",
+    "to": "a {{name}}",
+    "balanceAfter": "Tu saldo después",
+    "leftThisMonth": "Te quedará para enviar este mes",
+    "final": "Revisa bien el nombre: las transferencias son inmediatas y no se pueden revertir.",
+    "send": "Enviar {{amount}} USDT",
+    "doneTitle": "¡Transferencia enviada!",
+    "doneBody": "Enviaste {{amount}} USDT a {{name}}. Ya está en su billetera y le avisamos por notificación."
+  },
+  "charges": {
+    "title": "Cuotas",
+    "subtitle": "Se cobran el día 1 de cada mes según lo que ganaste el mes anterior.",
+    "empty": "Aún no tienes cuotas",
+    "emptyBody": "Tu primera cuota se calcula el día 1 del mes siguiente a tus primeros viajes.",
+    "status": {
+      "paid": "Pagada",
+      "pending": "Pendiente",
+      "waived": "Sin cobro"
+    },
+    "statusHint": {
+      "paid": "Descontada de tu saldo",
+      "pending": "Recarga para pagarla",
+      "waived": "Kuulis no la cobró"
+    },
+    "dueOn": "Vence el {{date}}",
+    "paidOn": "Pagada el {{date}}",
+    "freePeriod": "Mes dentro de tus meses gratis",
+    "freePill": "Periodo gratis",
+    "noFee": "Ganancia sin cuota en este tramo",
+    "waivedReason": "Exonerada: {{reason}}",
+    "howTitle": "¿Cómo se calcula la cuota?",
+    "howBody": "Según lo que ganas en el mes (los precios de tus viajes completados):",
+    "tierUpTo": "Hasta {{to}}",
+    "tierRange": "De {{from}} a {{to}}",
+    "tierAbove": "Más de {{from}}",
+    "yourTier": "Tu tramo",
+    "howNote": "Un mes sin viajes no paga. Los primeros 3 meses desde tu primer viaje son gratis. Si tu saldo no alcanza, tienes 7 días para recargar."
   }
 }

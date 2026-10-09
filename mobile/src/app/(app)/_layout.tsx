@@ -12,7 +12,8 @@ import { useTheme } from '@/theme';
 export const unstable_settings = { initialRouteName: '(tabs)' };
 
 /**
- * Signed-in area: the tabs plus full-screen flows pushed over them (driver onboarding, ride screens).
+ * Signed-in area: the tabs plus full-screen flows pushed over them (driver onboarding, ride screens, wallet
+ * top-ups, transfers and fees).
  * Owns the realtime socket and the ride state machinery shared by every screen.
  */
 export default function AppLayout() {
@@ -34,6 +35,9 @@ export default function AppLayout() {
           {/* Rating is mandatory: no swipe back. */}
           <Stack.Screen name="ride/rate" options={{ gestureEnabled: false, animation: 'slide_from_bottom' }} />
           <Stack.Screen name="drive" />
+          <Stack.Screen name="wallet/top-up" />
+          <Stack.Screen name="wallet/transfer" />
+          <Stack.Screen name="wallet/charges" />
         </Stack>
         <RideSync />
         <RideNavigator />

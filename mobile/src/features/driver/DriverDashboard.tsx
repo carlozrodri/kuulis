@@ -1,19 +1,26 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, StyleSheet, View } from 'react-native';
 
-import { Bike, ChevronRight, Info, Power } from '@/components/icons';
+import { Bike, ChevronRight, Clock, Info, LockKeyhole, Power, Wallet } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { showToast } from '@/components/Toast';
 import { Button, Card, IconTile, Notice, Skeleton, StatusPill, Txt } from '@/components/ui';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
+import { useWalletFormat } from '@/features/wallet/format';
+import { EarningsCard, goToTopUp } from '@/features/wallet/SubscriptionCard';
 import { getFreshPosition, requestLocationPermission, useUserLocation } from '@/hooks/useLocation';
 import { useActiveRide, useDriverState, useGoOffline, useGoOnline } from '@/hooks/useRides';
+import { isSubscriptionOverdue, refreshSubscription, useSubscription, useWallet } from '@/hooks/useWallet';
 import { apiErrorMessage } from '@/i18n';
 import { confirmHaptic, heavyHaptic } from '@/lib/feedback';
-import { isActiveStatus } from '@/lib/ride';
+import { formatAmount } from '@/lib/money';
+import { formatFare, isActiveStatus } from '@/lib/ride';
+import type { SubscriptionSummary } from '@/lib/types';
+import { nextDueAt, pendingTotal, shortfall, subscriptionState } from '@/lib/wallet';
 import { elevation, radius, space, useTheme } from '@/theme';
 
 /** Breathing green dot while online. */
@@ -47,13 +54,20 @@ function LiveDot({ online }: { online: boolean }) {
 }
 
 /**
- * Approved driver's home: huge CONECTARME / DESCONECTARME over the map. Going online sends the current
- * position (POST /drivers/me/online); the DriverController then streams it every ~4 s over the socket.
+ * Approved driver's home: this month's earnings and fee on top (Motorizado-Inicio) and a huge CONECTARME /
+ * DESCONECTARME over the map. Going online sends the current position (POST /drivers/me/online); the
+ * DriverController then streams it every ~4 s over the socket. A driver blocked for an unpaid fee sees why
+ * and a Recargar button instead.
  */
 export function DriverDashboard() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const state = useDriverState(true);
+  const subscription = useSubscription();
+  const wallet = useWallet();
+  // Set when going online answered 403 subscription_overdue, until a newer fee summary says otherwise.
+  const [overdueAt, setOverdueAt] = useState<number | null>(null);
   const active = useActiveRide();
   const goOnline = useGoOnline();
   const goOffline = useGoOffline();
@@ -62,6 +76,10 @@ export function DriverDashboard() {
 
   const online = !!state.data?.online;
   const activeRide = active.data && isActiveStatus(active.data.status) ? active.data : null;
+  const summary = subscription.data;
+  const fee = subscriptionState(summary);
+  const blocked =
+    fee === 'blocked' || (overdueAt !== null && (!summary || subscription.dataUpdatedAt <= overdueAt));
 
   const connect = async () => {
     setLocating(true);
@@ -78,6 +96,13 @@ export function DriverDashboard() {
       await goOnline.mutateAsync({ lat: position.lat, lng: position.lng });
       confirmHaptic();
     } catch (error) {
+      if (isSubscriptionOverdue(error)) {
+        // The blocked banner explains it; refresh the fee so it shows the amount.
+        heavyHaptic();
+        setOverdueAt(Date.now());
+        refreshSubscription(queryClient);
+        return;
+      }
       showToast(apiErrorMessage(error), 'danger');
     } finally {
       setLocating(false);
@@ -93,10 +118,13 @@ export function DriverDashboard() {
     <MapSheetLayout
       map={(insets) => <RideMap insets={insets} followUser showUser />}
       topBar={
-        <View style={styles.topRow}>
-          <View style={[styles.statusChip, { backgroundColor: theme.surface }, elevation(theme)]}>
-            <LiveDot online={online} />
-            <Txt variant="bodyStrong">{online ? t('drive.home.onlineChip') : t('drive.home.offlineChip')}</Txt>
+        <View style={{ gap: space.sm }} pointerEvents="box-none">
+          {summary ? <EarningsCard summary={summary} blocked={blocked} /> : null}
+          <View style={styles.topRow} pointerEvents="box-none">
+            <View style={[styles.statusChip, { backgroundColor: theme.surface }, elevation(theme)]}>
+              <LiveDot online={online} />
+              <Txt variant="bodyStrong">{online ? t('drive.home.onlineChip') : t('drive.home.offlineChip')}</Txt>
+            </View>
           </View>
         </View>
       }>
@@ -107,12 +135,16 @@ export function DriverDashboard() {
         </View>
       ) : (
         <>
-          <View style={{ gap: 4 }}>
-            <Txt variant="heading" accessibilityRole="header">
-              {online ? t('drive.home.online') : t('driver.home.offline')}
-            </Txt>
-            <Txt color="muted">{online ? t('drive.home.onlineBody') : t('driver.home.offlineBody')}</Txt>
-          </View>
+          {blocked && !online ? (
+            <BlockedPanel summary={summary} balance={wallet.data?.balance} />
+          ) : (
+            <View style={{ gap: 4 }}>
+              <Txt variant="heading" accessibilityRole="header">
+                {online ? t('drive.home.online') : t('driver.home.offline')}
+              </Txt>
+              <Txt color="muted">{online ? t('drive.home.onlineBody') : t('driver.home.offlineBody')}</Txt>
+            </View>
+          )}
 
           {activeRide ? (
             <Card tone="tint" onPress={() => router.push({ pathname: '/drive', params: { id: activeRide.id } })} style={styles.activeCard}>
@@ -127,7 +159,9 @@ export function DriverDashboard() {
             </Card>
           ) : null}
 
-          {permission !== 'granted' ? <LocationPrompt variant="driver" /> : null}
+          {fee === 'pending' && summary && !blocked ? <PendingFeeNotice summary={summary} /> : null}
+
+          {permission !== 'granted' && !(blocked && !online) ? <LocationPrompt variant="driver" /> : null}
 
           {online ? (
             <Button
@@ -139,6 +173,8 @@ export function DriverDashboard() {
               disabled={!!activeRide}
               onPress={disconnect}
             />
+          ) : blocked ? (
+            <Button title={t('wallet.topUpNow')} size="lg" variant="accent" icon={Wallet} onPress={goToTopUp} />
           ) : (
             <Button
               title={t('driver.home.connect')}
@@ -153,18 +189,77 @@ export function DriverDashboard() {
             <Notice tone="info" icon={Info}>
               {t('drive.home.foregroundOnly')}
             </Notice>
-          ) : (
+          ) : blocked ? (
+            <Button title={t('home.blocked.details')} variant="ghost" size="sm" onPress={() => router.push('/wallet')} />
+          ) : !summary || fee === 'not_started' ? (
             <View style={{ alignItems: 'center' }}>
               <StatusPill label={t('driver.home.freeMonths')} tone="accent" />
             </View>
-          )}
+          ) : null}
         </>
       )}
     </MapSheetLayout>
   );
 }
 
+/** Replaces "Estás desconectado" when an unpaid fee is past its grace week. */
+function BlockedPanel({ summary, balance }: { summary: SubscriptionSummary | undefined; balance: string | undefined }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const owed = pendingTotal(summary?.pending);
+  const missing = shortfall(balance, owed);
+  return (
+    <View accessibilityRole="alert" style={[styles.blocked, { backgroundColor: theme.dangerSoft }]}>
+      <View style={styles.blockedTitle}>
+        <LockKeyhole size={22} color={theme.danger} strokeWidth={2.2} />
+        <Txt variant="heading" style={{ color: theme.danger, flex: 1 }} accessibilityRole="header">
+          {t('home.blocked.title')}
+        </Txt>
+      </View>
+      <Txt style={{ color: theme.text }}>
+        {owed > 0 ? t('home.blocked.body', { amount: formatFare(owed) }) : t('home.blocked.bodyNoAmount')}
+      </Txt>
+      {missing > 0 ? (
+        <Txt variant="label" style={{ color: theme.text }}>
+          {t('wallet.sub.blocked.topUp', { amount: formatAmount(missing) })}
+        </Txt>
+      ) : null}
+    </View>
+  );
+}
+
+/** "Tienes una cuota de $5.00 pendiente · vence el 8 de noviembre" during the grace week. */
+function PendingFeeNotice({ summary }: { summary: SubscriptionSummary }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const format = useWalletFormat();
+  const owed = pendingTotal(summary.pending);
+  const dueAt = nextDueAt(summary.pending);
+  return (
+    <View style={[styles.pending, { backgroundColor: theme.warningSoft }]}>
+      <Clock size={18} color={theme.warning} strokeWidth={2.2} />
+      <Txt variant="label" style={{ color: theme.warning, flex: 1 }}>
+        {dueAt
+          ? t('home.pendingFee', { amount: formatFare(owed), date: format.dayMonth(dueAt) })
+          : t('home.pendingFeeNoDate', { amount: formatFare(owed) })}
+      </Txt>
+      <Button title={t('wallet.topUp')} variant="accent" size="sm" onPress={goToTopUp} style={{ marginTop: 0 }} />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  blocked: { borderRadius: radius.card, padding: space.md, gap: space.xs },
+  blockedTitle: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
+  pending: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.xs,
+    borderRadius: radius.tile,
+    paddingLeft: space.sm,
+    paddingRight: space.xs,
+    paddingVertical: space.xs,
+  },
   topRow: { flexDirection: 'row' },
   statusChip: {
     flexDirection: 'row',

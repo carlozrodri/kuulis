@@ -12,6 +12,7 @@ import {
 import { AppState } from 'react-native';
 
 import { DRIVER_QUERY_KEY, isDriverNotification } from '@/hooks/useDriver';
+import { isSubscriptionNotification, isWalletNotification, refreshSubscription, refreshWallet } from '@/hooks/useWallet';
 import { tokens } from '@/lib/api';
 import { config } from '@/lib/config';
 
@@ -81,6 +82,8 @@ export function RealtimeProvider({ enabled, children }: PropsWithChildren<{ enab
         if (message.event === 'notification') {
           void queryClient.invalidateQueries({ queryKey: ['notifications'] });
           if (isDriverNotification(message.data)) void queryClient.invalidateQueries({ queryKey: DRIVER_QUERY_KEY });
+          if (isWalletNotification(message.data)) refreshWallet(queryClient);
+          if (isSubscriptionNotification(message.data)) refreshSubscription(queryClient);
         }
         listenersRef.current.get(message.event)?.forEach((handler) => {
           try {
