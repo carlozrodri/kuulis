@@ -1,4 +1,4 @@
-from kuulis.settings.base import BaseAppSettings
+from kuulis.settings.base import BaseAppSettings, CSVList
 
 
 class QASettings(BaseAppSettings):
@@ -8,5 +8,5 @@ class QASettings(BaseAppSettings):
     STORAGE_PREFIX: str = "qa"
     PUBLIC_URL: str = "https://kuulis-qa.top8.uk"
     FRONTEND_URL: str = "https://kuulis-qa.top8.uk"
-    CORS_ORIGINS: list[str] = ["https://kuulis-qa.top8.uk"]
+    CORS_ORIGINS: CSVList = ["https://kuulis-qa.top8.uk"]
     EMAIL_ENABLED: bool = True

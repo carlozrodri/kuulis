@@ -1,0 +1,40 @@
+{
+  "name": "kuulis-admin",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.11.3",
+    "@nuxtjs/i18n": "^10.6.0",
+    "nuxt": "^4.6.0",
+    "tailwindcss": "^4.3.3",
+    "vue": "^3.5.0",
+    "zod": "^4.3.0"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.142",
+    "@nuxt/eslint": "^1.10.0",
+    "eslint": "^9.30.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0",
+    "vue-tsc": "^3.1.0"
+  },
+  "packageManager": "pnpm@10.18.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "unrs-resolver",
+      "vue-demi",
+      "@parcel/watcher",
+      "@tailwindcss/oxide"
+    ]
+  }
+}

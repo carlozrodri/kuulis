@@ -1,4 +1,4 @@
-from kuulis.settings.base import BaseAppSettings
+from kuulis.settings.base import BaseAppSettings, CSVList
 
 
 class LocalSettings(BaseAppSettings):
@@ -6,5 +6,5 @@ class LocalSettings(BaseAppSettings):
     DEBUG: bool = True
     LOG_JSON: bool = False
     LOG_LEVEL: str = "DEBUG"
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:8081"]
+    CORS_ORIGINS: CSVList = ["http://localhost:3000", "http://localhost:8081"]
     STORAGE_PREFIX: str = "local"

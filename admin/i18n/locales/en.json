@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "notifications": "Notifications",
+    "profile": "My profile"
+  },
+  "auth": {
+    "title": "Admin sign in",
+    "email": "Email",
+    "password": "Password",
+    "login": "Sign in",
+    "logout": "Sign out"
+  },
+  "dashboard": {
+    "totalUsers": "Total users",
+    "activeUsers": "Active users",
+    "verifiedUsers": "Verified users",
+    "staff": "Team (staff and admin)"
+  },
+  "users": {
+    "email": "Email",
+    "name": "Name",
+    "role": "Role",
+    "status": "Status",
+    "createdAt": "Created",
+    "lastLogin": "Last login",
+    "locale": "Language",
+    "search": "Search by email or name",
+    "allRoles": "All roles",
+    "active": "Active",
+    "inactive": "Inactive",
+    "verified": "Verified",
+    "readOnly": "Only administrators can edit users."
+  },
+  "roles": {
+    "user": "User",
+    "staff": "Staff",
+    "admin": "Administrator"
+  },
+  "notifications": {
+    "audience": "Audience",
+    "everyone": "All users",
+    "singleUser": "One user (ID)",
+    "userId": "User ID",
+    "title": "Title",
+    "body": "Message",
+    "send": "Send",
+    "queued": "Notification queued"
+  },
+  "profile": {
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "passwordChanged": "Password updated"
+  },
+  "common": {
+    "save": "Save",
+    "saved": "Changes saved",
+    "empty": "No results"
+  },
+  "validation": {
+    "email": "Invalid email",
+    "required": "Required",
+    "minPassword": "At least 8 characters"
+  },
+  "errors": {
+    "generic": "Something went wrong, please try again",
+    "invalid_credentials": "Wrong email or password",
+    "admin_required": "Your account cannot access the admin panel",
+    "account_disabled": "Account disabled",
+    "permission_denied": "You are not allowed to do this",
+    "self_demotion": "You cannot demote or disable yourself",
+    "user_not_found": "User not found",
+    "email_taken": "That email is already registered",
+    "validation_error": "Please check the form",
+    "http_429": "Too many attempts, please wait"
+  }
+}

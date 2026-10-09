@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "dashboard": "Panel",
+    "users": "Usuarios",
+    "notifications": "Notificaciones",
+    "profile": "Mi perfil"
+  },
+  "auth": {
+    "title": "Acceso administrador",
+    "email": "Correo",
+    "password": "Contraseña",
+    "login": "Entrar",
+    "logout": "Cerrar sesión"
+  },
+  "dashboard": {
+    "totalUsers": "Usuarios totales",
+    "activeUsers": "Usuarios activos",
+    "verifiedUsers": "Usuarios verificados",
+    "staff": "Equipo (staff y admin)"
+  },
+  "users": {
+    "email": "Correo",
+    "name": "Nombre",
+    "role": "Rol",
+    "status": "Estado",
+    "createdAt": "Creado",
+    "lastLogin": "Último acceso",
+    "locale": "Idioma",
+    "search": "Buscar por correo o nombre",
+    "allRoles": "Todos los roles",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "verified": "Verificado",
+    "readOnly": "Solo los administradores pueden editar usuarios."
+  },
+  "roles": {
+    "user": "Usuario",
+    "staff": "Staff",
+    "admin": "Administrador"
+  },
+  "notifications": {
+    "audience": "Destinatarios",
+    "everyone": "Todos los usuarios",
+    "singleUser": "Un usuario (ID)",
+    "userId": "ID del usuario",
+    "title": "Título",
+    "body": "Mensaje",
+    "send": "Enviar",
+    "queued": "Notificación en cola de envío"
+  },
+  "profile": {
+    "changePassword": "Cambiar contraseña",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "passwordChanged": "Contraseña actualizada"
+  },
+  "common": {
+    "save": "Guardar",
+    "saved": "Cambios guardados",
+    "empty": "Sin resultados"
+  },
+  "validation": {
+    "email": "Correo no válido",
+    "required": "Campo obligatorio",
+    "minPassword": "Mínimo 8 caracteres"
+  },
+  "errors": {
+    "generic": "Algo salió mal, inténtalo de nuevo",
+    "invalid_credentials": "Correo o contraseña incorrectos",
+    "admin_required": "Tu cuenta no tiene acceso al panel",
+    "account_disabled": "Cuenta desactivada",
+    "permission_denied": "No tienes permiso para esta acción",
+    "self_demotion": "No puedes quitarte el rol de administrador ni desactivarte",
+    "user_not_found": "Usuario no encontrado",
+    "email_taken": "Ese correo ya está registrado",
+    "validation_error": "Revisa los datos del formulario",
+    "http_429": "Demasiados intentos, espera un momento"
+  }
+}

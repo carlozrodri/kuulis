@@ -3,6 +3,9 @@ from typing import Annotated, Literal
 from pydantic import Field, PostgresDsn, RedisDsn, computed_field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
+# Comma separated env values ("a,b") instead of JSON. Subclasses must reuse this type.
+CSVList = Annotated[list[str], NoDecode]
+
 
 class BaseAppSettings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -16,8 +19,8 @@ class BaseAppSettings(BaseSettings):
     SECRET_KEY: str = Field(default="change-me-in-env", min_length=16)
     API_V1_PREFIX: str = "/api/v1"
     PUBLIC_URL: str = "http://localhost:8000"
-    ALLOWED_HOSTS: Annotated[list[str], NoDecode] = ["*"]
-    CORS_ORIGINS: Annotated[list[str], NoDecode] = []
+    ALLOWED_HOSTS: CSVList = ["*"]
+    CORS_ORIGINS: CSVList = []
     LOG_LEVEL: str = "INFO"
     LOG_JSON: bool = True
     DOCS_ENABLED: bool = True
