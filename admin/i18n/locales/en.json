@@ -12,7 +12,9 @@
     "promotions": "Promotions",
     "topUps": "Top-ups",
     "transfers": "Transfers",
-    "subscriptions": "Subscriptions"
+    "subscriptions": "Subscriptions",
+    "reports": "Reports",
+    "finance": "Finance"
   },
   "auth": {
     "title": "Admin sign in",
@@ -28,7 +30,67 @@
     "staff": "Team (staff and admin)",
     "staleRates": "Stale exchange rate: {sources}",
     "staleRatesHelp": "New quotes use this rate for amounts in bolívares. Check it or correct it manually.",
-    "openRates": "View rates"
+    "openRates": "View rates",
+    "updatedAt": "Updated {time}",
+    "usersTitle": "Users",
+    "overview": {
+      "onlineDrivers": "Drivers online",
+      "ridesInProgress": "Rides in progress",
+      "ridesToday": "Rides today",
+      "completedToday": "Completed today",
+      "gmvToday": "GMV today"
+    },
+    "actions": {
+      "title": "To do",
+      "none": "Nothing pending right now.",
+      "urgentReports": "Urgent open reports: {n}",
+      "openReports": "Open reports: {n}",
+      "driverApplications": "Driver applications to review: {n}",
+      "pendingTopUps": "Pending top-ups: {n}",
+      "unmatchedTopUps": "Unmatched payments: {n}",
+      "overdueDrivers": "Drivers blocked by an overdue fee: {n}"
+    },
+    "metrics": {
+      "title": "Metrics",
+      "allCities": "All cities",
+      "city": "City",
+      "groups": {
+        "rides": "Rides",
+        "money": "Money",
+        "times": "Average times",
+        "people": "People"
+      },
+      "requested": "Requested",
+      "completed": "Completed",
+      "completionRate": "{rate} completed",
+      "cancelled": "Cancelled",
+      "cancelledSplit": "Passenger {passenger} · driver {driver} · admin {admin}",
+      "noDrivers": "No driver found",
+      "gmv": "GMV",
+      "gmvHelp": "Sum of fares of completed rides",
+      "discounts": "Discounts paid by Kuulis",
+      "avgFare": "Average fare",
+      "avgDistance": "Average distance",
+      "avgAssign": "Assignment",
+      "avgAssignHelp": "From request to driver assigned",
+      "avgPickup": "Pickup",
+      "avgPickupHelp": "From assigned to \"arrived\"",
+      "avgTrip": "Trip",
+      "avgTripHelp": "From start to end",
+      "activeDrivers": "Active drivers",
+      "activePassengers": "Active passengers",
+      "newPassengers": "New accounts",
+      "newDrivers": "Drivers approved",
+      "ratingDrivers": "Driver rating",
+      "ratingPassengers": "Passenger rating",
+      "ridesByDay": "Rides per day",
+      "gmvByDay": "GMV per day",
+      "ridesByHour": "Rides by hour of day",
+      "peakHour": "Peak hour: {hour}",
+      "topDrivers": "Drivers with most rides",
+      "rides": "Rides",
+      "earnings": "Earnings"
+    }
   },
   "users": {
     "email": "Email",
@@ -43,7 +105,11 @@
     "active": "Active",
     "inactive": "Inactive",
     "verified": "Verified",
-    "readOnly": "Only administrators can edit users."
+    "readOnly": "Only administrators can edit users.",
+    "allAccounts": "All accounts",
+    "suspendedOnly": "Suspended",
+    "notSuspended": "Not suspended",
+    "suspensionFilter": "Suspension"
   },
   "roles": {
     "user": "User",
@@ -126,7 +192,21 @@
     "charge_not_pending": "This charge is no longer pending",
     "month_not_closed": "Only a closed month can be charged",
     "schedule_month_invalid": "The schedule must start next month or later",
-    "schedule_exists": "There is already a fee schedule for that month"
+    "schedule_exists": "There is already a fee schedule for that month",
+    "account_suspended": "The account is suspended",
+    "area_not_found": "That city is not in the configuration",
+    "range_invalid": "The date range is invalid (366 days at most)",
+    "assignee_invalid": "Reports can only be assigned to staff",
+    "cannot_suspend_staff": "Staff and admins cannot be suspended",
+    "not_ride_participant": "Only the ride's passenger or driver can report it",
+    "not_suspended": "This account is not suspended",
+    "report_already_open": "This person already has an open report about that ride",
+    "report_closed": "This report is already closed; reopen it to change it",
+    "report_not_closed": "This report is not closed",
+    "report_not_found": "Report not found",
+    "ride_without_driver": "That ride never had a driver assigned",
+    "suspension_until_invalid": "The suspension end must be in the future",
+    "too_many_open_reports": "This person already has 5 open reports"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -160,7 +240,7 @@
     "noVehicle": "No vehicle registered yet.",
     "vehiclePhotos": "Vehicle photos",
     "rejectionReason": "Rejection reason",
-    "suspensionReason": "Suspension reason",
+    "suspensionReason": "Profile suspension reason",
     "reason": "Reason",
     "reasonHelp": "The driver will see this reason in their notification.",
     "statuses": {
@@ -182,16 +262,16 @@
     "actions": {
       "approve": "Approve",
       "reject": "Reject",
-      "suspend": "Suspend",
-      "reinstate": "Reinstate",
+      "suspend": "Suspend profile",
+      "reinstate": "Reinstate profile",
       "rejectTitle": "Reject driver",
-      "suspendTitle": "Suspend driver"
+      "suspendTitle": "Suspend driver profile"
     },
     "toast": {
       "approved": "Driver approved",
       "rejected": "Driver rejected",
-      "suspended": "Driver suspended",
-      "reinstated": "Driver reinstated"
+      "suspended": "Driver profile suspended",
+      "reinstated": "Driver profile reinstated"
     },
     "documents": {
       "title": "Documents",
@@ -212,7 +292,8 @@
       }
     },
     "rating": "Rating",
-    "ratingCount": "ratings: {n}"
+    "ratingCount": "ratings: {n}",
+    "profileSuspensionHelp": "Driver-profile suspension (documents and approval): they cannot work as a driver but can still request rides. To sanction the whole account, use the account suspension."
   },
   "settings": {
     "readOnly": "Only administrators can change settings.",
@@ -857,6 +938,262 @@
         "monthTaken": "A schedule is already planned for that month: choose another one."
       },
       "builtIn": "initial schedule (business-model.md)"
+    }
+  },
+  "charts": {
+    "noData": "No data in this range",
+    "category": "Category"
+  },
+  "range": {
+    "label": "Period",
+    "caracas": "Dates in Caracas time",
+    "presets": {
+      "today": "Today",
+      "last7": "Last 7 days",
+      "last30": "Last 30 days",
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "custom": "Custom"
+    },
+    "errors": {
+      "invalid": "Invalid date",
+      "order": "The start date is after the end date",
+      "tooLong": "The maximum range is {max} days"
+    }
+  },
+  "suspensions": {
+    "title": "Account suspension",
+    "help": "Moderation: while it lasts they cannot request rides or go online as a driver. They can still log in, see their history and wallet, and file reports.",
+    "suspended": "Account suspended",
+    "notSuspended": "Not suspended",
+    "suspend": "Suspend account",
+    "replace": "Change suspension",
+    "lift": "Lift suspension",
+    "liftTitle": "Lift the suspension of {name}?",
+    "liftHelp": "They will be able to request rides and go online again. They will get a notification.",
+    "until": "Suspended until {date}",
+    "indefinite": "Suspended indefinitely",
+    "indefiniteShort": "indefinite",
+    "byOn": "By {name}, on {date}",
+    "by": "By {name}",
+    "liftedBy": "lifted by {name} on {date}",
+    "system": "the system",
+    "history": "History",
+    "noHistory": "Never suspended.",
+    "fromReport": "See report",
+    "thisPerson": "this person",
+    "states": {
+      "active": "In force",
+      "lifted": "Lifted",
+      "expired": "Expired"
+    },
+    "toast": {
+      "suspended": "Account suspended",
+      "lifted": "Suspension lifted"
+    },
+    "modal": {
+      "title": "Suspend {name}'s account",
+      "description": "They get a notification with the reason and the end date.",
+      "effects": "They will not be able to request rides or go online as a driver (if online, they are taken offline). Rides in progress continue. They can log in, see their history and wallet, and file reports.",
+      "replaces": "Already suspended: this suspension replaces the current one",
+      "fromReport": "A note about this suspension will be added to the report."
+    },
+    "reason": "Reason",
+    "reasonHelp": "3 to 500 characters. The person will see this reason.",
+    "duration": "Duration",
+    "presets": {
+      "24h": "24 hours",
+      "3d": "3 days",
+      "7d": "7 days",
+      "30d": "30 days",
+      "indefinite": "Indefinite",
+      "custom": "Until a date"
+    },
+    "customUntil": "Last day of the suspension",
+    "customUntilHelp": "Ends when that day ends (Caracas time).",
+    "customInvalid": "Pick today or a later day",
+    "willEnd": "Ends on {date}.",
+    "willNotEnd": "It does not end on its own: it has to be lifted manually."
+  },
+  "reports": {
+    "title": "Reports",
+    "seeAll": "See all",
+    "none": "No reports.",
+    "empty": "No reports match these filters",
+    "total": "{n} reports",
+    "search": "Search by name or email",
+    "allStatuses": "All",
+    "allCategories": "All categories",
+    "allPriorities": "All priorities",
+    "urgentOpen": "Urgent open: {n}",
+    "filterUser": "User {id}",
+    "filterRide": "Ride {id}",
+    "removeFilter": "Remove filter",
+    "category": "Category",
+    "priority": "Priority",
+    "status": "Status",
+    "createdAt": "Created",
+    "updatedAt": "Last update",
+    "resolvedAt": "Closed",
+    "people": "People",
+    "description": "Description",
+    "assignedTo": "Assigned to",
+    "unassigned": "Unassigned",
+    "ride": "Ride {id}",
+    "general": "General report",
+    "reporter": "Reporter",
+    "reported": "Reported",
+    "reportedFrom": "Reported as",
+    "notesCount": "{n} notes",
+    "side": {
+      "reporter": "Reporter",
+      "reported": "Reported"
+    },
+    "roles": {
+      "passenger": "passenger",
+      "driver": "driver"
+    },
+    "reporterRole": {
+      "passenger": "Passenger",
+      "driver": "Driver",
+      "general": "No ride"
+    },
+    "statuses": {
+      "open": "Open",
+      "in_review": "In review",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed"
+    },
+    "priorities": {
+      "urgent": "Urgent",
+      "normal": "Normal"
+    },
+    "categories": {
+      "safety": "Safety",
+      "harassment": "Harassment",
+      "driving": "Reckless driving",
+      "fare": "Fare",
+      "vehicle_mismatch": "Vehicle or person mismatch",
+      "lost_item": "Lost item",
+      "no_show": "No-show",
+      "app_issue": "App issue",
+      "other": "Other"
+    },
+    "categoryHelp": {
+      "safety": "felt in danger",
+      "harassment": "harassment or insults",
+      "driving": "reckless driving",
+      "fare": "charged differently than agreed",
+      "vehicle_mismatch": "the bike or the person did not match",
+      "lost_item": "item left behind",
+      "no_show": "did not show up",
+      "app_issue": "app malfunction",
+      "other": "other reason"
+    },
+    "detailTitle": "Report · {category}",
+    "resolutionSent": "Answer sent to the reporter",
+    "manage": "Handling",
+    "resolveHint": "When you resolve or dismiss, the reporter gets a notification with your answer.",
+    "rideTitle": "Ride",
+    "openRide": "Open ride",
+    "noRide": "General report, no ride attached.",
+    "suspendPerson": "Suspend {name}",
+    "summary": {
+      "rating": "Rating",
+      "ridesCompleted": "Completed rides",
+      "reportsAgainst": "Reports against them",
+      "reportsAgainstValue": "{total} total · {open} open · {recent} in 90 days",
+      "driverProfile": "Driver profile",
+      "openDriver": "Open profile",
+      "openUser": "Open user"
+    },
+    "actions": {
+      "resolve": "Resolve",
+      "dismiss": "Dismiss",
+      "reopen": "Reopen",
+      "startReview": "Start review",
+      "backToOpen": "Back to open",
+      "assignToMe": "Assign to me",
+      "unassign": "Unassign"
+    },
+    "toast": {
+      "priority": "Priority updated",
+      "inReview": "Report in review",
+      "open": "Report open again",
+      "assigned": "Report assigned to you",
+      "unassigned": "Assignment removed",
+      "reopened": "Report reopened",
+      "resolved": "Report resolved",
+      "dismissed": "Report dismissed"
+    },
+    "notes": {
+      "title": "Internal notes",
+      "internal": "Only staff can see these",
+      "empty": "No notes yet.",
+      "staff": "Staff",
+      "system": "System",
+      "placeholder": "Write an internal note…",
+      "add": "Add note",
+      "help": "Notes are not sent to anyone."
+    },
+    "resolve": {
+      "resolvedTitle": "Resolve report",
+      "dismissedTitle": "Dismiss report",
+      "resolvedHelp": "Closes the report as handled.",
+      "dismissedHelp": "Closes the report without action (not applicable or not enough information).",
+      "visible": "{name} will see this text",
+      "visibleHelp": "The answer is sent as a notification to the reporter and stays visible on their report. Do not include internal notes or the other person's details.",
+      "resolution": "Answer for the reporter",
+      "resolutionHelp": "{min} to {max} characters.",
+      "resolvedConfirm": "Resolve and notify",
+      "dismissedConfirm": "Dismiss and notify"
+    }
+  },
+  "finance": {
+    "count": "{n} operations",
+    "help": {
+      "toggle": "Show or hide help",
+      "title": "How to reconcile against the Binance statement",
+      "step1": "Pick the same period as the Binance Pay statement (dates are Caracas time; Binance shows UTC, so check movements near midnight).",
+      "step2": "What Binance received in the period must match \"Top-ups credited\". Download the top-ups CSV (status credited) and compare each order by its transaction or reference.",
+      "step3": "A payment in Binance but not in the CSV is usually \"unmatched\" or \"pending\": resolve it in Top-ups. One in the CSV but not in Binance is a manual confirmation to review.",
+      "step4": "To check balances use the entries CSV: each row has the balance after the movement.",
+      "balances": "\"Wallet balances\" does not depend on the period: it is what drivers hold in Kuulis today, the money Kuulis owes them in service."
+    },
+    "cards": {
+      "topUpsCompleted": "Top-ups credited",
+      "byCompletedAt": "by credit date",
+      "auto": "Automatic",
+      "manual": "Manual",
+      "topUpsOther": "Top-ups not credited",
+      "byCreatedAt": "By creation date.",
+      "feesCollected": "Fees collected",
+      "feesPending": "Pending today: {amount}",
+      "feesPendingHelp": "Pending fees do not depend on the period",
+      "waived": "{n} waived",
+      "promoCredits": "Promotion credits",
+      "promoCreditsHelp": "What Kuulis credited to drivers for discounts.",
+      "adjustments": "Manual adjustments",
+      "transfers": "Transfers between drivers",
+      "transfersHelp": "They do not change the wallet total",
+      "walletBalances": "Wallet balances (now)",
+      "walletBalancesHelp": "Sum of every balance right now: what Kuulis \"owes\" in service. It should be backed by what is in the Binance account."
+    },
+    "chart": {
+      "title": "Movements per day",
+      "topUps": "Top-ups",
+      "fees": "Fees",
+      "promoCredits": "Promotion credits"
+    },
+    "export": {
+      "title": "Export CSV",
+      "help": "From {from} to {to}. Opens in Excel or Google Sheets.",
+      "entries": "Wallet entries",
+      "entriesHelp": "Date, user, kind, amount, balance after, reference and detail.",
+      "topUps": "Top-ups",
+      "topUpsHelp": "Created, credited, status, origin, amount, driver, payer, transaction and reference.",
+      "allKinds": "All kinds",
+      "download": "Download CSV"
     }
   }
 }

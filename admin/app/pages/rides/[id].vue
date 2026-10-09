@@ -675,6 +675,9 @@ async function confirmCancel() {
               </li>
             </ul>
           </UCard>
+
+          <!-- Phase 1E: reports about this ride -->
+          <ReportsList :ride-id="ride.id" />
         </div>
       </div>
 

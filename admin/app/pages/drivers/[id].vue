@@ -167,6 +167,7 @@ const failedThumbs = reactive(new Set<string>())
               color="warning"
               variant="soft"
               :label="t('drivers.actions.suspend')"
+              :title="t('drivers.profileSuspensionHelp')"
               @click="askReason({ type: 'suspend' })"
             />
             <UButton
@@ -209,6 +210,12 @@ const failedThumbs = reactive(new Set<string>())
           :title="driver.status === 'rejected' ? t('drivers.rejectionReason') : t('drivers.suspensionReason')"
           :description="driver.rejection_reason"
         />
+        <p
+          v-if="driver.status === 'suspended'"
+          class="-mt-4 text-xs text-(--ui-text-muted)"
+        >
+          {{ t('drivers.profileSuspensionHelp') }}
+        </p>
 
         <div class="grid gap-6 lg:grid-cols-2">
           <UCard>
@@ -394,6 +401,16 @@ const failedThumbs = reactive(new Set<string>())
           </UCard>
         </div>
 
+        <!-- Phase 1E: account suspension (moderation, any role) — separate from the profile suspension above -->
+        <div class="grid gap-6 lg:grid-cols-2">
+          <AccountSuspensionCard
+            :user-id="driver.user_id"
+            :name="driver.user?.full_name || driver.user?.email"
+            @changed="refresh"
+          />
+          <ReportsList :user-id="driver.user_id" />
+        </div>
+
         <!-- Phase 1D: wallet & subscription -->
         <DriverWalletCard
           :user-id="driver.user_id"
@@ -515,7 +532,7 @@ const failedThumbs = reactive(new Set<string>())
       <UModal
         v-model:open="reasonOpen"
         :title="reasonTitle"
-        :description="t('drivers.reasonHelp')"
+        :description="reasonTarget?.type === 'suspend' ? `${t('drivers.reasonHelp')} ${t('drivers.profileSuspensionHelp')}` : t('drivers.reasonHelp')"
       >
         <template #body>
           <form

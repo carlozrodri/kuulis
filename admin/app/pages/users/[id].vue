@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Role, User } from '~/types/api'
+import type { AdminUser, Role } from '~/types/api'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -9,7 +9,7 @@ const toast = useToast()
 const apiError = useApiError()
 
 const id = computed(() => route.params.id as string)
-const { data: user, refresh } = await useAsyncData(`user-${id.value}`, () => request<User>(`/users/${id.value}`))
+const { data: user, refresh } = await useAsyncData(`user-${id.value}`, () => request<AdminUser>(`/users/${id.value}`))
 
 const form = reactive<{ full_name: string, role: Role, is_active: boolean, is_verified: boolean }>({
   full_name: '',
@@ -58,6 +58,16 @@ async function save() {
             variant="ghost"
             to="/users"
           />
+        </template>
+        <template #trailing>
+          <UBadge
+            v-if="isSuspensionInForce(user?.suspension)"
+            color="error"
+            variant="solid"
+            icon="i-lucide-user-x"
+          >
+            {{ t('suspensions.suspended') }}
+          </UBadge>
         </template>
       </UDashboardNavbar>
     </template>
@@ -134,6 +144,16 @@ async function save() {
             </p>
           </form>
         </UCard>
+
+        <!-- Phase 1E: account suspension (moderation) and reports -->
+        <AccountSuspensionCard
+          :user-id="user.id"
+          :name="user.full_name || user.email"
+          :suspension="user.suspension"
+          :can-suspend="user.role === 'user'"
+          @changed="refresh"
+        />
+        <ReportsList :user-id="user.id" />
       </div>
     </template>
   </UDashboardPanel>

@@ -12,7 +12,9 @@
     "promotions": "Promociones",
     "topUps": "Recargas",
     "transfers": "Transferencias",
-    "subscriptions": "Suscripciones"
+    "subscriptions": "Suscripciones",
+    "reports": "Reportes",
+    "finance": "Finanzas"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -28,7 +30,67 @@
     "staff": "Equipo (staff y admin)",
     "staleRates": "Tasa desactualizada: {sources}",
     "staleRatesHelp": "Los montos en bolívares de las cotizaciones nuevas usan esta tasa. Revísala o corrígela a mano.",
-    "openRates": "Ver tasas"
+    "openRates": "Ver tasas",
+    "updatedAt": "Actualizado {time}",
+    "usersTitle": "Usuarios",
+    "overview": {
+      "onlineDrivers": "Motorizados conectados",
+      "ridesInProgress": "Viajes en curso",
+      "ridesToday": "Viajes hoy",
+      "completedToday": "Completados hoy",
+      "gmvToday": "Facturado hoy"
+    },
+    "actions": {
+      "title": "Pendientes",
+      "none": "Nada pendiente por ahora.",
+      "urgentReports": "Reportes urgentes abiertos: {n}",
+      "openReports": "Reportes abiertos: {n}",
+      "driverApplications": "Solicitudes de motorizado por revisar: {n}",
+      "pendingTopUps": "Recargas pendientes: {n}",
+      "unmatchedTopUps": "Pagos sin asignar: {n}",
+      "overdueDrivers": "Motorizados bloqueados por cuota vencida: {n}"
+    },
+    "metrics": {
+      "title": "Métricas",
+      "allCities": "Todas las ciudades",
+      "city": "Ciudad",
+      "groups": {
+        "rides": "Viajes",
+        "money": "Dinero",
+        "times": "Tiempos promedio",
+        "people": "Personas"
+      },
+      "requested": "Pedidos",
+      "completed": "Completados",
+      "completionRate": "{rate} completados",
+      "cancelled": "Cancelados",
+      "cancelledSplit": "Pasajero {passenger} · motorizado {driver} · admin {admin}",
+      "noDrivers": "Sin motorizado",
+      "gmv": "Facturado (GMV)",
+      "gmvHelp": "Suma de tarifas de viajes completados",
+      "discounts": "Descuentos pagados por Kuulis",
+      "avgFare": "Tarifa promedio",
+      "avgDistance": "Distancia promedio",
+      "avgAssign": "Asignación",
+      "avgAssignHelp": "De pedido a motorizado asignado",
+      "avgPickup": "Llegada",
+      "avgPickupHelp": "De asignado a «llegué»",
+      "avgTrip": "Viaje",
+      "avgTripHelp": "De inicio a fin",
+      "activeDrivers": "Motorizados activos",
+      "activePassengers": "Pasajeros activos",
+      "newPassengers": "Cuentas nuevas",
+      "newDrivers": "Motorizados aprobados",
+      "ratingDrivers": "Calificación motorizados",
+      "ratingPassengers": "Calificación pasajeros",
+      "ridesByDay": "Viajes por día",
+      "gmvByDay": "Facturado por día",
+      "ridesByHour": "Viajes por hora del día",
+      "peakHour": "Hora pico: {hour}",
+      "topDrivers": "Motorizados con más viajes",
+      "rides": "Viajes",
+      "earnings": "Ganancias"
+    }
   },
   "users": {
     "email": "Correo",
@@ -43,7 +105,11 @@
     "active": "Activo",
     "inactive": "Inactivo",
     "verified": "Verificado",
-    "readOnly": "Solo los administradores pueden editar usuarios."
+    "readOnly": "Solo los administradores pueden editar usuarios.",
+    "allAccounts": "Todas las cuentas",
+    "suspendedOnly": "Suspendidos",
+    "notSuspended": "No suspendidos",
+    "suspensionFilter": "Suspensión"
   },
   "roles": {
     "user": "Usuario",
@@ -126,7 +192,21 @@
     "charge_not_pending": "Este cobro ya no está pendiente",
     "month_not_closed": "Solo se puede cobrar un mes ya cerrado",
     "schedule_month_invalid": "El esquema debe empezar el mes siguiente o después",
-    "schedule_exists": "Ya hay un esquema de tramos para ese mes"
+    "schedule_exists": "Ya hay un esquema de tramos para ese mes",
+    "account_suspended": "La cuenta está suspendida",
+    "area_not_found": "Esa ciudad no existe en la configuración",
+    "range_invalid": "El rango de fechas no es válido (máximo 366 días)",
+    "assignee_invalid": "Solo se puede asignar a alguien del equipo",
+    "cannot_suspend_staff": "No se puede suspender a alguien del equipo (staff o administrador)",
+    "not_ride_participant": "Solo el pasajero o el motorizado del viaje pueden reportarlo",
+    "not_suspended": "Esta cuenta no está suspendida",
+    "report_already_open": "Ya hay un reporte abierto de esta persona sobre ese viaje",
+    "report_closed": "Este reporte ya está cerrado; reábrelo para cambiarlo",
+    "report_not_closed": "Este reporte no está cerrado",
+    "report_not_found": "Reporte no encontrado",
+    "ride_without_driver": "Ese viaje no tuvo motorizado asignado",
+    "suspension_until_invalid": "La fecha de fin de la suspensión debe ser futura",
+    "too_many_open_reports": "Esta persona ya tiene 5 reportes abiertos"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -160,7 +240,7 @@
     "noVehicle": "Aún no registra vehículo.",
     "vehiclePhotos": "Fotos de la moto",
     "rejectionReason": "Motivo del rechazo",
-    "suspensionReason": "Motivo de la suspensión",
+    "suspensionReason": "Motivo de la suspensión del perfil",
     "reason": "Motivo",
     "reasonHelp": "El motorizado recibirá este motivo en su notificación.",
     "statuses": {
@@ -182,16 +262,16 @@
     "actions": {
       "approve": "Aprobar",
       "reject": "Rechazar",
-      "suspend": "Suspender",
-      "reinstate": "Reactivar",
+      "suspend": "Suspender perfil",
+      "reinstate": "Reactivar perfil",
       "rejectTitle": "Rechazar motorizado",
-      "suspendTitle": "Suspender motorizado"
+      "suspendTitle": "Suspender perfil de motorizado"
     },
     "toast": {
       "approved": "Motorizado aprobado",
       "rejected": "Motorizado rechazado",
-      "suspended": "Motorizado suspendido",
-      "reinstated": "Motorizado reactivado"
+      "suspended": "Perfil de motorizado suspendido",
+      "reinstated": "Perfil de motorizado reactivado"
     },
     "documents": {
       "title": "Documentos",
@@ -212,7 +292,8 @@
       }
     },
     "rating": "Calificación",
-    "ratingCount": "calificaciones: {n}"
+    "ratingCount": "calificaciones: {n}",
+    "profileSuspensionHelp": "Suspensión del perfil de motorizado (documentos y aprobación): no puede trabajar como motorizado, pero sí pedir viajes. Para sancionar la cuenta completa usa la suspensión de cuenta."
   },
   "settings": {
     "readOnly": "Solo los administradores pueden cambiar la configuración.",
@@ -857,6 +938,262 @@
         "monthTaken": "Ya hay un esquema programado para ese mes: elige otro."
       },
       "builtIn": "esquema inicial (business-model.md)"
+    }
+  },
+  "charts": {
+    "noData": "Sin datos en este rango",
+    "category": "Categoría"
+  },
+  "range": {
+    "label": "Periodo",
+    "caracas": "Fechas en hora de Caracas",
+    "presets": {
+      "today": "Hoy",
+      "last7": "Últimos 7 días",
+      "last30": "Últimos 30 días",
+      "thisMonth": "Este mes",
+      "lastMonth": "Mes pasado",
+      "custom": "Personalizado"
+    },
+    "errors": {
+      "invalid": "Fecha no válida",
+      "order": "La fecha inicial es posterior a la final",
+      "tooLong": "El rango máximo es de {max} días"
+    }
+  },
+  "suspensions": {
+    "title": "Suspensión de cuenta",
+    "help": "Moderación: mientras dure, no puede pedir viajes ni conectarse como motorizado. Puede entrar, ver su historial y su billetera y crear reportes.",
+    "suspended": "Cuenta suspendida",
+    "notSuspended": "Sin suspensión",
+    "suspend": "Suspender cuenta",
+    "replace": "Cambiar suspensión",
+    "lift": "Levantar suspensión",
+    "liftTitle": "¿Levantar la suspensión de {name}?",
+    "liftHelp": "Podrá volver a pedir viajes y conectarse como motorizado. Se le enviará una notificación.",
+    "until": "Suspendida hasta {date}",
+    "indefinite": "Suspendida indefinidamente",
+    "indefiniteShort": "indefinida",
+    "byOn": "Por {name}, el {date}",
+    "by": "Por {name}",
+    "liftedBy": "levantada por {name} el {date}",
+    "system": "el sistema",
+    "history": "Historial",
+    "noHistory": "Nunca ha sido suspendida.",
+    "fromReport": "Ver reporte",
+    "thisPerson": "esta persona",
+    "states": {
+      "active": "Vigente",
+      "lifted": "Levantada",
+      "expired": "Vencida"
+    },
+    "toast": {
+      "suspended": "Cuenta suspendida",
+      "lifted": "Suspensión levantada"
+    },
+    "modal": {
+      "title": "Suspender la cuenta de {name}",
+      "description": "La persona recibe una notificación con el motivo y la fecha de fin.",
+      "effects": "No podrá pedir viajes ni conectarse como motorizado (si está conectado, se desconecta). Los viajes en curso siguen. Puede entrar a la app, ver su historial y su billetera y crear reportes.",
+      "replaces": "Ya está suspendida: esta suspensión reemplaza a la actual",
+      "fromReport": "Quedará una nota en el reporte con esta suspensión."
+    },
+    "reason": "Motivo",
+    "reasonHelp": "Entre 3 y 500 caracteres. La persona verá este motivo.",
+    "duration": "Duración",
+    "presets": {
+      "24h": "24 horas",
+      "3d": "3 días",
+      "7d": "7 días",
+      "30d": "30 días",
+      "indefinite": "Indefinida",
+      "custom": "Hasta una fecha"
+    },
+    "customUntil": "Último día de la suspensión",
+    "customUntilHelp": "Termina al acabar ese día (hora de Caracas).",
+    "customInvalid": "Elige hoy o un día posterior",
+    "willEnd": "Termina el {date}.",
+    "willNotEnd": "No termina sola: hay que levantarla a mano."
+  },
+  "reports": {
+    "title": "Reportes",
+    "seeAll": "Ver todos",
+    "none": "Sin reportes.",
+    "empty": "No hay reportes con estos filtros",
+    "total": "{n} reportes",
+    "search": "Buscar por nombre o correo",
+    "allStatuses": "Todos",
+    "allCategories": "Todas las categorías",
+    "allPriorities": "Todas las prioridades",
+    "urgentOpen": "Urgentes abiertos: {n}",
+    "filterUser": "Usuario {id}",
+    "filterRide": "Viaje {id}",
+    "removeFilter": "Quitar filtro",
+    "category": "Categoría",
+    "priority": "Prioridad",
+    "status": "Estado",
+    "createdAt": "Creado",
+    "updatedAt": "Última actualización",
+    "resolvedAt": "Cerrado",
+    "people": "Personas",
+    "description": "Descripción",
+    "assignedTo": "Asignado a",
+    "unassigned": "Sin asignar",
+    "ride": "Viaje {id}",
+    "general": "Reporte general",
+    "reporter": "Reporta",
+    "reported": "Reportado",
+    "reportedFrom": "Reportado como",
+    "notesCount": "{n} notas",
+    "side": {
+      "reporter": "Reportó",
+      "reported": "Reportado"
+    },
+    "roles": {
+      "passenger": "pasajero",
+      "driver": "motorizado"
+    },
+    "reporterRole": {
+      "passenger": "Pasajero",
+      "driver": "Motorizado",
+      "general": "Sin viaje"
+    },
+    "statuses": {
+      "open": "Abiertos",
+      "in_review": "En revisión",
+      "resolved": "Resueltos",
+      "dismissed": "Descartados"
+    },
+    "priorities": {
+      "urgent": "Urgente",
+      "normal": "Normal"
+    },
+    "categories": {
+      "safety": "Seguridad",
+      "harassment": "Acoso",
+      "driving": "Manejo imprudente",
+      "fare": "Cobro",
+      "vehicle_mismatch": "Moto o persona distinta",
+      "lost_item": "Objeto olvidado",
+      "no_show": "No se presentó",
+      "app_issue": "Falla de la app",
+      "other": "Otro"
+    },
+    "categoryHelp": {
+      "safety": "se sintió en peligro",
+      "harassment": "acoso o insultos",
+      "driving": "manejo imprudente",
+      "fare": "cobro distinto al acordado",
+      "vehicle_mismatch": "la moto o la persona no coinciden",
+      "lost_item": "objeto olvidado",
+      "no_show": "no se presentó",
+      "app_issue": "falla de la app",
+      "other": "otro motivo"
+    },
+    "detailTitle": "Reporte · {category}",
+    "resolutionSent": "Respuesta enviada a quien reportó",
+    "manage": "Gestión",
+    "resolveHint": "Al resolver o descartar, quien reportó recibe una notificación con tu respuesta.",
+    "rideTitle": "Viaje",
+    "openRide": "Ver viaje",
+    "noRide": "Reporte general, sin viaje asociado.",
+    "suspendPerson": "Suspender a {name}",
+    "summary": {
+      "rating": "Calificación",
+      "ridesCompleted": "Viajes completados",
+      "reportsAgainst": "Reportes en su contra",
+      "reportsAgainstValue": "{total} en total · {open} abiertos · {recent} en 90 días",
+      "driverProfile": "Perfil de motorizado",
+      "openDriver": "Ver perfil",
+      "openUser": "Ver usuario"
+    },
+    "actions": {
+      "resolve": "Resolver",
+      "dismiss": "Descartar",
+      "reopen": "Reabrir",
+      "startReview": "Pasar a revisión",
+      "backToOpen": "Volver a abierto",
+      "assignToMe": "Asignarme",
+      "unassign": "Quitar asignación"
+    },
+    "toast": {
+      "priority": "Prioridad actualizada",
+      "inReview": "Reporte en revisión",
+      "open": "Reporte abierto de nuevo",
+      "assigned": "Reporte asignado a ti",
+      "unassigned": "Asignación quitada",
+      "reopened": "Reporte reabierto",
+      "resolved": "Reporte resuelto",
+      "dismissed": "Reporte descartado"
+    },
+    "notes": {
+      "title": "Notas internas",
+      "internal": "Solo las ve el equipo",
+      "empty": "Todavía no hay notas.",
+      "staff": "Equipo",
+      "system": "Sistema",
+      "placeholder": "Escribe una nota interna…",
+      "add": "Agregar nota",
+      "help": "Las notas no se envían a nadie."
+    },
+    "resolve": {
+      "resolvedTitle": "Resolver reporte",
+      "dismissedTitle": "Descartar reporte",
+      "resolvedHelp": "Cierra el reporte como atendido.",
+      "dismissedHelp": "Cierra el reporte sin medidas (no procede o no hay suficiente información).",
+      "visible": "{name} verá este texto",
+      "visibleHelp": "La respuesta se envía como notificación a quien reportó y queda visible en su reporte. No incluyas notas internas ni datos de la otra persona.",
+      "resolution": "Respuesta para quien reportó",
+      "resolutionHelp": "Entre {min} y {max} caracteres.",
+      "resolvedConfirm": "Resolver y notificar",
+      "dismissedConfirm": "Descartar y notificar"
+    }
+  },
+  "finance": {
+    "count": "{n} operaciones",
+    "help": {
+      "toggle": "Mostrar u ocultar la ayuda",
+      "title": "Cómo cuadrar con el estado de cuenta de Binance",
+      "step1": "Elige el mismo periodo que el estado de cuenta de Binance Pay (las fechas son de Caracas; Binance muestra UTC, así que revisa los movimientos cerca de medianoche).",
+      "step2": "Lo recibido en Binance en el periodo debe coincidir con «Recargas acreditadas». Descarga el CSV de recargas (estado acreditada) y compara cada orden por su transacción o referencia.",
+      "step3": "Un pago que está en Binance pero no en el CSV suele estar «sin asignar» o «pendiente»: resuélvelo en Recargas. Uno que está en el CSV pero no en Binance es una confirmación manual que hay que revisar.",
+      "step4": "Para revisar saldos usa el CSV de movimientos: cada fila trae el saldo después del movimiento.",
+      "balances": "«Saldos en billeteras» no depende del periodo: es el total que los motorizados tienen hoy en Kuulis, el dinero que Kuulis les debe en servicio."
+    },
+    "cards": {
+      "topUpsCompleted": "Recargas acreditadas",
+      "byCompletedAt": "por fecha de acreditación",
+      "auto": "Automáticas",
+      "manual": "Manuales",
+      "topUpsOther": "Recargas no acreditadas",
+      "byCreatedAt": "Por fecha de creación.",
+      "feesCollected": "Cuotas cobradas",
+      "feesPending": "Pendientes hoy: {amount}",
+      "feesPendingHelp": "Las pendientes no dependen del periodo",
+      "waived": "{n} exoneradas",
+      "promoCredits": "Créditos por promociones",
+      "promoCreditsHelp": "Lo que Kuulis acreditó a los motorizados por descuentos.",
+      "adjustments": "Ajustes manuales",
+      "transfers": "Transferencias entre motorizados",
+      "transfersHelp": "No cambian el total en billeteras",
+      "walletBalances": "Saldos en billeteras (ahora)",
+      "walletBalancesHelp": "Suma de todos los saldos en este momento: lo que Kuulis «debe» en servicio. Debe estar respaldado por lo que hay en la cuenta de Binance."
+    },
+    "chart": {
+      "title": "Movimientos por día",
+      "topUps": "Recargas",
+      "fees": "Cuotas",
+      "promoCredits": "Créditos de promociones"
+    },
+    "export": {
+      "title": "Exportar CSV",
+      "help": "Del {from} al {to}. Se abre en Excel o Google Sheets.",
+      "entries": "Movimientos de billeteras",
+      "entriesHelp": "Fecha, usuario, tipo, monto, saldo después, referencia y detalle.",
+      "topUps": "Recargas",
+      "topUpsHelp": "Creada, acreditada, estado, origen, monto, motorizado, pagador, transacción y referencia.",
+      "allKinds": "Todos los tipos",
+      "download": "Descargar CSV"
     }
   }
 }

@@ -619,3 +619,268 @@ export interface AdminWallet {
   entries: WalletEntry[]
   pending_charges: Charge[]
 }
+
+// ---- Phase 1E: reports, account suspensions, finance & metrics (docs/api/phase-1e.md) ----
+
+/** Calendar day in Caracas time, "2026-10-09". */
+export type Day = string
+
+export interface UserBrief {
+  id: string
+  name: string | null
+  email: string | null
+}
+
+/** Account suspension in force (`until` null = indefinite). */
+export interface Suspension {
+  reason: string
+  suspended_at: string
+  until: string | null
+  by: UserBrief | null
+}
+
+/** GET /admin/users/{id}/suspensions items, newest first. */
+export interface SuspensionRecord extends Suspension {
+  lifted_at: string | null
+  lifted_by: UserBrief | null
+  report_id: string | null
+}
+
+/** POST /admin/users/{id}/suspend body. */
+export interface SuspendInput {
+  reason: string
+  until?: string
+  report_id?: string
+}
+
+/** UserRead in the admin API adds the suspension in force (phase 1E) and the passenger rating (1B). */
+export interface AdminUser extends User {
+  suspension?: Suspension | null
+  rating_avg?: number | null
+  rating_count?: number
+}
+
+export type ReportCategory
+  = | 'safety'
+    | 'harassment'
+    | 'driving'
+    | 'fare'
+    | 'vehicle_mismatch'
+    | 'lost_item'
+    | 'no_show'
+    | 'app_issue'
+    | 'other'
+export const REPORT_CATEGORIES: ReportCategory[] = [
+  'safety',
+  'harassment',
+  'driving',
+  'fare',
+  'vehicle_mismatch',
+  'lost_item',
+  'no_show',
+  'app_issue',
+  'other',
+]
+export type ReportPriority = 'urgent' | 'normal'
+export const REPORT_PRIORITIES: ReportPriority[] = ['urgent', 'normal']
+export type ReportStatus = 'open' | 'in_review' | 'resolved' | 'dismissed'
+export const REPORT_STATUSES: ReportStatus[] = ['open', 'in_review', 'resolved', 'dismissed']
+export type ReporterRole = 'passenger' | 'driver'
+
+export interface Report {
+  id: string
+  category: ReportCategory
+  description: string
+  status: ReportStatus
+  priority: ReportPriority
+  ride_id: string | null
+  /** null for a general report (no ride, nobody reported). */
+  reporter_role: ReporterRole | null
+  created_at: string
+  updated_at: string
+  /** Answer shown to the reporter once resolved or dismissed. */
+  resolution: string | null
+  resolved_at: string | null
+}
+
+/** GET /admin/reports items. */
+export interface ReportAdminRead extends Report {
+  reporter: UserBrief
+  reported: UserBrief | null
+  assigned_to: UserBrief | null
+  notes_count: number
+}
+
+export interface ReportCounts {
+  open: number
+  in_review: number
+  urgent_open: number
+}
+
+/** GET /admin/reports: a page plus counts for the whole inbox. */
+export interface ReportPage extends Page<ReportAdminRead> {
+  counts?: ReportCounts | null
+}
+
+/** `note` = written by staff; the rest are written by the system. */
+export type ReportNoteKind = 'note' | 'status' | 'suspension'
+
+export interface ReportNote {
+  id: string
+  body: string
+  kind: ReportNoteKind
+  author: UserBrief | null
+  created_at: string
+}
+
+export interface PersonSummary {
+  user_id: string
+  name: string | null
+  email: string | null
+  phone: string | null
+  role_in_ride: ReporterRole | null
+  rating_avg: number | string | null
+  rating_count: number
+  rides_completed: number
+  reports_against: { total: number, open: number, last_90_days: number }
+  suspension: Suspension | null
+  driver_profile_id: string | null
+  driver_status: DriverStatus | null
+}
+
+/** GET /admin/reports/{id}. */
+export interface ReportAdminDetail extends ReportAdminRead {
+  ride: AdminRideRead | null
+  notes: ReportNote[]
+  reported_summary: PersonSummary | null
+  reporter_summary: PersonSummary
+}
+
+/** RideAdminRead (list shape of /admin/rides): the ride plus flat names of both parties. */
+export interface AdminRideRead extends Ride {
+  passenger_name?: string | null
+  passenger_email?: string | null
+  driver_name?: string | null
+  driver_email?: string | null
+  driver_profile_id?: string | null
+}
+
+/** PATCH /admin/reports/{id}. */
+export interface ReportUpdate {
+  status?: 'open' | 'in_review'
+  priority?: ReportPriority
+  assigned_to_id?: string | null
+}
+
+// ---- Finance ----
+
+export interface CountAmount {
+  count: number
+  amount: Decimal
+}
+
+export interface FinanceDay {
+  date: Day
+  top_ups: Decimal
+  fees: Decimal
+  promo_credits: Decimal
+}
+
+/** GET /admin/finance/summary. */
+export interface FinanceSummary {
+  from: Day
+  to: Day
+  top_ups: {
+    completed: CountAmount
+    completed_auto: CountAmount
+    completed_manual: CountAmount
+    pending: CountAmount
+    unmatched: CountAmount
+    rejected: CountAmount
+  }
+  fees: { collected: Decimal, pending: Decimal, waived_count: number }
+  promo_credits: Decimal
+  adjustments: { credit: Decimal, debit: Decimal }
+  transfers: CountAmount
+  /** Sum of every wallet balance right now (what Kuulis owes in service). */
+  wallet_balances: Decimal
+  by_day: FinanceDay[]
+}
+
+// ---- Metrics ----
+
+export interface MetricsTotals {
+  rides_requested: number
+  rides_completed: number
+  rides_cancelled_passenger: number
+  rides_cancelled_driver: number
+  rides_cancelled_admin: number
+  rides_no_drivers: number
+  /** 0–1. */
+  completion_rate: number | null
+  gmv: Decimal
+  discounts: Decimal
+  avg_fare: Decimal | null
+  avg_distance_m: number | null
+  avg_assign_s: number | null
+  avg_pickup_s: number | null
+  avg_trip_s: number | null
+  active_drivers: number
+  active_passengers: number
+  new_passengers: number
+  new_drivers: number
+  avg_rating_drivers: number | null
+  avg_rating_passengers: number | null
+}
+
+export interface MetricsDay {
+  date: Day
+  requested: number
+  completed: number
+  cancelled: number
+  no_drivers: number
+  gmv: Decimal
+  active_drivers: number
+}
+
+export interface MetricsHour {
+  /** 0–23, Caracas time. */
+  hour: number
+  requested: number
+  completed: number
+}
+
+export interface TopDriver {
+  user_id: string
+  name: string | null
+  rides: number
+  earnings: Decimal
+  rating_avg: number | null
+}
+
+/** GET /admin/metrics. */
+export interface Metrics {
+  from: Day
+  to: Day
+  area: string | null
+  totals: MetricsTotals
+  by_day: MetricsDay[]
+  by_hour: MetricsHour[]
+  top_drivers: TopDriver[]
+}
+
+/** GET /admin/overview. */
+export interface Overview {
+  online_drivers: number
+  rides_in_progress: number
+  rides_today: number
+  completed_today: number
+  gmv_today: Decimal
+  pending_driver_applications: number
+  pending_top_ups: number
+  unmatched_top_ups: number
+  open_reports: number
+  urgent_reports: number
+  overdue_drivers: number
+  stale_rates: RateSource[]
+}

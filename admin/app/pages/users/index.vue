@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { Page, Role, User } from '~/types/api'
+import type { AdminUser, Page, Role } from '~/types/api'
 
 const { t, locale } = useI18n()
 const { request } = useApi()
@@ -12,11 +12,15 @@ watch(search, (value) => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => (debouncedSearch.value = value), 300)
 })
+const route = useRoute()
 const role = ref<Role | 'all'>('all')
+type SuspendedFilter = 'all' | 'true' | 'false'
+// ?suspended=true from elsewhere opens the list already filtered.
+const suspended = ref<SuspendedFilter>(route.query.suspended === 'true' || route.query.suspended === 'false' ? route.query.suspended : 'all')
 const page = ref(1)
 const limit = 20
 
-watch([debouncedSearch, role], () => {
+watch([debouncedSearch, role, suspended], () => {
   page.value = 1
 })
 
@@ -25,11 +29,12 @@ const query = computed(() => ({
   offset: (page.value - 1) * limit,
   ...(debouncedSearch.value ? { search: debouncedSearch.value } : {}),
   ...(role.value !== 'all' ? { role: role.value } : {}),
+  ...(suspended.value !== 'all' ? { suspended: suspended.value } : {}),
 }))
 
 const { data, status } = await useAsyncData(
   'users',
-  () => request<Page<User>>('/users', { query: query.value }),
+  () => request<Page<AdminUser>>('/users', { query: query.value }),
   { watch: [query] },
 )
 
@@ -40,9 +45,15 @@ const roleItems = computed(() => [
   { label: t('roles.admin'), value: 'admin' },
 ])
 
+const suspendedItems = computed(() => [
+  { label: t('users.allAccounts'), value: 'all' },
+  { label: t('users.suspendedOnly'), value: 'true' },
+  { label: t('users.notSuspended'), value: 'false' },
+])
+
 const roleColor: Record<Role, 'neutral' | 'info' | 'primary'> = { user: 'neutral', staff: 'info', admin: 'primary' }
 
-const columns = computed<TableColumn<User>[]>(() => [
+const columns = computed<TableColumn<AdminUser>[]>(() => [
   { accessorKey: 'email', header: t('users.email') },
   { accessorKey: 'full_name', header: t('users.name') },
   { accessorKey: 'role', header: t('users.role') },
@@ -71,6 +82,12 @@ const columns = computed<TableColumn<User>[]>(() => [
           :items="roleItems"
           class="w-40"
         />
+        <USelect
+          v-model="suspended"
+          :items="suspendedItems"
+          class="w-48"
+          :aria-label="t('users.suspensionFilter')"
+        />
       </UDashboardToolbar>
     </template>
 
@@ -80,7 +97,7 @@ const columns = computed<TableColumn<User>[]>(() => [
         :columns="columns"
         :loading="status === 'pending'"
         :empty="t('common.empty')"
-        @select="(_e: Event, row: { original: User }) => navigateTo(`/users/${row.original.id}`)"
+        @select="(_e: Event, row: { original: AdminUser }) => navigateTo(`/users/${row.original.id}`)"
       >
         <template #role-cell="{ row }">
           <UBadge
@@ -96,6 +113,16 @@ const columns = computed<TableColumn<User>[]>(() => [
             variant="subtle"
           >
             {{ row.original.is_active ? t('users.active') : t('users.inactive') }}
+          </UBadge>
+          <UBadge
+            v-if="isSuspensionInForce(row.original.suspension)"
+            color="error"
+            variant="solid"
+            icon="i-lucide-user-x"
+            class="ml-1"
+            :title="row.original.suspension?.reason"
+          >
+            {{ t('suspensions.suspended') }}
           </UBadge>
         </template>
         <template #created_at-cell="{ row }">
