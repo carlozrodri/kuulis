@@ -18,12 +18,15 @@
 - Promociones al pasajero: Kuulis acredita la diferencia en la billetera del motorizado.
 - Transferencias entre motorizados: límite de 50 USD editable desde el admin.
 - Los recargos por demanda alta cuentan para el tramo de la cuota.
+- Documentos del motorizado: cédula, RIF (Venezuela), licencia, carnet de circulación, selfie y fotos de la moto; aprobación manual.
+- Chat dentro de la app y calificación obligatoria de ambos lados.
+- Llamadas enmascaradas: fuera, por costo. La operación debe ser de muy bajo costo.
+- Precios en USDT con equivalente en bolívares a tasa BCV y a tasa Binance.
 
 ## Preguntas para Carlos
-1. ¿Qué requisitos y documentos debe tener un motorizado para ser aprobado?
-2. ¿Hace falta chat dentro de la app, llamadas enmascaradas y calificaciones?
-3. ¿Se muestra el equivalente en bolívares? ¿Con qué tasa?
-4. ¿Caracas u otro país? Se puede decidir más adelante; el diseño no depende de eso.
+1. Confirmar: el límite de transferencia de 50 USD es por motorizado y por mes, sumando lo enviado.
+2. Confirmar: con promoción, para el tramo cuenta el precio completo del viaje, sin descuento.
+3. ¿Caracas u otro país? Se puede decidir más adelante; el diseño no depende de eso.
 
 ## Riesgos
 | Riesgo | Por qué importa | Mitigación propuesta (supuesto) |
@@ -39,6 +42,7 @@
 | Tiendas de apps | Faltan cuentas de Apple y Google Play | Ya está en `docs/blockers.md`; ambas permiten cuenta de persona natural |
 | Operar sin empresa registrada | Responsabilidad personal de Carlos ante accidentes, reclamos o autoridades; Binance Pay Merchant y algunos procesadores exigen empresa | Términos y condiciones claros (Kuulis conecta, no transporta), billetera no reembolsable, asesoría legal antes de escalar |
 | Custodia de saldos de motorizados | Guardar dinero de terceros puede tener implicaciones legales y contables | Saldo como crédito prepago no reembolsable; registro contable de cada movimiento en la app |
+| Fuentes de tasas de cambio | El sitio del BCV o la API de Binance P2P pueden cambiar o caerse | Guardar la última tasa válida, alerta en el admin y opción de cargarla a mano |
 | Abuso de promociones | Viajes falsos para cobrar saldo de Kuulis | Presupuesto y tope por promoción, detección de pares pasajero-motorizado repetidos |
 | Transferencias de saldo entre motorizados | Mercado de reventa de saldo, fraude con cuentas robadas | Límites por mes, registro de cada transferencia y alertas en el admin |
 | Reglas de las tiendas sobre cobros dentro de la app | Si Apple o Google consideran la suscripción un bien digital, exigirían su sistema de pago (15–30 %) | Validar con las guías de revisión antes de publicar; cobrar fuera de la app (USDT) |

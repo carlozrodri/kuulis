@@ -68,6 +68,16 @@ con la API de Binance.
   recibe el motorizado entre efectivo y saldo.
 - Los **recargos por demanda alta cuentan** para la ganancia del mes y, por tanto, para el tramo.
 
+### Moneda y tasas de cambio (decidido)
+- Todos los precios y la billetera están en **USD/USDT**.
+- La app muestra además el **equivalente en bolívares** con dos tasas: **BCV** (oficial) y **Binance** (P2P
+  USDT/VES), para que pasajero y motorizado sepan cuánto pagar si el pago es en Bs.
+- Supuesto de implementación a costo cero: una tarea programada del worker consulta la tasa BCV (sitio del BCV)
+  y la tasa promedio de Binance P2P, las guarda en Redis y en un historial en Postgres. Frecuencia sugerida:
+  BCV una vez al día, Binance cada 15–30 minutos. Desde el admin se puede corregir una tasa a mano si una fuente
+  falla, y la app muestra la hora de la última actualización.
+- Supuesto: el precio del viaje se **congela en USD y en Bs al confirmar**, para que no cambie durante el viaje.
+
 ### Riesgo de las promociones
 Como Kuulis acredita saldo por cada viaje con promoción, ese saldo es un **costo real de marketing**. Requisitos:
 presupuesto y fecha de fin por promoción, tope de usos por pasajero y alertas de abuso (viajes falsos entre un
