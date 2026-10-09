@@ -5,7 +5,8 @@ import type { ApiErrorBody } from '~/types/api'
 export function useApi() {
   const config = useRuntimeConfig()
   const auth = useAuth()
-  const { locale } = useI18n()
+  // $i18n (not useI18n) so this also works in route middleware, outside component setup.
+  const { $i18n } = useNuxtApp()
 
   async function request<T>(path: string, options: FetchOptions<'json'> = {}): Promise<T> {
     const call = () =>
@@ -13,7 +14,7 @@ export function useApi() {
         baseURL: config.public.apiBase,
         ...options,
         headers: {
-          'Accept-Language': locale.value,
+          'Accept-Language': $i18n.locale.value,
           ...(auth.accessToken.value ? { Authorization: `Bearer ${auth.accessToken.value}` } : {}),
           ...(options.headers as Record<string, string> | undefined),
         },
