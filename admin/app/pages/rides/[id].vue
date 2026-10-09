@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AdminRide, RideMessage, RideRating } from '~/types/api'
+import { RATE_SOURCES } from '~/types/api'
 import type { MapLine, MapMarker } from '~/utils/geo'
 
 const { t, te, locale } = useI18n()
@@ -94,6 +95,17 @@ const mapMarkers = computed<MapMarker[]>(() => {
 const surge = computed(() => Number(ride.value?.surge_multiplier ?? 1))
 // The final fare is rounded up after the surge, so the pre-surge amount is an approximation.
 const preSurgeFare = computed(() => (ride.value && surge.value > 1 ? Number(ride.value.fare) / surge.value : null))
+
+// Phase 1C: promotion discount and amounts in bolívares (absent on rides from an older API).
+const hasDiscount = computed(() => Number(ride.value?.discount ?? 0) > 0)
+const totalToPay = computed(() => ride.value?.total ?? ride.value?.fare ?? null)
+const vesRows = computed(() => {
+  const r = ride.value
+  if (!r) return []
+  return RATE_SOURCES
+    .map(source => ({ source, amount: r.total_ves?.[source] ?? null, rate: r.rates?.[source] ?? null }))
+    .filter(row => row.amount !== null || row.rate !== null)
+})
 
 // ---- Chat & ratings -------------------------------------------------------------------------
 
@@ -397,10 +409,70 @@ async function confirmCancel() {
                   </UBadge>
                 </dd>
               </div>
-              <div class="flex justify-between gap-4 border-t border-(--ui-border) pt-2 text-base font-semibold">
-                <dt>{{ t('rides.fare') }}</dt>
+              <div
+                class="flex justify-between gap-4 border-t border-(--ui-border) pt-2"
+                :class="hasDiscount ? '' : 'text-base font-semibold'"
+              >
+                <dt :class="hasDiscount ? 'text-(--ui-text-muted)' : ''">
+                  {{ t('rides.fare') }}
+                </dt>
                 <dd>{{ formatMoney(ride.fare, locale) }}</dd>
               </div>
+              <template v-if="hasDiscount">
+                <div class="flex justify-between gap-4">
+                  <dt class="text-(--ui-text-muted)">
+                    {{ t('rides.discount') }}
+                  </dt>
+                  <dd class="text-success">
+                    −{{ formatMoney(ride.discount, locale) }}
+                  </dd>
+                </div>
+                <div class="flex justify-between gap-4 text-base font-semibold">
+                  <dt>{{ t('rides.totalToPay') }}</dt>
+                  <dd>{{ formatMoney(totalToPay, locale) }}</dd>
+                </div>
+                <p class="text-xs text-(--ui-text-muted)">
+                  {{ t('rides.discountHelp') }}
+                </p>
+              </template>
+              <div
+                v-if="ride.promotion"
+                class="flex justify-between gap-4"
+              >
+                <dt class="text-(--ui-text-muted)">
+                  {{ t('rides.promotion') }}
+                </dt>
+                <dd class="text-right">
+                  <NuxtLink
+                    :to="`/promotions/${ride.promotion.id}`"
+                    class="text-primary hover:underline"
+                  >
+                    {{ ride.promotion.name }}
+                  </NuxtLink>
+                  <span
+                    v-if="ride.promotion.code"
+                    class="ml-1 font-mono text-xs text-(--ui-text-muted)"
+                  >{{ ride.promotion.code }}</span>
+                </dd>
+              </div>
+              <template v-if="vesRows.length">
+                <div
+                  v-for="row in vesRows"
+                  :key="row.source"
+                  class="flex justify-between gap-4"
+                >
+                  <dt class="text-(--ui-text-muted)">
+                    {{ t('rides.totalVes', { source: t(`rates.sources.${row.source}`) }) }}
+                    <span
+                      v-if="row.rate"
+                      class="block text-xs"
+                    >{{ t('rides.frozenRate', { rate: formatRate(row.rate, locale) }) }}</span>
+                  </dt>
+                  <dd class="whitespace-nowrap tabular-nums">
+                    {{ formatVes(row.amount, locale) }}
+                  </dd>
+                </div>
+              </template>
               <div class="flex justify-between gap-4 pt-2">
                 <dt class="text-(--ui-text-muted)">
                   {{ t('rides.paymentMethod') }}

@@ -33,6 +33,10 @@ DEFAULTS = {
     "search_radius_m": [2000, 4000, 7000],
     "search_timeout_seconds": 180,
     "quote_ttl_seconds": 300,
+    "rates_stale_minutes": {"bcv": 2160, "binance": 120},
+    "rates_manual_hold_hours": 6,
+    "promo_pair_alert_threshold": 3,
+    "promo_pair_alert_days": 30,
 }
 
 

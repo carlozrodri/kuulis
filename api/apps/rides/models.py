@@ -151,6 +151,17 @@ class Ride(BaseModel):
     duration_s: Mapped[int] = mapped_column(Integer)
     fare: Mapped[Decimal] = mapped_column(Numeric(10, 2))
     surge_multiplier: Mapped[Decimal] = mapped_column(Numeric(4, 2))
+    # Promotion paid by Kuulis: the passenger pays ``total`` and the driver gets ``discount`` in
+    # the wallet when the ride completes.
+    promotion_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("promotions.id", ondelete="RESTRICT"), index=True
+    )
+    discount: Mapped[Decimal] = mapped_column(
+        Numeric(10, 2), default=Decimal("0"), server_default=text("0")
+    )
+    # Bolívares per USD when the ride was requested (None: rate unknown then).
+    rate_bcv: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
+    rate_binance: Mapped[Decimal | None] = mapped_column(Numeric(14, 4))
     payment_method: Mapped[PaymentMethod] = mapped_column(_enum(PaymentMethod, "payment_method"))
     polyline: Mapped[str | None] = mapped_column(Text)
     # Snapshot of the vehicle when the driver accepted (brand, model, color, plate, type).
@@ -170,6 +181,11 @@ class Ride(BaseModel):
 
     rated_by_passenger: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
     rated_by_driver: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
+
+    @property
+    def total(self) -> Decimal:
+        """What the passenger pays the driver."""
+        return self.fare - (self.discount or Decimal("0"))
 
 
 class RideOffer(BaseModel):

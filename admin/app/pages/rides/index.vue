@@ -237,6 +237,16 @@ const apiError = useApiError()
           >
             {{ formatMultiplier(row.original.surge_multiplier) }}
           </UBadge>
+          <p
+            v-if="Number(row.original.discount) > 0 && row.original.total"
+            class="text-xs whitespace-nowrap text-success"
+            :title="row.original.promotion?.name"
+          >
+            <UIcon
+              name="i-lucide-ticket-percent"
+              class="mr-0.5 align-middle"
+            />{{ t('rides.pays', { amount: formatMoney(row.original.total, locale) }) }}
+          </p>
         </template>
         <template #payment_method-cell="{ row }">
           {{ t(`paymentMethods.${row.original.payment_method}`, row.original.payment_method) }}

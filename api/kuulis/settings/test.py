@@ -17,3 +17,4 @@ class TestSettings(BaseAppSettings):
     STORAGE_PREFIX: str = "test"
     OSRM_URL: str = ""  # tests never call the network
     PHOTON_URL: str = ""
+    RATES_ENABLED: bool = False  # tests never call the network

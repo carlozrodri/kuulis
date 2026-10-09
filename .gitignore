@@ -42,3 +42,4 @@ android/
 *.key
 *.mobileprovision
 *.keystore
+dump.rdb

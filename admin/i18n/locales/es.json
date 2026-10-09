@@ -7,7 +7,9 @@
     "drivers": "Motorizados",
     "settings": "Configuración",
     "rides": "Viajes",
-    "live": "En vivo"
+    "live": "En vivo",
+    "rates": "Tasas",
+    "promotions": "Promociones"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -20,7 +22,10 @@
     "totalUsers": "Usuarios totales",
     "activeUsers": "Usuarios activos",
     "verifiedUsers": "Usuarios verificados",
-    "staff": "Equipo (staff y admin)"
+    "staff": "Equipo (staff y admin)",
+    "staleRates": "Tasa desactualizada: {sources}",
+    "staleRatesHelp": "Los montos en bolívares de las cotizaciones nuevas usan esta tasa. Revísala o corrígela a mano.",
+    "openRates": "Ver tasas"
   },
   "users": {
     "email": "Correo",
@@ -97,7 +102,12 @@
     "ride_active": "El motorizado tiene un viaje activo",
     "offer_expired": "La oferta venció",
     "ride_taken": "Otro motorizado tomó el viaje",
-    "chat_closed": "El chat de este viaje está cerrado"
+    "chat_closed": "El chat de este viaje está cerrado",
+    "promotion_code_taken": "Ya existe una promoción con ese código",
+    "budget_below_committed": "El presupuesto no puede ser menor que lo ya comprometido (acreditado + reservado)",
+    "promotion_not_found": "Promoción no encontrada",
+    "promotion_invalid": "La promoción no aplica a este viaje",
+    "promotion_unavailable": "La promoción se agotó; hay que cotizar de nuevo"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -215,7 +225,11 @@
       "radii": "Radios: de 1 a 6 valores entre 100 y 50.000 m, de menor a mayor.",
       "timeouts": "Los tiempos deben ser mayores que cero.",
       "searchShorterThanOffer": "El tiempo de búsqueda no puede ser menor que el de cada oferta.",
-      "serviceAreaCount": "Debe haber entre 1 y 20 ciudades."
+      "serviceAreaCount": "Debe haber entre 1 y 20 ciudades.",
+      "ratesStale": "Antigüedad de las tasas: minutos enteros entre {min} y {max}.",
+      "manualHold": "Vigencia de la tasa manual: entre {min} y {max} horas.",
+      "pairThreshold": "Alerta de pares: entre {min} y {max} viajes.",
+      "pairDays": "Ventana de la alerta: entre {min} y {max} días."
     },
     "fares": {
       "title": "Tarifas",
@@ -270,6 +284,18 @@
       "radiiHelp": "Se amplía la búsqueda en este orden, de menor a mayor.",
       "addRadius": "Agregar radio",
       "removeRadius": "Quitar radio"
+    },
+    "rates": {
+      "title": "Tasas y promociones",
+      "help": "Avisos de tasas de cambio desactualizadas, correcciones manuales y control de abuso de promociones.",
+      "staleMinutes": "Aviso de tasa vieja: {source} (min)",
+      "staleHelp": "Pasada esa antigüedad el panel marca la tasa como desactualizada.",
+      "manualHold": "Vigencia de tasa manual (h)",
+      "manualHoldHelp": "Horas en que la consulta automática no reemplaza una tasa manual.",
+      "pairThreshold": "Viajes para alertar",
+      "pairThresholdHelp": "Viajes con promoción entre el mismo pasajero y motorizado que generan una alerta.",
+      "pairDays": "Ventana de la alerta (días)",
+      "pairDaysHelp": "Días hacia atrás en los que se cuentan esos viajes."
     }
   },
   "paymentMethods": {
@@ -386,7 +412,14 @@
       "unsafe_location": "Lugar inseguro",
       "vehicle_problem": "Problema con la moto",
       "other": "Otro motivo"
-    }
+    },
+    "discount": "Descuento",
+    "totalToPay": "Total a pagar",
+    "discountHelp": "El pasajero paga el total al motorizado; Kuulis le acredita el descuento al completar el viaje.",
+    "promotion": "Promoción",
+    "totalVes": "Total en Bs ({source})",
+    "frozenRate": "Tasa {rate} al pedir",
+    "pays": "Paga {amount}"
   },
   "live": {
     "activeRides": "Viajes ({n})",
@@ -411,5 +444,166 @@
     "secondsAgo": "hace {n} s",
     "minutesAgo": "hace {n} min",
     "city": "Ciudad"
+  },
+  "rates": {
+    "sources": {
+      "bcv": "BCV (oficial)",
+      "binance": "Binance P2P"
+    },
+    "origins": {
+      "auto": "Automática",
+      "manual": "Manual"
+    },
+    "allSources": "Todas las fuentes",
+    "source": "Fuente",
+    "rate": "Tasa",
+    "unit": "Bs por 1 USD",
+    "origin": "Origen",
+    "asOf": "Fecha de la tasa",
+    "fetchedAt": "Guardada",
+    "createdBy": "Registrada por",
+    "worker": "Consulta automática",
+    "note": "Nota",
+    "noRate": "Todavía no hay tasa para esta fuente.",
+    "stale": "Tasa desactualizada",
+    "staleHelp": "Tiene más de {age} de antigüedad. Revisa la fuente o carga una tasa manual.",
+    "fetchNow": "Consultar ahora",
+    "refreshed": "Tasas consultadas",
+    "readOnly": "Solo los administradores pueden corregir o consultar las tasas.",
+    "history": "Historial",
+    "total": "{n} registros",
+    "manual": {
+      "title": "Corrección manual",
+      "help": "La tasa manual queda vigente {n} h: durante ese tiempo la consulta automática no la reemplaza.",
+      "rate": "Nueva tasa",
+      "note": "Nota (opcional)",
+      "notePlaceholder": "Ej. el BCV publicó tarde",
+      "save": "Guardar tasa",
+      "saved": "Tasa manual guardada"
+    }
+  },
+  "promotions": {
+    "new": "Nueva promoción",
+    "edit": "Editar",
+    "editTitle": "Editar «{name}»",
+    "search": "Buscar por nombre o código",
+    "allStatuses": "Todas",
+    "total": "{n} promociones",
+    "name": "Nombre",
+    "description": "Descripción",
+    "code": "Código",
+    "automatic": "Automática (sin código)",
+    "discount": "Descuento",
+    "upTo": "hasta {amount}",
+    "maxDiscount": "Descuento máximo (USD)",
+    "minFare": "Tarifa mínima",
+    "validity": "Vigencia",
+    "startsAt": "Inicio",
+    "endsAt": "Fin",
+    "budget": "Presupuesto (USD)",
+    "budgetUsage": "Presupuesto",
+    "ofBudget": "de {amount}",
+    "uses": "Usos",
+    "status": "Estado",
+    "maxUsesPerPassenger": "Usos por pasajero",
+    "maxTotalUses": "Usos totales",
+    "firstRideOnly": "Solo primer viaje",
+    "serviceAreas": "Ciudades",
+    "vehicleTypes": "Vehículos",
+    "allAreas": "Todas",
+    "allVehicles": "Todos",
+    "unlimited": "Sin límite",
+    "none": "Ninguna",
+    "yes": "Sí",
+    "no": "No",
+    "createdAt": "Creada",
+    "updatedAt": "Actualizada",
+    "conditions": "Condiciones",
+    "activate": "Activar",
+    "deactivate": "Pausar",
+    "activated": "Promoción activada",
+    "deactivated": "Promoción pausada",
+    "rides": "Viajes con esta promoción",
+    "noRides": "Ningún viaje la ha usado todavía.",
+    "completedAt": "Completado",
+    "statuses": {
+      "active": "Activa",
+      "scheduled": "Programada",
+      "ended": "Terminada",
+      "exhausted": "Agotada",
+      "inactive": "Pausada"
+    },
+    "discountTypes": {
+      "percent": "Porcentaje",
+      "fixed": "Monto fijo"
+    },
+    "stats": {
+      "credited": "Acreditado",
+      "reserved": "Reservado",
+      "remaining": "Disponible",
+      "uses": "Usos",
+      "completed": "Completados",
+      "help": "Acreditado: descuentos pagados a motorizados por viajes completados. Reservado: viajes en curso. Usos: viajes en curso y completados."
+    },
+    "alerts": {
+      "title": "Alertas",
+      "rule": "Pares pasajero–motorizado con {n} o más viajes con promoción en los últimos {days} días.",
+      "help": "Muchos viajes con descuento entre las mismas dos personas pueden indicar viajes simulados para cobrar promociones. Revisa los viajes antes de actuar.",
+      "rides": "Viajes con promoción",
+      "discountTotal": "Descuento total",
+      "lastRide": "Último viaje",
+      "refresh": "Actualizar",
+      "empty": "No hay pares sospechosos."
+    },
+    "form": {
+      "general": "Datos generales",
+      "namePlaceholder": "Ej. Bienvenida",
+      "descriptionHelp": "Uso interno; opcional.",
+      "codePlaceholder": "Vacío = automática",
+      "codeHelp": "Entre 3 y 20 letras o números. El pasajero lo escribe al cotizar.",
+      "automaticHelp": "Sin código la promoción se aplica sola a quien califique (gana la de mayor descuento).",
+      "state": "Estado",
+      "enabled": "Activa",
+      "disabled": "Pausada",
+      "activeHelp": "Pausada no se aplica aunque esté dentro de su vigencia.",
+      "discount": "Descuento",
+      "discountHelp": "Kuulis asume el descuento: el pasajero paga la tarifa menos el descuento y Kuulis se lo acredita al motorizado. Nunca supera la tarifa.",
+      "percent": "Porcentaje (1–100)",
+      "fixed": "Monto (USD)",
+      "maxDiscountHelp": "Tope por viaje; vacío = sin tope.",
+      "minFareHelp": "Tarifa desde la cual aplica; 0 = cualquiera.",
+      "noLimit": "Sin límite",
+      "validity": "Vigencia",
+      "validityHelp": "Fechas y horas en tu zona horaria ({zone}).",
+      "limits": "Presupuesto y límites",
+      "budgetHelp": "Lo acreditado más lo reservado nunca supera este monto.",
+      "budgetCommitted": "Ya comprometido: {amount}. No puede bajar de ahí.",
+      "emptyNoLimit": "Vacío = sin límite.",
+      "firstRideOnlyHelp": "Solo para pasajeros sin viajes completados.",
+      "scope": "Alcance",
+      "scopeHelp": "Sin marcar nada aplica a todas las ciudades y a todos los vehículos.",
+      "noAreas": "No hay ciudades configuradas.",
+      "unknownArea": "{name} (ya no configurada)",
+      "fixErrors": "Corrige estos datos antes de guardar.",
+      "create": "Crear promoción",
+      "created": "Promoción creada"
+    },
+    "errors": {
+      "nameRequired": "Escribe un nombre.",
+      "nameTooLong": "El nombre admite hasta {max} caracteres.",
+      "descriptionTooLong": "La descripción admite hasta {max} caracteres.",
+      "code": "El código debe tener entre 3 y 20 letras (A–Z) o números, o quedar vacío.",
+      "percent": "El porcentaje va de 1 a 100.",
+      "maxDiscount": "El descuento máximo debe ser mayor que 0 o quedar vacío.",
+      "fixed": "El monto fijo debe ser mayor que 0.",
+      "minFare": "La tarifa mínima debe ser 0 o más.",
+      "dates": "Indica fecha y hora de inicio y fin.",
+      "endBeforeStart": "El fin debe ser posterior al inicio.",
+      "budget": "El presupuesto debe ser mayor que 0.",
+      "budgetBelowCommitted": "El presupuesto no puede ser menor que lo ya comprometido ({amount}).",
+      "maxUsesPerPassenger": "Usos por pasajero: un número entero entre 1 y {max}.",
+      "maxTotalUses": "Usos totales: un número entero entre 1 y {max}, o vacío.",
+      "amountTooLarge": "Los montos no pueden superar {max}."
+    }
   }
 }

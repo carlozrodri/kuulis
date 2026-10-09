@@ -2,11 +2,11 @@ import type { BottomTabBarProps } from 'expo-router/tabs';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Bell, House, type Icon, Route, User } from '@/components/icons';
+import { Bell, House, type Icon, Route, User, Wallet } from '@/components/icons';
 import { TAB_BAR_HEIGHT } from '@/components/ui';
 import { radius, space, useTheme } from '@/theme';
 
-const ICONS: Record<string, Icon> = { index: House, rides: Route, notifications: Bell, profile: User };
+const ICONS: Record<string, Icon> = { index: House, rides: Route, wallet: Wallet, notifications: Bell, profile: User };
 
 /** Floating dark pill navigation; the active item sits in a `primary` circle. */
 export function TabBar({ state, descriptors, navigation, badges = {} }: BottomTabBarProps & { badges?: Record<string, boolean> }) {
@@ -23,6 +23,8 @@ export function TabBar({ state, descriptors, navigation, badges = {} }: BottomTa
         {state.routes.map((route, index) => {
           const focused = state.index === index;
           const { options } = descriptors[route.key];
+          // Tabs hidden with `href: null` (e.g. the wallet outside driver mode).
+          if (StyleSheet.flatten(options.tabBarItemStyle)?.display === 'none') return null;
           const TabIcon = ICONS[route.name] ?? House;
           const label = options.title ?? route.name;
           const onPress = () => {

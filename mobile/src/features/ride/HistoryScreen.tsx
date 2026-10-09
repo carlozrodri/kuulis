@@ -7,6 +7,7 @@ import { CircleX, Route } from '@/components/icons';
 import { Button, Card, EmptyState, Skeleton, StatusPill, TAB_BAR_SPACE, type Tone, Txt } from '@/components/ui';
 import { useRideHistory } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
+import { amountToPay } from '@/lib/money';
 import { formatFare } from '@/lib/ride';
 import type { Ride, RideStatus } from '@/lib/types';
 import { useMode } from '@/providers/ModeProvider';
@@ -41,7 +42,7 @@ export function HistoryScreen() {
     return (
       <Card
         onPress={() => router.push({ pathname: '/ride/detail', params: { id: item.id } })}
-        accessibilityLabel={`${date.toLocaleString(i18n.language)}. ${t(`ride.status.${item.status}`)}. ${item.dropoff.address}. ${formatFare(item.fare)}`}
+        accessibilityLabel={`${date.toLocaleString(i18n.language)}. ${t(`ride.status.${item.status}`)}. ${item.dropoff.address}. ${formatFare(amountToPay(item))}`}
         style={styles.item}>
         <View style={styles.itemTop}>
           <Txt variant="label" color="muted" style={{ flex: 1 }}>
@@ -49,7 +50,7 @@ export function HistoryScreen() {
             {date.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })}
           </Txt>
           <Txt variant="subtitle" tabular style={{ opacity: item.status === 'completed' ? 1 : 0.5 }}>
-            {formatFare(item.fare)}
+            {formatFare(amountToPay(item))}
           </Txt>
         </View>
         <PlaceRows pickup={item.pickup} dropoff={item.dropoff} compact />

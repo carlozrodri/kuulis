@@ -75,3 +75,6 @@ export { default as Crosshair } from 'lucide-react-native/icons/crosshair';
 export { default as ArrowUpDown } from 'lucide-react-native/icons/arrow-up-down';
 export { default as PhoneCall } from 'lucide-react-native/icons/phone-call';
 export { default as MapIcon } from 'lucide-react-native/icons/map';
+export { default as TicketPercent } from 'lucide-react-native/icons/ticket-percent';
+export { default as BadgePercent } from 'lucide-react-native/icons/badge-percent';
+export { default as HandCoins } from 'lucide-react-native/icons/hand-coins';

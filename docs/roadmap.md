@@ -33,8 +33,9 @@ funcionando en QA antes de pasar a la siguiente.
 - [ ] Ubicación en segundo plano del motorizado (requiere build instalada, no funciona en Expo Go).
 
 ### 1C · Tasas y promociones
-- [ ] Tasas BCV y Binance P2P (worker), historial y corrección manual en el admin.
-- [ ] Promociones con presupuesto, fechas y tope por pasajero; crédito al motorizado en su billetera.
+- [x] Tasas BCV y Binance P2P (worker), historial y corrección manual en el admin.
+- [x] Promociones con presupuesto, fechas y tope por pasajero; crédito al motorizado en su billetera.
+- [x] Billetera del motorizado (solo lectura: saldo y movimientos). Contrato en `docs/api/phase-1c.md`.
 
 ### 1D · Billetera y suscripción
 - [ ] Libro contable de la billetera (recargas, cuotas, promociones, transferencias).

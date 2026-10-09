@@ -63,7 +63,8 @@
     "home": "Inicio",
     "notifications": "Notificaciones",
     "profile": "Perfil",
-    "rides": "Viajes"
+    "rides": "Viajes",
+    "wallet": "Billetera"
   },
   "home": {
     "goodMorning": "Buenos días",
@@ -323,7 +324,9 @@
     "ride_not_found": "No encontramos este viaje.",
     "ride_invalid_transition": "El viaje cambió de estado. Actualizamos la pantalla.",
     "ride_not_completed": "El viaje aún no ha terminado.",
-    "rating_already_submitted": "Ya calificaste este viaje."
+    "rating_already_submitted": "Ya calificaste este viaje.",
+    "promotion_invalid": "Ese código promocional no es válido.",
+    "promotion_unavailable": "La promoción se agotó. Revisa el precio actualizado."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -380,7 +383,36 @@
     "choosePayment": "Elige cómo vas a pagar",
     "priceUpdated": "El precio se actualizó. Revísalo y vuelve a pedir.",
     "changeDestination": "Cambiar destino",
-    "outsideTitle": "Fuera del área de servicio"
+    "outsideTitle": "Fuera del área de servicio",
+    "vehicleA11yDiscount": "Moto, {{fare}} con la promoción {{name}}, antes {{original}}",
+    "promo": {
+      "have": "¿Tienes un código?",
+      "label": "Código promocional",
+      "placeholder": "Ej. HOLA",
+      "apply": "Aplicar",
+      "cancel": "Cerrar sin aplicar",
+      "empty": "Escribe el código",
+      "promotion": "Promoción",
+      "applied": "Código {{code}} aplicado",
+      "appliedNamed": "Promoción {{name}}",
+      "appliedToast": "¡Código aplicado! Ahorras {{discount}}",
+      "savings": "Ahorras {{discount}} en este viaje",
+      "savingsCode": "Ahorras {{discount}} con el código {{code}}",
+      "noSavings": "Este código no cambia el precio de este viaje",
+      "remove": "Quitar código",
+      "removed": "Quitamos el código",
+      "dropped": "Quitamos el código {{code}}: {{reason}}",
+      "unavailable": "La promoción se agotó justo ahora. Te mostramos el precio actualizado.",
+      "invalid": {
+        "not_found": "Ese código no existe. Revisa que esté bien escrito.",
+        "not_started": "Esta promoción todavía no ha comenzado.",
+        "ended": "Esta promoción ya terminó.",
+        "exhausted": "Esta promoción se agotó.",
+        "max_uses": "Ya usaste este código todas las veces permitidas.",
+        "first_ride_only": "Este código es solo para tu primer viaje.",
+        "not_eligible": "Este código no aplica para este viaje (zona, vehículo o monto mínimo)."
+      }
+    }
   },
   "ride": {
     "pickup": "Recogida",
@@ -557,7 +589,9 @@
       "toPickup": "Recogida a {{distance}} · {{time}}",
       "trip": "Viaje de {{distance}} · {{time}}",
       "accept": "Aceptar",
-      "decline": "Rechazar"
+      "decline": "Rechazar",
+      "promoCredit": "+ {{discount}} te acredita Kuulis (promoción)",
+      "promoCreditA11y": "Además, Kuulis te acredita {{discount}} en tu billetera por una promoción"
     },
     "stage": {
       "toPickup": "Recoge a {{name}}",
@@ -578,6 +612,46 @@
       "passengerCancelled": "El pasajero canceló el viaje",
       "offerGone": "La solicitud ya no está disponible",
       "offerExpired": "Se acabó el tiempo para aceptar la solicitud"
+    },
+    "completeConfirmBodyPromo": "Confirma que recibiste {{fare}} por {{method}}. Kuulis te acredita {{discount}} de la promoción en tu billetera.",
+    "promo": {
+      "willCredit": "Promoción: al finalizar, Kuulis te acredita {{discount}} en tu billetera",
+      "credited": "Kuulis te acreditó {{discount}} en tu billetera (promoción)",
+      "creditedToast": "Kuulis te acreditó {{discount}} en tu billetera por la promoción",
+      "creditedTitle": "+ {{discount}} en tu billetera",
+      "creditedBody": "El pasajero usó la promoción {{name}} y te pagó {{total}}. Kuulis te reintegra el descuento."
+    }
+  },
+  "money": {
+    "rate": {
+      "bcv": "BCV",
+      "binance": "Binance"
+    },
+    "vesAt": "En Bs a tasa {{rate}}",
+    "discountNote": "Incluye {{discount}} de descuento",
+    "discountNoteNamed": "Incluye {{discount}} de descuento · {{name}}"
+  },
+  "wallet": {
+    "title": "Billetera",
+    "balance": "Saldo disponible",
+    "balanceA11y": "Saldo disponible: {{amount}} {{currency}}",
+    "topUp": "Recargar",
+    "transfer": "Transferir",
+    "soon": "Pronto",
+    "promoInfo": "Cuando un pasajero usa una promoción, le cobras el monto con descuento y Kuulis te reintegra la diferencia aquí al terminar el viaje.",
+    "movements": "Movimientos",
+    "empty": "Aún no tienes movimientos",
+    "emptyBody": "Aquí verás los reintegros de Kuulis por los viajes con promoción.",
+    "entryA11y": "{{title}}, {{amount}} {{currency}}, {{date}}",
+    "openRide": "Abre el viaje",
+    "kind": {
+      "promo_credit": {
+        "title": "Promoción · viaje de {{name}}",
+        "titleNoName": "Promoción",
+        "subtitle": "Kuulis te reintegra el descuento",
+        "subtitleNamed": "Kuulis te reintegra el descuento de {{name}}"
+      },
+      "other": "Movimiento"
     }
   }
 }

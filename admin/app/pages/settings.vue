@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AppConfig, DocumentKind, VehicleType } from '~/types/api'
-import { DOCUMENT_KINDS, PAYMENT_METHODS, VEHICLE_TYPES } from '~/types/api'
+import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/types/api'
 import type { MapRectangle } from '~/utils/geo'
 import type { SettingsForm } from '~/utils/settings'
 
@@ -614,6 +614,75 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
                 />
               </div>
             </UFormField>
+          </div>
+        </UCard>
+
+        <!-- Phase 1C: exchange rates & promotions -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.rates.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.rates.help') }}
+            </p>
+          </template>
+          <div class="space-y-6">
+            <div class="grid gap-4 sm:grid-cols-3">
+              <UFormField
+                v-for="source in RATE_SOURCES"
+                :key="source"
+                :label="t('settings.rates.staleMinutes', { source: t(`rates.sources.${source}`) })"
+                :hint="formatMinutes(form.rates_stale_minutes[source])"
+              >
+                <UInputNumber
+                  v-model="form.rates_stale_minutes[source]"
+                  :min="RATE_STALE_MIN"
+                  :max="RATE_STALE_MAX"
+                  :step="15"
+                  :format-options="{ useGrouping: false }"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+              <UFormField
+                :label="t('settings.rates.manualHold')"
+                :help="t('settings.rates.manualHoldHelp')"
+              >
+                <UInputNumber
+                  v-model="form.rates_manual_hold_hours"
+                  :min="MANUAL_HOLD_MIN"
+                  :max="MANUAL_HOLD_MAX"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+            </div>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.rates.staleHelp') }}
+            </p>
+            <div class="grid gap-4 border-t border-(--ui-border) pt-4 sm:grid-cols-2">
+              <UFormField
+                :label="t('settings.rates.pairThreshold')"
+                :help="t('settings.rates.pairThresholdHelp')"
+              >
+                <UInputNumber
+                  v-model="form.promo_pair_alert_threshold"
+                  :min="PAIR_THRESHOLD_MIN"
+                  :max="PAIR_THRESHOLD_MAX"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+              <UFormField
+                :label="t('settings.rates.pairDays')"
+                :help="t('settings.rates.pairDaysHelp')"
+              >
+                <UInputNumber
+                  v-model="form.promo_pair_alert_days"
+                  :min="PAIR_DAYS_MIN"
+                  :max="PAIR_DAYS_MAX"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+            </div>
           </div>
         </UCard>
 

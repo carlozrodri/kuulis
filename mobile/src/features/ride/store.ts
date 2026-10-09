@@ -10,6 +10,8 @@ export type RideDraft = {
   pickupIsCurrent: boolean;
   dropoff: Place | null;
   paymentMethod: PaymentMethod | null;
+  /** Promo code the passenger applied on the quote screen (normalized), until the ride is requested. */
+  promoCode: string | null;
 };
 
 /** The ride being put together across search → pin → quote. */
@@ -18,6 +20,7 @@ export const rideDraft = createStore<RideDraft>({
   pickupIsCurrent: true,
   dropoff: null,
   paymentMethod: null,
+  promoCode: null,
 });
 
 export function setDraftPlace(field: DraftField, place: Place, fromCurrentLocation = false) {
@@ -30,6 +33,10 @@ export function setDraftPlace(field: DraftField, place: Place, fromCurrentLocati
 
 export function resetDraftDestination() {
   rideDraft.set((draft) => ({ ...draft, dropoff: null }));
+}
+
+export function setDraftPromoCode(code: string | null) {
+  rideDraft.set((draft) => (draft.promoCode === code ? draft : { ...draft, promoCode: code }));
 }
 
 const PAYMENT_KEY = 'kuulis.payment_method';

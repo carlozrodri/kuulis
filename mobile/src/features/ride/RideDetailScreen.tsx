@@ -6,8 +6,10 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { ChevronLeft, Star } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
+import { DiscountNote, VesLine } from '@/components/Money';
 import { Button, IconButton, StatusPill, Txt } from '@/components/ui';
 import { useRide } from '@/hooks/useRides';
+import { amountToPay, hasDiscount } from '@/lib/money';
 import { decodePolyline, formatDistance, formatDuration, formatFare, isActiveStatus, rideRole } from '@/lib/ride';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
@@ -63,14 +65,31 @@ export function RideDetailScreen() {
 
       <PlaceRows pickup={ride.pickup} dropoff={ride.dropoff} />
 
-      <View style={[styles.row, { backgroundColor: theme.background }]}>
-        {PaymentIcon ? <PaymentIcon size={20} color={theme.muted} /> : null}
-        <Txt variant="bodyStrong" style={{ flex: 1 }}>
-          {t(`payment.${ride.payment_method}`)}
-        </Txt>
-        <Txt variant="heading" tabular>
-          {formatFare(ride.fare)}
-        </Txt>
+      <View style={[styles.priceBox, { backgroundColor: theme.background }]}>
+        <View style={styles.priceRow}>
+          {PaymentIcon ? <PaymentIcon size={20} color={theme.muted} /> : null}
+          <Txt variant="bodyStrong" style={{ flex: 1 }}>
+            {t(`payment.${ride.payment_method}`)}
+          </Txt>
+          {hasDiscount(ride) ? (
+            <Txt variant="caption" color="muted" tabular style={{ textDecorationLine: 'line-through' }}>
+              {formatFare(ride.fare)}
+            </Txt>
+          ) : null}
+          <Txt variant="heading" tabular>
+            {formatFare(amountToPay(ride))}
+          </Txt>
+        </View>
+        <VesLine ves={ride.total_ves} align="right" />
+        {role === 'driver' && hasDiscount(ride) ? (
+          <Txt variant="caption" color="success">
+            {ride.status === 'completed'
+              ? t('drive.promo.credited', { discount: formatFare(ride.discount) })
+              : t('drive.promo.willCredit', { discount: formatFare(ride.discount) })}
+          </Txt>
+        ) : (
+          <DiscountNote item={ride} />
+        )}
       </View>
 
       {other ? (
@@ -120,5 +139,7 @@ export function RideDetailScreen() {
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderRadius: 16, padding: space.md },
+  priceBox: { gap: 4, borderRadius: 16, padding: space.md },
+  priceRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   myRating: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 });

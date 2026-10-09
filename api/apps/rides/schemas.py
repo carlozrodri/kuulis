@@ -8,6 +8,8 @@ from pydantic import BaseModel, ConfigDict, Field, PlainSerializer, field_valida
 
 from apps.drivers.models import VehicleType
 from apps.geo.schemas import Place, Point
+from apps.promotions.schemas import PromotionBrief
+from apps.rates.schemas import FrozenRates, VesAmount
 from apps.rides.models import OfferStatus, PaymentMethod, RatingRole, RideStatus
 
 # Amounts travel as 2-decimal strings ("2.40") so clients never do float math with money.
@@ -32,6 +34,7 @@ class QuoteRequest(BaseModel):
     pickup: Place
     dropoff: Place
     vehicle_type: VehicleType
+    promo_code: str | None = Field(default=None, max_length=40)
 
 
 class Quote(BaseModel):
@@ -43,6 +46,10 @@ class Quote(BaseModel):
     duration_s: int
     fare: MoneyStr
     surge_multiplier: MoneyStr
+    discount: MoneyStr = Decimal("0.00")
+    total: MoneyStr  # what the passenger pays: fare - discount
+    promotion: PromotionBrief | None = None
+    total_ves: VesAmount
     polyline: str | None
     expires_at: datetime
 
@@ -119,6 +126,11 @@ class RideRead(BaseModel):
     duration_s: int
     fare: MoneyStr
     surge_multiplier: MoneyStr
+    discount: MoneyStr
+    total: MoneyStr
+    promotion: PromotionBrief | None
+    rates: FrozenRates
+    total_ves: VesAmount
     payment_method: PaymentMethod
     polyline: str | None
     passenger: PersonBrief
@@ -148,6 +160,9 @@ class Offer(BaseModel):
     pickup_distance_m: int
     pickup_eta_s: int
     fare: MoneyStr
+    discount: MoneyStr  # credited by Kuulis to the driver's wallet when the ride completes
+    total: MoneyStr  # what the driver collects from the passenger
+    total_ves: VesAmount
     payment_method: PaymentMethod
     passenger: OfferPassenger
     expires_at: datetime

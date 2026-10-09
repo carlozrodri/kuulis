@@ -1,5 +1,5 @@
-import type { AppConfig, DocumentKind, PaymentMethod, ServiceArea, VehicleType } from '~/types/api'
-import { DOCUMENT_KINDS, PAYMENT_METHODS, VEHICLE_TYPES } from '~/types/api'
+import type { AppConfig, DocumentKind, PaymentMethod, RateSource, ServiceArea, VehicleType } from '~/types/api'
+import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/types/api'
 
 /** Editable copy of AppConfig: decimals as numbers so they bind to numeric inputs. */
 export interface FareForm { base: number, per_km: number, per_minute: number, minimum: number }
@@ -21,14 +21,27 @@ export interface SettingsForm {
   search_radius_m: number[]
   search_timeout_seconds: number
   quote_ttl_seconds: number
+  rates_stale_minutes: Record<RateSource, number>
+  rates_manual_hold_hours: number
+  promo_pair_alert_threshold: number
+  promo_pair_alert_days: number
 }
 
 export const FARE_FIELDS = ['base', 'per_km', 'per_minute', 'minimum'] as const
 export const FARE_ROUNDINGS = ['0.01', '0.05', '0.10', '0.25', '0.50', '1.00']
 export const SURGE_MIN = 1
 export const SURGE_MAX = 3
+/** Phase 1C limits (the contract states the hold window; the rest match the API validation). */
+export const RATE_STALE_MIN = 5
+export const RATE_STALE_MAX = 43_200
+export const MANUAL_HOLD_MIN = 1
+export const MANUAL_HOLD_MAX = 168
+export const PAIR_THRESHOLD_MIN = 2
+export const PAIR_THRESHOLD_MAX = 100
+export const PAIR_DAYS_MIN = 1
+export const PAIR_DAYS_MAX = 365
 
-/** Defaults from docs/api/phase-1a.md and phase-1b.md, used for keys an older API does not return yet. */
+/** Defaults from docs/api/phase-1a.md, phase-1b.md and phase-1c.md, used for keys an older API does not return yet. */
 export function defaultSettings(): SettingsForm {
   return {
     driver_min_age: 21,
@@ -49,6 +62,10 @@ export function defaultSettings(): SettingsForm {
     search_radius_m: [2000, 4000, 7000],
     search_timeout_seconds: 180,
     quote_ttl_seconds: 300,
+    rates_stale_minutes: { bcv: 2160, binance: 120 },
+    rates_manual_hold_hours: 6,
+    promo_pair_alert_threshold: 3,
+    promo_pair_alert_days: 30,
   }
 }
 
@@ -94,6 +111,13 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
     search_radius_m: [...(config.search_radius_m ?? d.search_radius_m)],
     search_timeout_seconds: config.search_timeout_seconds ?? d.search_timeout_seconds,
     quote_ttl_seconds: config.quote_ttl_seconds ?? d.quote_ttl_seconds,
+    rates_stale_minutes: {
+      bcv: num(config.rates_stale_minutes?.bcv, d.rates_stale_minutes.bcv),
+      binance: num(config.rates_stale_minutes?.binance, d.rates_stale_minutes.binance),
+    },
+    rates_manual_hold_hours: num(config.rates_manual_hold_hours, d.rates_manual_hold_hours),
+    promo_pair_alert_threshold: num(config.promo_pair_alert_threshold, d.promo_pair_alert_threshold),
+    promo_pair_alert_days: num(config.promo_pair_alert_days, d.promo_pair_alert_days),
   }
 }
 
@@ -131,6 +155,10 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
     search_radius_m: form.search_radius_m.map(Number),
     search_timeout_seconds: form.search_timeout_seconds,
     quote_ttl_seconds: form.quote_ttl_seconds,
+    rates_stale_minutes: Object.fromEntries(RATE_SOURCES.map(s => [s, form.rates_stale_minutes[s]])) as Record<RateSource, number>,
+    rates_manual_hold_hours: form.rates_manual_hold_hours,
+    promo_pair_alert_threshold: form.promo_pair_alert_threshold,
+    promo_pair_alert_days: form.promo_pair_alert_days,
   }
 }
 
@@ -182,6 +210,19 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
   }
   else if (form.search_timeout_seconds < form.offer_timeout_seconds) {
     issues.push({ key: 'searchShorterThanOffer' })
+  }
+  const between = (v: number, min: number, max: number) => Number.isInteger(v) && v >= min && v <= max
+  if (RATE_SOURCES.some(s => !between(form.rates_stale_minutes[s], RATE_STALE_MIN, RATE_STALE_MAX))) {
+    issues.push({ key: 'ratesStale', params: { min: RATE_STALE_MIN, max: RATE_STALE_MAX } })
+  }
+  if (!between(form.rates_manual_hold_hours, MANUAL_HOLD_MIN, MANUAL_HOLD_MAX)) {
+    issues.push({ key: 'manualHold', params: { min: MANUAL_HOLD_MIN, max: MANUAL_HOLD_MAX } })
+  }
+  if (!between(form.promo_pair_alert_threshold, PAIR_THRESHOLD_MIN, PAIR_THRESHOLD_MAX)) {
+    issues.push({ key: 'pairThreshold', params: { min: PAIR_THRESHOLD_MIN, max: PAIR_THRESHOLD_MAX } })
+  }
+  if (!between(form.promo_pair_alert_days, PAIR_DAYS_MIN, PAIR_DAYS_MAX)) {
+    issues.push({ key: 'pairDays', params: { min: PAIR_DAYS_MIN, max: PAIR_DAYS_MAX } })
   }
   return issues
 }

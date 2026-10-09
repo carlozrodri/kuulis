@@ -1,7 +1,7 @@
 import { type QueryClient, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { routedRides } from '@/features/ride/store';
-import { api } from '@/lib/api';
+import { ApiError, api } from '@/lib/api';
 import { isActiveStatus, isTerminalStatus, mergeRide } from '@/lib/ride';
 import type {
   DriverState,
@@ -39,6 +39,8 @@ export function applyRide(queryClient: QueryClient, ride: Ride) {
     void queryClient.invalidateQueries({ queryKey: rideKeys.pendingRating });
     void queryClient.invalidateQueries({ queryKey: ['rides', 'history'] });
     void queryClient.invalidateQueries({ queryKey: rideKeys.driverState });
+    // A completed ride with a promotion credits the driver's wallet.
+    if (ride.status === 'completed') void queryClient.invalidateQueries({ queryKey: ['wallet'] });
   }
 }
 
@@ -155,10 +157,36 @@ export function useGeoSearch(q: string, near: { lat: number; lng: number } | nul
 
 export const reverseGeocode = (lat: number, lng: number) => api<GeoResult>('/geo/reverse', { query: { lat, lng } });
 
-export function useQuote(pickup: Place | null, dropoff: Place | null, vehicleType: VehicleType = 'moto') {
+export const quoteKey = (
+  pickup: Place | null,
+  dropoff: Place | null,
+  vehicleType: VehicleType = 'moto',
+  promoCode: string | null = null,
+) => ['quote', vehicleType, pickup?.lat, pickup?.lng, dropoff?.lat, dropoff?.lng, promoCode ?? ''] as const;
+
+/** POST /rides/quote. With `promo_code` the API answers 400 promotion_invalid when the code does not apply. */
+export const fetchQuote = (
+  pickup: Place,
+  dropoff: Place,
+  vehicleType: VehicleType = 'moto',
+  promoCode: string | null = null,
+  signal?: AbortSignal,
+) =>
+  api<Quote>('/rides/quote', {
+    method: 'POST',
+    body: { pickup, dropoff, vehicle_type: vehicleType, ...(promoCode ? { promo_code: promoCode } : {}) },
+    signal,
+  });
+
+export function useQuote(
+  pickup: Place | null,
+  dropoff: Place | null,
+  vehicleType: VehicleType = 'moto',
+  promoCode: string | null = null,
+) {
   return useQuery({
-    queryKey: ['quote', vehicleType, pickup?.lat, pickup?.lng, dropoff?.lat, dropoff?.lng],
-    queryFn: () => api<Quote>('/rides/quote', { method: 'POST', body: { pickup, dropoff, vehicle_type: vehicleType } }),
+    queryKey: quoteKey(pickup, dropoff, vehicleType, promoCode),
+    queryFn: ({ signal }) => fetchQuote(pickup!, dropoff!, vehicleType, promoCode, signal),
     enabled: !!pickup && !!dropoff,
     staleTime: Infinity,
     gcTime: 5 * 60_000,
@@ -181,13 +209,21 @@ export function useRequestRide() {
   });
 }
 
-/** Quotes the same trip again and requests it (no_drivers retry, driver cancelled). */
-export async function requestAgain(ride: Ride): Promise<Ride> {
-  const quote = await api<Quote>('/rides/quote', {
-    method: 'POST',
-    body: { pickup: ride.pickup, dropoff: ride.dropoff, vehicle_type: ride.vehicle_type },
-  });
-  return api<Ride>('/rides', { method: 'POST', body: { quote_id: quote.quote_id, payment_method: ride.payment_method } });
+/**
+ * Quotes the same trip again and requests it (no_drivers retry, driver cancelled). Automatic promotions apply
+ * again; if one runs out between the quote and the request (409 promotion_unavailable) it quotes once more.
+ */
+export async function requestAgain(ride: Ride, attempt = 0): Promise<Ride> {
+  const quote = await fetchQuote(ride.pickup, ride.dropoff, ride.vehicle_type);
+  try {
+    return await api<Ride>('/rides', {
+      method: 'POST',
+      body: { quote_id: quote.quote_id, payment_method: ride.payment_method },
+    });
+  } catch (error) {
+    if (attempt === 0 && error instanceof ApiError && error.code === 'promotion_unavailable') return requestAgain(ride, 1);
+    throw error;
+  }
 }
 
 export function useCancelRide() {

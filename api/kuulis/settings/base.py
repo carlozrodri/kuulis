@@ -82,6 +82,15 @@ class BaseAppSettings(BaseSettings):
     PHOTON_URL: str = ""  # e.g. https://photon.komoot.io
     GEO_TIMEOUT_SECONDS: float = 4.0
 
+    # --- Exchange rates (bolívares per USD) -------------------------------------------------
+    # The worker polls these sources; RATES_ENABLED=false turns polling off (manual rates only).
+    RATES_ENABLED: bool = True
+    RATES_BCV_URL: str = "https://ve.dolarapi.com/v1/dolares/oficial"
+    RATES_BINANCE_URL: str = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search"
+    RATES_BCV_INTERVAL_MINUTES: int = 60
+    RATES_BINANCE_INTERVAL_MINUTES: int = 15
+    RATES_TIMEOUT_SECONDS: float = 10.0
+
     # --- Observability ----------------------------------------------------------
     SENTRY_ENABLED: bool = False
     SENTRY_DSN: str = ""

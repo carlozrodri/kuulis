@@ -3,14 +3,16 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, BackHandler, StyleSheet, View } from 'react-native';
 
-import { CircleCheck } from '@/components/icons';
+import { CircleCheck, HandCoins } from '@/components/icons';
+import { DiscountNote, VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
-import { Button, Card, Chip, EmptyState, Field, Screen, Txt } from '@/components/ui';
+import { Button, Card, Chip, EmptyState, Field, Notice, Screen, Txt } from '@/components/ui';
 import { usePendingRating, useRateRide } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { ApiError } from '@/lib/api';
 import { confirmHaptic, selectionHaptic } from '@/lib/feedback';
 import { formatDistance, formatDuration, formatFare, RATING_TAGS, rideRole } from '@/lib/ride';
+import { amountToPay, hasDiscount } from '@/lib/money';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
 import { fonts, space, useTheme } from '@/theme';
@@ -99,6 +101,19 @@ export function RateScreen() {
         </Txt>
       </View>
 
+      {role === 'driver' && hasDiscount(ride) ? (
+        <Notice
+          tone="success"
+          icon={HandCoins}
+          title={t('drive.promo.creditedTitle', { discount: formatFare(ride.discount) })}
+          style={{ marginBottom: space.lg }}>
+          {t('drive.promo.creditedBody', {
+            name: ride.promotion?.name ?? t('quote.promo.promotion'),
+            total: formatFare(amountToPay(ride)),
+          })}
+        </Notice>
+      ) : null}
+
       <StarInput
         value={stars}
         onChange={(value) => {
@@ -144,9 +159,11 @@ export function RateScreen() {
             {t(`payment.${ride.payment_method}`)}
           </Txt>
           <Txt style={{ fontFamily: fonts.extrabold, fontSize: 22, color: theme.text }} tabular>
-            {formatFare(ride.fare)}
+            {formatFare(amountToPay(ride))}
           </Txt>
         </View>
+        <VesLine ves={ride.total_ves} align="right" />
+        {role === 'passenger' ? <DiscountNote item={ride} /> : null}
         <Txt variant="caption" color="muted">
           {t('quote.meta', { distance: formatDistance(ride.distance_m, i18n.language), time: formatDuration(ride.duration_s) })}
         </Txt>

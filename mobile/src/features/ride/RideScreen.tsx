@@ -7,10 +7,12 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { ChevronDown, CircleX, MessageCircle, SearchX, Share2, ShieldCheck } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { type MapInsets, MapSheetLayout } from '@/components/MapSheetLayout';
+import { DiscountNote, VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, EmptyState, IconButton, ProgressSteps, StatusPill, Txt } from '@/components/ui';
 import { applyRide, requestAgain, useActiveRide, useCancelRide, useRide } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
+import { amountToPay } from '@/lib/money';
 import {
   canPassengerCancel,
   decodePolyline,
@@ -139,14 +141,18 @@ function FareRow({ ride }: { ride: Ride }) {
   const theme = useTheme();
   const PaymentIcon = PAYMENT_ICONS[ride.payment_method];
   return (
-    <View style={[styles.fareRow, { backgroundColor: theme.background }]}>
-      {PaymentIcon ? <PaymentIcon size={20} color={theme.muted} strokeWidth={2} /> : null}
-      <Txt variant="bodyStrong" style={{ flex: 1 }}>
-        {t(`payment.${ride.payment_method}`)}
-      </Txt>
-      <Txt variant="subtitle" tabular>
-        {formatFare(ride.fare)}
-      </Txt>
+    <View style={[styles.fareBox, { backgroundColor: theme.background }]}>
+      <View style={styles.fareRow}>
+        {PaymentIcon ? <PaymentIcon size={20} color={theme.muted} strokeWidth={2} /> : null}
+        <Txt variant="bodyStrong" style={{ flex: 1 }}>
+          {t(`payment.${ride.payment_method}`)}
+        </Txt>
+        <Txt variant="subtitle" tabular>
+          {formatFare(amountToPay(ride))}
+        </Txt>
+      </View>
+      <VesLine ves={ride.total_ves} align="right" />
+      <DiscountNote item={ride} />
     </View>
   );
 }
@@ -276,7 +282,7 @@ function EndedSheet({ ride }: { ride: Ride }) {
   if (ride.status === 'completed') {
     return (
       // The ride navigator opens the (mandatory) rating right after this.
-      <EmptyState icon={ShieldCheck} title={t('ride.completed.title')} body={t('ride.completed.body', { fare: formatFare(ride.fare) })} />
+      <EmptyState icon={ShieldCheck} title={t('ride.completed.title')} body={t('ride.completed.body', { fare: formatFare(amountToPay(ride)) })} />
     );
   }
 
@@ -310,7 +316,8 @@ function EndedSheet({ ride }: { ride: Ride }) {
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.lg, gap: space.md },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
-  fareRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderRadius: radius.tile, padding: space.md },
+  fareBox: { gap: 4, borderRadius: radius.tile, padding: space.md },
+  fareRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   driverCard: { flexDirection: 'row', alignItems: 'center', gap: space.md, borderRadius: radius.card, padding: space.md },
   actions: { flexDirection: 'row', justifyContent: 'space-around' },
 });

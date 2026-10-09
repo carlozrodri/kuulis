@@ -7,7 +7,9 @@
     "drivers": "Drivers",
     "settings": "Settings",
     "rides": "Rides",
-    "live": "Live"
+    "live": "Live",
+    "rates": "Rates",
+    "promotions": "Promotions"
   },
   "auth": {
     "title": "Admin sign in",
@@ -20,7 +22,10 @@
     "totalUsers": "Total users",
     "activeUsers": "Active users",
     "verifiedUsers": "Verified users",
-    "staff": "Team (staff and admin)"
+    "staff": "Team (staff and admin)",
+    "staleRates": "Stale exchange rate: {sources}",
+    "staleRatesHelp": "New quotes use this rate for amounts in bolívares. Check it or correct it manually.",
+    "openRates": "View rates"
   },
   "users": {
     "email": "Email",
@@ -97,7 +102,12 @@
     "ride_active": "The driver has an active ride",
     "offer_expired": "The offer has expired",
     "ride_taken": "Another driver took the ride",
-    "chat_closed": "This ride's chat is closed"
+    "chat_closed": "This ride's chat is closed",
+    "promotion_code_taken": "A promotion with that code already exists",
+    "budget_below_committed": "The budget cannot be lower than what is already committed (credited + reserved)",
+    "promotion_not_found": "Promotion not found",
+    "promotion_invalid": "The promotion does not apply to this ride",
+    "promotion_unavailable": "The promotion ran out; quote again"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -215,7 +225,11 @@
       "radii": "Radii: 1 to 6 values between 100 and 50,000 m, in increasing order.",
       "timeouts": "Timeouts must be greater than zero.",
       "searchShorterThanOffer": "The search time cannot be shorter than each offer's time.",
-      "serviceAreaCount": "There must be between 1 and 20 cities."
+      "serviceAreaCount": "There must be between 1 and 20 cities.",
+      "ratesStale": "Rate age: whole minutes between {min} and {max}.",
+      "manualHold": "Manual rate hold: between {min} and {max} hours.",
+      "pairThreshold": "Pair alert: between {min} and {max} rides.",
+      "pairDays": "Alert window: between {min} and {max} days."
     },
     "fares": {
       "title": "Fares",
@@ -270,6 +284,18 @@
       "radiiHelp": "The search widens in this order, smallest first.",
       "addRadius": "Add radius",
       "removeRadius": "Remove radius"
+    },
+    "rates": {
+      "title": "Rates and promotions",
+      "help": "Stale exchange rate warnings, manual corrections and promotion abuse control.",
+      "staleMinutes": "Stale rate warning: {source} (min)",
+      "staleHelp": "Past that age the panel flags the rate as stale.",
+      "manualHold": "Manual rate hold (h)",
+      "manualHoldHelp": "Hours during which automatic fetches do not replace a manual rate.",
+      "pairThreshold": "Rides to alert",
+      "pairThresholdHelp": "Promoted rides between the same passenger and driver that raise an alert.",
+      "pairDays": "Alert window (days)",
+      "pairDaysHelp": "Days back in which those rides are counted."
     }
   },
   "paymentMethods": {
@@ -386,7 +412,14 @@
       "unsafe_location": "Unsafe location",
       "vehicle_problem": "Vehicle problem",
       "other": "Other reason"
-    }
+    },
+    "discount": "Discount",
+    "totalToPay": "Total to pay",
+    "discountHelp": "The passenger pays the total to the driver; Kuulis credits the discount to the driver when the ride completes.",
+    "promotion": "Promotion",
+    "totalVes": "Total in Bs ({source})",
+    "frozenRate": "Rate {rate} when requested",
+    "pays": "Pays {amount}"
   },
   "live": {
     "activeRides": "Rides ({n})",
@@ -411,5 +444,166 @@
     "secondsAgo": "{n} s ago",
     "minutesAgo": "{n} min ago",
     "city": "City"
+  },
+  "rates": {
+    "sources": {
+      "bcv": "BCV (official)",
+      "binance": "Binance P2P"
+    },
+    "origins": {
+      "auto": "Automatic",
+      "manual": "Manual"
+    },
+    "allSources": "All sources",
+    "source": "Source",
+    "rate": "Rate",
+    "unit": "Bs per 1 USD",
+    "origin": "Origin",
+    "asOf": "Rate date",
+    "fetchedAt": "Stored",
+    "createdBy": "Recorded by",
+    "worker": "Automatic fetch",
+    "note": "Note",
+    "noRate": "No rate for this source yet.",
+    "stale": "Stale rate",
+    "staleHelp": "It is older than {age}. Check the source or enter a manual rate.",
+    "fetchNow": "Fetch now",
+    "refreshed": "Rates fetched",
+    "readOnly": "Only administrators can correct or fetch rates.",
+    "history": "History",
+    "total": "{n} records",
+    "manual": {
+      "title": "Manual correction",
+      "help": "A manual rate holds for {n} h: during that time automatic fetches do not replace it.",
+      "rate": "New rate",
+      "note": "Note (optional)",
+      "notePlaceholder": "E.g. the BCV published late",
+      "save": "Save rate",
+      "saved": "Manual rate saved"
+    }
+  },
+  "promotions": {
+    "new": "New promotion",
+    "edit": "Edit",
+    "editTitle": "Edit “{name}”",
+    "search": "Search by name or code",
+    "allStatuses": "All",
+    "total": "{n} promotions",
+    "name": "Name",
+    "description": "Description",
+    "code": "Code",
+    "automatic": "Automatic (no code)",
+    "discount": "Discount",
+    "upTo": "up to {amount}",
+    "maxDiscount": "Maximum discount (USD)",
+    "minFare": "Minimum fare",
+    "validity": "Validity",
+    "startsAt": "Starts",
+    "endsAt": "Ends",
+    "budget": "Budget (USD)",
+    "budgetUsage": "Budget",
+    "ofBudget": "of {amount}",
+    "uses": "Uses",
+    "status": "Status",
+    "maxUsesPerPassenger": "Uses per passenger",
+    "maxTotalUses": "Total uses",
+    "firstRideOnly": "First ride only",
+    "serviceAreas": "Cities",
+    "vehicleTypes": "Vehicles",
+    "allAreas": "All",
+    "allVehicles": "All",
+    "unlimited": "Unlimited",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "createdAt": "Created",
+    "updatedAt": "Updated",
+    "conditions": "Conditions",
+    "activate": "Activate",
+    "deactivate": "Pause",
+    "activated": "Promotion activated",
+    "deactivated": "Promotion paused",
+    "rides": "Rides with this promotion",
+    "noRides": "No ride has used it yet.",
+    "completedAt": "Completed",
+    "statuses": {
+      "active": "Active",
+      "scheduled": "Scheduled",
+      "ended": "Ended",
+      "exhausted": "Exhausted",
+      "inactive": "Paused"
+    },
+    "discountTypes": {
+      "percent": "Percentage",
+      "fixed": "Fixed amount"
+    },
+    "stats": {
+      "credited": "Credited",
+      "reserved": "Reserved",
+      "remaining": "Remaining",
+      "uses": "Uses",
+      "completed": "Completed",
+      "help": "Credited: discounts paid to drivers for completed rides. Reserved: rides in progress. Uses: rides in progress and completed."
+    },
+    "alerts": {
+      "title": "Alerts",
+      "rule": "Passenger–driver pairs with {n} or more promoted rides in the last {days} days.",
+      "help": "Many discounted rides between the same two people may mean fake rides to cash in promotions. Review the rides before acting.",
+      "rides": "Promoted rides",
+      "discountTotal": "Total discount",
+      "lastRide": "Last ride",
+      "refresh": "Refresh",
+      "empty": "No suspicious pairs."
+    },
+    "form": {
+      "general": "General",
+      "namePlaceholder": "E.g. Welcome",
+      "descriptionHelp": "Internal use; optional.",
+      "codePlaceholder": "Empty = automatic",
+      "codeHelp": "3 to 20 letters or digits. The passenger types it when quoting.",
+      "automaticHelp": "Without a code the promotion applies by itself to whoever qualifies (the largest discount wins).",
+      "state": "Status",
+      "enabled": "Active",
+      "disabled": "Paused",
+      "activeHelp": "A paused promotion does not apply even within its validity.",
+      "discount": "Discount",
+      "discountHelp": "Kuulis pays for the discount: the passenger pays the fare minus the discount and Kuulis credits it to the driver. It never exceeds the fare.",
+      "percent": "Percentage (1–100)",
+      "fixed": "Amount (USD)",
+      "maxDiscountHelp": "Cap per ride; empty = no cap.",
+      "minFareHelp": "Fare from which it applies; 0 = any.",
+      "noLimit": "No limit",
+      "validity": "Validity",
+      "validityHelp": "Dates and times in your time zone ({zone}).",
+      "limits": "Budget and limits",
+      "budgetHelp": "Credited plus reserved never exceeds this amount.",
+      "budgetCommitted": "Already committed: {amount}. It cannot go below that.",
+      "emptyNoLimit": "Empty = no limit.",
+      "firstRideOnlyHelp": "Only for passengers without completed rides.",
+      "scope": "Scope",
+      "scopeHelp": "Leave everything unchecked to apply to every city and vehicle.",
+      "noAreas": "No cities configured.",
+      "unknownArea": "{name} (no longer configured)",
+      "fixErrors": "Fix these fields before saving.",
+      "create": "Create promotion",
+      "created": "Promotion created"
+    },
+    "errors": {
+      "nameRequired": "Enter a name.",
+      "nameTooLong": "The name allows up to {max} characters.",
+      "descriptionTooLong": "The description allows up to {max} characters.",
+      "code": "The code must have 3 to 20 letters (A–Z) or digits, or be empty.",
+      "percent": "The percentage goes from 1 to 100.",
+      "maxDiscount": "The maximum discount must be greater than 0 or empty.",
+      "fixed": "The fixed amount must be greater than 0.",
+      "minFare": "The minimum fare must be 0 or more.",
+      "dates": "Enter start and end date and time.",
+      "endBeforeStart": "The end must be after the start.",
+      "budget": "The budget must be greater than 0.",
+      "budgetBelowCommitted": "The budget cannot be lower than what is already committed ({amount}).",
+      "maxUsesPerPassenger": "Uses per passenger: a whole number between 1 and {max}.",
+      "maxTotalUses": "Total uses: a whole number between 1 and {max}, or empty.",
+      "amountTooLarge": "Amounts cannot exceed {max}."
+    }
   }
 }

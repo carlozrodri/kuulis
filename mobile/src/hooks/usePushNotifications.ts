@@ -6,6 +6,7 @@ import { Platform } from 'react-native';
 
 import { DRIVER_QUERY_KEY, isDriverNotification } from '@/hooks/useDriver';
 import { rideKeys } from '@/hooks/useRides';
+import { isWalletNotification, walletKeys } from '@/hooks/useWallet';
 import { api } from '@/lib/api';
 import { config } from '@/lib/config';
 
@@ -43,6 +44,7 @@ export function usePushNotifications(enabled: boolean) {
         void queryClient.invalidateQueries({ queryKey: rideKeys.all });
         void queryClient.invalidateQueries({ queryKey: rideKeys.driverState });
       }
+      if (isWalletNotification(data)) void queryClient.invalidateQueries({ queryKey: walletKeys.all });
     };
     const received = Notifications.addNotificationReceivedListener((n) => handle(n.request.content.data));
     const opened = Notifications.addNotificationResponseReceivedListener((r) => handle(r.notification.request.content.data));

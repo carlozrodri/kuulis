@@ -18,6 +18,9 @@ from apps.config.schemas import AppConfig
 from apps.config.services import get_app_config
 from apps.drivers.models import DriverProfile, DriverStatus
 from apps.geo import clients as geo
+from apps.promotions import services as promotions
+from apps.promotions.schemas import PromotionBrief
+from apps.rates import services as rates
 from apps.rides import dispatch, events, presence, pricing
 from apps.rides.models import (
     ACTIVE_STATUSES,
@@ -60,6 +63,8 @@ from apps.rides.state import (
     utcnow,
 )
 from apps.users.models import User
+from apps.wallet import services as wallet
+from apps.wallet.models import EntryKind
 from kuulis.core.exceptions import AppError
 from kuulis.core.pagination import PageParams, paginate
 from kuulis.core.redis import redis_client
@@ -141,12 +146,15 @@ def _ensure_participant(ride: Ride, user: User) -> None:
 # --- Quote and request -------------------------------------------------------------------------
 
 
-def _check_area(config: AppConfig, *points: tuple[float, float]) -> None:
-    """Every point must fall inside one service area, the same one (no trips between cities)."""
+def _check_area(config: AppConfig, *points: tuple[float, float]) -> str:
+    """Every point must fall inside one service area, the same one (no trips between cities).
+    Returns the area name."""
     area = config.area_at(*points[0])
     for lat, lng in points:
         if area is None or not area.contains(lat, lng):
             raise OutsideServiceAreaError(details={"lat": lat, "lng": lng})
+    assert area is not None
+    return area.name
 
 
 async def create_quote(session: AsyncSession, user: User, data: QuoteRequest) -> Quote:
@@ -157,9 +165,15 @@ async def create_quote(session: AsyncSession, user: User, data: QuoteRequest) ->
             code="vehicle_type_not_enabled",
             details={"enabled": [t.value for t in config.enabled_vehicle_types]},
         )
-    _check_area(config, (data.pickup.lat, data.pickup.lng), (data.dropoff.lat, data.dropoff.lng))
+    area = _check_area(
+        config, (data.pickup.lat, data.pickup.lng), (data.dropoff.lat, data.dropoff.lng)
+    )
     route = await geo.route(data.pickup.lat, data.pickup.lng, data.dropoff.lat, data.dropoff.lng)
     fare, surge = pricing.quote_price(config, data.vehicle_type, route.distance_m, route.duration_s)
+    promotion, discount = await promotions.for_quote(
+        session, promotions.RideContext(user.id, area, data.vehicle_type, fare), data.promo_code
+    )
+    total = fare - discount
     quote = Quote(
         quote_id=secrets.token_urlsafe(18),
         vehicle_type=data.vehicle_type,
@@ -169,6 +183,12 @@ async def create_quote(session: AsyncSession, user: User, data: QuoteRequest) ->
         duration_s=route.duration_s,
         fare=fare,
         surge_multiplier=surge,
+        discount=discount,
+        total=total,
+        promotion=PromotionBrief(id=promotion.id, name=promotion.name, code=promotion.code)
+        if promotion
+        else None,
+        total_ves=rates.to_ves(total, await rates.current_values(session)),
         polyline=route.polyline,
         expires_at=utcnow() + timedelta(seconds=config.quote_ttl_seconds),
     )
@@ -197,9 +217,18 @@ async def create_ride(session: AsyncSession, user: User, data: RideCreate) -> Ri
     if stored is None or stored.get("user_id") != str(user.id):
         raise QuoteExpiredError()
     quote = Quote.model_validate(stored)
-    _check_area(
+    area = _check_area(
         config, (quote.pickup.lat, quote.pickup.lng), (quote.dropoff.lat, quote.dropoff.lng)
     )
+    if quote.promotion is not None:
+        # Locks the promotion until the commit, so its budget cannot be overspent.
+        await promotions.lock_for_ride(
+            session,
+            quote.promotion.id,
+            promotions.RideContext(user.id, area, quote.vehicle_type, quote.fare),
+            quote.discount,
+        )
+    frozen = await rates.current_values(session)
 
     now = utcnow()
     ride = Ride(
@@ -216,6 +245,10 @@ async def create_ride(session: AsyncSession, user: User, data: RideCreate) -> Ri
         duration_s=quote.duration_s,
         fare=quote.fare,
         surge_multiplier=quote.surge_multiplier,
+        promotion_id=quote.promotion.id if quote.promotion else None,
+        discount=quote.discount,
+        rate_bcv=frozen.bcv,
+        rate_binance=frozen.binance,
         payment_method=PaymentMethod(data.payment_method),
         polyline=quote.polyline,
         requested_at=now,
@@ -396,6 +429,7 @@ async def driver_step(
     field, push_event = _DRIVER_STEPS[target]
     now = utcnow()
     setattr(ride, field, now)
+    credited = False
     if target == RideStatus.COMPLETED:
         await session.execute(
             update(DriverProfile)
@@ -405,15 +439,38 @@ async def driver_step(
             )
             .values(first_trip_completed_at=now)
         )
+        credited = await _credit_promotion(session, ride)
     await session.commit()
     if target == RideStatus.COMPLETED:
         await presence.clear_active_ride(user.id, ride.id)
+        if credited:
+            await events.notify_promo_credit(session, ride)
     await events.emit_updated(session, ride)
     if push_event:
         await events.push_to(
             session, ride.passenger_id, push_event, ride, name=events.first_name(user)
         )
     return ride
+
+
+async def _credit_promotion(session: AsyncSession, ride: Ride) -> bool:
+    """Kuulis pays the promotion discount into the driver's wallet (same transaction as the
+    completion, so a completed promoted ride always has its credit)."""
+    if not ride.promotion_id or ride.discount <= 0 or ride.driver_id is None:
+        return False
+    promotion = await session.get(promotions.Promotion, ride.promotion_id)
+    passenger = await session.get(User, ride.passenger_id)
+    await wallet.post_entry(
+        session,
+        ride.driver_id,
+        EntryKind.PROMO_CREDIT,
+        ride.discount,
+        ride_id=ride.id,
+        promotion_id=ride.promotion_id,
+        description=promotion.name if promotion else "",
+        details={"passenger_name": events.short_name(passenger)},
+    )
+    return True
 
 
 # --- Cancellation ------------------------------------------------------------------------------

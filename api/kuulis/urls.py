@@ -10,12 +10,15 @@ from apps.files.router import router as files_router
 from apps.geo.router import router as geo_router
 from apps.health.router import router as health_router
 from apps.notifications.router import router as notifications_router
+from apps.promotions.router import admin_router as promotions_admin_router
+from apps.rates.router import router as rates_router
 from apps.realtime.router import router as realtime_router
 from apps.rides.router import admin_drivers_router as rides_admin_drivers_router
 from apps.rides.router import admin_router as rides_admin_router
 from apps.rides.router import driver_router as rides_driver_router
 from apps.rides.router import router as rides_router
 from apps.users.router import router as users_router
+from apps.wallet.router import router as wallet_router
 
 api_v1 = APIRouter()
 api_v1.include_router(auth_router)
@@ -32,6 +35,9 @@ api_v1.include_router(drivers_admin_router)
 api_v1.include_router(geo_router)
 api_v1.include_router(rides_router)
 api_v1.include_router(rides_admin_router)
+api_v1.include_router(rates_router)
+api_v1.include_router(promotions_admin_router)
+api_v1.include_router(wallet_router)
 
 root = APIRouter()
 root.include_router(health_router)

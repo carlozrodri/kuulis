@@ -14,6 +14,7 @@ from pydantic import (
 )
 
 from apps.drivers.models import DocumentKind, VehicleType
+from apps.rates.models import RateSource
 from apps.rides.models import PaymentMethod
 
 MinYear = Annotated[int, Field(ge=1950, le=2100)]
@@ -136,6 +137,7 @@ def _default_areas() -> list[ServiceArea]:
 
 
 Radius = Annotated[int, Field(ge=100, le=50_000)]
+StaleMinutes = Annotated[int, Field(ge=5, le=30 * 24 * 60)]
 
 
 def _unique[T](values: list[T]) -> list[T]:
@@ -191,6 +193,14 @@ class AppConfig(BaseModel):
     search_timeout_seconds: int = Field(default=180, ge=30, le=1800)
     quote_ttl_seconds: int = Field(default=300, ge=30, le=3600)
 
+    # --- Rates and promotions (phase 1C) -------------------------------------------------------
+    rates_stale_minutes: dict[RateSource, StaleMinutes] = Field(
+        default_factory=lambda: {RateSource.BCV: 36 * 60, RateSource.BINANCE: 120}
+    )
+    rates_manual_hold_hours: int = Field(default=6, ge=1, le=168)
+    promo_pair_alert_threshold: int = Field(default=3, ge=2, le=100)
+    promo_pair_alert_days: int = Field(default=30, ge=1, le=365)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -209,6 +219,9 @@ class AppConfig(BaseModel):
         if self.search_timeout_seconds < self.offer_timeout_seconds:
             raise ValueError("search_timeout_seconds must be >= offer_timeout_seconds")
         return self
+
+    def stale_minutes(self, source: RateSource) -> int:
+        return self.rates_stale_minutes.get(source, 24 * 60)
 
     def min_year(self, vehicle_type: VehicleType) -> int:
         return self.vehicle_min_year.get(vehicle_type, 0)
@@ -235,6 +248,10 @@ class AppConfigUpdate(BaseModel):
     search_radius_m: list[Radius] | None = Field(default=None, min_length=1, max_length=6)
     search_timeout_seconds: int | None = Field(default=None, ge=30, le=1800)
     quote_ttl_seconds: int | None = Field(default=None, ge=30, le=3600)
+    rates_stale_minutes: dict[RateSource, StaleMinutes] | None = None  # merged per source
+    rates_manual_hold_hours: int | None = Field(default=None, ge=1, le=168)
+    promo_pair_alert_threshold: int | None = Field(default=None, ge=2, le=100)
+    promo_pair_alert_days: int | None = Field(default=None, ge=1, le=365)
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

@@ -10,6 +10,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.drivers.models import DocumentKind, DocumentStatus, DriverDocument, DriverProfile
+from apps.notifications import services as notifications
+from apps.notifications import tasks as notification_tasks
+from apps.promotions.models import Promotion
+from apps.promotions.schemas import PromotionBrief
+from apps.rates import services as rates
+from apps.rates.schemas import FrozenRates
 from apps.realtime.manager import publish
 from apps.rides import notify, presence
 from apps.rides.models import ASSIGNED_STATUSES, Rating, Ride, RideMessage, RideOffer
@@ -38,6 +44,29 @@ def first_name(user: User | None) -> str:
         return ""
     parts = (user.full_name or "").split()
     return parts[0] if parts else ""
+
+
+def short_name(user: User | None) -> str:
+    """ "Ana M." (first name and last initial)."""
+    if user is None:
+        return ""
+    parts = (user.full_name or "").split()
+    if not parts:
+        return ""
+    return f"{parts[0]} {parts[-1][0]}." if len(parts) > 1 else parts[0]
+
+
+def _frozen(ride: Ride) -> FrozenRates:
+    return FrozenRates(bcv=ride.rate_bcv, binance=ride.rate_binance)
+
+
+async def _promotions(
+    session: AsyncSession, ids: set[uuid.UUID]
+) -> dict[uuid.UUID, PromotionBrief]:
+    if not ids:
+        return {}
+    rows = await session.scalars(select(Promotion).where(Promotion.id.in_(ids)))
+    return {p.id: PromotionBrief(id=p.id, name=p.name, code=p.code) for p in rows}
 
 
 def _rating(value: Any) -> float | None:
@@ -118,6 +147,7 @@ async def serialize_rides(
         }
     live = [str(r.driver_id) for r in rides if r.driver_id and r.status in ASSIGNED_STATUSES]
     locations = await presence.get_locations(live)
+    promos = await _promotions(session, {r.promotion_id for r in rides if r.promotion_id})
 
     result: list[RideRead] = []
     for ride in rides:
@@ -151,6 +181,11 @@ async def serialize_rides(
             "duration_s": ride.duration_s,
             "fare": ride.fare,
             "surge_multiplier": ride.surge_multiplier,
+            "discount": ride.discount,
+            "total": ride.total,
+            "promotion": promos.get(ride.promotion_id) if ride.promotion_id else None,
+            "rates": _frozen(ride),
+            "total_ves": rates.to_ves(ride.total, _frozen(ride)),
             "payment_method": ride.payment_method,
             "polyline": ride.polyline,
             "passenger": PersonBrief(
@@ -246,6 +281,9 @@ async def build_offer(session: AsyncSession, ride: Ride, offer: RideOffer) -> Of
         pickup_distance_m=offer.pickup_distance_m,
         pickup_eta_s=offer.pickup_eta_s,
         fare=ride.fare,
+        discount=ride.discount,
+        total=ride.total,
+        total_ves=rates.to_ves(ride.total, _frozen(ride)),
         payment_method=ride.payment_method,
         passenger=OfferPassenger(
             first_name=first_name(passenger),
@@ -266,7 +304,7 @@ async def emit_offer(session: AsyncSession, ride: Ride, offer: RideOffer) -> Non
         ride,
         {"priority": "high", "ttl": ttl},
         pickup=ride.pickup_address or f"{ride.pickup_lat:.4f}, {ride.pickup_lng:.4f}",
-        fare=f"{ride.fare:.2f}",
+        fare=f"{ride.total:.2f}",
     )
 
 
@@ -281,3 +319,17 @@ async def emit_message(ride: Ride, message: RideMessage) -> None:
         MessageRead.model_validate(message).model_dump(mode="json"),
         user_ids=participants,
     )
+
+
+async def notify_promo_credit(session: AsyncSession, ride: Ride) -> None:
+    """Inbox row + push to the driver: Kuulis credited the promotion discount."""
+    if ride.driver_id is None:
+        return
+    driver = await session.get(User, ride.driver_id)
+    if driver is None:
+        return
+    title, body = notify.render("promo_credit", driver.locale, amount=f"{ride.discount:.2f}")
+    data = {"type": "wallet", "event": "promo_credit", "ride_id": str(ride.id)}
+    await notifications.create_notifications(session, [driver.id], title, body, data)
+    await session.commit()
+    await notification_tasks.send_push.kiq([str(driver.id)], title, body, data)

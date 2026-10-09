@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Navigation, Route } from '@/components/icons';
+import { HandCoins, Navigation, Route } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { Txt } from '@/components/ui';
 import { CountdownRing, PAYMENT_ICONS, RatingBadge } from '@/features/ride/components';
@@ -14,6 +14,7 @@ import { useOfferResponse } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { ApiError } from '@/lib/api';
 import { confirmHaptic, playOfferAlert, tick } from '@/lib/feedback';
+import { amountToPay, formatVesPair, hasDiscount } from '@/lib/money';
 import { formatDistance, formatDuration, formatFare, secondsUntil } from '@/lib/ride';
 import type { Offer } from '@/lib/types';
 import { fonts, palette, radius, space } from '@/theme';
@@ -64,6 +65,10 @@ export function IncomingOffer({ offer }: { offer: Offer | null }) {
 
   if (!offer) return null;
   const PaymentIcon = PAYMENT_ICONS[offer.payment_method];
+  // The driver collects the total; Kuulis credits the promotion discount to the wallet on completion.
+  const collect = formatFare(amountToPay(offer));
+  const ves = formatVesPair(offer.total_ves, { bcv: t('money.rate.bcv'), binance: t('money.rate.binance') });
+  const credit = hasDiscount(offer) ? formatFare(offer.discount) : null;
 
   const answer = (accept: boolean) => {
     if (respond.isPending) return;
@@ -101,9 +106,16 @@ export function IncomingOffer({ offer }: { offer: Offer | null }) {
           </CountdownRing>
 
           <View style={{ alignItems: 'center', gap: space.xs }}>
-            <Text style={styles.fare} accessibilityLabel={t('drive.offer.fareA11y', { fare: formatFare(offer.fare) })}>
-              {formatFare(offer.fare)}
+            <Text style={styles.fare} accessibilityLabel={t('drive.offer.fareA11y', { fare: collect })}>
+              {collect}
             </Text>
+            {ves ? <Text style={styles.ves}>{ves}</Text> : null}
+            {credit ? (
+              <View style={styles.credit} accessibilityLabel={t('drive.offer.promoCreditA11y', { discount: credit })}>
+                <HandCoins size={16} color={c.onAccent} strokeWidth={2.4} />
+                <Text style={styles.creditText}>{t('drive.offer.promoCredit', { discount: credit })}</Text>
+              </View>
+            ) : null}
             <View style={styles.payment}>
               {PaymentIcon ? <PaymentIcon size={16} color={c.text} strokeWidth={2.2} /> : null}
               <Text style={styles.paymentText}>{t(`payment.${offer.payment_method}`)}</Text>
@@ -197,6 +209,17 @@ const styles = StyleSheet.create({
   seconds: { fontFamily: fonts.extrabold, fontSize: 52, color: c.text, fontVariant: ['tabular-nums'] },
   secondsLabel: { fontFamily: fonts.semibold, fontSize: 13, color: c.muted, marginTop: -6 },
   fare: { fontFamily: fonts.extrabold, fontSize: 56, letterSpacing: -1.5, color: c.text, fontVariant: ['tabular-nums'] },
+  ves: { fontFamily: fonts.semibold, fontSize: 14, color: c.muted, textAlign: 'center', fontVariant: ['tabular-nums'], marginTop: -4 },
+  credit: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: c.accent,
+    borderRadius: radius.pill,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  creditText: { fontFamily: fonts.extrabold, fontSize: 14, color: c.onAccent },
   payment: {
     flexDirection: 'row',
     alignItems: 'center',

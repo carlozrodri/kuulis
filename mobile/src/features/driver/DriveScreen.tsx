@@ -3,9 +3,10 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
 
-import { ChevronDown, CircleX, Flag, MapPin, MessageCircle, Navigation, Power } from '@/components/icons';
+import { ChevronDown, CircleX, Flag, HandCoins, MapPin, MessageCircle, Navigation, Power } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
+import { VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, EmptyState, IconButton, ProgressSteps, StatusPill, Txt } from '@/components/ui';
 import { Avatar, PAYMENT_ICONS, RatingBadge, RoundAction } from '@/features/ride/components';
@@ -15,6 +16,7 @@ import { useUserLocation } from '@/hooks/useLocation';
 import { useActiveRide, useCancelRide, useDriverRideAction, useRide } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { confirmHaptic } from '@/lib/feedback';
+import { amountToPay, hasDiscount } from '@/lib/money';
 import {
   canDriverCancel,
   decodePolyline,
@@ -83,6 +85,8 @@ export function DriveScreen() {
   const distance = me ? haversineMeters(me, target) : null;
   const PaymentIcon = PAYMENT_ICONS[ride.payment_method];
   const ended = !next;
+  const collect = formatFare(amountToPay(ride));
+  const credit = hasDiscount(ride) ? formatFare(ride.discount) : null;
 
   const run = () => {
     if (!next) return;
@@ -90,12 +94,21 @@ export function DriveScreen() {
       action.mutate(
         { id: ride.id, action: next },
         {
-          onSuccess: () => confirmHaptic(),
+          onSuccess: (updated) => {
+            confirmHaptic();
+            if (next === 'complete' && hasDiscount(updated)) {
+              showToast(t('drive.promo.creditedToast', { discount: formatFare(updated.discount) }), 'success');
+            }
+          },
           onError: (e) => showToast(apiErrorMessage(e), 'danger'),
         },
       );
     if (next === 'complete') {
-      Alert.alert(t('drive.completeConfirmTitle'), t('drive.completeConfirmBody', { fare: formatFare(ride.fare), method: t(`payment.${ride.payment_method}`) }), [
+      Alert.alert(t('drive.completeConfirmTitle'), t(credit ? 'drive.completeConfirmBodyPromo' : 'drive.completeConfirmBody', {
+          fare: collect,
+          method: t(`payment.${ride.payment_method}`),
+          discount: credit,
+        }), [
         { text: t('common.back'), style: 'cancel' },
         { text: t('drive.action.complete'), onPress: go },
       ]);
@@ -190,17 +203,30 @@ export function DriveScreen() {
         ) : null}
       </View>
 
-      <View style={[styles.collect, { backgroundColor: theme.surfaceAlt }]}>
-        {PaymentIcon ? <PaymentIcon size={22} color={theme.scheme === 'dark' ? theme.primary : theme.primaryPressed} /> : null}
-        <View style={{ flex: 1 }}>
-          <Txt variant="micro" color="muted">
-            {t('drive.collect')}
+      <View style={[styles.collectBox, { backgroundColor: theme.surfaceAlt }]}>
+        <View style={styles.collect}>
+          {PaymentIcon ? <PaymentIcon size={22} color={theme.scheme === 'dark' ? theme.primary : theme.primaryPressed} /> : null}
+          <View style={{ flex: 1 }}>
+            <Txt variant="micro" color="muted">
+              {t('drive.collect')}
+            </Txt>
+            <Txt variant="bodyStrong">{t(`payment.${ride.payment_method}`)}</Txt>
+          </View>
+          <Txt style={{ fontFamily: fonts.extrabold, fontSize: 28, color: theme.text }} tabular>
+            {collect}
           </Txt>
-          <Txt variant="bodyStrong">{t(`payment.${ride.payment_method}`)}</Txt>
         </View>
-        <Txt style={{ fontFamily: fonts.extrabold, fontSize: 28, color: theme.text }} tabular>
-          {formatFare(ride.fare)}
-        </Txt>
+        <VesLine ves={ride.total_ves} align="right" />
+        {credit ? (
+          <View style={[styles.credit, { backgroundColor: theme.accentSoft }]}>
+            <HandCoins size={18} color={theme.onAccentSoft} strokeWidth={2.2} />
+            <Txt variant="label" style={{ color: theme.onAccentSoft, flex: 1 }}>
+              {ride.status === 'completed'
+                ? t('drive.promo.credited', { discount: credit })
+                : t('drive.promo.willCredit', { discount: credit })}
+            </Txt>
+          </View>
+        ) : null}
       </View>
 
       {canDriverCancel(ride.status) ? (
@@ -257,5 +283,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
   },
   passenger: { flexDirection: 'row', alignItems: 'center', gap: space.md, borderRadius: radius.card, padding: space.md },
-  collect: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderRadius: radius.tile, padding: space.md },
+  collectBox: { gap: space.xs, borderRadius: radius.tile, padding: space.md },
+  collect: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  credit: { flexDirection: 'row', alignItems: 'center', gap: space.xs, borderRadius: radius.field, paddingHorizontal: space.sm, paddingVertical: space.xs },
 });

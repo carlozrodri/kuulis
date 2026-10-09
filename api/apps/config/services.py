@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 CACHE_KEY = "app_config"
 CACHE_TTL_SECONDS = 300  # Updates invalidate the cache; the TTL is only a safety net.
 # Dict settings merged per key on PATCH (sending one vehicle type keeps the others).
-MERGED_KEYS = ("vehicle_min_year", "fares")
+MERGED_KEYS = ("vehicle_min_year", "fares", "rates_stale_minutes")
 
 
 class ConfigInvalidError(AppError):

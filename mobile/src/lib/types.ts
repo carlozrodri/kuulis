@@ -196,6 +196,13 @@ export interface Quote {
   surge_multiplier: string;
   polyline: string | null;
   expires_at: string;
+  // Phase 1C (optional: older servers do not send them).
+  /** Promotion discount in USD ("0.60"); Kuulis credits it to the driver. */
+  discount?: string;
+  /** What the passenger pays: fare − discount. */
+  total?: string;
+  promotion?: RidePromotion | null;
+  total_ves?: VesAmount | null;
 }
 
 export type RideStatus =
@@ -261,6 +268,13 @@ export interface Ride {
   cancelled_at: string | null;
   cancel_reason: string | null;
   my_rating: RideRating | null;
+  // Phase 1C (optional: older servers do not send them).
+  discount?: string;
+  total?: string;
+  promotion?: RidePromotion | null;
+  /** Bs per USD, frozen when the ride was requested. */
+  rates?: { bcv: string | null; binance: string | null } | null;
+  total_ves?: VesAmount | null;
 }
 
 export interface Offer {
@@ -275,6 +289,10 @@ export interface Offer {
   payment_method: PaymentMethod;
   passenger: { first_name: string; rating: number | string | null };
   expires_at: string;
+  // Phase 1C (optional): the driver collects `total`; Kuulis credits `discount` on completion.
+  discount?: string;
+  total?: string;
+  total_ves?: VesAmount | null;
 }
 
 export interface DriverState {
@@ -295,4 +313,61 @@ export interface RideMessage {
 export interface DriverLocationEvent extends LatLng {
   ride_id: string;
   heading?: number | null;
+}
+
+// ── Phase 1C: exchange rates, promotions and wallet (docs/api/phase-1c.md) ──
+
+export type RateSource = "bcv" | "binance";
+
+export interface ExchangeRate {
+  source: RateSource;
+  /** Bs per 1 USD ("875.65"). */
+  rate: string;
+  origin: "auto" | "manual";
+  as_of: string;
+  fetched_at: string;
+  stale: boolean;
+}
+
+/** GET /rates. */
+export interface Rates {
+  bcv: ExchangeRate | null;
+  binance: ExchangeRate | null;
+}
+
+/** A USD amount in bolívares at each rate ("2101.56"), null when that rate is missing. */
+export interface VesAmount {
+  bcv: string | null;
+  binance: string | null;
+}
+
+/** The promotion applied to a quote or ride. `code` is null for automatic promotions. */
+export interface RidePromotion {
+  id: string;
+  name: string;
+  code: string | null;
+}
+
+/** GET /wallet/me. */
+export interface Wallet {
+  balance: string;
+  currency: string;
+}
+
+/** 1C only has `promo_credit`; 1D adds top-ups, transfers and fees. */
+export type WalletEntryKind = "promo_credit" | (string & {});
+
+/** GET /wallet/me/entries (newest first). */
+export interface WalletEntry {
+  id: string;
+  kind: WalletEntryKind;
+  /** Signed USDT amount ("0.60", "-3.00"). */
+  amount: string;
+  balance_after: string;
+  ride_id: string | null;
+  /** For `promo_credit`: the promotion name. */
+  description: string | null;
+  /** For `promo_credit`: {passenger_name}. */
+  details?: Record<string, unknown> | null;
+  created_at: string;
 }

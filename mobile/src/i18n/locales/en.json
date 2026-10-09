@@ -63,7 +63,8 @@
     "home": "Home",
     "notifications": "Notifications",
     "profile": "Profile",
-    "rides": "Rides"
+    "rides": "Rides",
+    "wallet": "Wallet"
   },
   "home": {
     "goodMorning": "Good morning",
@@ -323,7 +324,9 @@
     "ride_not_found": "We couldn't find this ride.",
     "ride_invalid_transition": "The ride changed status. We refreshed the screen.",
     "ride_not_completed": "The ride hasn't finished yet.",
-    "rating_already_submitted": "You already rated this ride."
+    "rating_already_submitted": "You already rated this ride.",
+    "promotion_invalid": "That promo code is not valid.",
+    "promotion_unavailable": "The promotion ran out. Check the updated price."
   },
   "map": {
     "recenter": "Recenter map"
@@ -380,7 +383,36 @@
     "choosePayment": "Choose how you'll pay",
     "priceUpdated": "The price was updated. Check it and request again.",
     "changeDestination": "Change destination",
-    "outsideTitle": "Outside the service area"
+    "outsideTitle": "Outside the service area",
+    "vehicleA11yDiscount": "Moto, {{fare}} with the {{name}} promotion, was {{original}}",
+    "promo": {
+      "have": "Have a promo code?",
+      "label": "Promo code",
+      "placeholder": "e.g. HELLO",
+      "apply": "Apply",
+      "cancel": "Close without applying",
+      "empty": "Enter the code",
+      "promotion": "Promotion",
+      "applied": "Code {{code}} applied",
+      "appliedNamed": "{{name}} promotion",
+      "appliedToast": "Code applied! You save {{discount}}",
+      "savings": "You save {{discount}} on this ride",
+      "savingsCode": "You save {{discount}} with code {{code}}",
+      "noSavings": "This code does not change the price of this ride",
+      "remove": "Remove code",
+      "removed": "Code removed",
+      "dropped": "We removed code {{code}}: {{reason}}",
+      "unavailable": "The promotion just ran out. Here is the updated price.",
+      "invalid": {
+        "not_found": "That code does not exist. Check the spelling.",
+        "not_started": "This promotion has not started yet.",
+        "ended": "This promotion has ended.",
+        "exhausted": "This promotion has run out.",
+        "max_uses": "You have already used this code as many times as allowed.",
+        "first_ride_only": "This code is only for your first ride.",
+        "not_eligible": "This code does not apply to this ride (area, vehicle or minimum fare)."
+      }
+    }
   },
   "ride": {
     "pickup": "Pickup",
@@ -557,7 +589,9 @@
       "toPickup": "Pickup {{distance}} away · {{time}}",
       "trip": "{{distance}} trip · {{time}}",
       "accept": "Accept",
-      "decline": "Decline"
+      "decline": "Decline",
+      "promoCredit": "+ {{discount}} credited by Kuulis (promotion)",
+      "promoCreditA11y": "Kuulis also credits {{discount}} to your wallet for a promotion"
     },
     "stage": {
       "toPickup": "Pick up {{name}}",
@@ -578,6 +612,46 @@
       "passengerCancelled": "The passenger cancelled the ride",
       "offerGone": "The request is no longer available",
       "offerExpired": "Time ran out to accept the request"
+    },
+    "completeConfirmBodyPromo": "Confirm you received {{fare}} via {{method}}. Kuulis credits the {{discount}} promotion to your wallet.",
+    "promo": {
+      "willCredit": "Promotion: when you finish, Kuulis credits {{discount}} to your wallet",
+      "credited": "Kuulis credited {{discount}} to your wallet (promotion)",
+      "creditedToast": "Kuulis credited {{discount}} to your wallet for the promotion",
+      "creditedTitle": "+ {{discount}} in your wallet",
+      "creditedBody": "The passenger used the {{name}} promotion and paid you {{total}}. Kuulis refunds you the discount."
+    }
+  },
+  "money": {
+    "rate": {
+      "bcv": "BCV",
+      "binance": "Binance"
+    },
+    "vesAt": "In Bs at {{rate}} rate",
+    "discountNote": "Includes a {{discount}} discount",
+    "discountNoteNamed": "Includes a {{discount}} discount · {{name}}"
+  },
+  "wallet": {
+    "title": "Wallet",
+    "balance": "Available balance",
+    "balanceA11y": "Available balance: {{amount}} {{currency}}",
+    "topUp": "Top up",
+    "transfer": "Transfer",
+    "soon": "Soon",
+    "promoInfo": "When a passenger uses a promotion, you collect the discounted amount and Kuulis refunds you the difference here when the ride ends.",
+    "movements": "Activity",
+    "empty": "No activity yet",
+    "emptyBody": "Kuulis refunds for rides with promotions will show up here.",
+    "entryA11y": "{{title}}, {{amount}} {{currency}}, {{date}}",
+    "openRide": "Opens the ride",
+    "kind": {
+      "promo_credit": {
+        "title": "Promotion · ride with {{name}}",
+        "titleNoName": "Promotion",
+        "subtitle": "Kuulis refunds you the discount",
+        "subtitleNamed": "Kuulis refunds you the {{name}} discount"
+      },
+      "other": "Transaction"
     }
   }
 }

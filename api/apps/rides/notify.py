@@ -49,6 +49,10 @@ TEMPLATES: dict[str, dict[str, tuple[str, str]]] = {
             "There are no drivers available nearby. Please try again in a few minutes.",
         ),
     },
+    "promo_credit": {
+        "es": ("Kuulis te acreditó ${amount}", "Es el descuento de la promoción del último viaje."),
+        "en": ("Kuulis credited you ${amount}", "It is the promotion discount of your last ride."),
+    },
     "message": {
         "es": ("{name}", "{text}"),
         "en": ("{name}", "{text}"),

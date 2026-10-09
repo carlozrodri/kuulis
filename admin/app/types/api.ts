@@ -138,6 +138,11 @@ export interface AppConfig {
   search_radius_m?: number[]
   search_timeout_seconds?: number
   quote_ttl_seconds?: number
+  // ---- Phase 1C (docs/api/phase-1c.md). Optional so the panel still loads against an older API. ----
+  rates_stale_minutes?: Partial<Record<RateSource, number>>
+  rates_manual_hold_hours?: number
+  promo_pair_alert_threshold?: number
+  promo_pair_alert_days?: number
 }
 
 // ---- Phase 1B: rides (docs/api/phase-1b.md) ----
@@ -266,6 +271,14 @@ export interface Ride {
   cancelled_at: string | null
   cancel_reason: string | null
   my_rating?: RideRating | null
+  // ---- Phase 1C. Optional so the panel still works against an older API. ----
+  /** What Kuulis pays the driver on completion; the passenger pays `total = fare − discount`. */
+  discount?: Decimal
+  total?: Decimal
+  promotion?: PromotionRef | null
+  /** Rates frozen when the ride was requested (Bs per 1 USD). */
+  rates?: Record<RateSource, Decimal | null> | null
+  total_ves?: VesAmount | null
 }
 
 export interface RideMessage {
@@ -310,4 +323,111 @@ export interface OnlineDriver {
   lng: number
   last_seen_at: string | null
   active_ride_id: string | null
+}
+
+// ---- Phase 1C: exchange rates & promotions (docs/api/phase-1c.md) ----
+
+export type RateSource = 'bcv' | 'binance'
+export const RATE_SOURCES: RateSource[] = ['bcv', 'binance']
+export type RateOrigin = 'auto' | 'manual'
+
+export interface ExchangeRate {
+  source: RateSource
+  /** Bs per 1 USD, 2 decimals. */
+  rate: Decimal
+  origin: RateOrigin
+  /** Date of the rate according to the source. */
+  as_of: string
+  /** When Kuulis stored it. */
+  fetched_at: string
+  /** Older than rates_stale_minutes[source]. */
+  stale: boolean
+}
+
+/** GET /rates and POST /admin/rates/refresh. */
+export type CurrentRates = Record<RateSource, ExchangeRate | null>
+
+/** Amount in bolívares per rate source (null when that rate is missing). */
+export type VesAmount = Record<RateSource, Decimal | null>
+
+/** GET /admin/rates/history items. */
+export interface RateHistoryEntry {
+  id: string
+  source: RateSource
+  rate: Decimal
+  origin: RateOrigin
+  as_of: string
+  fetched_at: string
+  created_by: { id: string, name: string | null } | null
+  note: string | null
+}
+
+export type PromotionStatus = 'active' | 'scheduled' | 'ended' | 'exhausted' | 'inactive'
+export const PROMOTION_STATUSES: PromotionStatus[] = ['active', 'scheduled', 'ended', 'exhausted', 'inactive']
+export type DiscountType = 'percent' | 'fixed'
+
+export interface PromotionRef {
+  id: string
+  name: string
+  code: string | null
+}
+
+export interface PromotionStats {
+  /** Rides in progress plus completed. */
+  uses: number
+  completed: number
+  credited: Decimal
+  reserved: Decimal
+  remaining: Decimal
+}
+
+export interface Promotion {
+  id: string
+  name: string
+  description: string | null
+  /** null = automatic promotion (applies without a code). */
+  code: string | null
+  discount_type: DiscountType
+  discount_value: Decimal
+  max_discount: Decimal | null
+  min_fare: Decimal
+  starts_at: string
+  ends_at: string
+  budget: Decimal
+  max_uses_per_passenger: number
+  max_total_uses: number | null
+  first_ride_only: boolean
+  /** Empty = every service area / vehicle type. */
+  service_areas: string[]
+  vehicle_types: VehicleType[]
+  is_active: boolean
+  status: PromotionStatus
+  stats: PromotionStats
+  created_at: string
+  updated_at: string
+}
+
+/** POST /admin/promotions body (PATCH takes any subset). */
+export type PromotionInput = Omit<Promotion, 'id' | 'status' | 'stats' | 'created_at' | 'updated_at'>
+
+/** GET /admin/promotions/{id}/rides items. */
+export interface PromotionRide {
+  ride_id: string
+  status: RideStatus
+  passenger_name: string | null
+  driver_name: string | null
+  fare: Decimal
+  discount: Decimal
+  total: Decimal
+  requested_at: string
+  completed_at: string | null
+}
+
+/** GET /admin/promotions/alerts items: passenger–driver pairs with many promoted rides. */
+export interface PromotionPairAlert {
+  passenger: { id: string, name: string | null, email: string | null }
+  driver: { id: string, name: string | null, email: string | null, profile_id: string | null }
+  rides: number
+  discount_total: Decimal
+  last_ride_at: string
 }

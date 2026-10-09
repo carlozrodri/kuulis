@@ -11,7 +11,12 @@ from taskiq_redis import RedisAsyncResultBackend, RedisStreamBroker
 
 from kuulis.settings import settings
 
-TASK_MODULES = ["apps.users.tasks", "apps.notifications.tasks", "apps.rides.tasks"]
+TASK_MODULES = [
+    "apps.users.tasks",
+    "apps.notifications.tasks",
+    "apps.rides.tasks",
+    "apps.rates.tasks",
+]
 
 if settings.APP_ENV == "test":
     broker = InMemoryBroker(await_inplace=True)

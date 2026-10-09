@@ -79,6 +79,16 @@ con la API de Binance.
   falla, y la app muestra la hora de la última actualización.
 - Supuesto: el precio del viaje se **congela en USD y en Bs al confirmar**, para que no cambie durante el viaje.
 
+### Cómo funcionan las promociones (supuesto de implementación, 2026-10-09)
+- Dos tipos: **con código** (el pasajero lo escribe al cotizar) o **automáticas** (se aplican solas; si
+  califican varias, gana la de mayor descuento).
+- Descuento en **porcentaje** (con tope opcional) o **monto fijo**, nunca mayor que la tarifa.
+- Condiciones: fechas, presupuesto, usos por pasajero, usos totales, solo primer viaje, ciudades, tipo de
+  vehículo y tarifa mínima.
+- El descuento queda **reservado** al pedir el viaje y se **acredita** al motorizado al completarlo; si se
+  cancela, se libera.
+- Alerta de abuso: pares pasajero–motorizado con 3 o más viajes con promoción en 30 días (configurable).
+
 ### Riesgo de las promociones
 Como Kuulis acredita saldo por cada viaje con promoción, ese saldo es un **costo real de marketing**. Requisitos:
 presupuesto y fecha de fin por promoción, tope de usos por pasajero y alertas de abuso (viajes falsos entre un
