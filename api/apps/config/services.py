@@ -14,11 +14,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from apps.config.models import AppSetting
 from apps.config.schemas import AppConfig, AppConfigUpdate
 from kuulis.core.cache import cache_delete, cached
+from kuulis.core.exceptions import AppError
 
 logger = logging.getLogger(__name__)
 
 CACHE_KEY = "app_config"
 CACHE_TTL_SECONDS = 300  # Updates invalidate the cache; the TTL is only a safety net.
+# Dict settings merged per key on PATCH (sending one vehicle type keeps the others).
+MERGED_KEYS = ("vehicle_min_year", "fares")
+
+
+class ConfigInvalidError(AppError):
+    status_code = 422
+    code = "validation_error"
+    message = "Invalid configuration"
 
 
 async def _load(session: AsyncSession) -> dict:
@@ -50,9 +59,18 @@ async def update_app_config(session: AsyncSession, data: AppConfigUpdate) -> App
     """Upserts the given keys. The caller commits, then calls ``invalidate_cache``."""
     current = AppConfig.model_validate(await _load(session))
     changes = data.model_dump(exclude_unset=True, exclude_none=True)
-    if "vehicle_min_year" in changes:
-        changes["vehicle_min_year"] = current.vehicle_min_year | changes["vehicle_min_year"]
-    merged = AppConfig.model_validate(current.model_dump() | changes)
+    for key in MERGED_KEYS:
+        if key in changes:
+            changes[key] = getattr(current, key) | changes[key]
+    try:
+        # Cross-field rules (fares for every enabled type, search vs offer timeout...).
+        merged = AppConfig.model_validate(current.model_dump() | changes)
+    except ValidationError as exc:
+        details = [
+            {"loc": list(err["loc"]), "msg": err["msg"], "type": err["type"]}
+            for err in exc.errors(include_url=False, include_context=False, include_input=False)
+        ]
+        raise ConfigInvalidError(details=details) from exc
     values = merged.model_dump(mode="json")
     for key in changes:
         stmt = insert(AppSetting).values(key=key, value=values[key])

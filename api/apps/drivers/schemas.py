@@ -151,6 +151,8 @@ class DriverProfileRead(BaseModel):
     approved_at: datetime | None
     suspended_at: datetime | None
     first_trip_completed_at: datetime | None
+    rating_avg: float | None = None
+    rating_count: int = 0
     created_at: datetime
     vehicle: VehicleRead | None
     documents: list[DocumentRead]

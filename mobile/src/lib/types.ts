@@ -57,7 +57,7 @@ export type DocumentStatus = 'pending' | 'approved' | 'rejected';
 
 export type DriverStatus = 'draft' | 'pending_review' | 'approved' | 'rejected' | 'suspended';
 
-export interface AppConfig {
+export interface AppConfig extends RideConfig {
   driver_min_age: number;
   vehicle_min_year: Partial<Record<VehicleType, number>>;
   enabled_vehicle_types: VehicleType[];
@@ -138,4 +138,140 @@ export interface PresignResponse {
   method: 'PUT';
   headers: Record<string, string>;
   expires_in: number;
+}
+
+// ── Phase 1B: rides (docs/api/phase-1b.md) ──
+
+export type PaymentMethod = 'cash_usd' | 'pago_movil' | 'binance' | 'zelle' | 'cash_ves';
+
+/** Public configuration keys added in 1B (all optional: older servers may not send them). */
+export interface RideConfig {
+  payment_methods?: PaymentMethod[];
+  offer_timeout_seconds?: number;
+  search_timeout_seconds?: number;
+  quote_ttl_seconds?: number;
+  service_area?: { min_lat: number; max_lat: number; min_lng: number; max_lng: number };
+  surge_manual_multiplier?: string;
+}
+
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+export interface Place extends LatLng {
+  address: string;
+}
+
+/** GET /geo/search and /geo/reverse. */
+export interface GeoResult extends LatLng {
+  name: string;
+  address: string;
+}
+
+export interface Quote {
+  quote_id: string;
+  vehicle_type: VehicleType;
+  pickup: Place;
+  dropoff: Place;
+  distance_m: number;
+  duration_s: number;
+  fare: string;
+  surge_multiplier: string;
+  polyline: string | null;
+  expires_at: string;
+}
+
+export type RideStatus =
+  | 'searching'
+  | 'driver_assigned'
+  | 'driver_arrived'
+  | 'in_progress'
+  | 'completed'
+  | 'cancelled_by_passenger'
+  | 'cancelled_by_driver'
+  | 'cancelled_by_admin'
+  | 'no_drivers';
+
+export interface RideRating {
+  stars: number;
+  tags: string[];
+  comment?: string | null;
+}
+
+export interface RidePassenger {
+  id: string;
+  first_name: string;
+  rating: number | string | null;
+}
+
+export interface RideDriver {
+  id: string;
+  first_name: string;
+  rating: number | string | null;
+  photo_url: string | null;
+  vehicle: { brand: string; model: string; color: string; plate: string } | null;
+}
+
+export interface DriverLocation extends LatLng {
+  heading?: number | null;
+}
+
+export interface Ride {
+  id: string;
+  status: RideStatus;
+  vehicle_type: VehicleType;
+  pickup: Place;
+  dropoff: Place;
+  distance_m: number;
+  duration_s: number;
+  fare: string;
+  surge_multiplier: string;
+  payment_method: PaymentMethod;
+  polyline: string | null;
+  passenger: RidePassenger;
+  driver: RideDriver | null;
+  driver_location: DriverLocation | null;
+  requested_at: string;
+  assigned_at: string | null;
+  arrived_at: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  cancelled_at: string | null;
+  cancel_reason: string | null;
+  my_rating: RideRating | null;
+}
+
+export interface Offer {
+  ride_id: string;
+  pickup: Place;
+  dropoff: Place;
+  distance_m: number;
+  duration_s: number;
+  pickup_distance_m: number;
+  pickup_eta_s: number;
+  fare: string;
+  payment_method: PaymentMethod;
+  passenger: { first_name: string; rating: number | string | null };
+  expires_at: string;
+}
+
+export interface DriverState {
+  online: boolean;
+  active_ride_id: string | null;
+  current_offer: Offer | null;
+}
+
+export interface RideMessage {
+  id: string;
+  ride_id: string;
+  sender_id: string;
+  text: string;
+  created_at: string;
+}
+
+/** WS `ride.driver_location`. */
+export interface DriverLocationEvent extends LatLng {
+  ride_id: string;
+  heading?: number | null;
 }

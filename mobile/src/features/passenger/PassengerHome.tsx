@@ -1,11 +1,20 @@
-import { useState } from 'react';
+import { router } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Bike, Mail, Search, ShieldCheck, Wallet } from '@/components/icons';
+import { Bike, ChevronRight, Clock, Mail, Search } from '@/components/icons';
+import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
-import { Button, Card, ListRow, Notice, StatusPill, Txt, Wordmark } from '@/components/ui';
+import { Button, Card, IconTile, ListRow, Notice, Txt, Wordmark } from '@/components/ui';
+import { LocationPrompt } from '@/features/ride/LocationPrompt';
+import { rideDraft, setDraftPlace } from '@/features/ride/store';
+import { useCurrentPickup } from '@/features/ride/useCurrentPickup';
+import { useUserLocation } from '@/hooks/useLocation';
+import { useActiveRide, useRideHistory } from '@/hooks/useRides';
 import { api } from '@/lib/api';
+import { isActiveStatus, shortAddress } from '@/lib/ride';
+import type { Place } from '@/lib/types';
 import { useAuth } from '@/providers/AuthProvider';
 import { elevation, radius, space, useTheme } from '@/theme';
 
@@ -20,17 +29,51 @@ export function firstName(fullName: string | null | undefined) {
   return fullName?.trim().split(/\s+/)[0] ?? '';
 }
 
-/** Passenger home. Requesting a ride (map, search, price) arrives in a later phase. */
+/** Recent destinations from the ride history, newest first, without duplicates. */
+function useRecentDestinations(limit = 3): Place[] {
+  const history = useRideHistory('passenger');
+  return useMemo(() => {
+    const seen = new Set<string>();
+    const places: Place[] = [];
+    for (const ride of history.data?.pages.flatMap((page) => page.items) ?? []) {
+      const key = ride.dropoff.address.trim().toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      places.push(ride.dropoff);
+      if (places.length >= limit) break;
+    }
+    return places;
+  }, [history.data, limit]);
+}
+
+/** Passenger home: the map with "¿A dónde vamos?" on a bottom sheet. */
 export function PassengerHome() {
   const { t } = useTranslation();
   const theme = useTheme();
   const { user } = useAuth();
   const [sent, setSent] = useState(false);
   const name = firstName(user?.full_name);
+  const { permission } = useUserLocation();
+  const active = useActiveRide();
+  const recents = useRecentDestinations();
+  useCurrentPickup();
+
+  useEffect(() => {
+    // Coming back home starts a fresh request from the current location.
+    rideDraft.set((draft) => ({ ...draft, dropoff: null }));
+  }, []);
+
+  const activeRide = active.data && isActiveStatus(active.data.status) ? active.data : null;
+
+  const goTo = (place: Place) => {
+    setDraftPlace('dropoff', place);
+    if (rideDraft.get().pickup) router.push('/ride/quote');
+    else router.push({ pathname: '/ride/search', params: { field: 'pickup' } });
+  };
 
   return (
     <MapSheetLayout
-      variant="passenger"
+      map={(insets) => <RideMap insets={insets} followUser showUser />}
       topBar={
         <View style={[styles.brand, { backgroundColor: theme.surface }, elevation(theme)]}>
           <Wordmark size={22} />
@@ -40,18 +83,55 @@ export function PassengerHome() {
         {name ? t('home.greetingName', { greeting: t(greetingKey()), name }) : t(greetingKey())}
       </Txt>
 
-      <View
-        accessible
-        accessibilityRole="search"
-        accessibilityLabel={`${t('home.whereTo')}. ${t('common.comingSoon')}`}
-        accessibilityState={{ disabled: true }}
-        style={[styles.search, { backgroundColor: theme.background }]}>
-        <Search size={22} color={theme.primary} strokeWidth={2.2} />
-        <Txt variant="bodyStrong" color="muted" style={{ flex: 1, fontSize: 16 }}>
-          {t('home.whereTo')}
-        </Txt>
-        <StatusPill label={t('common.comingSoon')} tone="accent" />
-      </View>
+      {activeRide ? (
+        <Card
+          tone="tint"
+          onPress={() => router.push({ pathname: '/ride', params: { id: activeRide.id } })}
+          accessibilityLabel={t('home.activeRide')}
+          style={styles.activeCard}>
+          <IconTile icon={Bike} tone="primary" />
+          <View style={{ flex: 1 }}>
+            <Txt variant="bodyStrong">{t('home.activeRide')}</Txt>
+            <Txt variant="caption" color="muted" numberOfLines={1}>
+              {t(`ride.status.${activeRide.status}`)}
+            </Txt>
+          </View>
+          <ChevronRight size={20} color={theme.muted} />
+        </Card>
+      ) : (
+        <Pressable
+          accessibilityRole="search"
+          accessibilityLabel={t('home.whereTo')}
+          accessibilityHint={t('home.whereToHint')}
+          onPress={() => router.push({ pathname: '/ride/search', params: { field: 'dropoff' } })}
+          style={({ pressed }) => [styles.search, { backgroundColor: theme.background, opacity: pressed ? 0.8 : 1 }]}>
+          <Search size={22} color={theme.primary} strokeWidth={2.4} />
+          <Txt variant="subtitle" style={{ flex: 1 }}>
+            {t('home.whereTo')}
+          </Txt>
+          <View style={[styles.go, { backgroundColor: theme.primary }]}>
+            <ChevronRight size={20} color={theme.onPrimary} strokeWidth={2.6} />
+          </View>
+        </Pressable>
+      )}
+
+      {permission !== 'granted' ? <LocationPrompt /> : null}
+
+      {!activeRide && recents.length ? (
+        <View>
+          {recents.map((place, index) => (
+            <ListRow
+              key={`${place.lat},${place.lng}`}
+              icon={Clock}
+              iconTone="neutral"
+              title={shortAddress(place.address)}
+              subtitle={place.address}
+              onPress={() => goTo(place)}
+              divider={index < recents.length - 1}
+            />
+          ))}
+        </View>
+      ) : null}
 
       {!user?.is_verified ? (
         <Notice tone="warning" icon={Mail} title={t('home.verifyTitle')}>
@@ -73,15 +153,6 @@ export function PassengerHome() {
           ) : null}
         </Notice>
       ) : null}
-
-      <Card tone="tint" style={{ paddingVertical: space.xs }}>
-        <Txt variant="overline" color="muted" style={{ marginTop: space.sm }}>
-          {t('home.howItWorks')}
-        </Txt>
-        <ListRow icon={Wallet} title={t('home.how.price.title')} subtitle={t('home.how.price.body')} divider />
-        <ListRow icon={Bike} title={t('home.how.pay.title')} subtitle={t('home.how.pay.body')} divider />
-        <ListRow icon={ShieldCheck} title={t('home.how.safe.title')} subtitle={t('home.how.safe.body')} />
-      </Card>
     </MapSheetLayout>
   );
 }
@@ -92,9 +163,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.sm,
-    height: 60,
-    borderRadius: 18,
-    paddingHorizontal: space.md,
-    opacity: 0.9,
+    height: 64,
+    borderRadius: 20,
+    paddingLeft: space.md,
+    paddingRight: space.xs,
   },
+  go: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  activeCard: { flexDirection: 'row', alignItems: 'center', gap: space.sm, padding: space.md },
 });

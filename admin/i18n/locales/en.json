@@ -5,7 +5,9 @@
     "notifications": "Notifications",
     "profile": "My profile",
     "drivers": "Drivers",
-    "settings": "Settings"
+    "settings": "Settings",
+    "rides": "Rides",
+    "live": "Live"
   },
   "auth": {
     "title": "Admin sign in",
@@ -80,7 +82,22 @@
     "user_not_found": "User not found",
     "email_taken": "That email is already registered",
     "validation_error": "Please check the form",
-    "http_429": "Too many attempts, please wait"
+    "http_429": "Too many attempts, please wait",
+    "driver_not_found": "Driver not found",
+    "ride_not_found": "Ride not found",
+    "ride_invalid_transition": "The ride no longer allows that status change",
+    "ride_not_active": "The ride has already ended",
+    "ride_not_cancellable": "This ride can no longer be cancelled",
+    "quote_expired": "The quote has expired",
+    "outside_service_area": "Outside the service area",
+    "payment_method_invalid": "Payment method not available",
+    "ride_already_active": "The passenger already has an active ride",
+    "rating_required": "The previous ride has not been rated yet",
+    "driver_not_approved": "The driver is not approved",
+    "ride_active": "The driver has an active ride",
+    "offer_expired": "The offer has expired",
+    "ride_taken": "Another driver took the ride",
+    "chat_closed": "This ride's chat is closed"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -164,7 +181,9 @@
         "approved": "Approved",
         "rejected": "Rejected"
       }
-    }
+    },
+    "rating": "Rating",
+    "ratingCount": "ratings: {n}"
   },
   "settings": {
     "readOnly": "Only administrators can change settings.",
@@ -181,6 +200,210 @@
     "requiredDocuments": "Required documents",
     "requiredDocumentsHelp": "Drivers cannot submit their application without these documents.",
     "identityWarning": "Without ID card and selfie the driver's identity cannot be verified.",
-    "needVehicleType": "Enable at least one vehicle type"
+    "fixErrors": "Fix these values before saving.",
+    "errors": {
+      "needVehicleType": "Enable at least one vehicle type.",
+      "fareInvalid": "{type} fare: amounts must be 0 or more.",
+      "surgeDays": "Rule {n}: pick at least one day.",
+      "surgeTime": "Rule {n}: set a start and end time.",
+      "surgeSameTime": "Rule {n}: start and end must differ.",
+      "surgeMultiplier": "Rule {n}: the multiplier must be between 1.00 and 3.00.",
+      "surgeTooMany": "At most 50 surge rules.",
+      "manualMultiplier": "The manual surge must be between 1.00 and 3.00.",
+      "paymentMethods": "Enable at least one payment method.",
+      "serviceArea": "Service area: minimums must be lower than maximums.",
+      "radii": "Radii: 1 to 6 values between 100 and 50,000 m, in increasing order.",
+      "timeouts": "Timeouts must be greater than zero.",
+      "searchShorterThanOffer": "The search time cannot be shorter than each offer's time."
+    },
+    "fares": {
+      "title": "Fares",
+      "help": "Price = max(minimum, base + per km × km + per minute × min) × surge, rounded up. Amounts in USD.",
+      "base": "Base",
+      "per_km": "Per km",
+      "per_minute": "Per minute",
+      "minimum": "Minimum",
+      "rounding": "Rounding",
+      "roundingHelp": "The final price is rounded up to this multiple."
+    },
+    "surge": {
+      "title": "Surge pricing",
+      "help": "The higher of the active time rule and the manual surge applies. Caracas time.",
+      "manual": "Manual surge",
+      "manualHelp": "For one-off high demand. 1.00 = no surge.",
+      "rules": "Time rules",
+      "noRules": "No rules: only the manual surge applies.",
+      "days": "Days",
+      "start": "Start",
+      "end": "End",
+      "overnight": "Crosses midnight",
+      "multiplier": "Multiplier",
+      "add": "Add rule",
+      "remove": "Remove rule"
+    },
+    "payments": {
+      "title": "Payment methods",
+      "help": "Methods the passenger can choose when requesting a ride."
+    },
+    "area": {
+      "title": "Service area",
+      "help": "Coordinate box; rides cannot be requested outside it.",
+      "minLat": "Minimum latitude (south)",
+      "maxLat": "Maximum latitude (north)",
+      "minLng": "Minimum longitude (west)",
+      "maxLng": "Maximum longitude (east)"
+    },
+    "dispatch": {
+      "title": "Dispatch",
+      "offerTimeout": "Time to accept (s)",
+      "offerTimeoutHelp": "How long each driver has to accept an offer.",
+      "searchTimeout": "Max search time (s)",
+      "searchTimeoutHelp": "After this the ride ends as “no drivers”.",
+      "quoteTtl": "Quote validity (s)",
+      "quoteTtlHelp": "Time to confirm a quoted price.",
+      "radii": "Search radii (m)",
+      "radiiHelp": "The search widens in this order, smallest first.",
+      "addRadius": "Add radius",
+      "removeRadius": "Remove radius"
+    }
+  },
+  "paymentMethods": {
+    "cash_usd": "Cash (USD)",
+    "pago_movil": "Pago Móvil",
+    "binance": "Binance",
+    "zelle": "Zelle",
+    "cash_ves": "Cash (Bs.)"
+  },
+  "rides": {
+    "search": "Search by passenger, driver, plate or ID",
+    "allStatuses": "All statuses",
+    "status": "Status",
+    "requestedAt": "Requested",
+    "passenger": "Passenger",
+    "driver": "Driver",
+    "route": "Route",
+    "fare": "Fare",
+    "paymentMethod": "Payment method",
+    "vehicleType": "Vehicle",
+    "from": "From",
+    "to": "To",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "clearFilters": "Clear filters",
+    "invalidRange": "The start date is after the end date; the range is ignored.",
+    "total": "{n} rides",
+    "statuses": {
+      "searching": "Searching for a driver",
+      "driver_assigned": "Driver assigned",
+      "driver_arrived": "Driver at pickup",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled_by_passenger": "Cancelled by passenger",
+      "cancelled_by_driver": "Cancelled by driver",
+      "cancelled_by_admin": "Cancelled by admin",
+      "no_drivers": "No drivers"
+    },
+    "detailTitle": "Ride {id}",
+    "cancelReason": "Cancellation reason",
+    "pickup": "Pickup",
+    "dropoff": "Drop-off",
+    "estimatedRoute": "Straight-line estimate (no calculated route).",
+    "fareBreakdown": "Fare",
+    "preSurgeFare": "Before surge (approx.)",
+    "surge": "Surge",
+    "distance": "Distance",
+    "duration": "Duration",
+    "people": "Participants",
+    "noDriver": "No driver assigned.",
+    "timeline": {
+      "title": "Timeline",
+      "requested": "Requested",
+      "assigned": "Driver assigned",
+      "arrived": "Arrived at pickup",
+      "started": "Ride started",
+      "completed": "Ride completed",
+      "noDrivers": "No drivers available",
+      "pending": "Pending"
+    },
+    "chat": {
+      "title": "Chat",
+      "empty": "No messages.",
+      "passenger": "Passenger",
+      "driver": "Driver",
+      "other": "Other"
+    },
+    "offers": {
+      "title": "Offer history",
+      "empty": "No offers were sent.",
+      "sentAt": "Sent",
+      "distance": "Distance to pickup",
+      "respondedAt": "Response",
+      "statuses": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "declined": "Declined",
+        "expired": "Expired",
+        "cancelled": "Withdrawn"
+      }
+    },
+    "ratings": {
+      "title": "Ratings",
+      "empty": "No ratings.",
+      "stars": "{n} out of 5 stars",
+      "from": {
+        "passenger": "Passenger → driver",
+        "driver": "Driver → passenger",
+        "other": "Rating"
+      },
+      "tags": {
+        "safe_driving": "Safe driving",
+        "on_time": "On time",
+        "friendly": "Friendly",
+        "clean_helmet": "Clean helmet",
+        "respectful": "Respectful",
+        "ready_at_pickup": "Ready at pickup"
+      }
+    },
+    "cancel": {
+      "action": "Cancel ride",
+      "title": "Cancel ride",
+      "help": "The passenger and the driver will be notified. This cannot be undone.",
+      "reason": "Reason",
+      "confirm": "Cancel ride",
+      "done": "Ride cancelled"
+    },
+    "cancelReasons": {
+      "wait_too_long": "Waited too long",
+      "driver_not_moving": "Driver wasn't moving",
+      "changed_plans": "Changed plans",
+      "wrong_pickup": "Wrong pickup point",
+      "passenger_no_show": "Passenger didn't show up",
+      "unsafe_location": "Unsafe location",
+      "vehicle_problem": "Vehicle problem",
+      "other": "Other reason"
+    }
+  },
+  "live": {
+    "activeRides": "Rides ({n})",
+    "onlineDrivers": "Drivers ({n})",
+    "updatedAt": "Updated {time}",
+    "autoRefresh": "Auto (10 s)",
+    "refresh": "Refresh",
+    "statOnline": "Drivers online",
+    "statFree": "Available",
+    "statRides": "Active rides",
+    "statSearching": "Searching for a driver",
+    "free": "Available",
+    "busy": "On a ride",
+    "stale": "No signal",
+    "ridePickup": "Ride pickup",
+    "unnamed": "No name",
+    "noRides": "No active rides.",
+    "noDrivers": "No drivers online.",
+    "openRide": "Open ride",
+    "openDriver": "Open profile",
+    "lastSeen": "seen {ago}",
+    "secondsAgo": "{n} s ago",
+    "minutesAgo": "{n} min ago"
   }
 }

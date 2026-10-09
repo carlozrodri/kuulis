@@ -15,3 +15,5 @@ class TestSettings(BaseAppSettings):
     EMAIL_ENABLED: bool = False
     PUSH_ENABLED: bool = False
     STORAGE_PREFIX: str = "test"
+    OSRM_URL: str = ""  # tests never call the network
+    PHOTON_URL: str = ""

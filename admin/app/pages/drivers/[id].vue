@@ -16,6 +16,8 @@ const { data: driver, refresh, status, error } = await useAsyncData(
 )
 
 const age = computed(() => ageFrom(driver.value?.birth_date))
+// Phase 1B: only shown once the API returns a rating (drivers without trips have none).
+const rating = computed(() => (driver.value?.rating_count === 0 ? null : formatRating(driver.value?.rating_avg)))
 const actions = computed<DriverAction[]>(() => (driver.value ? driverActions[driver.value.status] : []))
 // Documents can be reviewed once the driver has submitted (not while still a draft).
 const canReviewDocuments = computed(() => !!driver.value && driver.value.status !== 'draft')
@@ -281,6 +283,19 @@ const failedThumbs = reactive(new Set<string>())
                   >
                     {{ t('drivers.belowMinAge') }}
                   </UBadge>
+                </dd>
+              </div>
+              <div v-if="rating">
+                <dt class="text-(--ui-text-muted)">
+                  {{ t('drivers.rating') }}
+                </dt>
+                <dd class="flex items-center gap-1">
+                  <UIcon
+                    name="i-lucide-star"
+                    class="size-4 text-warning"
+                  />
+                  {{ rating }}
+                  <span class="text-(--ui-text-muted)">({{ t('drivers.ratingCount', { n: driver.rating_count ?? 0 }) }})</span>
                 </dd>
               </div>
             </dl>

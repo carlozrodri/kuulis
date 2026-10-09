@@ -17,6 +17,7 @@ from apps.drivers.schemas import (
     VehicleWrite,
 )
 from apps.files.schemas import UploadResponse
+from apps.rides import presence
 from apps.users.dependencies import CurrentUser, DBSession, StaffUser
 from kuulis.core.pagination import Page, PageParams, page_params
 
@@ -138,6 +139,7 @@ async def suspend(
 ) -> DriverAdminRead:
     profile = await services.get_or_404(session, driver_id)
     profile = await services.suspend(session, profile, admin, data.reason)
+    await presence.go_offline(profile.user_id)  # stop offers right away
     await services.notify(session, profile, "suspended", reason=data.reason)
     return services.to_admin_read(profile, await get_app_config(session))
 

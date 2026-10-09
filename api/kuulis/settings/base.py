@@ -75,6 +75,13 @@ class BaseAppSettings(BaseSettings):
     EXPO_ACCESS_TOKEN: str = ""
     PUSH_ENABLED: bool = True
 
+    # --- Geo (routes and address search) --------------------------------------------------
+    # Empty OSRM_URL: routes are estimated (straight line x 1.3 at 22 km/h, no polyline).
+    # Empty PHOTON_URL: address search returns [] and reverse geocoding returns coordinates.
+    OSRM_URL: str = ""  # e.g. https://router.project-osrm.org
+    PHOTON_URL: str = ""  # e.g. https://photon.komoot.io
+    GEO_TIMEOUT_SECONDS: float = 4.0
+
     # --- Observability ----------------------------------------------------------
     SENTRY_ENABLED: bool = False
     SENTRY_DSN: str = ""

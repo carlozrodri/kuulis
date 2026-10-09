@@ -1,8 +1,9 @@
 import enum
 import uuid
 from datetime import date, datetime
+from decimal import Decimal
 
-from sqlalchemy import Date, DateTime, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import Date, DateTime, Enum, ForeignKey, Integer, Numeric, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from apps.users.models import User
@@ -84,6 +85,10 @@ class DriverProfile(BaseModel):
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     suspended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     first_trip_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Rating received as a driver (see apps/rides). ``rating_avg`` = sum / count, 2 decimals.
+    rating_sum: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
+    rating_count: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
+    rating_avg: Mapped[Decimal | None] = mapped_column(Numeric(3, 2))
 
     user: Mapped[User] = relationship(foreign_keys=[user_id], lazy="raise")
     vehicle: Mapped["Vehicle | None"] = relationship(

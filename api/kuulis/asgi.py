@@ -12,6 +12,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIASGIMiddleware
 
 import kuulis.models  # noqa: F401  (register models)
+from apps.geo import clients as geo_clients
 from apps.realtime.manager import manager
 from kuulis.core.db import engine
 from kuulis.core.exceptions import register_exception_handlers
@@ -37,6 +38,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     manager.start()
     yield
     await manager.stop()
+    await geo_clients.aclose()
     if not broker.is_worker_process:
         await broker.shutdown()
     await redis_client.aclose()

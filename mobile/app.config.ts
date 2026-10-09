@@ -19,6 +19,12 @@ const API_URLS = {
 const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || undefined;
 const GOOGLE_IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || undefined;
 
+/**
+ * Google Maps SDK key for Android store/dev builds (Expo Go ships its own key, so it is optional there).
+ * iOS uses Apple Maps, which needs no key.
+ */
+const GOOGLE_MAPS_ANDROID_API_KEY = process.env.GOOGLE_MAPS_ANDROID_API_KEY || undefined;
+
 /** "123-abc.apps.googleusercontent.com" -> "com.googleusercontent.apps.123-abc" (iOS URL scheme). */
 function reversedClientId(clientId: string) {
   return clientId.split('.').reverse().join('.');
@@ -44,6 +50,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     infoPlist: {
       NSCameraUsageDescription: 'Kuulis usa la cámara para fotografiar tus documentos, tu selfie y tu moto.',
       NSPhotoLibraryUsageDescription: 'Kuulis accede a tus fotos para subir tus documentos y las fotos de tu moto.',
+      // "Navegar con Google Maps / Waze" from the driver's active ride.
+      LSApplicationQueriesSchemes: ['comgooglemaps', 'waze'],
     },
   },
   android: {
@@ -85,6 +93,22 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     ['expo-notifications', { color: '#0E7C5A' }],
+    [
+      'expo-location',
+      {
+        // Foreground only: background location needs a development build (not available in Expo Go).
+        locationWhenInUsePermission:
+          'Kuulis usa tu ubicación para saber dónde recogerte y, si eres motorizado, para enviarte viajes cercanos y mostrar tu posición al pasajero durante el viaje.',
+        locationAlwaysAndWhenInUsePermission: false,
+        locationAlwaysPermission: false,
+        isIosBackgroundLocationEnabled: false,
+        isAndroidBackgroundLocationEnabled: false,
+      },
+    ],
+    ['expo-audio', { microphonePermission: false }],
+    ...(GOOGLE_MAPS_ANDROID_API_KEY
+      ? [['react-native-maps', { androidGoogleMapsApiKey: GOOGLE_MAPS_ANDROID_API_KEY }] as [string, object]]
+      : []),
     // Native Google Sign-In needs a development or store build (it is not part of Expo Go). The iOS URL
     // scheme is only added when the iOS client id is configured, so `expo start` works without it.
     ...(GOOGLE_IOS_CLIENT_ID

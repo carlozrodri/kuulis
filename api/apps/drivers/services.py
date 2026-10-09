@@ -200,6 +200,8 @@ def _base_fields(profile: DriverProfile, config: AppConfig) -> dict:
         "approved_at": profile.approved_at,
         "suspended_at": profile.suspended_at,
         "first_trip_completed_at": profile.first_trip_completed_at,
+        "rating_avg": profile.rating_avg,
+        "rating_count": profile.rating_count,
         "created_at": profile.created_at,
         "vehicle": VehicleRead.model_validate(profile.vehicle) if profile.vehicle else None,
         "requirements": requirements(profile, config),

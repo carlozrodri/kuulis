@@ -1,13 +1,16 @@
 import asyncio
 import contextlib
+import logging
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 
 from apps.realtime.manager import manager
+from apps.rides import presence
 from apps.users.dependencies import user_from_token
 from kuulis.core.db import SessionLocal
 from kuulis.core.exceptions import AuthenticationError
 
+logger = logging.getLogger(__name__)
 router = APIRouter(tags=["realtime"])
 
 AUTH_TIMEOUT_SECONDS = 10
@@ -20,6 +23,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     Protocol: connect, then send ``{"type": "auth", "token": "<access token>"}`` as the first
     message within 10s (tokens are kept out of URLs and proxy logs). After that the server pushes
     ``{"event": str, "data": any}`` messages; clients may send ``{"type": "ping"}``.
+    Drivers send ``{"type": "location", "lat", "lng", "heading"?, "speed"?}`` every 3-5 s.
     """
     await websocket.accept()
     try:
@@ -39,8 +43,14 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     try:
         while True:
             message = await websocket.receive_json()
-            if message.get("type") == "ping":
+            kind = message.get("type") if isinstance(message, dict) else None
+            if kind == "ping":
                 await websocket.send_json({"event": "pong", "data": None})
+            elif kind == "location":
+                try:
+                    await presence.handle_location(user_id, message)
+                except Exception:  # never drop the socket because of one bad update
+                    logger.warning("Location update failed", exc_info=True)
     except (WebSocketDisconnect, ValueError):
         pass
     finally:

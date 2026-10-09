@@ -16,11 +16,19 @@ FANOUT_BATCH = 500
 
 
 @broker.task(task_name="notifications.send_push", retry_on_error=True, max_retries=3)
-async def send_push(user_ids: list[str], title: str, body: str, data: dict | None = None) -> int:
+async def send_push(
+    user_ids: list[str],
+    title: str,
+    body: str,
+    data: dict | None = None,
+    options: dict | None = None,
+) -> int:
+    """``options`` adds Expo message fields (e.g. ``{"priority": "high", "ttl": 15}``)."""
     async with SessionLocal() as session:
         tokens = await services.active_push_tokens(session, [uuid.UUID(u) for u in user_ids])
         messages = [
             {"to": t, "title": title, "body": body, "data": data or {}, "sound": "default"}
+            | (options or {})
             for t in tokens
         ]
         tickets = await send_expo_push(messages)

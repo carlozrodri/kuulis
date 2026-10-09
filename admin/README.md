@@ -17,3 +17,6 @@ pnpm build        # .output/ node server, used by the Dockerfile
 - Translations live in `i18n/locales/{es,en}.json`; API error codes map to `errors.<code>`.
 - In QA/production the panel and the API share the domain (`https://<host>` and `https://<host>/api`),
   so no CORS is involved and tokens are first-party cookies.
+- Maps (rides, live view, service area) use Leaflet with OpenStreetMap raster tiles: no API key, attribution
+  shown on every map. OSM's tile policy allows this low-volume internal use; set `NUXT_PUBLIC_MAP_TILE_URL`
+  (and `NUXT_PUBLIC_MAP_TILE_ATTRIBUTION`) to switch to a self-hosted or commercial tile server.

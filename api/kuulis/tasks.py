@@ -1,7 +1,7 @@
 """Background jobs (Taskiq on Redis Streams), the equivalent of Django's celery.py.
 
 Each app declares its jobs in ``apps/<app>/tasks.py`` with ``@broker.task``.
-Run a worker with:   taskiq worker kuulis.tasks:broker apps.users.tasks apps.notifications.tasks
+Run a worker with:   taskiq worker kuulis.tasks:broker <TASK_MODULES...>  (see manage.py worker)
 Run the scheduler:   taskiq scheduler kuulis.tasks:scheduler
 """
 
@@ -11,7 +11,7 @@ from taskiq_redis import RedisAsyncResultBackend, RedisStreamBroker
 
 from kuulis.settings import settings
 
-TASK_MODULES = ["apps.users.tasks", "apps.notifications.tasks"]
+TASK_MODULES = ["apps.users.tasks", "apps.notifications.tasks", "apps.rides.tasks"]
 
 if settings.APP_ENV == "test":
     broker = InMemoryBroker(await_inplace=True)

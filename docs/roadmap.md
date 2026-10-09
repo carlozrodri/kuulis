@@ -22,13 +22,15 @@ funcionando en QA antes de pasar a la siguiente.
 - [x] Admin: cola de aprobación con visor de documentos; configuración editable (edad mínima, año mínimo,
       documentos requeridos).
 
-### 1B · Viajes
-- [ ] PostGIS; ubicación en vivo del motorizado por WebSocket, guardada en Redis (GEO).
-- [ ] Cotización: tarifa base, km, minutos, mínimo y recargo, todo configurable en el admin.
-- [ ] Solicitud, emparejamiento por cercanía con oferta de 15 s, estados del viaje y cancelaciones.
-- [ ] Chat del viaje y calificación obligatoria de ambos lados.
-- [ ] Mapas: `react-native-maps` (gratis). Rutas con OSRM y búsqueda con Photon, alojados en Coolify con
-      el mapa de Venezuela (supuesto, para costo cero por uso).
+### 1B · Viajes (hecha 2026-10-09, en QA; contrato en `docs/api/phase-1b.md`)
+- [x] Ubicación en vivo del motorizado por WebSocket, guardada en Redis (GEO).
+- [x] Cotización: tarifa base, km, minutos, mínimo y recargo, todo configurable en el admin.
+- [x] Solicitud, emparejamiento por cercanía con oferta de 15 s, estados del viaje y cancelaciones.
+- [x] Chat del viaje y calificación obligatoria de ambos lados.
+- [x] Mapas: `react-native-maps` (gratis). Rutas con OSRM y búsqueda con Photon. En QA usan los
+      servidores públicos de demostración.
+- [ ] Antes del lanzamiento: alojar OSRM y Photon en Coolify (los públicos no son para producción).
+- [ ] Ubicación en segundo plano del motorizado (requiere build instalada, no funciona en Expo Go).
 
 ### 1C · Tasas y promociones
 - [ ] Tasas BCV y Binance P2P (worker), historial y corrección manual en el admin.

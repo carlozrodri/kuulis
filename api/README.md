@@ -48,7 +48,9 @@ uv run ruff check . && uv run ruff format --check .
 | `drivers` | Driver onboarding: profile, vehicle, documents in private S3, review workflow (`draft → pending_review → approved/rejected`, `approved ↔ suspended`) and admin endpoints under `/admin/drivers`. |
 | `notifications` | Push (Expo) + in-app inbox. |
 | `files` | Presigned S3 uploads/downloads. |
-| `realtime` | WebSocket fan-out through Redis pub/sub. |
+| `realtime` | WebSocket fan-out through Redis pub/sub. Drivers also send `{"type": "location", lat, lng, heading?, speed?}` on it. |
+| `geo` | OSRM routes and Photon address search / reverse geocoding (`/geo/search`, `/geo/reverse`), limited to the service area and cached in Redis. |
+| `rides` | Quotes and pricing (Decimal, surge by Caracas time), rides and their state machine, driver presence (Redis GEO), matching, chat, mandatory ratings and `/admin/rides`. |
 
 The HTTP contract shared with the apps lives in `docs/api/`.
 
@@ -64,6 +66,34 @@ APPLE_CLIENT_IDS=<ios bundle id>
 
 ID tokens are verified against the providers' public keys (JWKS, cached in Redis for 6 hours and
 refetched when an unknown key id shows up).
+
+## Geo providers
+
+```bash
+OSRM_URL=https://router.project-osrm.org      # routes; empty = straight line x 1.3 at 22 km/h
+PHOTON_URL=https://photon.komoot.io           # address search; empty = search returns []
+GEO_TIMEOUT_SECONDS=4
+```
+
+The public demo servers are fine for QA only; before launch both are self-hosted in Coolify.
+Provider errors never fail a request: routes fall back to the estimate, search to `[]` and
+reverse geocoding to the coordinates.
+
+## Rides and matching
+
+- Every status change locks the ride row (`SELECT ... FOR UPDATE`) and follows
+  `apps/rides/models.py:RIDE_TRANSITIONS`. Partial unique indexes guarantee one active ride per
+  passenger and per driver.
+- Driver presence lives in Redis (`<env>:drivers:*`): an online hash, a last-seen location hash
+  and one GEO set per vehicle type. Drivers silent for 60 s get no offers; after 30 min they are
+  taken offline.
+- Matching (`apps/rides/dispatch.py`) offers a ride to one driver at a time, nearest first,
+  searching the configured radii in order. Each step is idempotent and runs under the ride lock.
+  Immediate steps go through the `rides.dispatch` task; timed steps (offer timeout, retries,
+  search deadline) sit in the Redis sorted set `<env>:rides:dispatch:due` and are run by a small
+  loop that starts inside **every worker process**. **No scheduler process is needed.**
+  A reconcile pass every 30 s re-schedules any `searching` ride that lost its entry.
+- The worker must therefore always be running in every environment that takes rides.
 
 ## Adding an app
 

@@ -62,7 +62,8 @@
   "tabs": {
     "home": "Home",
     "notifications": "Notifications",
-    "profile": "Profile"
+    "profile": "Profile",
+    "rides": "Rides"
   },
   "home": {
     "goodMorning": "Good morning",
@@ -88,7 +89,9 @@
         "title": "Verified drivers",
         "body": "We check their documents and motorcycle before activating them."
       }
-    }
+    },
+    "whereToHint": "Search your destination to see the price",
+    "activeRide": "You have a ride in progress"
   },
   "notifications": {
     "empty": "No notifications",
@@ -268,8 +271,7 @@
       "freeMonths": "Your 3 free months start with your first trip.",
       "offline": "You're offline",
       "offlineBody": "Go online to start receiving trip requests near you.",
-      "connect": "Go online",
-      "nextUp": "Very soon you'll be able to go online and receive trips from here."
+      "connect": "Go online"
     }
   },
   "validation": {
@@ -307,6 +309,275 @@
     "file_too_large": "The file is too large. Try a lighter photo.",
     "too_many_documents": "You've reached the maximum number of photos.",
     "storage_disabled": "File uploads aren't available right now.",
-    "upload_failed": "The file couldn't be uploaded. Check your connection and try again."
+    "upload_failed": "The file couldn't be uploaded. Check your connection and try again.",
+    "quote_expired": "The price expired. Here's an updated one.",
+    "outside_service_area": "For now we only operate in Caracas. Choose a point inside the city.",
+    "payment_method_invalid": "That payment method isn't available. Choose another.",
+    "ride_already_active": "You already have a ride in progress.",
+    "rating_required": "Rate your last ride before requesting another one.",
+    "driver_not_approved": "Your driver account isn't approved yet.",
+    "ride_active": "You can't go offline during a ride.",
+    "offer_expired": "The request expired before you accepted it.",
+    "ride_taken": "Another driver took this ride.",
+    "chat_closed": "The chat closed because the ride ended.",
+    "ride_not_found": "We couldn't find this ride.",
+    "ride_invalid_transition": "The ride changed status. We refreshed the screen.",
+    "ride_not_completed": "The ride hasn't finished yet.",
+    "rating_already_submitted": "You already rated this ride."
+  },
+  "map": {
+    "recenter": "Recenter map"
+  },
+  "connection": {
+    "offline": "No internet connection",
+    "reconnecting": "Unstable connection, reconnecting…"
+  },
+  "location": {
+    "title": "Turn on your location",
+    "body": "So your driver finds you fast. Only while you use the app.",
+    "driverBody": "You need it to go online: that is how nearby rides reach you and the passenger sees you coming.",
+    "blockedBody": "Kuulis doesn't have location permission. Turn it on in your phone settings.",
+    "allow": "Allow location",
+    "requiredToConnect": "Turn on your location to go online and get rides.",
+    "unavailable": "We couldn't get your location. Check that GPS is on."
+  },
+  "payment": {
+    "cash_usd": "Cash $",
+    "pago_movil": "Pago móvil",
+    "binance": "Binance",
+    "zelle": "Zelle",
+    "cash_ves": "Cash Bs"
+  },
+  "search": {
+    "title": "Plan your ride",
+    "currentLocation": "Your location · {{address}}",
+    "pickupPlaceholder": "Where should we pick you up?",
+    "useMyLocation": "Use my current location",
+    "pinOnMap": "Set on map",
+    "pinPickupHint": "Move the map to the exact pickup point",
+    "pinDropoffHint": "Move the map to your destination",
+    "noResults": "We couldn't find that address. Try another name or set it on the map.",
+    "hint": "Type at least 3 letters: street, building, mall…",
+    "clear": "Clear",
+    "swap": "Swap pickup and destination"
+  },
+  "pin": {
+    "pickupTitle": "Pickup point",
+    "dropoffTitle": "Destination",
+    "moveMap": "Move the map to place the point",
+    "confirmPickup": "Confirm pickup",
+    "confirmDropoff": "Confirm destination"
+  },
+  "quote": {
+    "moto": "Moto",
+    "meta": "{{distance}} · {{time}}",
+    "arrival": "Arrive by {{time}}",
+    "request": "Request moto · {{fare}}",
+    "surge": "High demand {{value}}",
+    "surgeA11y": "High demand price, {{value}}",
+    "vehicleA11y": "Moto, {{fare}}",
+    "payDriver": "You pay the driver directly at the end of the ride.",
+    "choosePayment": "Choose how you'll pay",
+    "priceUpdated": "The price was updated. Check it and request again.",
+    "changeDestination": "Change destination",
+    "outsideTitle": "Outside the service area"
+  },
+  "ride": {
+    "pickup": "Pickup",
+    "dropoff": "Destination",
+    "currentLocation": "Your current location",
+    "paymentMethod": "Payment method",
+    "ratingA11y": "Rating {{value}} out of 5",
+    "new": "New",
+    "newUser": "No ratings yet",
+    "plateA11y": "Plate {{plate}}",
+    "minimize": "Minimize",
+    "chat": "Chat",
+    "share": "Share",
+    "safety": "Safety",
+    "cancel": "Cancel ride",
+    "cancelled": "Ride cancelled",
+    "backHome": "Back to home",
+    "notFound": "We couldn't find this ride",
+    "yourDriver": "Your driver",
+    "shareMessage": "I'm riding with Kuulis with {{driver}} ({{vehicle}}, plate {{plate}}) from {{pickup}} to {{dropoff}}. Destination: {{maps}}",
+    "status": {
+      "searching": "Finding a driver",
+      "driver_assigned": "Driver on the way",
+      "driver_arrived": "Your driver is here",
+      "in_progress": "On the ride",
+      "completed": "Completed",
+      "cancelled_by_passenger": "Cancelled by passenger",
+      "cancelled_by_driver": "Cancelled by driver",
+      "no_drivers": "No drivers available",
+      "cancelled_by_admin": "Cancelled by Kuulis"
+    },
+    "searching": {
+      "title": "Finding your driver",
+      "body": "We're alerting the nearest drivers. We'll let you know as soon as one accepts."
+    },
+    "assigned": {
+      "title": "{{name}} is on the way",
+      "eta": "Arrives in about {{time}}",
+      "body": "Wait at the pickup point."
+    },
+    "arrived": {
+      "title": "{{name}} is here",
+      "body": "Waiting at the pickup point. Check the plate before getting on."
+    },
+    "inProgress": {
+      "title": "On our way",
+      "eta": "Estimated arrival at {{time}}"
+    },
+    "completed": {
+      "title": "You've arrived!",
+      "body": "Remember to pay {{fare}} to your driver."
+    },
+    "noDrivers": {
+      "title": "No drivers found",
+      "body": "Everyone is busy right now. Try again in a few minutes.",
+      "retry": "Search again"
+    },
+    "driverCancelled": {
+      "title": "Your driver cancelled",
+      "body": "Don't worry, we can find you another one right now at the same estimated price.",
+      "retry": "Find another driver"
+    },
+    "passengerCancelled": {
+      "title": "You cancelled this ride"
+    },
+    "toast": {
+      "assigned": "{{name}} accepted your ride!",
+      "arrived": "Your driver is at the pickup point",
+      "driverCancelled": "Your driver cancelled the ride",
+      "noDrivers": "No drivers available",
+      "adminCancelled": "The Kuulis team cancelled the ride"
+    },
+    "adminCancelled": {
+      "title": "Kuulis cancelled this ride",
+      "body": "Our support team cancelled the ride. If you still need it, you can request another moto right now."
+    }
+  },
+  "cancel": {
+    "title": "Why are you cancelling?",
+    "subtitlePassenger": "Your answer helps us improve.",
+    "subtitleDriver": "Cancelling often affects your reputation. Tell us what happened.",
+    "reasonLabel": "Cancellation reason: {{reason}}",
+    "reason": {
+      "wait_too_long": "The wait is too long",
+      "driver_not_moving": "The driver isn't moving",
+      "changed_plans": "My plans changed",
+      "wrong_pickup": "The pickup point is wrong",
+      "passenger_no_show": "The passenger didn't show up",
+      "unsafe_location": "The area isn't safe",
+      "vehicle_problem": "Problem with the motorcycle",
+      "other": "Other reason"
+    }
+  },
+  "safety": {
+    "title": "Your safety",
+    "subtitle": "If something feels wrong, act fast.",
+    "call911": "Call 911",
+    "call911Hint": "Emergencies in Venezuela",
+    "share": "Share my ride",
+    "shareHint": "Send the driver's details and your destination to someone you trust"
+  },
+  "chat": {
+    "title": "Chat",
+    "yourDriver": "Your driver",
+    "yourPassenger": "Your passenger",
+    "placeholder": "Write a message",
+    "send": "Send",
+    "emptyTitle": "Coordinate the pickup",
+    "emptyBody": "Use quick replies to let them know without typing.",
+    "newMessage": "New message: {{text}}",
+    "quick": {
+      "onMyWay": "I'm on my way out",
+      "atEntrance": "I'm at the entrance",
+      "whereAreYou": "Where are you?",
+      "thanks": "Thanks!",
+      "arrived": "I'm here",
+      "outside": "I'm outside waiting for you",
+      "traffic": "There's traffic, I'll be there in a few minutes"
+    }
+  },
+  "rating": {
+    "titlePassenger": "How was your ride with {{name}}?",
+    "titleDriver": "How was {{name}} as a passenger?",
+    "subtitle": "Your rating is anonymous and keeps Kuulis safe for everyone.",
+    "submit": "Submit rating",
+    "comment": "Comment (optional)",
+    "commentPlaceholder": "Tell us more",
+    "whatWentWell": "What did you like?",
+    "whatToImprove": "What could be better?",
+    "thanks": "Thanks for rating!",
+    "nothingPending": "You have no rides to rate",
+    "starsA11y": "{{count}} out of 5 stars",
+    "starN": "{{count}} stars",
+    "yourRating": "You rated {{count}} stars",
+    "yourRatingLabel": "Your rating",
+    "level": {
+      "1": "Very bad",
+      "2": "Bad",
+      "3": "Okay",
+      "4": "Good",
+      "5": "Excellent!"
+    },
+    "tag": {
+      "safe_driving": "Safe driving",
+      "on_time": "On time",
+      "friendly": "Friendly",
+      "clean_helmet": "Clean helmet",
+      "respectful": "Respectful",
+      "ready_at_pickup": "Ready at pickup"
+    }
+  },
+  "history": {
+    "title": "Your rides",
+    "subtitlePassenger": "Rides you've requested",
+    "subtitleDriver": "Rides you've driven",
+    "empty": "No rides yet",
+    "emptyPassenger": "When you request your first moto, you'll see it here.",
+    "emptyDriver": "Go online to get your first ride."
+  },
+  "drive": {
+    "home": {
+      "online": "You're online",
+      "onlineBody": "Looking for rides near you. We'll alert you with sound and vibration.",
+      "onlineChip": "Online",
+      "offlineChip": "Offline",
+      "disconnect": "Go offline",
+      "foregroundOnly": "Keep Kuulis open on screen while you're online: for now your location is only shared while the app is in the foreground."
+    },
+    "offer": {
+      "title": "New request",
+      "seconds": "sec",
+      "secondsLeft": "{{count}} seconds left",
+      "fareA11y": "Fare {{fare}}",
+      "toPickup": "Pickup {{distance}} away · {{time}}",
+      "trip": "{{distance}} trip · {{time}}",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
+    "stage": {
+      "toPickup": "Pick up {{name}}",
+      "waiting": "Waiting for {{name}}",
+      "toDropoff": "Take {{name}} to the destination"
+    },
+    "action": {
+      "arrive": "I've arrived",
+      "start": "Start ride",
+      "complete": "Finish ride"
+    },
+    "completeConfirmTitle": "Finish the ride?",
+    "completeConfirmBody": "Confirm you received {{fare}} via {{method}}.",
+    "collect": "Collect from passenger",
+    "distanceEta": "{{distance}} away · {{time}}",
+    "navigateWith": "Navigate with {{app}}",
+    "toast": {
+      "passengerCancelled": "The passenger cancelled the ride",
+      "offerGone": "The request is no longer available",
+      "offerExpired": "Time ran out to accept the request"
+    }
   }
 }

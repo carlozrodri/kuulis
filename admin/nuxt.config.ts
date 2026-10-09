@@ -17,6 +17,11 @@ export default defineNuxtConfig({
       // Same origin in QA/production (https://<host>/api/v1). Override with NUXT_PUBLIC_API_BASE.
       apiBase: '/api/v1',
       appEnv: 'local',
+      // Raster tiles for the ride maps (Leaflet). OpenStreetMap's standard tiles are fine for a
+      // low-volume internal panel per https://operations.osmfoundation.org/policies/tiles/ (attribution
+      // required, no bulk downloads). Point NUXT_PUBLIC_MAP_TILE_URL at a self-hosted/commercial server if usage grows.
+      mapTileUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      mapTileAttribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
     },
   },
 

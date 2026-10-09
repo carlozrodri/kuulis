@@ -62,7 +62,8 @@
   "tabs": {
     "home": "Inicio",
     "notifications": "Notificaciones",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "rides": "Viajes"
   },
   "home": {
     "goodMorning": "Buenos días",
@@ -88,7 +89,9 @@
         "title": "Motorizados verificados",
         "body": "Revisamos sus documentos y su moto antes de activarlos."
       }
-    }
+    },
+    "whereToHint": "Busca tu destino para ver el precio",
+    "activeRide": "Tienes un viaje en curso"
   },
   "notifications": {
     "empty": "No tienes notificaciones",
@@ -268,8 +271,7 @@
       "freeMonths": "Tus 3 meses gratis empiezan con tu primer viaje.",
       "offline": "Estás desconectado",
       "offlineBody": "Conéctate para empezar a recibir solicitudes de viaje cerca de ti.",
-      "connect": "Conectarme",
-      "nextUp": "Muy pronto podrás conectarte y recibir viajes desde aquí."
+      "connect": "Conectarme"
     }
   },
   "validation": {
@@ -307,6 +309,275 @@
     "file_too_large": "El archivo es muy pesado. Prueba con una foto más liviana.",
     "too_many_documents": "Llegaste al máximo de fotos permitidas.",
     "storage_disabled": "La subida de archivos no está disponible por ahora.",
-    "upload_failed": "No se pudo subir el archivo. Revisa tu conexión e inténtalo de nuevo."
+    "upload_failed": "No se pudo subir el archivo. Revisa tu conexión e inténtalo de nuevo.",
+    "quote_expired": "El precio venció. Te mostramos uno actualizado.",
+    "outside_service_area": "Por ahora solo operamos en Caracas. Elige un punto dentro de la ciudad.",
+    "payment_method_invalid": "Ese método de pago no está disponible. Elige otro.",
+    "ride_already_active": "Ya tienes un viaje en curso.",
+    "rating_required": "Califica tu último viaje antes de pedir otro.",
+    "driver_not_approved": "Tu cuenta de motorizado aún no está aprobada.",
+    "ride_active": "No puedes desconectarte con un viaje en curso.",
+    "offer_expired": "La solicitud expiró antes de que la aceptaras.",
+    "ride_taken": "Otro motorizado tomó este viaje.",
+    "chat_closed": "El chat se cerró porque el viaje terminó.",
+    "ride_not_found": "No encontramos este viaje.",
+    "ride_invalid_transition": "El viaje cambió de estado. Actualizamos la pantalla.",
+    "ride_not_completed": "El viaje aún no ha terminado.",
+    "rating_already_submitted": "Ya calificaste este viaje."
+  },
+  "map": {
+    "recenter": "Centrar el mapa"
+  },
+  "connection": {
+    "offline": "Sin conexión a internet",
+    "reconnecting": "Conexión inestable, reconectando…"
+  },
+  "location": {
+    "title": "Activa tu ubicación",
+    "body": "La usamos para que tu motorizado te encuentre rápido. Solo mientras usas la app.",
+    "driverBody": "La necesitas para conectarte: así te llegan viajes cercanos y el pasajero te ve llegar.",
+    "blockedBody": "Kuulis no tiene permiso de ubicación. Actívalo en los ajustes del teléfono.",
+    "allow": "Permitir ubicación",
+    "requiredToConnect": "Activa tu ubicación para conectarte y recibir viajes.",
+    "unavailable": "No pudimos obtener tu ubicación. Revisa que el GPS esté encendido."
+  },
+  "payment": {
+    "cash_usd": "Efectivo $",
+    "pago_movil": "Pago móvil",
+    "binance": "Binance",
+    "zelle": "Zelle",
+    "cash_ves": "Efectivo Bs"
+  },
+  "search": {
+    "title": "Planifica tu viaje",
+    "currentLocation": "Tu ubicación · {{address}}",
+    "pickupPlaceholder": "¿Dónde te recogemos?",
+    "useMyLocation": "Usar mi ubicación actual",
+    "pinOnMap": "Fijar en el mapa",
+    "pinPickupHint": "Mueve el mapa hasta el punto exacto de recogida",
+    "pinDropoffHint": "Mueve el mapa hasta tu destino",
+    "noResults": "No encontramos esa dirección. Prueba con otro nombre o fíjala en el mapa.",
+    "hint": "Escribe al menos 3 letras: calle, edificio, centro comercial…",
+    "clear": "Borrar",
+    "swap": "Intercambiar recogida y destino"
+  },
+  "pin": {
+    "pickupTitle": "Punto de recogida",
+    "dropoffTitle": "Destino",
+    "moveMap": "Mueve el mapa para ubicar el punto",
+    "confirmPickup": "Confirmar recogida",
+    "confirmDropoff": "Confirmar destino"
+  },
+  "quote": {
+    "moto": "Moto",
+    "meta": "{{distance}} · {{time}}",
+    "arrival": "Llegas a las {{time}}",
+    "request": "Pedir moto · {{fare}}",
+    "surge": "Alta demanda {{value}}",
+    "surgeA11y": "Precio con recargo por alta demanda, {{value}}",
+    "vehicleA11y": "Moto, {{fare}}",
+    "payDriver": "Le pagas directo al motorizado al terminar el viaje.",
+    "choosePayment": "Elige cómo vas a pagar",
+    "priceUpdated": "El precio se actualizó. Revísalo y vuelve a pedir.",
+    "changeDestination": "Cambiar destino",
+    "outsideTitle": "Fuera del área de servicio"
+  },
+  "ride": {
+    "pickup": "Recogida",
+    "dropoff": "Destino",
+    "currentLocation": "Tu ubicación actual",
+    "paymentMethod": "Método de pago",
+    "ratingA11y": "Calificación {{value}} de 5",
+    "new": "Nuevo",
+    "newUser": "Sin calificaciones aún",
+    "plateA11y": "Placa {{plate}}",
+    "minimize": "Minimizar",
+    "chat": "Chat",
+    "share": "Compartir",
+    "safety": "Seguridad",
+    "cancel": "Cancelar viaje",
+    "cancelled": "Viaje cancelado",
+    "backHome": "Volver al inicio",
+    "notFound": "No encontramos este viaje",
+    "yourDriver": "Tu motorizado",
+    "shareMessage": "Voy en Kuulis con {{driver}} ({{vehicle}}, placa {{plate}}) desde {{pickup}} hasta {{dropoff}}. Destino: {{maps}}",
+    "status": {
+      "searching": "Buscando motorizado",
+      "driver_assigned": "Motorizado en camino",
+      "driver_arrived": "Tu motorizado llegó",
+      "in_progress": "En viaje",
+      "completed": "Completado",
+      "cancelled_by_passenger": "Cancelado por el pasajero",
+      "cancelled_by_driver": "Cancelado por el motorizado",
+      "no_drivers": "Sin motorizados disponibles",
+      "cancelled_by_admin": "Cancelado por Kuulis"
+    },
+    "searching": {
+      "title": "Buscando tu motorizado",
+      "body": "Le avisamos a los motorizados más cercanos. Te avisamos apenas uno acepte."
+    },
+    "assigned": {
+      "title": "{{name}} va en camino",
+      "eta": "Llega en {{time}} aproximadamente",
+      "body": "Espera en el punto de recogida."
+    },
+    "arrived": {
+      "title": "{{name}} llegó",
+      "body": "Te espera en el punto de recogida. Confirma la placa antes de subir."
+    },
+    "inProgress": {
+      "title": "Vamos en camino",
+      "eta": "Llegada estimada a las {{time}}"
+    },
+    "completed": {
+      "title": "¡Llegaste!",
+      "body": "Recuerda pagar {{fare}} al motorizado."
+    },
+    "noDrivers": {
+      "title": "No encontramos motorizados",
+      "body": "Todos están ocupados en este momento. Inténtalo de nuevo en unos minutos.",
+      "retry": "Buscar de nuevo"
+    },
+    "driverCancelled": {
+      "title": "Tu motorizado canceló",
+      "body": "No te preocupes, podemos buscarte otro ahora mismo con el mismo precio estimado.",
+      "retry": "Buscar otro motorizado"
+    },
+    "passengerCancelled": {
+      "title": "Cancelaste este viaje"
+    },
+    "toast": {
+      "assigned": "¡{{name}} aceptó tu viaje!",
+      "arrived": "Tu motorizado llegó al punto de recogida",
+      "driverCancelled": "Tu motorizado canceló el viaje",
+      "noDrivers": "No encontramos motorizados disponibles",
+      "adminCancelled": "El equipo de Kuulis canceló el viaje"
+    },
+    "adminCancelled": {
+      "title": "Kuulis canceló este viaje",
+      "body": "Nuestro equipo de soporte canceló el viaje. Si lo necesitas, puedes pedir otra moto ahora mismo."
+    }
+  },
+  "cancel": {
+    "title": "¿Por qué cancelas?",
+    "subtitlePassenger": "Tu respuesta nos ayuda a mejorar el servicio.",
+    "subtitleDriver": "Cancelar seguido afecta tu reputación. Cuéntanos qué pasó.",
+    "reasonLabel": "Motivo de cancelación: {{reason}}",
+    "reason": {
+      "wait_too_long": "La espera es muy larga",
+      "driver_not_moving": "El motorizado no avanza",
+      "changed_plans": "Cambié de planes",
+      "wrong_pickup": "El punto de recogida está mal",
+      "passenger_no_show": "El pasajero no apareció",
+      "unsafe_location": "La zona no es segura",
+      "vehicle_problem": "Problema con la moto",
+      "other": "Otro motivo"
+    }
+  },
+  "safety": {
+    "title": "Tu seguridad",
+    "subtitle": "Si algo no anda bien, actúa rápido.",
+    "call911": "Llamar al 911",
+    "call911Hint": "Emergencias en Venezuela",
+    "share": "Compartir mi viaje",
+    "shareHint": "Envía los datos del motorizado y tu destino a alguien de confianza"
+  },
+  "chat": {
+    "title": "Chat",
+    "yourDriver": "Tu motorizado",
+    "yourPassenger": "Tu pasajero",
+    "placeholder": "Escribe un mensaje",
+    "send": "Enviar",
+    "emptyTitle": "Coordina el encuentro",
+    "emptyBody": "Usa las respuestas rápidas para avisar sin escribir.",
+    "newMessage": "Nuevo mensaje: {{text}}",
+    "quick": {
+      "onMyWay": "Ya voy saliendo",
+      "atEntrance": "Estoy en la entrada",
+      "whereAreYou": "¿Dónde estás?",
+      "thanks": "¡Gracias!",
+      "arrived": "Ya llegué",
+      "outside": "Estoy afuera esperándote",
+      "traffic": "Hay tráfico, llego en unos minutos"
+    }
+  },
+  "rating": {
+    "titlePassenger": "¿Cómo te fue con {{name}}?",
+    "titleDriver": "¿Cómo te fue con {{name}}?",
+    "subtitle": "Tu calificación es anónima y mantiene a Kuulis seguro para todos.",
+    "submit": "Enviar calificación",
+    "comment": "Comentario (opcional)",
+    "commentPlaceholder": "Cuéntanos algo más",
+    "whatWentWell": "¿Qué te gustó?",
+    "whatToImprove": "¿Qué se puede mejorar?",
+    "thanks": "¡Gracias por calificar!",
+    "nothingPending": "No tienes viajes por calificar",
+    "starsA11y": "{{count}} de 5 estrellas",
+    "starN": "{{count}} estrellas",
+    "yourRating": "Calificaste con {{count}} estrellas",
+    "yourRatingLabel": "Tu calificación",
+    "level": {
+      "1": "Muy mal",
+      "2": "Mal",
+      "3": "Regular",
+      "4": "Bien",
+      "5": "¡Excelente!"
+    },
+    "tag": {
+      "safe_driving": "Manejo seguro",
+      "on_time": "Puntual",
+      "friendly": "Amable",
+      "clean_helmet": "Casco limpio",
+      "respectful": "Respetuoso",
+      "ready_at_pickup": "Listo al llegar"
+    }
+  },
+  "history": {
+    "title": "Tus viajes",
+    "subtitlePassenger": "Los viajes que has pedido",
+    "subtitleDriver": "Los viajes que has hecho como motorizado",
+    "empty": "Aún no tienes viajes",
+    "emptyPassenger": "Cuando pidas tu primera moto, la verás aquí.",
+    "emptyDriver": "Conéctate para recibir tu primer viaje."
+  },
+  "drive": {
+    "home": {
+      "online": "Estás conectado",
+      "onlineBody": "Buscando viajes cerca de ti. Te avisamos con sonido y vibración.",
+      "onlineChip": "Conectado",
+      "offlineChip": "Desconectado",
+      "disconnect": "Desconectarme",
+      "foregroundOnly": "Mantén Kuulis abierto en pantalla mientras estés conectado: por ahora tu ubicación solo se comparte con la app en primer plano."
+    },
+    "offer": {
+      "title": "Nueva solicitud",
+      "seconds": "seg",
+      "secondsLeft": "Quedan {{count}} segundos",
+      "fareA11y": "Tarifa {{fare}}",
+      "toPickup": "Recogida a {{distance}} · {{time}}",
+      "trip": "Viaje de {{distance}} · {{time}}",
+      "accept": "Aceptar",
+      "decline": "Rechazar"
+    },
+    "stage": {
+      "toPickup": "Recoge a {{name}}",
+      "waiting": "Esperando a {{name}}",
+      "toDropoff": "Lleva a {{name}} a su destino"
+    },
+    "action": {
+      "arrive": "Llegué",
+      "start": "Iniciar viaje",
+      "complete": "Finalizar viaje"
+    },
+    "completeConfirmTitle": "¿Finalizar el viaje?",
+    "completeConfirmBody": "Confirma que recibiste {{fare}} por {{method}}.",
+    "collect": "Cobra al pasajero",
+    "distanceEta": "A {{distance}} · {{time}}",
+    "navigateWith": "Navegar con {{app}}",
+    "toast": {
+      "passengerCancelled": "El pasajero canceló el viaje",
+      "offerGone": "La solicitud ya no está disponible",
+      "offerExpired": "Se acabó el tiempo para aceptar la solicitud"
+    }
   }
 }

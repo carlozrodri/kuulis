@@ -22,6 +22,9 @@ class UserRead(BaseModel):
     is_verified: bool
     created_at: datetime
     last_login_at: datetime | None
+    # Rating received as a passenger.
+    rating_avg: float | None = None
+    rating_count: int = 0
 
 
 class UserCreate(BaseModel):

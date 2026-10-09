@@ -5,7 +5,9 @@
     "notifications": "Notificaciones",
     "profile": "Mi perfil",
     "drivers": "Motorizados",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "rides": "Viajes",
+    "live": "En vivo"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -80,7 +82,22 @@
     "user_not_found": "Usuario no encontrado",
     "email_taken": "Ese correo ya está registrado",
     "validation_error": "Revisa los datos del formulario",
-    "http_429": "Demasiados intentos, espera un momento"
+    "http_429": "Demasiados intentos, espera un momento",
+    "driver_not_found": "Motorizado no encontrado",
+    "ride_not_found": "Viaje no encontrado",
+    "ride_invalid_transition": "El viaje ya no admite ese cambio de estado",
+    "ride_not_active": "El viaje ya terminó",
+    "ride_not_cancellable": "Este viaje ya no se puede cancelar",
+    "quote_expired": "La cotización venció",
+    "outside_service_area": "Fuera del área de servicio",
+    "payment_method_invalid": "Método de pago no disponible",
+    "ride_already_active": "El pasajero ya tiene un viaje activo",
+    "rating_required": "Falta calificar el viaje anterior",
+    "driver_not_approved": "El motorizado no está aprobado",
+    "ride_active": "El motorizado tiene un viaje activo",
+    "offer_expired": "La oferta venció",
+    "ride_taken": "Otro motorizado tomó el viaje",
+    "chat_closed": "El chat de este viaje está cerrado"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -164,7 +181,9 @@
         "approved": "Aprobado",
         "rejected": "Rechazado"
       }
-    }
+    },
+    "rating": "Calificación",
+    "ratingCount": "calificaciones: {n}"
   },
   "settings": {
     "readOnly": "Solo los administradores pueden cambiar la configuración.",
@@ -181,6 +200,210 @@
     "requiredDocuments": "Documentos obligatorios",
     "requiredDocumentsHelp": "El motorizado no podrá enviar su solicitud sin estos documentos.",
     "identityWarning": "Sin cédula y selfie no es posible verificar la identidad del motorizado.",
-    "needVehicleType": "Habilita al menos un tipo de vehículo"
+    "fixErrors": "Corrige estos datos antes de guardar.",
+    "errors": {
+      "needVehicleType": "Habilita al menos un tipo de vehículo.",
+      "fareInvalid": "Tarifa de {type}: los montos deben ser 0 o más.",
+      "surgeDays": "Regla {n}: elige al menos un día.",
+      "surgeTime": "Regla {n}: indica hora de inicio y fin.",
+      "surgeSameTime": "Regla {n}: el inicio y el fin deben ser distintos.",
+      "surgeMultiplier": "Regla {n}: el multiplicador va de 1,00 a 3,00.",
+      "surgeTooMany": "Máximo 50 reglas de recargo.",
+      "manualMultiplier": "El recargo manual va de 1,00 a 3,00.",
+      "paymentMethods": "Habilita al menos un método de pago.",
+      "serviceArea": "Área de servicio: los mínimos deben ser menores que los máximos.",
+      "radii": "Radios: de 1 a 6 valores entre 100 y 50.000 m, de menor a mayor.",
+      "timeouts": "Los tiempos deben ser mayores que cero.",
+      "searchShorterThanOffer": "El tiempo de búsqueda no puede ser menor que el de cada oferta."
+    },
+    "fares": {
+      "title": "Tarifas",
+      "help": "Precio = máx(mínimo, base + por km × km + por minuto × min) × recargo, redondeado hacia arriba. Montos en USD.",
+      "base": "Base",
+      "per_km": "Por km",
+      "per_minute": "Por minuto",
+      "minimum": "Mínimo",
+      "rounding": "Redondeo",
+      "roundingHelp": "El precio final se redondea hacia arriba a este múltiplo."
+    },
+    "surge": {
+      "title": "Recargos",
+      "help": "Se aplica el mayor entre la regla horaria vigente y el recargo manual. Horas de Caracas.",
+      "manual": "Recargo manual",
+      "manualHelp": "Para demanda alta puntual. 1,00 = sin recargo.",
+      "rules": "Reglas por horario",
+      "noRules": "Sin reglas: solo aplica el recargo manual.",
+      "days": "Días",
+      "start": "Inicio",
+      "end": "Fin",
+      "overnight": "Cruza la medianoche",
+      "multiplier": "Multiplicador",
+      "add": "Agregar regla",
+      "remove": "Eliminar regla"
+    },
+    "payments": {
+      "title": "Métodos de pago",
+      "help": "Métodos que el pasajero puede elegir al pedir un viaje."
+    },
+    "area": {
+      "title": "Área de servicio",
+      "help": "Caja de coordenadas; fuera de ella no se pueden pedir viajes.",
+      "minLat": "Latitud mínima (sur)",
+      "maxLat": "Latitud máxima (norte)",
+      "minLng": "Longitud mínima (oeste)",
+      "maxLng": "Longitud máxima (este)"
+    },
+    "dispatch": {
+      "title": "Asignación de viajes",
+      "offerTimeout": "Tiempo para aceptar (s)",
+      "offerTimeoutHelp": "Lo que tiene cada motorizado para aceptar una oferta.",
+      "searchTimeout": "Búsqueda máxima (s)",
+      "searchTimeoutHelp": "Después, el viaje termina como «sin motorizados».",
+      "quoteTtl": "Vigencia de cotización (s)",
+      "quoteTtlHelp": "Tiempo para confirmar el precio cotizado.",
+      "radii": "Radios de búsqueda (m)",
+      "radiiHelp": "Se amplía la búsqueda en este orden, de menor a mayor.",
+      "addRadius": "Agregar radio",
+      "removeRadius": "Quitar radio"
+    }
+  },
+  "paymentMethods": {
+    "cash_usd": "Efectivo (USD)",
+    "pago_movil": "Pago Móvil",
+    "binance": "Binance",
+    "zelle": "Zelle",
+    "cash_ves": "Efectivo (Bs.)"
+  },
+  "rides": {
+    "search": "Buscar por pasajero, motorizado, placa o ID",
+    "allStatuses": "Todos los estados",
+    "status": "Estado",
+    "requestedAt": "Solicitado",
+    "passenger": "Pasajero",
+    "driver": "Motorizado",
+    "route": "Recorrido",
+    "fare": "Tarifa",
+    "paymentMethod": "Método de pago",
+    "vehicleType": "Vehículo",
+    "from": "Desde",
+    "to": "Hasta",
+    "dateFrom": "Fecha desde",
+    "dateTo": "Fecha hasta",
+    "clearFilters": "Limpiar filtros",
+    "invalidRange": "La fecha inicial es posterior a la final; se ignora el rango.",
+    "total": "{n} viajes",
+    "statuses": {
+      "searching": "Buscando motorizado",
+      "driver_assigned": "Motorizado asignado",
+      "driver_arrived": "Motorizado en el punto",
+      "in_progress": "En curso",
+      "completed": "Completado",
+      "cancelled_by_passenger": "Cancelado por el pasajero",
+      "cancelled_by_driver": "Cancelado por el motorizado",
+      "cancelled_by_admin": "Cancelado por administración",
+      "no_drivers": "Sin motorizados"
+    },
+    "detailTitle": "Viaje {id}",
+    "cancelReason": "Motivo de la cancelación",
+    "pickup": "Origen",
+    "dropoff": "Destino",
+    "estimatedRoute": "Ruta estimada en línea recta (no había ruta calculada).",
+    "fareBreakdown": "Tarifa",
+    "preSurgeFare": "Sin recargo (aprox.)",
+    "surge": "Recargo",
+    "distance": "Distancia",
+    "duration": "Duración",
+    "people": "Participantes",
+    "noDriver": "Sin motorizado asignado.",
+    "timeline": {
+      "title": "Línea de tiempo",
+      "requested": "Solicitado",
+      "assigned": "Motorizado asignado",
+      "arrived": "Llegó al origen",
+      "started": "Viaje iniciado",
+      "completed": "Viaje completado",
+      "noDrivers": "Sin motorizados disponibles",
+      "pending": "Pendiente"
+    },
+    "chat": {
+      "title": "Chat",
+      "empty": "No hubo mensajes.",
+      "passenger": "Pasajero",
+      "driver": "Motorizado",
+      "other": "Otro"
+    },
+    "offers": {
+      "title": "Historial de ofertas",
+      "empty": "No se enviaron ofertas.",
+      "sentAt": "Enviada",
+      "distance": "Distancia al origen",
+      "respondedAt": "Respuesta",
+      "statuses": {
+        "pending": "Pendiente",
+        "accepted": "Aceptada",
+        "declined": "Rechazada",
+        "expired": "Vencida",
+        "cancelled": "Anulada"
+      }
+    },
+    "ratings": {
+      "title": "Calificaciones",
+      "empty": "Sin calificaciones.",
+      "stars": "{n} de 5 estrellas",
+      "from": {
+        "passenger": "Del pasajero al motorizado",
+        "driver": "Del motorizado al pasajero",
+        "other": "Calificación"
+      },
+      "tags": {
+        "safe_driving": "Manejo seguro",
+        "on_time": "Puntual",
+        "friendly": "Amable",
+        "clean_helmet": "Casco limpio",
+        "respectful": "Respetuoso",
+        "ready_at_pickup": "Listo en el punto"
+      }
+    },
+    "cancel": {
+      "action": "Cancelar viaje",
+      "title": "Cancelar viaje",
+      "help": "Pasajero y motorizado recibirán una notificación. Esta acción no se puede deshacer.",
+      "reason": "Motivo",
+      "confirm": "Cancelar viaje",
+      "done": "Viaje cancelado"
+    },
+    "cancelReasons": {
+      "wait_too_long": "Esperó demasiado",
+      "driver_not_moving": "El motorizado no avanzaba",
+      "changed_plans": "Cambio de planes",
+      "wrong_pickup": "Punto de recogida equivocado",
+      "passenger_no_show": "El pasajero no apareció",
+      "unsafe_location": "Lugar inseguro",
+      "vehicle_problem": "Problema con la moto",
+      "other": "Otro motivo"
+    }
+  },
+  "live": {
+    "activeRides": "Viajes ({n})",
+    "onlineDrivers": "Motorizados ({n})",
+    "updatedAt": "Actualizado {time}",
+    "autoRefresh": "Auto (10 s)",
+    "refresh": "Actualizar",
+    "statOnline": "Motorizados conectados",
+    "statFree": "Disponibles",
+    "statRides": "Viajes activos",
+    "statSearching": "Buscando motorizado",
+    "free": "Disponible",
+    "busy": "En viaje",
+    "stale": "Sin señal",
+    "ridePickup": "Origen de viaje",
+    "unnamed": "Sin nombre",
+    "noRides": "No hay viajes activos.",
+    "noDrivers": "No hay motorizados conectados.",
+    "openRide": "Ver viaje",
+    "openDriver": "Ver perfil",
+    "lastSeen": "visto {ago}",
+    "secondsAgo": "hace {n} s",
+    "minutesAgo": "hace {n} min"
   }
 }

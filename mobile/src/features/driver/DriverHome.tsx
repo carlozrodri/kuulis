@@ -11,11 +11,8 @@ import {
   Gift,
   Hourglass,
   type Icon,
-  Power,
   ShieldAlert,
-  Sparkles,
 } from '@/components/icons';
-import { MapSheetLayout } from '@/components/MapSheetLayout';
 import {
   Button,
   Card,
@@ -36,11 +33,12 @@ import { documentChecklist, nextDriverStep, requirementChecklist } from '@/lib/d
 import type { DriverProfile } from '@/lib/types';
 import { elevation, radius, space, useTheme } from '@/theme';
 
+import { DriverDashboard } from './DriverDashboard';
 import { DOCUMENT_ICONS, DOCUMENT_STATE_TONE, STEP_HREF } from './meta';
 
 type RefreshEl = ReactElement<RefreshControlProps>;
 
-/** Driver mode home: onboarding until approved, then the (placeholder) online/offline home. */
+/** Driver mode home: onboarding until approved, then the online/offline dashboard. */
 export function DriverHome() {
   const { t } = useTranslation();
   const profile = useDriverProfile();
@@ -71,7 +69,7 @@ export function DriverHome() {
 
   const data = profile.data;
   if (!data || data.status === 'draft') return <DriverIntro profile={data} refresh={refresh} />;
-  if (data.status === 'approved') return <DriverOffline refresh={refresh} />;
+  if (data.status === 'approved') return <DriverDashboard />;
   return <DriverStatus profile={data} refresh={refresh} config={config} />;
 }
 
@@ -260,49 +258,8 @@ function DriverStatus({
   );
 }
 
-function DriverOffline({ refresh }: { refresh: RefreshEl }) {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  return (
-    <MapSheetLayout
-      variant="driver"
-      refreshControl={refresh}
-      topBar={
-        <Card elevated style={{ gap: space.xs }}>
-          <StatusPill label={t('driver.home.approved')} tone="success" dot />
-          <Txt variant="subtitle">{t('driver.home.welcome')}</Txt>
-          <Txt variant="caption" color="muted">
-            {t('driver.home.freeMonths')}
-          </Txt>
-        </Card>
-      }>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
-        <View style={[styles.offlineDot, { backgroundColor: theme.muted, shadowColor: theme.muted }]} />
-        <Txt variant="heading" accessibilityRole="header">
-          {t('driver.home.offline')}
-        </Txt>
-      </View>
-      <Txt color="muted">{t('driver.home.offlineBody')}</Txt>
-      <Button
-        title={t('driver.home.connect')}
-        size="lg"
-        icon={Power}
-        disabled
-        accessibilityHint={t('common.comingSoon')}
-      />
-      <View style={{ alignItems: 'center' }}>
-        <StatusPill label={t('common.comingSoon')} tone="accent" />
-      </View>
-      <Notice tone="info" icon={Sparkles}>
-        {t('driver.home.nextUp')}
-      </Notice>
-    </MapSheetLayout>
-  );
-}
-
 const styles = StyleSheet.create({
   statusHero: { alignItems: 'center', gap: space.sm, paddingTop: space.xxl, paddingBottom: space.lg },
   statusRing: { width: 128, height: 128, borderRadius: 64, alignItems: 'center', justifyContent: 'center', marginBottom: space.sm },
   statusIcon: { width: 84, height: 84, borderRadius: 42, alignItems: 'center', justifyContent: 'center' },
-  offlineDot: { width: 12, height: 12, borderRadius: 6 },
 });
