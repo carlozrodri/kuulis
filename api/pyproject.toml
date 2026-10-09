@@ -1,0 +1,65 @@
+[project]
+name = "kuulis-api"
+version = "0.1.0"
+description = "Kuulis REST + WebSocket API"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "gunicorn>=23.0",
+    "uvicorn-worker>=0.3",
+    "pydantic[email]>=2.9",
+    "pydantic-settings>=2.6",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30",
+    "alembic>=1.14",
+    "redis[hiredis]>=5.2",
+    "taskiq>=0.11",
+    "taskiq-redis>=1.0",
+    "pyjwt>=2.10",
+    "pwdlib[argon2]>=0.2",
+    "slowapi>=0.1.9",
+    "httpx>=0.28",
+    "boto3>=1.35",
+    "sentry-sdk[fastapi]>=2.19",
+    "orjson>=3.10",
+    "typer>=0.15",
+    "python-multipart>=0.0.18",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.25",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+extend-exclude = ["migrations/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "ASYNC", "S", "RUF"]
+ignore = ["S101", "S105", "B008", "RUF012", "UP046"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106"]
+"apps/*/tests/**" = ["S105", "S106"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["apps"]
+env = []
+addopts = "-ra"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["kuulis", "apps"]
+omit = ["*/tests/*", "migrations/*"]
