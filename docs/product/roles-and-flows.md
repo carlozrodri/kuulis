@@ -32,10 +32,13 @@ Supuesto: una misma persona podría tener cuenta de pasajero y de motorizado (do
 9. Puede transferir saldo a otro motorizado, pero no retirarlo.
 
 ## Requisitos del motorizado (decidido)
+Requisitos previos: **21 años o más** y moto **año 2013 o más nueva** (ambos configurables desde el admin).
+
 Para ser aprobado sube, desde la app:
 - Cédula de identidad.
 - **RIF** (en Venezuela).
 - Licencia de conducir.
+- **Certificado médico** vigente.
 - Carnet de circulación de la moto.
 - Selfie (para comparar con la cédula).
 - Fotos de la moto con la placa visible.
@@ -43,6 +46,11 @@ Para ser aprobado sube, desde la app:
 La aprobación es **manual desde el admin**. Supuesto: el admin puede rechazar con un motivo y el motorizado
 corrige y reenvía; los documentos se guardan en el S3 privado con URLs firmadas. Si el lanzamiento es en otro
 país, la lista de documentos debe ser configurable por país (el RIF solo aplica a Venezuela).
+
+## Inicio de sesión (decidido)
+- **Email y contraseña, y Google.** Sin login por teléfono, porque cada SMS cuesta.
+- Nota: Apple exige en iOS que, si la app ofrece Google, también ofrezca "Iniciar sesión con Apple" (guía 4.8
+  de la App Store). Es gratis. Pendiente de confirmar con Carlos.
 
 ## Comunicación y confianza (decidido)
 - **Chat dentro de la app** entre pasajero y motorizado, solo mientras el viaje está activo. Va por el WebSocket

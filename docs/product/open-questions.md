@@ -18,6 +18,8 @@
 - Promociones al pasajero: Kuulis acredita la diferencia en la billetera del motorizado.
 - Transferencias entre motorizados: límite de 50 USD editable desde el admin; cuenta solo lo enviado.
 - Con promoción, para el tramo cuenta el precio con descuento.
+- Motorizado: 21 años o más, certificado médico y moto 2013 o más nueva (configurables).
+- Inicio de sesión: solo email y Google.
 - Los recargos por demanda alta cuentan para el tramo de la cuota.
 - Documentos del motorizado: cédula, RIF (Venezuela), licencia, carnet de circulación, selfie y fotos de la moto; aprobación manual.
 - Chat dentro de la app y calificación obligatoria de ambos lados.
@@ -25,12 +27,9 @@
 - Precios en USDT con equivalente en bolívares a tasa BCV y a tasa Binance.
 
 ## Preguntas para Carlos
-1. Edad mínima del motorizado (Yummy pide 21). Recomendado: 21, configurable.
-2. ¿Pedir certificado médico (Yummy lo pide)? Recomendado: sí.
-3. Año mínimo de la moto (Yummy pide 2013). Recomendado: 2013, configurable desde el admin.
-4. Inicio de sesión: el login por teléfono necesita SMS, que cuesta por mensaje. Recomendado: email y Google/Apple al inicio, teléfono después.
-5. Color de marca de Kuulis, distinto del morado de Yummy.
-6. ¿Caracas u otro país? Se puede decidir más adelante; el diseño no depende de eso.
+1. Color de marca: elegir entre las paletas A (Verde Ávila, recomendada), B (Naranja Moto) o C (Azul Eléctrico): https://claude.ai/artifact/38jgHYUuqhFoqDxHhp9Usj
+2. Agregar "Iniciar sesión con Apple" en iOS (Apple lo exige si hay Google). Recomendado: sí.
+3. ¿Caracas u otro país? Se puede decidir más adelante; el diseño no depende de eso.
 
 ## Riesgos
 | Riesgo | Por qué importa | Mitigación propuesta (supuesto) |
