@@ -49,8 +49,8 @@ país, la lista de documentos debe ser configurable por país (el RIF solo aplic
 
 ## Inicio de sesión (decidido)
 - **Email y contraseña, y Google.** Sin login por teléfono, porque cada SMS cuesta.
-- Nota: Apple exige en iOS que, si la app ofrece Google, también ofrezca "Iniciar sesión con Apple" (guía 4.8
-  de la App Store). Es gratis. Pendiente de confirmar con Carlos.
+- **Iniciar sesión con Apple solo en iOS**, porque Apple lo exige si la app ofrece Google (guía 4.8 de la
+  App Store). Es gratis.
 
 ## Comunicación y confianza (decidido)
 - **Chat dentro de la app** entre pasajero y motorizado, solo mientras el viaje está activo. Va por el WebSocket

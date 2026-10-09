@@ -28,6 +28,19 @@
 - Motorizado: disponible/no disponible, solicitud entrante, viaje activo, ganancias del mes y cuota.
 - Perfil, historial y ayuda.
 
+## Marca: paleta Verde Ávila (decidido 2026-10-09)
+Carlos eligió la paleta A entre tres propuestas (https://claude.ai/artifact/38jgHYUuqhFoqDxHhp9Usj).
+
+| Rol | Color | Uso |
+| --- | --- | --- |
+| Marca | `#0E7C5A` | Botones principales, ruta, selección |
+| Acento | `#FFC83D` | Promociones, punto de destino |
+| Tinta | `#14201B` | Textos |
+| Fondo | `#F3F7F4` | Fondo de pantallas |
+| Tinte | `#EAF5EF` | Tarjeta seleccionada |
+
+Supuesto: el modo oscuro y los colores de estado (éxito, alerta, error) se definen al armar el sistema de diseño.
+
 ## Análisis de las referencias de Yummy
 | Screenshot | Qué muestra | Qué tomamos para Kuulis |
 | --- | --- | --- |
