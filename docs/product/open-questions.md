@@ -25,7 +25,12 @@
 - Precios en USDT con equivalente en bolívares a tasa BCV y a tasa Binance.
 
 ## Preguntas para Carlos
-1. ¿Caracas u otro país? Se puede decidir más adelante; el diseño no depende de eso.
+1. Edad mínima del motorizado (Yummy pide 21). Recomendado: 21, configurable.
+2. ¿Pedir certificado médico (Yummy lo pide)? Recomendado: sí.
+3. Año mínimo de la moto (Yummy pide 2013). Recomendado: 2013, configurable desde el admin.
+4. Inicio de sesión: el login por teléfono necesita SMS, que cuesta por mensaje. Recomendado: email y Google/Apple al inicio, teléfono después.
+5. Color de marca de Kuulis, distinto del morado de Yummy.
+6. ¿Caracas u otro país? Se puede decidir más adelante; el diseño no depende de eso.
 
 ## Riesgos
 | Riesgo | Por qué importa | Mitigación propuesta (supuesto) |
