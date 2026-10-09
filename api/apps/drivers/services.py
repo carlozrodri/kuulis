@@ -1,5 +1,6 @@
 """Driver onboarding: profile, vehicle, documents, review workflow and notifications."""
 
+import asyncio
 import uuid
 from datetime import UTC, date, datetime
 from zoneinfo import ZoneInfo
@@ -338,7 +339,8 @@ async def register_document(
     if any(d.key == data.key for d in profile.documents):
         raise ConflictError("Document already registered", code="document_already_registered")
     try:
-        head = storage.head_object(data.key)
+        # boto3 is blocking: run it off the event loop.
+        head = await asyncio.to_thread(storage.head_object, data.key)
     except storage.StorageCheckUnavailable:
         # Some S3 endpoints refuse server-side reads; the presigned PUT already pinned the type.
         head = {"ContentType": _type_from_extension(data.key), "ContentLength": 0}

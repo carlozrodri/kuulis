@@ -36,7 +36,14 @@ def get_s3_client() -> BaseClient:
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
         region_name=settings.AWS_S3_REGION,
-        config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
+        config=Config(
+            signature_version="s3v4",
+            s3={"addressing_style": "path"},
+            # Fail fast: a slow storage must not hold a request (callers have a fallback).
+            connect_timeout=3,
+            read_timeout=5,
+            retries={"max_attempts": 2, "mode": "standard"},
+        ),
     )
 
 
