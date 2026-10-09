@@ -10,5 +10,6 @@
 | [roadmap.md](roadmap.md) | Qué está hecho y qué viene después |
 | [pending.md](pending.md) | Lista de trabajo pendiente concreto |
 | [blockers.md](blockers.md) | Bloqueos que dependen de Carlos o de terceros |
+| [template.md](template.md) | Tag `template-v1.0.0`: la plantilla para crear otros productos |
 
 Regla: cada cambio relevante actualiza `roadmap.md` / `pending.md`, y cada bloqueo nuevo va a `blockers.md`.
