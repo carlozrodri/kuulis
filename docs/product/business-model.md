@@ -36,7 +36,8 @@ lo fija Kuulis, coincide con lo que cobró el motorizado.
 - Se paga en **USDT**.
 - Cada motorizado tiene una **billetera dentro de la app** que recarga con USDT; la cuota se descuenta de ese saldo.
 - **Recarga mínima: 5 USDT.**
-- **El saldo no se puede retirar**, pero **se puede transferir a otro motorizado**.
+- **El saldo no se puede retirar**, pero **se puede transferir a otro motorizado**, con un **límite de 50 USD**
+  editable desde el admin (supuesto: por motorizado y por mes, sumando lo enviado). Cada transferencia queda registrada.
 - La cuota se cobra **el día 1 de cada mes por lo ganado el mes anterior**.
 - Solo hace falta recargar **cuando le toca pagar**. No se exige saldo para empezar ni durante los 3 meses gratis.
 - La **semana de gracia empieza el día del cobro** si el saldo no alcanza.
@@ -61,8 +62,16 @@ con la API de Binance.
 ## Precio del viaje (decidido)
 - Lo calcula Kuulis **como las otras empresas** (tarifa base, distancia, tiempo, mínimo y recargos por horario
   o demanda), y **todo es configurable desde el admin** para competir.
-- Desde el admin se pueden crear **promociones**. Quién asume el descuento de una promoción al pasajero está
-  pendiente (ver `open-questions.md`).
+- Desde el admin se pueden crear **promociones**. El descuento al pasajero lo asume **Kuulis**: el
+  motorizado cobra menos en efectivo y Kuulis le **acredita la diferencia en su billetera**.
+- Supuesto: para el tramo de la cuota cuenta el **precio completo** del viaje (sin descuento), porque es lo que
+  recibe el motorizado entre efectivo y saldo.
+- Los **recargos por demanda alta cuentan** para la ganancia del mes y, por tanto, para el tramo.
+
+### Riesgo de las promociones
+Como Kuulis acredita saldo por cada viaje con promoción, ese saldo es un **costo real de marketing**. Requisitos:
+presupuesto y fecha de fin por promoción, tope de usos por pasajero y alertas de abuso (viajes falsos entre un
+pasajero y un motorizado que se conocen).
 
 ## Otros medios de pago a futuro (supuesto)
 Carlos propuso **Apple Pay / Google Pay** además de USDT. Hallazgos a validar:
