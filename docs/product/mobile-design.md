@@ -68,6 +68,39 @@ Supuesto: el modo oscuro y los colores de estado (éxito, alerta, error) se defi
 - **Sin suscripción para pasajeros:** Yummy vende "Prime" al pasajero. En Kuulis solo pagan los motorizados.
 - **Identidad propia:** no usar el morado de Yummy, para no parecer una copia.
 
-## Siguiente paso
-Con los screenshots de Carlos: extraer paleta, tipografía, componentes y patrones, y armar un sistema de
-diseño (colores, tipografía, espaciado, componentes) antes de escribir pantallas.
+## Sistema de diseño (v1, 2026-10-09)
+Maquetas y sistema de diseño: https://claude.ai/artifact/WnUr3Aqf6UEB7zbfwkmfb3 (11 pantallas: pasajero,
+bienvenida y motorizado). Es la fuente visual; los valores de abajo son la fuente para el código.
+
+### Colores
+| Token | Claro | Oscuro | Uso |
+| --- | --- | --- | --- |
+| `primary` | `#0E7C5A` | `#34C08C` | Botones, ruta, selección |
+| `primaryPressed` | `#0B6A4C` | `#2AA77A` | Botón presionado, precio |
+| `onPrimary` | `#FFFFFF` | `#04140D` | Texto sobre `primary` |
+| `accent` | `#FFC83D` | `#FFD25E` | Promociones, destino, zonas de demanda |
+| `onAccent` | `#3A2A00` | `#2A1E00` | Texto sobre `accent` |
+| `background` | `#F3F7F4` | `#0B1310` | Fondo de pantallas |
+| `surface` | `#FFFFFF` | `#131D18` | Tarjetas y paneles |
+| `surfaceAlt` | `#EAF5EF` | `#1A2721` | Tinte, opción seleccionada |
+| `text` | `#14201B` | `#E7EFEB` | Texto principal |
+| `muted` | `#5B6A63` | `#9AADA4` | Texto secundario |
+| `border` | `#DCE6E0` | `#23322B` | Bordes y separadores |
+| `success` / `warning` / `danger` / `info` | `#15803D` / `#B45309` / `#B42318` / `#1D4ED8` | `#4ADE80` / `#FBBF24` / `#F87171` / `#60A5FA` | Estados |
+
+### Tipografía y forma
+- Fuente **Plus Jakarta Sans** (Google Fonts, vía `@expo-google-fonts/plus-jakarta-sans`).
+- Escala: display 32/800, título 22–26/800, subtítulo 17/800, texto 15–16/500, nota 12–13/500. Precios con
+  números tabulares.
+- Espaciado en múltiplos de 4. Radios: 12 campos y chips, 20 tarjetas, 28 paneles inferiores, píldora en botones.
+- Botón principal: 56 px de alto, ancho completo, mayúsculas con letra espaciada. En el modo motorizado, los
+  botones de acción miden 60–76 px para usarlos con casco y guantes.
+- Barra de navegación inferior flotante en tinta oscura con el ítem activo en `primary`.
+- Iconos de trazo de 2 px (supuesto: Lucide, `lucide-react-native`).
+
+### Decisiones de las maquetas (supuesto, a validar con Carlos)
+- El pasajero elige cómo pagará (Efectivo $, Pago móvil, Binance, Zelle) antes de pedir; el motorizado lo ve en
+  la solicitud. Así "acordar el método" no requiere chatear.
+- La solicitud al motorizado dura 15 segundos con cuenta regresiva; si no responde, pasa al siguiente.
+- La pantalla de calificar no tiene botón de saltar.
+- El motorizado ve en el mapa las zonas con más pedidos.

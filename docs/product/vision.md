@@ -6,7 +6,7 @@ en dólares, y el motorizado no paga comisión por viaje sino una mensualidad qu
 
 ## Decidido (palabras de Carlos)
 - Funciona como una app de viajes tipo Uber, con referencia en una app venezolana de ese estilo.
-- Mercado: **Venezuela, empezando por Caracas**. Podría ser otra ciudad o país de Latinoamérica con leyes más flexibles. El lanzamiento es un **experimento de mercado sin empresa registrada**.
+- Mercado: **Venezuela, lanzamiento solo en Caracas**. El lanzamiento es un **experimento de mercado sin empresa registrada**.
 - Dos tipos de usuario: **clientes (pasajeros)** y **motorizados (conductores)**.
 - La app **no cobra por viaje**. Kuulis gana con la **suscripción mensual de los motorizados**.
 - El pasajero **paga directamente al motorizado**. Entre ellos solo acuerdan el método de pago; **el monto lo fija Kuulis**.

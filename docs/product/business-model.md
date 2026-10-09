@@ -99,7 +99,7 @@ de ganancias de motorizados para estimar mejor.
 
 ## Lanzamiento (decidido + supuesto)
 - Decidido: 3 meses sin cobro, **contados para cada motorizado desde su primer viaje completado**.
-- Decidido: ciudad inicial **Caracas**, o otra ciudad o país de Latinoamérica con leyes más flexibles.
+- Decidido (2026-10-09): el lanzamiento es **solo en Caracas**.
   Es un **experimento de mercado sin empresa registrada**.
 - Supuesto: durante esos meses la app calcula y muestra la cuota que "habría pagado", para que el
   motorizado se acostumbre y para validar los tramos con datos reales.

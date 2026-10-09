@@ -14,7 +14,7 @@ Supuesto: una misma persona podría tener cuenta de pasajero y de motorizado (do
 2. Elige destino (búsqueda o pin en el mapa).
 3. Ve el **precio en dólares** (fijado por Kuulis, no negociable) y, debajo, su equivalente en bolívares a
    tasa **BCV** y a tasa **Binance**, además de la distancia y el tiempo estimado.
-4. Confirma y pide el viaje.
+4. Elige cómo le pagará al motorizado (supuesto: Efectivo $, Pago móvil, Binance, Zelle), confirma y pide el viaje.
 5. Ve "buscando motorizado"; cuando uno acepta, ve su nombre, foto, moto, placa y ubicación en vivo.
 6. El motorizado llega, empieza el viaje y el pasajero lo sigue en el mapa.
 7. Llega al destino y **paga directamente al motorizado** el monto de la app, con el método que acordaron.

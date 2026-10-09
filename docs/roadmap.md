@@ -9,9 +9,39 @@
 - [x] Coolify: proyecto `kuulis` con QA y producción (API, worker, admin, Postgres, Redis, backups).
 - [x] Documentación inicial.
 
-## Fase 1 · Producto (siguiente)
-Depende de la definición del producto. Al llegar ahí: modelar las apps de dominio en `api/apps/`,
-pantallas en mobile y secciones del admin.
+## Fase 1 · Producto (en curso desde 2026-10-09)
+Plan en `docs/product/`; diseño en `docs/product/mobile-design.md`. Cada sub-fase deja API, admin y mobile
+funcionando en QA antes de pasar a la siguiente.
+
+### 1A · Cuentas, motorizados y configuración
+- [ ] Mobile: sistema de diseño Verde Ávila (tokens, fuente, componentes) y modo claro/oscuro.
+- [ ] Login con Google (Android/iOS) y Apple (solo iOS).
+- [ ] Modo pasajero / motorizado en la misma cuenta.
+- [ ] Perfil de motorizado: vehículo (tipo, marca, modelo, año, placa, color), documentos en S3 privado,
+      estados (borrador, en revisión, aprobado, rechazado con motivo, suspendido).
+- [ ] Admin: cola de aprobación con visor de documentos; configuración editable (edad mínima, año mínimo,
+      documentos requeridos).
+
+### 1B · Viajes
+- [ ] PostGIS; ubicación en vivo del motorizado por WebSocket, guardada en Redis (GEO).
+- [ ] Cotización: tarifa base, km, minutos, mínimo y recargo, todo configurable en el admin.
+- [ ] Solicitud, emparejamiento por cercanía con oferta de 15 s, estados del viaje y cancelaciones.
+- [ ] Chat del viaje y calificación obligatoria de ambos lados.
+- [ ] Mapas: `react-native-maps` (gratis). Rutas con OSRM y búsqueda con Photon, alojados en Coolify con
+      el mapa de Venezuela (supuesto, para costo cero por uso).
+
+### 1C · Tasas y promociones
+- [ ] Tasas BCV y Binance P2P (worker), historial y corrección manual en el admin.
+- [ ] Promociones con presupuesto, fechas y tope por pasajero; crédito al motorizado en su billetera.
+
+### 1D · Billetera y suscripción
+- [ ] Libro contable de la billetera (recargas, cuotas, promociones, transferencias).
+- [ ] Recarga con Binance Pay (validar API de conciliación) y TRC-20 como respaldo; confirmación manual en el admin.
+- [ ] Cuota el día 1 por tramos, 3 meses gratis desde el primer viaje, 1 semana de gracia y bloqueo.
+- [ ] Transferencias entre motorizados con límite mensual de lo enviado.
+
+### 1E · Operación en el admin
+- [ ] Viajes en vivo e historial, reportes y suspensiones, conciliación de pagos, métricas.
 
 ## Fase 2 · Lanzamiento móvil
 - [ ] Cuentas Apple Developer y Google Play (bloqueo, ver `blockers.md`).
@@ -22,5 +52,4 @@ pantallas en mobile y secciones del admin.
 ## Fase 3 · Operación
 - [ ] Activar Sentry (API, admin, mobile).
 - [ ] Prueba de carga y ajuste de workers/pool.
-- [ ] Login social (Google, Apple).
 - [ ] Auditoría de acciones del admin.

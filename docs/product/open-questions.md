@@ -9,7 +9,7 @@
 - Canal: Binance Pay o la red más fácil (recomendación en `business-model.md`).
 - Impago: 1 semana de gracia y luego no recibe viajes.
 - 3 meses gratis: desde el primer viaje completado de cada motorizado.
-- Lanzamiento: Caracas u otra ciudad o país de Latinoamérica, como experimento sin empresa registrada.
+- Lanzamiento: solo Caracas, como experimento sin empresa registrada.
 - La cuota se cobra el día 1 por lo ganado el mes anterior.
 - El saldo de la billetera no se retira, pero se puede transferir a otro motorizado.
 - Solo se recarga cuando toca pagar; la semana de gracia empieza el día del cobro.
@@ -28,7 +28,7 @@
 - Precios en USDT con equivalente en bolívares a tasa BCV y a tasa Binance.
 
 ## Preguntas para Carlos
-1. ¿Caracas u otro país? Se puede decidir más adelante; el diseño no depende de eso.
+Ninguna abierta por ahora.
 
 ## Riesgos
 | Riesgo | Por qué importa | Mitigación propuesta (supuesto) |
