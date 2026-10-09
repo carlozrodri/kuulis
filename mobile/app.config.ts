@@ -19,6 +19,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: `Kuulis${nameSuffix}`,
   slug: 'kuulis',
+  owner: process.env.EXPO_OWNER,
   scheme: 'kuulis',
   version: '1.0.0',
   orientation: 'portrait',
