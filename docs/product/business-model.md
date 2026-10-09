@@ -37,7 +37,8 @@ lo fija Kuulis, coincide con lo que cobró el motorizado.
 - Cada motorizado tiene una **billetera dentro de la app** que recarga con USDT; la cuota se descuenta de ese saldo.
 - **Recarga mínima: 5 USDT.**
 - **El saldo no se puede retirar**, pero **se puede transferir a otro motorizado**, con un **límite de 50 USD**
-  editable desde el admin (supuesto: por motorizado y por mes, sumando lo enviado). Cada transferencia queda registrada.
+  editable desde el admin. El límite cuenta **solo lo que el motorizado envía**, no lo que recibe (supuesto: el
+  periodo es el mes calendario). Cada transferencia queda registrada.
 - La cuota se cobra **el día 1 de cada mes por lo ganado el mes anterior**.
 - Solo hace falta recargar **cuando le toca pagar**. No se exige saldo para empezar ni durante los 3 meses gratis.
 - La **semana de gracia empieza el día del cobro** si el saldo no alcanza.
@@ -64,8 +65,8 @@ con la API de Binance.
   o demanda), y **todo es configurable desde el admin** para competir.
 - Desde el admin se pueden crear **promociones**. El descuento al pasajero lo asume **Kuulis**: el
   motorizado cobra menos en efectivo y Kuulis le **acredita la diferencia en su billetera**.
-- Supuesto: para el tramo de la cuota cuenta el **precio completo** del viaje (sin descuento), porque es lo que
-  recibe el motorizado entre efectivo y saldo.
+- Para el tramo de la cuota cuenta el **precio con descuento** (lo que paga el pasajero). El saldo que Kuulis
+  acredita por la promoción no suma a la ganancia del mes.
 - Los **recargos por demanda alta cuentan** para la ganancia del mes y, por tanto, para el tramo.
 
 ### Moneda y tasas de cambio (decidido)

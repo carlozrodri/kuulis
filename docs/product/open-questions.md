@@ -16,7 +16,8 @@
 - El precio del viaje se calcula como en otras apps, configurable desde el admin, con promociones.
 - En otro país se mantiene USDT por ahora; Apple Pay y Google Pay quedan a evaluar.
 - Promociones al pasajero: Kuulis acredita la diferencia en la billetera del motorizado.
-- Transferencias entre motorizados: límite de 50 USD editable desde el admin.
+- Transferencias entre motorizados: límite de 50 USD editable desde el admin; cuenta solo lo enviado.
+- Con promoción, para el tramo cuenta el precio con descuento.
 - Los recargos por demanda alta cuentan para el tramo de la cuota.
 - Documentos del motorizado: cédula, RIF (Venezuela), licencia, carnet de circulación, selfie y fotos de la moto; aprobación manual.
 - Chat dentro de la app y calificación obligatoria de ambos lados.
@@ -24,9 +25,7 @@
 - Precios en USDT con equivalente en bolívares a tasa BCV y a tasa Binance.
 
 ## Preguntas para Carlos
-1. Confirmar: el límite de transferencia de 50 USD es por motorizado y por mes, sumando lo enviado.
-2. Confirmar: con promoción, para el tramo cuenta el precio completo del viaje, sin descuento.
-3. ¿Caracas u otro país? Se puede decidir más adelante; el diseño no depende de eso.
+1. ¿Caracas u otro país? Se puede decidir más adelante; el diseño no depende de eso.
 
 ## Riesgos
 | Riesgo | Por qué importa | Mitigación propuesta (supuesto) |
