@@ -143,6 +143,14 @@ export interface AppConfig {
   rates_manual_hold_hours?: number
   promo_pair_alert_threshold?: number
   promo_pair_alert_days?: number
+  // ---- Phase 1D (docs/api/phase-1d.md). Optional so the panel still loads against an older API. ----
+  topup_min_amount?: Decimal
+  /** Kuulis' Binance Pay ID shown to drivers ("" = not configured yet). */
+  topup_binance_pay_id?: string
+  topup_account_name?: string
+  transfer_monthly_limit?: Decimal
+  subscription_free_months?: number
+  subscription_grace_days?: number
 }
 
 // ---- Phase 1B: rides (docs/api/phase-1b.md) ----
@@ -430,4 +438,184 @@ export interface PromotionPairAlert {
   rides: number
   discount_total: Decimal
   last_ride_at: string
+}
+
+// ---- Phase 1D: wallet, top-ups, transfers & subscription (docs/api/phase-1d.md) ----
+
+/** Calendar month in Caracas time, "2026-10". */
+export type Month = string
+
+/** Someone as the admin list endpoints return them (name and email of the driver). */
+export interface PartyRef {
+  id: string
+  name: string | null
+  email: string | null
+}
+
+export type WalletEntryKind
+  = | 'promo_credit'
+    | 'top_up'
+    | 'transfer_in'
+    | 'transfer_out'
+    | 'subscription_fee'
+    | 'adjustment'
+export const WALLET_ENTRY_KINDS: WalletEntryKind[] = [
+  'promo_credit',
+  'top_up',
+  'transfer_in',
+  'transfer_out',
+  'subscription_fee',
+  'adjustment',
+]
+
+/** `details` per kind (all keys optional so an older/newer API never breaks the table). */
+export interface WalletEntryDetails {
+  /** promo_credit */
+  passenger_name?: string | null
+  /** top_up */
+  method?: string | null
+  reference?: string | null
+  /** transfer_in / transfer_out */
+  counterpart_name?: string | null
+  note?: string | null
+  /** subscription_fee */
+  month?: Month | null
+  /** adjustment */
+  reason?: string | null
+  [key: string]: unknown
+}
+
+export interface WalletEntry {
+  id: string
+  kind: WalletEntryKind
+  /** Signed: negative for transfer_out, subscription_fee and negative adjustments. */
+  amount: Decimal
+  balance_after: Decimal
+  ride_id: string | null
+  description: string | null
+  details: WalletEntryDetails | null
+  created_at: string
+}
+
+export type TopUpStatus = 'pending' | 'unmatched' | 'completed' | 'rejected'
+export const TOP_UP_STATUSES: TopUpStatus[] = ['pending', 'unmatched', 'completed', 'rejected']
+export type TopUpMethod = 'binance_pay'
+
+export interface TopUp {
+  id: string
+  status: TopUpStatus
+  amount: Decimal
+  method: TopUpMethod | string
+  /** Binance order id. */
+  reference: string | null
+  payer_binance_id: string | null
+  payer_name: string | null
+  note: string | null
+  created_at: string
+  completed_at: string | null
+  rejection_reason: string | null
+}
+
+/** GET /admin/top-ups items: the top-up plus the driver (null while `unmatched`). */
+export interface AdminTopUp extends TopUp {
+  /** Binance Pay transaction id (automatic matches and assigned payments). */
+  transaction_id?: string | null
+  user?: PartyRef | null
+  user_id?: string | null
+  user_name?: string | null
+  user_email?: string | null
+}
+
+/** GET /wallet/top-up-info. */
+export interface TopUpInfo {
+  method: TopUpMethod
+  pay_id: string
+  account_name: string
+  min_amount: Decimal
+  /** True when the worker reconciles Binance Pay automatically (API credentials configured). */
+  automatic: boolean
+}
+
+/** GET /admin/transfers items. */
+export interface AdminTransfer {
+  id: string
+  amount: Decimal
+  note: string | null
+  created_at: string
+  sender?: PartyRef | null
+  recipient?: PartyRef | null
+  /** Alternative flat shape, tolerated. */
+  from_user?: PartyRef | null
+  to_user?: PartyRef | null
+}
+
+export type ChargeStatus = 'paid' | 'pending' | 'waived'
+export const CHARGE_STATUSES: ChargeStatus[] = ['pending', 'paid', 'waived']
+
+export interface Charge {
+  id: string
+  month: Month
+  earnings: Decimal
+  fee: Decimal
+  status: ChargeStatus
+  /** The month fell entirely within the driver's free period. */
+  free_period: boolean
+  /** Only for `pending`: after this moment the driver is blocked. */
+  due_at: string | null
+  paid_at: string | null
+  waived_reason: string | null
+  /** Pending and past `due_at` (the driver is blocked). Computed by the panel when an older API omits it. */
+  overdue?: boolean
+}
+
+/** GET /admin/subscriptions/charges items. */
+export interface AdminCharge extends Charge {
+  user?: PartyRef | null
+  user_id?: string | null
+  user_name?: string | null
+  user_email?: string | null
+}
+
+/**
+ * GET /admin/subscriptions/charges. `totals` = sum of `fee` per status over every row matching the filters
+ * (not just this page). Used when the API sends it; the panel adds the rows up otherwise.
+ */
+export interface ChargePage extends Page<AdminCharge> {
+  totals?: Partial<Record<ChargeStatus, Decimal>> | null
+}
+
+/** POST /admin/subscriptions/run. */
+export interface SubscriptionRunResult {
+  created: number
+  paid: number
+  pending: number
+  waived: number
+}
+
+export interface FeeTier {
+  /** The fee applies when the month's earnings are strictly above this amount. */
+  above: Decimal
+  fee: Decimal
+}
+
+export interface FeeSchedule {
+  /** null for the built-in default schedule (nothing stored yet). */
+  id: string | null
+  effective_month: Month
+  tiers: FeeTier[]
+  /** The schedule in force this month, when the API flags it. */
+  current?: boolean
+  created_by: PartyRef | null
+  created_at: string | null
+}
+
+/** GET /admin/wallets/{user_id}. */
+export interface AdminWallet {
+  user: PartyRef
+  balance: Decimal
+  binance_pay_id: string | null
+  sent_this_month: Decimal
+  /** The 20 most recent. */
+  entries: WalletEntry[]
+  pending_charges: Charge[]
 }

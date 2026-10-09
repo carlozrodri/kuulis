@@ -9,7 +9,10 @@
     "rides": "Viajes",
     "live": "En vivo",
     "rates": "Tasas",
-    "promotions": "Promociones"
+    "promotions": "Promociones",
+    "topUps": "Recargas",
+    "transfers": "Transferencias",
+    "subscriptions": "Suscripciones"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -107,7 +110,23 @@
     "budget_below_committed": "El presupuesto no puede ser menor que lo ya comprometido (acreditado + reservado)",
     "promotion_not_found": "Promoción no encontrada",
     "promotion_invalid": "La promoción no aplica a este viaje",
-    "promotion_unavailable": "La promoción se agotó; hay que cotizar de nuevo"
+    "promotion_unavailable": "La promoción se agotó; hay que cotizar de nuevo",
+    "binance_pay_id_taken": "Ese Binance Pay ID ya está registrado por otro usuario",
+    "too_many_pending_top_ups": "El motorizado ya tiene 3 avisos de recarga pendientes",
+    "insufficient_balance": "Saldo insuficiente: el saldo no puede quedar negativo",
+    "transfer_limit_exceeded": "Se superó el límite mensual de transferencias",
+    "recipient_not_found": "No se encontró un motorizado con ese correo o teléfono",
+    "transfer_to_self": "No se puede transferir a la misma cuenta",
+    "subscription_overdue": "El motorizado está bloqueado por una cuota vencida",
+    "top_up_not_found": "Recarga no encontrada",
+    "charge_not_found": "Cobro no encontrado",
+    "top_up_invalid_status": "Esta recarga ya no admite ese cambio (revisa su estado)",
+    "not_a_driver": "Este usuario no es motorizado",
+    "amount_too_low": "El monto es menor que la recarga mínima",
+    "charge_not_pending": "Este cobro ya no está pendiente",
+    "month_not_closed": "Solo se puede cobrar un mes ya cerrado",
+    "schedule_month_invalid": "El esquema debe empezar el mes siguiente o después",
+    "schedule_exists": "Ya hay un esquema de tramos para ese mes"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -229,7 +248,13 @@
       "ratesStale": "Antigüedad de las tasas: minutos enteros entre {min} y {max}.",
       "manualHold": "Vigencia de la tasa manual: entre {min} y {max} horas.",
       "pairThreshold": "Alerta de pares: entre {min} y {max} viajes.",
-      "pairDays": "Ventana de la alerta: entre {min} y {max} días."
+      "pairDays": "Ventana de la alerta: entre {min} y {max} días.",
+      "topupMin": "Recarga mínima: entre {min} y {max} USDT.",
+      "binancePayId": "Binance Pay ID: solo dígitos, de 6 a 20.",
+      "accountName": "El nombre de la cuenta es obligatorio (máximo {max} caracteres).",
+      "transferLimit": "Límite de transferencias: entre 0 y {max} USDT.",
+      "freeMonths": "Meses gratis: entero entre {min} y {max}.",
+      "graceDays": "Días de gracia: entero entre {min} y {max}."
     },
     "fares": {
       "title": "Tarifas",
@@ -296,6 +321,26 @@
       "pairThresholdHelp": "Viajes con promoción entre el mismo pasajero y motorizado que generan una alerta.",
       "pairDays": "Ventana de la alerta (días)",
       "pairDaysHelp": "Días hacia atrás en los que se cuentan esos viajes."
+    },
+    "wallet": {
+      "title": "Billetera y suscripción",
+      "help": "Recargas por Binance Pay, transferencias entre motorizados y cobro de la cuota mensual.",
+      "topUps": "Recargas",
+      "payIdMissing": "Sin Binance Pay ID de Kuulis los motorizados no pueden recargar.",
+      "payId": "Binance Pay ID de Kuulis",
+      "payIdHelp": "El que ve el motorizado para enviar USDT. Solo dígitos, de 6 a 20.",
+      "accountName": "Nombre de la cuenta",
+      "accountNameHelp": "Nombre de la cuenta de Binance de Kuulis, para que el motorizado confirme a quién paga.",
+      "minAmount": "Recarga mínima (USDT)",
+      "minAmountHelp": "Monto mínimo de cada aviso de recarga.",
+      "transferLimit": "Límite de transferencias (USDT/mes)",
+      "transferLimitHelp": "Máximo que cada motorizado puede enviar en el mes calendario. Lo recibido no cuenta. 0 desactiva las transferencias.",
+      "subscription": "Suscripción",
+      "freeMonths": "Meses gratis",
+      "freeMonthsHelp": "Contados desde el primer viaje completado de cada motorizado.",
+      "graceDays": "Días de gracia",
+      "graceDaysHelp": "Días para pagar desde el cobro antes de quedar bloqueado.",
+      "tiersHint": "Los tramos de la cuota se editan en"
     }
   },
   "paymentMethods": {
@@ -604,6 +649,214 @@
       "maxUsesPerPassenger": "Usos por pasajero: un número entero entre 1 y {max}.",
       "maxTotalUses": "Usos totales: un número entero entre 1 y {max}, o vacío.",
       "amountTooLarge": "Los montos no pueden superar {max}."
+    }
+  },
+  "wallet": {
+    "title": "Billetera",
+    "balance": "Saldo",
+    "binancePayId": "Binance Pay ID",
+    "noPayId": "No lo ha registrado",
+    "sentThisMonth": "Enviado este mes",
+    "pendingCharges": "Cuotas pendientes",
+    "manageCharges": "Ver en Suscripciones",
+    "recentEntries": "Últimos movimientos",
+    "allEntries": "Todos los movimientos",
+    "entries": "Movimientos",
+    "totalEntries": "{n} movimientos",
+    "none": "Este motorizado aún no tiene billetera.",
+    "noEntries": "Sin movimientos",
+    "date": "Fecha",
+    "kind": "Tipo",
+    "amount": "Monto",
+    "balanceAfter": "Saldo después",
+    "kinds": {
+      "promo_credit": "Promoción",
+      "top_up": "Recarga",
+      "transfer_in": "Transferencia recibida",
+      "transfer_out": "Transferencia enviada",
+      "subscription_fee": "Cuota mensual",
+      "adjustment": "Ajuste"
+    },
+    "detail": {
+      "title": "Detalle",
+      "promo": "{name} · pasajero {passenger}",
+      "topUp": "Recarga por Binance Pay",
+      "topUpRef": "Binance Pay · orden {reference}",
+      "transferIn": "De {name}",
+      "transferOut": "Para {name}",
+      "fee": "Cuota de {month}"
+    },
+    "adjust": {
+      "title": "Ajustar saldo",
+      "description": "Suma o resta saldo a mano. Queda en el libro contable con tu nombre y el motivo.",
+      "descriptionFor": "Suma o resta saldo a {name}. Queda en el libro contable con tu nombre y el motivo.",
+      "amount": "Monto (USDT)",
+      "amountHelp": "Positivo para sumar, negativo para restar.",
+      "resulting": "Saldo resultante",
+      "negative": "El saldo no puede quedar negativo.",
+      "reason": "Motivo",
+      "reasonHelp": "Obligatorio. Explica por qué se ajusta (p. ej. «recarga duplicada»).",
+      "submit": "Aplicar ajuste",
+      "done": "Saldo ajustado"
+    }
+  },
+  "topUps": {
+    "allStatuses": "Todas",
+    "statuses": {
+      "pending": "Pendientes",
+      "unmatched": "Sin dueño",
+      "completed": "Acreditadas",
+      "rejected": "Rechazadas"
+    },
+    "search": "Buscar por nombre, correo, referencia o Pay ID",
+    "createdAt": "Fecha",
+    "driver": "Motorizado",
+    "amount": "Monto",
+    "payer": "Pagador en Binance",
+    "reference": "Referencia (orden de Binance)",
+    "referenceHelp": "ID de la orden en el historial de Binance Pay.",
+    "status": "Estado",
+    "noOwner": "Sin asignar",
+    "total": "{n} recargas",
+    "requested": "Monto avisado",
+    "receivedAmount": "Monto recibido (USDT)",
+    "receivedAmountHelp": "Lo que realmente llegó a la cuenta de Kuulis según Binance; es lo que se acredita.",
+    "rejectReason": "Motivo del rechazo",
+    "findDriver": "Buscar motorizado",
+    "findDriverHelp": "Escribe al menos 2 letras del nombre, correo, cédula o placa.",
+    "assignTo": "Se acreditarán {amount} a {name}.",
+    "toast": {
+      "confirm": "Recarga acreditada",
+      "reject": "Recarga rechazada",
+      "assign": "Pago asignado y acreditado"
+    },
+    "actions": {
+      "confirm": "Acreditar",
+      "reject": "Rechazar",
+      "assign": "Asignar",
+      "confirmTitle": "Acreditar recarga",
+      "rejectTitle": "Rechazar recarga",
+      "assignTitle": "Asignar pago a un motorizado",
+      "confirmHelp": "Verifica en Binance Pay que el pago llegó antes de acreditarlo.",
+      "rejectHelp": "El motorizado verá este motivo. Úsalo si el pago no llegó o no coincide.",
+      "assignHelp": "El pago llegó a Kuulis pero su Pay ID no coincide con ningún motorizado. Elige a quién pertenece."
+    },
+    "help": {
+      "toggle": "Mostrar u ocultar la explicación",
+      "title": "Cómo funcionan las recargas",
+      "step1": "El motorizado registra su Binance Pay ID en la app.",
+      "step2": "Envía USDT por Binance Pay al Pay ID {payId} ({name}). Recarga mínima: {min}.",
+      "step2Missing": "Envía USDT por Binance Pay a la cuenta de Kuulis. Todavía no hay Pay ID configurado: los motorizados no pueden recargar hasta que lo agregues en",
+      "step3": "En la app avisa que pagó (con el ID de la orden, si lo tiene); el aviso aparece aquí como pendiente.",
+      "automatic": "Conciliación automática activa: cada minuto se revisa el historial de Binance Pay y se acredita cada pago en USDT cuyo pagador coincide con el Pay ID de un motorizado. Los pagos que no coinciden quedan como «Sin dueño» para asignarlos a mano.",
+      "manual": "Conciliación manual: el servidor no tiene credenciales de Binance, así que cada aviso pendiente se acredita aquí después de verificar el pago en Binance.",
+      "unknownMode": "Si el servidor tiene credenciales de Binance, los pagos se acreditan solos cuando el Pay ID del pagador coincide con el de un motorizado y los que no coinciden quedan «Sin dueño». Si no las tiene, cada aviso pendiente se acredita aquí a mano tras verificarlo en Binance.",
+      "statuses": "Al acreditar una recarga se cierra el aviso pendiente más antiguo del motorizado y se intenta cobrar cualquier cuota pendiente."
+    }
+  },
+  "transfers": {
+    "help": "Envíos de saldo entre motorizados. Límite por motorizado: {limit} enviados por mes.",
+    "search": "Buscar por nombre o correo",
+    "date": "Fecha",
+    "sender": "Envía",
+    "recipient": "Recibe",
+    "amount": "Monto",
+    "note": "Nota",
+    "total": "{n} transferencias"
+  },
+  "subscriptions": {
+    "charges": "Cobros",
+    "allStatuses": "Todos",
+    "allMonths": "Todos los meses",
+    "statuses": {
+      "pending": "Pendiente",
+      "paid": "Pagado",
+      "waived": "Condonado"
+    },
+    "blocked": "Bloqueado",
+    "dueAt": "Vence",
+    "paidAt": "Pagado",
+    "search": "Buscar por nombre o correo",
+    "driver": "Motorizado",
+    "month": "Mes",
+    "earnings": "Ganancia del mes",
+    "fee": "Cuota",
+    "status": "Estado",
+    "dates": "Fechas",
+    "freePeriod": "Periodo gratis",
+    "total": "{n} cobros",
+    "totals": {
+      "paid": "Cobrado",
+      "pending": "Por cobrar",
+      "waived": "Condonados (incluye cuota 0)",
+      "charges": "{n} cobros",
+      "blocked": "{n} bloqueados",
+      "waivedHelp": "Por ganancia baja, periodo gratis o decisión de un admin.",
+      "partial": "Hay demasiados cobros para contarlos todos aquí: algunos totales son parciales."
+    },
+    "waive": {
+      "button": "Condonar",
+      "title": "Condonar cuota",
+      "help": "La cuota queda en 0 y, si estaba bloqueado, el motorizado se desbloquea de inmediato.",
+      "reason": "Motivo",
+      "summary": "{name} · {month} · {fee}",
+      "done": "Cuota condonada"
+    },
+    "run": {
+      "button": "Cobrar mes",
+      "title": "Cobrar un mes cerrado",
+      "help": "El worker lo hace solo el día 1 de cada mes (hora de Caracas). Úsalo si ese cobro falló o se saltó.",
+      "confirm": "Se cobrará {month} a todos los motorizados con viajes completados ese mes. Es seguro repetirlo: no cobra dos veces.",
+      "submit": "Cobrar",
+      "close": "Cerrar",
+      "done": "Cobro de {month} ejecutado",
+      "result": {
+        "created": "Creados",
+        "paid": "Pagados",
+        "pending": "Pendientes",
+        "waived": "Condonados"
+      }
+    },
+    "schedules": {
+      "title": "Tramos",
+      "howTitle": "Cómo se calcula la cuota",
+      "how": "La cuota del mes es la del tramo más alto que la ganancia supere; un mes sin ganancia cuesta 0. Cada mes usa el esquema vigente más reciente, y un esquema nuevo solo puede empezar el mes siguiente o después, así que un mes cerrado nunca cambia.",
+      "current": "Esquema vigente",
+      "since": "Desde {month}",
+      "createdBy": "Creado por {by} el {at}",
+      "new": "Nuevo esquema",
+      "newHelp": "Parte del último esquema. Cada fila es «ganancia mayor que» → cuota. La primera empieza en 0.",
+      "none": "No hay esquema vigente.",
+      "noUpcoming": "No hay cambios programados.",
+      "earnings": "Ganancia del mes (USD)",
+      "fee": "Cuota (USDT)",
+      "above": "Ganancia mayor que (USD)",
+      "noEarnings": "0 (sin viajes)",
+      "between": "{from} – {to}",
+      "over": "más de {from}",
+      "system": "sistema",
+      "scheduled": "Programado",
+      "history": "Esquemas anteriores ({n})",
+      "effectiveMonth": "Aplica desde",
+      "effectiveMonthHelp": "El mes siguiente o después.",
+      "addTier": "Agregar tramo",
+      "removeTier": "Quitar tramo",
+      "simulate": "Probar con una ganancia de (USD)",
+      "simulated": "Cuota: {fee}",
+      "save": "Guardar esquema",
+      "saved": "Esquema guardado: aplica desde {month}",
+      "errors": {
+        "month": "Elige el mes desde el que aplica.",
+        "monthTooEarly": "Debe empezar en {month} o después.",
+        "noTiers": "Agrega al menos un tramo.",
+        "tooMany": "Máximo {max} tramos.",
+        "firstAbove": "El primer tramo debe empezar en 0.",
+        "above": "Tramo {n}: el límite debe ser un monto válido de 0 o más.",
+        "increasing": "Tramo {n}: el límite debe ser mayor que el del tramo anterior.",
+        "fee": "Tramo {n}: la cuota va de 0 a {max}.",
+        "monthTaken": "Ya hay un esquema programado para ese mes: elige otro."
+      },
+      "builtIn": "esquema inicial (business-model.md)"
     }
   }
 }

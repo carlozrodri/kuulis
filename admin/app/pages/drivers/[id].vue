@@ -394,6 +394,12 @@ const failedThumbs = reactive(new Set<string>())
           </UCard>
         </div>
 
+        <!-- Phase 1D: wallet & subscription -->
+        <DriverWalletCard
+          :user-id="driver.user_id"
+          :name="driver.user?.full_name"
+        />
+
         <section class="space-y-3">
           <div class="flex flex-wrap items-center gap-2">
             <h2 class="font-semibold">

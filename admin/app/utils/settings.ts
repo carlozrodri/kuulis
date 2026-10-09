@@ -25,6 +25,12 @@ export interface SettingsForm {
   rates_manual_hold_hours: number
   promo_pair_alert_threshold: number
   promo_pair_alert_days: number
+  topup_min_amount: number
+  topup_binance_pay_id: string
+  topup_account_name: string
+  transfer_monthly_limit: number
+  subscription_free_months: number
+  subscription_grace_days: number
 }
 
 export const FARE_FIELDS = ['base', 'per_km', 'per_minute', 'minimum'] as const
@@ -40,6 +46,14 @@ export const PAIR_THRESHOLD_MIN = 2
 export const PAIR_THRESHOLD_MAX = 100
 export const PAIR_DAYS_MIN = 1
 export const PAIR_DAYS_MAX = 365
+/** Phase 1D limits (the contract states the defaults and the Pay ID format; the ranges are panel guard rails). */
+export const TOPUP_MIN_MIN = 1
+export const TOPUP_MIN_MAX = 1000
+export const BINANCE_PAY_ID = /^\d{6,20}$/
+export const ACCOUNT_NAME_MAX = 60
+export const TRANSFER_LIMIT_MAX = 10_000
+export const FREE_MONTHS_MAX = 24
+export const GRACE_DAYS_MAX = 60
 
 /** Defaults from docs/api/phase-1a.md, phase-1b.md and phase-1c.md, used for keys an older API does not return yet. */
 export function defaultSettings(): SettingsForm {
@@ -66,6 +80,12 @@ export function defaultSettings(): SettingsForm {
     rates_manual_hold_hours: 6,
     promo_pair_alert_threshold: 3,
     promo_pair_alert_days: 30,
+    topup_min_amount: 5,
+    topup_binance_pay_id: '',
+    topup_account_name: 'Kuulis',
+    transfer_monthly_limit: 50,
+    subscription_free_months: 3,
+    subscription_grace_days: 7,
   }
 }
 
@@ -118,6 +138,12 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
     rates_manual_hold_hours: num(config.rates_manual_hold_hours, d.rates_manual_hold_hours),
     promo_pair_alert_threshold: num(config.promo_pair_alert_threshold, d.promo_pair_alert_threshold),
     promo_pair_alert_days: num(config.promo_pair_alert_days, d.promo_pair_alert_days),
+    topup_min_amount: num(config.topup_min_amount, d.topup_min_amount),
+    topup_binance_pay_id: config.topup_binance_pay_id ?? d.topup_binance_pay_id,
+    topup_account_name: config.topup_account_name ?? d.topup_account_name,
+    transfer_monthly_limit: num(config.transfer_monthly_limit, d.transfer_monthly_limit),
+    subscription_free_months: num(config.subscription_free_months, d.subscription_free_months),
+    subscription_grace_days: num(config.subscription_grace_days, d.subscription_grace_days),
   }
 }
 
@@ -159,6 +185,12 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
     rates_manual_hold_hours: form.rates_manual_hold_hours,
     promo_pair_alert_threshold: form.promo_pair_alert_threshold,
     promo_pair_alert_days: form.promo_pair_alert_days,
+    topup_min_amount: money(form.topup_min_amount),
+    topup_binance_pay_id: form.topup_binance_pay_id.replace(/\s+/g, ''),
+    topup_account_name: form.topup_account_name.trim(),
+    transfer_monthly_limit: money(form.transfer_monthly_limit),
+    subscription_free_months: form.subscription_free_months,
+    subscription_grace_days: form.subscription_grace_days,
   }
 }
 
@@ -223,6 +255,22 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
   }
   if (!between(form.promo_pair_alert_days, PAIR_DAYS_MIN, PAIR_DAYS_MAX)) {
     issues.push({ key: 'pairDays', params: { min: PAIR_DAYS_MIN, max: PAIR_DAYS_MAX } })
+  }
+  if (!(Number.isFinite(form.topup_min_amount) && form.topup_min_amount >= TOPUP_MIN_MIN && form.topup_min_amount <= TOPUP_MIN_MAX)) {
+    issues.push({ key: 'topupMin', params: { min: TOPUP_MIN_MIN, max: TOPUP_MIN_MAX } })
+  }
+  const payId = form.topup_binance_pay_id.replace(/\s+/g, '')
+  if (payId && !BINANCE_PAY_ID.test(payId)) issues.push({ key: 'binancePayId' })
+  const accountName = form.topup_account_name.trim()
+  if (!accountName || accountName.length > ACCOUNT_NAME_MAX) issues.push({ key: 'accountName', params: { max: ACCOUNT_NAME_MAX } })
+  if (!(Number.isFinite(form.transfer_monthly_limit) && form.transfer_monthly_limit >= 0 && form.transfer_monthly_limit <= TRANSFER_LIMIT_MAX)) {
+    issues.push({ key: 'transferLimit', params: { max: TRANSFER_LIMIT_MAX } })
+  }
+  if (!between(form.subscription_free_months, 0, FREE_MONTHS_MAX)) {
+    issues.push({ key: 'freeMonths', params: { min: 0, max: FREE_MONTHS_MAX } })
+  }
+  if (!between(form.subscription_grace_days, 0, GRACE_DAYS_MAX)) {
+    issues.push({ key: 'graceDays', params: { min: 0, max: GRACE_DAYS_MAX } })
   }
   return issues
 }

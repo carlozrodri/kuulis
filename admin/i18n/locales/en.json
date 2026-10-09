@@ -9,7 +9,10 @@
     "rides": "Rides",
     "live": "Live",
     "rates": "Rates",
-    "promotions": "Promotions"
+    "promotions": "Promotions",
+    "topUps": "Top-ups",
+    "transfers": "Transfers",
+    "subscriptions": "Subscriptions"
   },
   "auth": {
     "title": "Admin sign in",
@@ -107,7 +110,23 @@
     "budget_below_committed": "The budget cannot be lower than what is already committed (credited + reserved)",
     "promotion_not_found": "Promotion not found",
     "promotion_invalid": "The promotion does not apply to this ride",
-    "promotion_unavailable": "The promotion ran out; quote again"
+    "promotion_unavailable": "The promotion ran out; quote again",
+    "binance_pay_id_taken": "That Binance Pay ID is already registered by another user",
+    "too_many_pending_top_ups": "The driver already has 3 pending top-up notices",
+    "insufficient_balance": "Insufficient balance: the balance cannot go negative",
+    "transfer_limit_exceeded": "The monthly transfer limit was exceeded",
+    "recipient_not_found": "No driver found with that email or phone",
+    "transfer_to_self": "You cannot transfer to the same account",
+    "subscription_overdue": "The driver is blocked by an overdue fee",
+    "top_up_not_found": "Top-up not found",
+    "charge_not_found": "Charge not found",
+    "top_up_invalid_status": "This top-up no longer allows that change (check its status)",
+    "not_a_driver": "This user is not a driver",
+    "amount_too_low": "The amount is below the minimum top-up",
+    "charge_not_pending": "This charge is no longer pending",
+    "month_not_closed": "Only a closed month can be charged",
+    "schedule_month_invalid": "The schedule must start next month or later",
+    "schedule_exists": "There is already a fee schedule for that month"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -229,7 +248,13 @@
       "ratesStale": "Rate age: whole minutes between {min} and {max}.",
       "manualHold": "Manual rate hold: between {min} and {max} hours.",
       "pairThreshold": "Pair alert: between {min} and {max} rides.",
-      "pairDays": "Alert window: between {min} and {max} days."
+      "pairDays": "Alert window: between {min} and {max} days.",
+      "topupMin": "Minimum top-up: between {min} and {max} USDT.",
+      "binancePayId": "Binance Pay ID: digits only, 6 to 20.",
+      "accountName": "The account name is required (at most {max} characters).",
+      "transferLimit": "Transfer limit: between 0 and {max} USDT.",
+      "freeMonths": "Free months: whole number between {min} and {max}.",
+      "graceDays": "Grace days: whole number between {min} and {max}."
     },
     "fares": {
       "title": "Fares",
@@ -296,6 +321,26 @@
       "pairThresholdHelp": "Promoted rides between the same passenger and driver that raise an alert.",
       "pairDays": "Alert window (days)",
       "pairDaysHelp": "Days back in which those rides are counted."
+    },
+    "wallet": {
+      "title": "Wallet and subscription",
+      "help": "Binance Pay top-ups, transfers between drivers and the monthly fee.",
+      "topUps": "Top-ups",
+      "payIdMissing": "Without a Kuulis Binance Pay ID drivers cannot top up.",
+      "payId": "Kuulis Binance Pay ID",
+      "payIdHelp": "Shown to drivers to send USDT. Digits only, 6 to 20.",
+      "accountName": "Account name",
+      "accountNameHelp": "Name of the Kuulis Binance account, so drivers can confirm who they pay.",
+      "minAmount": "Minimum top-up (USDT)",
+      "minAmountHelp": "Minimum amount of each top-up notice.",
+      "transferLimit": "Transfer limit (USDT/month)",
+      "transferLimitHelp": "Maximum each driver can send per calendar month. Received amounts do not count. 0 disables transfers.",
+      "subscription": "Subscription",
+      "freeMonths": "Free months",
+      "freeMonthsHelp": "Counted from each driver's first completed ride.",
+      "graceDays": "Grace days",
+      "graceDaysHelp": "Days to pay after the charge before being blocked.",
+      "tiersHint": "Fee tiers are edited in"
     }
   },
   "paymentMethods": {
@@ -604,6 +649,214 @@
       "maxUsesPerPassenger": "Uses per passenger: a whole number between 1 and {max}.",
       "maxTotalUses": "Total uses: a whole number between 1 and {max}, or empty.",
       "amountTooLarge": "Amounts cannot exceed {max}."
+    }
+  },
+  "wallet": {
+    "title": "Wallet",
+    "balance": "Balance",
+    "binancePayId": "Binance Pay ID",
+    "noPayId": "Not registered",
+    "sentThisMonth": "Sent this month",
+    "pendingCharges": "Pending fees",
+    "manageCharges": "View in Subscriptions",
+    "recentEntries": "Latest entries",
+    "allEntries": "All entries",
+    "entries": "Entries",
+    "totalEntries": "{n} entries",
+    "none": "This driver has no wallet yet.",
+    "noEntries": "No entries",
+    "date": "Date",
+    "kind": "Type",
+    "amount": "Amount",
+    "balanceAfter": "Balance after",
+    "kinds": {
+      "promo_credit": "Promotion",
+      "top_up": "Top-up",
+      "transfer_in": "Transfer received",
+      "transfer_out": "Transfer sent",
+      "subscription_fee": "Monthly fee",
+      "adjustment": "Adjustment"
+    },
+    "detail": {
+      "title": "Detail",
+      "promo": "{name} · passenger {passenger}",
+      "topUp": "Binance Pay top-up",
+      "topUpRef": "Binance Pay · order {reference}",
+      "transferIn": "From {name}",
+      "transferOut": "To {name}",
+      "fee": "Fee for {month}"
+    },
+    "adjust": {
+      "title": "Adjust balance",
+      "description": "Add or subtract balance by hand. It is recorded in the ledger with your name and the reason.",
+      "descriptionFor": "Add or subtract balance for {name}. It is recorded in the ledger with your name and the reason.",
+      "amount": "Amount (USDT)",
+      "amountHelp": "Positive to add, negative to subtract.",
+      "resulting": "Resulting balance",
+      "negative": "The balance cannot go negative.",
+      "reason": "Reason",
+      "reasonHelp": "Required. Explain why (e.g. \"duplicated top-up\").",
+      "submit": "Apply adjustment",
+      "done": "Balance adjusted"
+    }
+  },
+  "topUps": {
+    "allStatuses": "All",
+    "statuses": {
+      "pending": "Pending",
+      "unmatched": "Unmatched",
+      "completed": "Credited",
+      "rejected": "Rejected"
+    },
+    "search": "Search by name, email, reference or Pay ID",
+    "createdAt": "Date",
+    "driver": "Driver",
+    "amount": "Amount",
+    "payer": "Binance payer",
+    "reference": "Reference (Binance order)",
+    "referenceHelp": "Order ID in the Binance Pay history.",
+    "status": "Status",
+    "noOwner": "Unassigned",
+    "total": "{n} top-ups",
+    "requested": "Notified amount",
+    "receivedAmount": "Amount received (USDT)",
+    "receivedAmountHelp": "What actually reached the Kuulis account according to Binance; this is what gets credited.",
+    "rejectReason": "Rejection reason",
+    "findDriver": "Find driver",
+    "findDriverHelp": "Type at least 2 characters of the name, email, ID number or plate.",
+    "assignTo": "{amount} will be credited to {name}.",
+    "toast": {
+      "confirm": "Top-up credited",
+      "reject": "Top-up rejected",
+      "assign": "Payment assigned and credited"
+    },
+    "actions": {
+      "confirm": "Credit",
+      "reject": "Reject",
+      "assign": "Assign",
+      "confirmTitle": "Credit top-up",
+      "rejectTitle": "Reject top-up",
+      "assignTitle": "Assign payment to a driver",
+      "confirmHelp": "Check in Binance Pay that the payment arrived before crediting it.",
+      "rejectHelp": "The driver will see this reason. Use it when the payment did not arrive or does not match.",
+      "assignHelp": "The payment reached Kuulis but its Pay ID matches no driver. Choose who it belongs to."
+    },
+    "help": {
+      "toggle": "Show or hide the explanation",
+      "title": "How top-ups work",
+      "step1": "The driver registers their Binance Pay ID in the app.",
+      "step2": "They send USDT through Binance Pay to Pay ID {payId} ({name}). Minimum top-up: {min}.",
+      "step2Missing": "They send USDT through Binance Pay to the Kuulis account. No Pay ID is configured yet: drivers cannot top up until you add it in",
+      "step3": "In the app they notify the payment (with the order ID, if they have it); the notice shows up here as pending.",
+      "automatic": "Automatic reconciliation is on: every minute the Binance Pay history is checked and each USDT payment whose payer matches a driver's Pay ID is credited. Payments that match nobody stay as \"Unmatched\" to be assigned by hand.",
+      "manual": "Manual reconciliation: the server has no Binance credentials, so each pending notice is credited here after checking the payment in Binance.",
+      "unknownMode": "If the server has Binance credentials, payments are credited automatically when the payer's Pay ID matches a driver's, and the rest stay \"Unmatched\". Without them, each pending notice is credited here by hand after checking it in Binance.",
+      "statuses": "Crediting a top-up closes the driver's oldest pending notice and retries any pending fee."
+    }
+  },
+  "transfers": {
+    "help": "Balance sent between drivers. Limit per driver: {limit} sent per month.",
+    "search": "Search by name or email",
+    "date": "Date",
+    "sender": "From",
+    "recipient": "To",
+    "amount": "Amount",
+    "note": "Note",
+    "total": "{n} transfers"
+  },
+  "subscriptions": {
+    "charges": "Charges",
+    "allStatuses": "All",
+    "allMonths": "All months",
+    "statuses": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "waived": "Waived"
+    },
+    "blocked": "Blocked",
+    "dueAt": "Due",
+    "paidAt": "Paid",
+    "search": "Search by name or email",
+    "driver": "Driver",
+    "month": "Month",
+    "earnings": "Month earnings",
+    "fee": "Fee",
+    "status": "Status",
+    "dates": "Dates",
+    "freePeriod": "Free period",
+    "total": "{n} charges",
+    "totals": {
+      "paid": "Collected",
+      "pending": "Outstanding",
+      "waived": "Waived (includes 0 fees)",
+      "charges": "{n} charges",
+      "blocked": "{n} blocked",
+      "waivedHelp": "Due to low earnings, the free period or an admin decision.",
+      "partial": "There are too many charges to count them all here: some totals are partial."
+    },
+    "waive": {
+      "button": "Waive",
+      "title": "Waive fee",
+      "help": "The fee is cleared and, if the driver was blocked, they are unblocked right away.",
+      "reason": "Reason",
+      "summary": "{name} · {month} · {fee}",
+      "done": "Fee waived"
+    },
+    "run": {
+      "button": "Charge month",
+      "title": "Charge a closed month",
+      "help": "The worker does this on day 1 of every month (Caracas time). Use it if that run failed or was skipped.",
+      "confirm": "{month} will be charged to every driver with completed rides that month. It is safe to repeat: nobody is charged twice.",
+      "submit": "Charge",
+      "close": "Close",
+      "done": "{month} charged",
+      "result": {
+        "created": "Created",
+        "paid": "Paid",
+        "pending": "Pending",
+        "waived": "Waived"
+      }
+    },
+    "schedules": {
+      "title": "Tiers",
+      "howTitle": "How the fee is calculated",
+      "how": "The month's fee is the one of the highest tier the earnings exceed; a month without earnings costs 0. Each month uses the latest schedule in force, and a new schedule can only start next month or later, so a closed month never changes.",
+      "current": "Current schedule",
+      "since": "Since {month}",
+      "createdBy": "Created by {by} on {at}",
+      "new": "New schedule",
+      "newHelp": "Starts from the latest schedule. Each row is \"earnings above\" → fee. The first one starts at 0.",
+      "none": "No schedule in force.",
+      "noUpcoming": "No scheduled changes.",
+      "earnings": "Month earnings (USD)",
+      "fee": "Fee (USDT)",
+      "above": "Earnings above (USD)",
+      "noEarnings": "0 (no rides)",
+      "between": "{from} – {to}",
+      "over": "over {from}",
+      "system": "system",
+      "scheduled": "Scheduled",
+      "history": "Previous schedules ({n})",
+      "effectiveMonth": "Effective from",
+      "effectiveMonthHelp": "Next month or later.",
+      "addTier": "Add tier",
+      "removeTier": "Remove tier",
+      "simulate": "Try earnings of (USD)",
+      "simulated": "Fee: {fee}",
+      "save": "Save schedule",
+      "saved": "Schedule saved: effective from {month}",
+      "errors": {
+        "month": "Choose the month it applies from.",
+        "monthTooEarly": "It must start in {month} or later.",
+        "noTiers": "Add at least one tier.",
+        "tooMany": "At most {max} tiers.",
+        "firstAbove": "The first tier must start at 0.",
+        "above": "Tier {n}: the threshold must be a valid amount of 0 or more.",
+        "increasing": "Tier {n}: the threshold must be greater than the previous tier's.",
+        "fee": "Tier {n}: the fee must be between 0 and {max}.",
+        "monthTaken": "A schedule is already planned for that month: choose another one."
+      },
+      "builtIn": "initial schedule (business-model.md)"
     }
   }
 }

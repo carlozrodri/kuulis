@@ -686,6 +686,121 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           </div>
         </UCard>
 
+        <!-- Phase 1D: wallet & subscription -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.wallet.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.wallet.help') }}
+            </p>
+          </template>
+          <div class="space-y-6">
+            <div class="space-y-4">
+              <h3 class="text-sm font-medium">
+                {{ t('settings.wallet.topUps') }}
+              </h3>
+              <UAlert
+                v-if="!form.topup_binance_pay_id.trim()"
+                color="warning"
+                variant="subtle"
+                icon="i-lucide-triangle-alert"
+                :title="t('settings.wallet.payIdMissing')"
+              />
+              <div class="grid gap-4 sm:grid-cols-2">
+                <UFormField
+                  :label="t('settings.wallet.payId')"
+                  :help="t('settings.wallet.payIdHelp')"
+                >
+                  <UInput
+                    v-model="form.topup_binance_pay_id"
+                    inputmode="numeric"
+                    maxlength="20"
+                    class="w-full font-mono"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+                <UFormField
+                  :label="t('settings.wallet.accountName')"
+                  :help="t('settings.wallet.accountNameHelp')"
+                >
+                  <UInput
+                    v-model="form.topup_account_name"
+                    :maxlength="ACCOUNT_NAME_MAX"
+                    class="w-full"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+                <UFormField
+                  :label="t('settings.wallet.minAmount')"
+                  :help="t('settings.wallet.minAmountHelp')"
+                >
+                  <UInputNumber
+                    v-model="form.topup_min_amount"
+                    :min="TOPUP_MIN_MIN"
+                    :max="TOPUP_MIN_MAX"
+                    :step="1"
+                    :format-options="moneyFormat"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+              </div>
+            </div>
+            <div class="grid gap-4 border-t border-(--ui-border) pt-4 sm:grid-cols-2">
+              <UFormField
+                :label="t('settings.wallet.transferLimit')"
+                :help="t('settings.wallet.transferLimitHelp')"
+              >
+                <UInputNumber
+                  v-model="form.transfer_monthly_limit"
+                  :min="0"
+                  :max="TRANSFER_LIMIT_MAX"
+                  :step="5"
+                  :format-options="moneyFormat"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+            </div>
+            <div class="space-y-4 border-t border-(--ui-border) pt-4">
+              <h3 class="text-sm font-medium">
+                {{ t('settings.wallet.subscription') }}
+              </h3>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <UFormField
+                  :label="t('settings.wallet.freeMonths')"
+                  :help="t('settings.wallet.freeMonthsHelp')"
+                >
+                  <UInputNumber
+                    v-model="form.subscription_free_months"
+                    :min="0"
+                    :max="FREE_MONTHS_MAX"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+                <UFormField
+                  :label="t('settings.wallet.graceDays')"
+                  :help="t('settings.wallet.graceDaysHelp')"
+                >
+                  <UInputNumber
+                    v-model="form.subscription_grace_days"
+                    :min="0"
+                    :max="GRACE_DAYS_MAX"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+              </div>
+              <p class="text-sm text-(--ui-text-muted)">
+                {{ t('settings.wallet.tiersHint') }}
+                <NuxtLink
+                  to="/subscriptions?tab=schedules"
+                  class="text-primary hover:underline"
+                >{{ t('nav.subscriptions') }}</NuxtLink>
+              </p>
+            </div>
+          </div>
+        </UCard>
+
         <UAlert
           v-if="!readOnly && dirty && issues.length"
           color="error"
