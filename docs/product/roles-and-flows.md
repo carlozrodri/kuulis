@@ -27,7 +27,8 @@ Supuesto: una misma persona podría tener cuenta de pasajero y de motorizado (do
 5. Recibe el pago directo del pasajero.
 6. Ve sus ganancias del mes y la cuota que le toca según los tramos.
 7. Recarga su **billetera** con USDT (mínimo 5) y la cuota se descuenta de ahí (detalles en `business-model.md`).
-8. Si no paga, tiene 1 semana de gracia; después deja de recibir viajes hasta pagar.
+8. El día 1 se cobra la cuota del mes anterior. Si el saldo no alcanza, tiene 1 semana de gracia; después deja de recibir viajes hasta pagar.
+9. Puede transferir saldo a otro motorizado, pero no retirarlo.
 
 ## Flujo del admin (supuesto)
 - Aprobar o rechazar motorizados.

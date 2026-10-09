@@ -10,31 +10,25 @@
 - Impago: 1 semana de gracia y luego no recibe viajes.
 - 3 meses gratis: desde el primer viaje completado de cada motorizado.
 - Lanzamiento: Caracas u otra ciudad o país de Latinoamérica, como experimento sin empresa registrada.
+- La cuota se cobra el día 1 por lo ganado el mes anterior.
+- El saldo de la billetera no se retira, pero se puede transferir a otro motorizado.
+- Solo se recarga cuando toca pagar; la semana de gracia empieza el día del cobro.
+- El precio del viaje se calcula como en otras apps, configurable desde el admin, con promociones.
+- En otro país se mantiene USDT por ahora; Apple Pay y Google Pay quedan a evaluar.
 
 ## Preguntas para Carlos
-### Cuota y billetera
-1. **¿Cuándo se cobra la cuota?** Opción A: el día 1 de cada mes, por lo ganado el mes anterior. Opción B:
-   durante el mes, a medida que pasa cada tramo (100 USD → se descuentan 5, 200 USD → otros 5…).
-   Recomiendo la A porque es más simple y predecible.
-2. **¿Cuándo empieza la semana de gracia?** ¿Desde el día de cobro si el saldo no alcanza?
-3. **¿Hace falta saldo para recibir viajes?** Por ejemplo, ¿debe recargar los 5 USDT antes de su primer viaje,
-   o solo cuando le toque pagar (después de los 3 meses gratis)?
-4. **¿El saldo de la billetera se puede retirar** si el motorizado deja la app? ¿O es crédito prepago no
-   reembolsable? Recomiendo **no reembolsable** (solo sirve para pagar cuotas): así Kuulis no custodia dinero
-   de terceros, lo que importa mucho sin empresa registrada.
-5. **Mes parcial:** si el primer viaje es el día 20, ¿los 3 meses gratis terminan el día 20 del tercer mes,
-   y la primera cuota cuenta solo los días restantes de ese mes?
-
-### Precio del viaje
-6. **¿Cómo se calcula el precio?** Propuesta: tarifa base + por km + por minuto, con un precio mínimo, todo
-   configurable desde el admin. ¿Quieres recargos por horario nocturno o demanda alta?
-7. ¿Se muestra también el equivalente en bolívares? ¿Con qué tasa?
-
-### Lanzamiento
-8. **¿Caracas o otro país?** Si es otro país, ¿también se cobra en USD y se usa USDT? Afecta moneda, idioma,
-   mapas y métodos de pago.
-9. ¿Qué requisitos y documentos debe tener un motorizado para ser aprobado?
-10. ¿Hace falta chat dentro de la app, llamadas enmascaradas y calificaciones?
+1. **Promociones al pasajero:** el pasajero le paga al motorizado, así que si hay un descuento, ¿quién lo asume?
+   - A) El motorizado cobra menos (es difícil que lo acepte).
+   - B) Kuulis le compensa al motorizado con saldo en su billetera.
+   - C) Las promociones son solo para motorizados (por ejemplo, un mes sin cuota).
+2. **Transferencias entre motorizados:** ¿con mínimo y máximo? ¿Gratis? Se pueden usar para revender saldo,
+   así que propongo un límite mensual y que queden registradas en el admin.
+3. **Recargo por demanda alta:** ¿también cuenta para la ganancia del mes y, por tanto, para el tramo de la cuota?
+   Propuesta: sí, porque es lo que cobró el motorizado.
+4. ¿Qué requisitos y documentos debe tener un motorizado para ser aprobado?
+5. ¿Hace falta chat dentro de la app, llamadas enmascaradas y calificaciones?
+6. ¿Se muestra el equivalente en bolívares? ¿Con qué tasa?
+7. ¿Caracas u otro país? Se puede decidir más adelante; el diseño no depende de eso.
 
 ## Riesgos
 | Riesgo | Por qué importa | Mitigación propuesta (supuesto) |
@@ -50,6 +44,8 @@
 | Tiendas de apps | Faltan cuentas de Apple y Google Play | Ya está en `docs/blockers.md`; ambas permiten cuenta de persona natural |
 | Operar sin empresa registrada | Responsabilidad personal de Carlos ante accidentes, reclamos o autoridades; Binance Pay Merchant y algunos procesadores exigen empresa | Términos y condiciones claros (Kuulis conecta, no transporta), billetera no reembolsable, asesoría legal antes de escalar |
 | Custodia de saldos de motorizados | Guardar dinero de terceros puede tener implicaciones legales y contables | Saldo como crédito prepago no reembolsable; registro contable de cada movimiento en la app |
+| Transferencias de saldo entre motorizados | Mercado de reventa de saldo, fraude con cuentas robadas | Límites por mes, registro de cada transferencia y alertas en el admin |
+| Reglas de las tiendas sobre cobros dentro de la app | Si Apple o Google consideran la suscripción un bien digital, exigirían su sistema de pago (15–30 %) | Validar con las guías de revisión antes de publicar; cobrar fuera de la app (USDT) |
 | Cuenta personal de Binance para cobrar | Riesgo de bloqueo o límites de la cuenta; mezcla de fondos personales | Cuenta dedicada solo a Kuulis; exportar movimientos; plan para migrar a Merchant |
 
 ## Supuestos técnicos (no decididos)

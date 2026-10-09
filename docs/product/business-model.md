@@ -36,6 +36,10 @@ lo fija Kuulis, coincide con lo que cobró el motorizado.
 - Se paga en **USDT**.
 - Cada motorizado tiene una **billetera dentro de la app** que recarga con USDT; la cuota se descuenta de ese saldo.
 - **Recarga mínima: 5 USDT.**
+- **El saldo no se puede retirar**, pero **se puede transferir a otro motorizado**.
+- La cuota se cobra **el día 1 de cada mes por lo ganado el mes anterior**.
+- Solo hace falta recargar **cuando le toca pagar**. No se exige saldo para empezar ni durante los 3 meses gratis.
+- La **semana de gracia empieza el día del cobro** si el saldo no alcanza.
 - Si no paga, tiene **1 semana de gracia**; después **no recibe más viajes** hasta ponerse al día.
 - Canal: **Binance Pay** o la red más fácil de implementar, según la recomendación de abajo.
 
@@ -53,6 +57,21 @@ pago se concilia automáticamente por ID y monto. Si la API no permite conciliar
 respaldo es la confirmación manual en el admin. Como segunda vía, **TRC-20** para quien no use Binance. Cuando
 exista empresa, pasar a Binance Pay Merchant. Antes de construir hay que validar técnicamente la conciliación
 con la API de Binance.
+
+## Precio del viaje (decidido)
+- Lo calcula Kuulis **como las otras empresas** (tarifa base, distancia, tiempo, mínimo y recargos por horario
+  o demanda), y **todo es configurable desde el admin** para competir.
+- Desde el admin se pueden crear **promociones**. Quién asume el descuento de una promoción al pasajero está
+  pendiente (ver `open-questions.md`).
+
+## Otros medios de pago a futuro (supuesto)
+Carlos propuso **Apple Pay / Google Pay** además de USDT. Hallazgos a validar:
+- Apple Pay y Google Pay no cobran por sí solos: necesitan un procesador (Stripe, Adyen…), que exige una
+  empresa registrada en un país soportado. Venezuela no está entre los países soportados.
+- Por ahora la recomendación es **solo USDT** y evaluar estos medios cuando haya empresa o si se lanza en otro país.
+- Hay que confirmar que las reglas de Apple y Google no exigen cobrar la suscripción con sus compras
+  integradas (que se quedan con un 15–30 %). Las apps de transporte suelen quedar fuera porque es un servicio
+  físico, pero hay que validarlo antes de publicar.
 
 ## Números de referencia (supuesto, solo para dimensionar)
 Si 1.000 motorizados activos pagan en promedio 12 USD/mes, son 12.000 USD/mes. Hacen falta datos reales
