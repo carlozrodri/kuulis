@@ -12,3 +12,26 @@ function keys(obj: Record<string, unknown>, prefix = ''): string[] {
 it('es and en translations have the same keys', () => {
   expect(keys(en).sort()).toEqual(keys(es).sort());
 });
+
+it('every static translation key used in src exists in es', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const fs = require('fs') as typeof import('fs');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const path = require('path') as typeof import('path');
+  const files: string[] = [];
+  const walk = (dir: string) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (/\.tsx?$/.test(entry.name)) files.push(full);
+    }
+  };
+  walk(path.join(__dirname, '..', 'src'));
+  const known = new Set(keys(es));
+  const missing = files.flatMap((file) =>
+    [...fs.readFileSync(file, 'utf8').matchAll(/\bt\(\s*'([a-zA-Z0-9_.]+)'/g)]
+      .map((m) => m[1])
+      .filter((key) => !known.has(key)),
+  );
+  expect(missing).toEqual([]);
+});

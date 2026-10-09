@@ -1,2 +1,28 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+/* Kuulis brand: Verde Ávila #0E7C5A (shade 600), accent #FFC83D. */
+@theme static {
+  --color-verde-50: #ecfdf6;
+  --color-verde-100: #d2f9e8;
+  --color-verde-200: #a8f0d3;
+  --color-verde-300: #6fe0b9;
+  --color-verde-400: #34c799;
+  --color-verde-500: #13a37c;
+  --color-verde-600: #0e7c5a;
+  --color-verde-700: #0d654b;
+  --color-verde-800: #0e503d;
+  --color-verde-900: #0c4233;
+  --color-verde-950: #04251c;
+
+  --color-accent: #ffc83d;
+}
+
+/* Use the exact brand shade in light mode (Nuxt UI defaults to 500); dark mode keeps the lighter 400. */
+:root {
+  --ui-primary: var(--ui-color-primary-600);
+}
+
+.dark {
+  --ui-primary: var(--ui-color-primary-400);
+}

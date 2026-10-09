@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 
+import { DRIVER_QUERY_KEY, isDriverNotification } from '@/hooks/useDriver';
 import { tokens } from '@/lib/api';
 import { config } from '@/lib/config';
 
@@ -39,6 +40,7 @@ export function useRealtime(enabled: boolean) {
         }
         if (message.event === 'notification') {
           void queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          if (isDriverNotification(message.data)) void queryClient.invalidateQueries({ queryKey: DRIVER_QUERY_KEY });
         }
       };
       ws.onclose = () => {

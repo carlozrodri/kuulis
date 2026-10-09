@@ -8,7 +8,9 @@ const config = useRuntimeConfig()
 const links = computed<NavigationMenuItem[]>(() => [
   { label: t('nav.dashboard'), icon: 'i-lucide-layout-dashboard', to: '/' },
   { label: t('nav.users'), icon: 'i-lucide-users', to: '/users' },
+  { label: t('nav.drivers'), icon: 'i-lucide-bike', to: '/drivers' },
   { label: t('nav.notifications'), icon: 'i-lucide-bell', to: '/notifications' },
+  { label: t('nav.settings'), icon: 'i-lucide-settings', to: '/settings' },
   { label: t('nav.profile'), icon: 'i-lucide-user-cog', to: '/profile' },
 ])
 

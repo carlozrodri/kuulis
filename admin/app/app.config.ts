@@ -1,5 +1,6 @@
 export default defineAppConfig({
   ui: {
-    colors: { primary: 'indigo', neutral: 'slate' },
+    // "verde" is the Kuulis brand palette (Verde Ávila), defined in assets/css/main.css.
+    colors: { primary: 'verde', neutral: 'slate' },
   },
 })

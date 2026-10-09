@@ -3,7 +3,9 @@
     "dashboard": "Panel",
     "users": "Usuarios",
     "notifications": "Notificaciones",
-    "profile": "Mi perfil"
+    "profile": "Mi perfil",
+    "drivers": "Motorizados",
+    "settings": "Configuración"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -57,7 +59,11 @@
   "common": {
     "save": "Guardar",
     "saved": "Cambios guardados",
-    "empty": "Sin resultados"
+    "empty": "Sin resultados",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "discard": "Descartar cambios"
   },
   "validation": {
     "email": "Correo no válido",
@@ -75,5 +81,106 @@
     "email_taken": "Ese correo ya está registrado",
     "validation_error": "Revisa los datos del formulario",
     "http_429": "Demasiados intentos, espera un momento"
+  },
+  "vehicleTypes": {
+    "moto": "Moto",
+    "car": "Carro"
+  },
+  "drivers": {
+    "name": "Nombre",
+    "email": "Correo",
+    "nationalId": "Cédula",
+    "rif": "RIF",
+    "phone": "Teléfono",
+    "city": "Ciudad",
+    "birthDate": "Fecha de nacimiento",
+    "age": "Edad",
+    "belowMinAge": "Menor a la edad mínima",
+    "plate": "Placa",
+    "status": "Estado",
+    "submittedAt": "Enviado",
+    "reviewedAt": "Revisado",
+    "approvedAt": "Aprobado",
+    "search": "Buscar por nombre, correo, cédula o placa",
+    "allStatuses": "Todos",
+    "total": "{n} motorizados",
+    "personal": "Datos personales",
+    "vehicle": "Vehículo",
+    "vehicleType": "Tipo",
+    "brandModel": "Marca y modelo",
+    "year": "Año",
+    "color": "Color",
+    "vehicleNotOk": "No cumple el año mínimo",
+    "noVehicle": "Aún no registra vehículo.",
+    "vehiclePhotos": "Fotos de la moto",
+    "rejectionReason": "Motivo del rechazo",
+    "suspensionReason": "Motivo de la suspensión",
+    "reason": "Motivo",
+    "reasonHelp": "El motorizado recibirá este motivo en su notificación.",
+    "statuses": {
+      "draft": "Borrador",
+      "pending_review": "En revisión",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "suspended": "Suspendido"
+    },
+    "kinds": {
+      "id_card": "Cédula",
+      "rif": "RIF",
+      "drivers_license": "Licencia de conducir",
+      "medical_certificate": "Certificado médico",
+      "vehicle_registration": "Carnet de circulación",
+      "selfie": "Selfie",
+      "vehicle_photo": "Foto de la moto"
+    },
+    "actions": {
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "suspend": "Suspender",
+      "reinstate": "Reactivar",
+      "rejectTitle": "Rechazar motorizado",
+      "suspendTitle": "Suspender motorizado"
+    },
+    "toast": {
+      "approved": "Motorizado aprobado",
+      "rejected": "Motorizado rechazado",
+      "suspended": "Motorizado suspendido",
+      "reinstated": "Motorizado reactivado"
+    },
+    "documents": {
+      "title": "Documentos",
+      "none": "No ha subido documentos.",
+      "missing": "Falta: {kind}",
+      "open": "Ver documento",
+      "openNewTab": "Abrir en otra pestaña",
+      "unavailable": "Archivo no disponible",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "rejectTitle": "Rechazar {kind}",
+      "approved": "Documento aprobado",
+      "rejected": "Documento rechazado",
+      "statuses": {
+        "pending": "Pendiente",
+        "approved": "Aprobado",
+        "rejected": "Rechazado"
+      }
+    }
+  },
+  "settings": {
+    "readOnly": "Solo los administradores pueden cambiar la configuración.",
+    "drivers": "Motorizados",
+    "minAge": "Edad mínima",
+    "minAgeHelp": "Años cumplidos al enviar la solicitud.",
+    "minPhotos": "Fotos mínimas del vehículo",
+    "minPhotosHelp": "Cantidad de fotos de la moto exigidas.",
+    "vehicles": "Vehículos",
+    "enabledTypes": "Tipos aceptados",
+    "enabledTypesHelp": "Solo se pueden registrar vehículos de estos tipos.",
+    "minYear": "Año mínimo ({type})",
+    "typeDisabled": "Tipo no habilitado",
+    "requiredDocuments": "Documentos obligatorios",
+    "requiredDocumentsHelp": "El motorizado no podrá enviar su solicitud sin estos documentos.",
+    "identityWarning": "Sin cédula y selfie no es posible verificar la identidad del motorizado.",
+    "needVehicleType": "Habilita al menos un tipo de vehículo"
   }
 }

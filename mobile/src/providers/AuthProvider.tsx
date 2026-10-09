@@ -3,6 +3,7 @@ import { createContext, type PropsWithChildren, useCallback, useContext, useEffe
 
 import i18n from '@/i18n';
 import { api, setSessionExpiredHandler, tokens } from '@/lib/api';
+import { googleSignOut } from '@/lib/social';
 import type { AuthResponse, User } from '@/lib/types';
 
 type AuthContextValue = {
@@ -10,6 +11,9 @@ type AuthContextValue = {
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  /** Exchanges a Google / Apple id token for a Kuulis session (POST /auth/social/{provider}). */
+  signInWithGoogle: (idToken: string) => Promise<void>;
+  signInWithApple: (idToken: string, fullName: string | null) => Promise<void>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
 };
@@ -66,6 +70,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
           }),
         );
       },
+      signInWithGoogle: async (idToken) => {
+        await applySession(
+          await api<AuthResponse>('/auth/social/google', { method: 'POST', body: { id_token: idToken }, auth: false }),
+        );
+      },
+      signInWithApple: async (idToken, fullName) => {
+        await applySession(
+          await api<AuthResponse>('/auth/social/apple', {
+            method: 'POST',
+            body: { id_token: idToken, full_name: fullName },
+            auth: false,
+          }),
+        );
+      },
       signOut: async () => {
         const refreshToken = await tokens.refreshToken();
         if (refreshToken) {
@@ -73,6 +91,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
             () => undefined,
           );
         }
+        void googleSignOut();
         await clear();
       },
       refreshUser: async () => setUser(await api<User>('/users/me')),

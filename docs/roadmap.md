@@ -13,13 +13,13 @@
 Plan en `docs/product/`; diseño en `docs/product/mobile-design.md`. Cada sub-fase deja API, admin y mobile
 funcionando en QA antes de pasar a la siguiente.
 
-### 1A · Cuentas, motorizados y configuración
-- [ ] Mobile: sistema de diseño Verde Ávila (tokens, fuente, componentes) y modo claro/oscuro.
-- [ ] Login con Google (Android/iOS) y Apple (solo iOS).
-- [ ] Modo pasajero / motorizado en la misma cuenta.
-- [ ] Perfil de motorizado: vehículo (tipo, marca, modelo, año, placa, color), documentos en S3 privado,
+### 1A · Cuentas, motorizados y configuración (hecha 2026-10-09, en QA; contrato en `docs/api/phase-1a.md`)
+- [x] Mobile: sistema de diseño Verde Ávila (tokens, fuente, componentes) y modo claro/oscuro.
+- [x] Login con Google (Android/iOS) y Apple (solo iOS).
+- [x] Modo pasajero / motorizado en la misma cuenta.
+- [x] Perfil de motorizado: vehículo (tipo, marca, modelo, año, placa, color), documentos en S3 privado,
       estados (borrador, en revisión, aprobado, rechazado con motivo, suspendido).
-- [ ] Admin: cola de aprobación con visor de documentos; configuración editable (edad mínima, año mínimo,
+- [x] Admin: cola de aprobación con visor de documentos; configuración editable (edad mínima, año mínimo,
       documentos requeridos).
 
 ### 1B · Viajes

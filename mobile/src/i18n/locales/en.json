@@ -1,24 +1,63 @@
 {
   "common": {
     "loading": "Loading…",
-    "retry": "Retry",
+    "retry": "Try again",
     "save": "Save",
+    "continue": "Continue",
+    "done": "Done",
+    "edit": "Edit",
+    "back": "Back",
+    "close": "Close",
+    "comingSoon": "Coming soon",
+    "openSettings": "Open settings",
     "error": "Something went wrong, please try again"
   },
+  "a11y": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
   "auth": {
-    "welcome": "Welcome to Kuulis",
+    "welcome": "Welcome back",
+    "welcomeSubtitle": "Sign in to get a ride or start earning with your motorcycle.",
+    "registerTitle": "Create your account",
+    "registerSubtitle": "One account to ride and to drive.",
     "email": "Email",
+    "emailPlaceholder": "you@email.com",
     "password": "Password",
-    "fullName": "Name",
+    "fullName": "Full name",
     "login": "Sign in",
     "register": "Create account",
     "logout": "Sign out",
-    "noAccount": "No account? Sign up",
-    "haveAccount": "Already have an account? Sign in",
+    "noAccountPrefix": "Don't have an account?",
+    "noAccountAction": "Sign up",
+    "haveAccountPrefix": "Already have an account?",
+    "haveAccountAction": "Sign in",
     "forgot": "Forgot your password?",
-    "resetTitle": "Reset password",
+    "resetTitle": "Reset your password",
+    "resetSubtitle": "We'll email you a link to create a new one.",
     "resetSend": "Send link",
-    "resetSent": "If the email exists, we sent you a link to reset your password."
+    "resetSentTitle": "Check your email",
+    "resetSent": "If the email exists, we sent you a link to reset your password.",
+    "backToLogin": "Back to sign in",
+    "terms": "By creating an account you accept Kuulis' terms and privacy policy.",
+    "social": {
+      "google": "Continue with Google",
+      "or": "or with your email",
+      "installedOnly": "Google sign-in is available in the installed app. Meanwhile, use your email."
+    }
+  },
+  "mode": {
+    "title": "How do you want to use Kuulis today?",
+    "subtitle": "You can switch modes anytime from your profile.",
+    "passenger": {
+      "title": "Passenger",
+      "body": "Get a motorcycle and get there fast"
+    },
+    "driver": {
+      "title": "Driver",
+      "body": "Earn with your motorcycle. No commission per trip"
+    },
+    "driverPromo": "Drivers: 3 months free from your first trip and never a commission. After that, a low monthly fee only in the months you work."
   },
   "tabs": {
     "home": "Home",
@@ -26,30 +65,248 @@
     "profile": "Profile"
   },
   "home": {
-    "greeting": "Hi, {{name}}",
-    "verifyEmail": "Confirm your email to unlock every feature.",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
+    "greetingName": "{{greeting}}, {{name}}",
+    "whereTo": "Where to?",
+    "verifyTitle": "Confirm your email",
+    "verifyEmail": "We sent you a link to unlock every feature.",
+    "verifySent": "Done, check your inbox.",
     "resend": "Resend email",
-    "realtime": "Realtime: {{status}}"
+    "howItWorks": "How Kuulis works",
+    "how": {
+      "price": {
+        "title": "Fixed price in dollars",
+        "body": "You see it before you ask, with its bolívar equivalent."
+      },
+      "pay": {
+        "title": "Pay the driver directly",
+        "body": "Cash, pago móvil, Binance or Zelle."
+      },
+      "safe": {
+        "title": "Verified drivers",
+        "body": "We check their documents and motorcycle before activating them."
+      }
+    }
   },
   "notifications": {
-    "empty": "You have no notifications",
-    "markAll": "Mark all as read"
+    "empty": "No notifications",
+    "emptyBody": "Updates about your trips and account will show up here.",
+    "markAll": "Mark all as read",
+    "unread": "Unread"
   },
   "profile": {
     "language": "Language",
     "environment": "Environment",
-    "version": "Version"
+    "version": "Version",
+    "mode": "App mode",
+    "modeHint": "Switches the app mode",
+    "current": "Current",
+    "verified": "Email verified",
+    "about": "About the app"
+  },
+  "driver": {
+    "intro": {
+      "badge": "Earn with your motorcycle",
+      "title": "Become a Kuulis driver",
+      "continueTitle": "Continue your application",
+      "subtitle": "Before you start, check the requirements and have your documents at hand.",
+      "requirements": "Requirements",
+      "age": "Be {{age}} or older",
+      "vehicleYear": "Motorcycle from {{year}} or newer",
+      "vehicleOnlyMoto": "For now we only accept motorcycles",
+      "documents": "Documents",
+      "review": "An administrator reviews your details and documents before activating you. We'll let you know with a notification.",
+      "progress": "{{done}} of {{total}} done",
+      "start": "Start application",
+      "continue": "Continue application"
+    },
+    "requirement": {
+      "personal": "Personal details",
+      "age": "Minimum age: {{age}}",
+      "vehicle": "Motorcycle details",
+      "vehicle_year": "Motorcycle from {{year}} or newer",
+      "documents": "All documents uploaded"
+    },
+    "step": {
+      "counter": "Step {{current}} of {{total}}",
+      "locked": "Your application was already submitted and can't be edited right now."
+    },
+    "personal": {
+      "title": "Your details",
+      "subtitle": "We use these details to verify your identity.",
+      "birthDate": "Date of birth",
+      "birthPlaceholder": "DD/MM/YYYY",
+      "birthHint": "You must be {{age}} or older.",
+      "birthInvalid": "Enter a valid date (DD/MM/YYYY)",
+      "tooYoung": "You must be at least {{age}}",
+      "nationalId": "ID number (cédula)",
+      "nationalIdInvalid": "Enter V or E followed by 6 to 9 digits",
+      "rif": "RIF (tax ID)",
+      "rifHint": "A letter and 9 digits, e.g. V123456789",
+      "rifInvalid": "Enter the letter (V, E, J, P or G) and 9 digits",
+      "phone": "Phone",
+      "phoneHint": "We'll contact you here if needed.",
+      "phoneInvalid": "Enter a valid mobile number, e.g. 0412 123 4567"
+    },
+    "vehicle": {
+      "title": "Your motorcycle",
+      "subtitle": "We accept motorcycles from {{year}} or newer.",
+      "type": "Vehicle type",
+      "brand": "Brand",
+      "model": "Model",
+      "modelPlaceholder": "For example, SBR 150",
+      "year": "Year",
+      "plate": "Plate",
+      "color": "Color",
+      "yearInvalid": "The year must be between {{min}} and {{max}}",
+      "plateInvalid": "Enter the plate: 5 to 8 letters and digits"
+    },
+    "vehicleType": {
+      "moto": "Motorcycle",
+      "car": "Car"
+    },
+    "colors": {
+      "black": "Black",
+      "white": "White",
+      "red": "Red",
+      "blue": "Blue",
+      "gray": "Gray",
+      "silver": "Silver"
+    },
+    "documents": {
+      "title": "Your documents",
+      "subtitle": "Take clear photos without glare. An administrator reviews everything before activating you.",
+      "upload": "Upload",
+      "take": "Take photo",
+      "uploading": "Uploading…",
+      "takePhoto": "Take photo",
+      "takeSelfie": "Take selfie",
+      "fromLibrary": "Choose from gallery",
+      "fromFiles": "Choose file",
+      "fromFilesHint": "PDF or image",
+      "replaceHint": "Tap to replace the file",
+      "rejectedHint": "Rejected: upload it again",
+      "photosCount": "{{count}} of {{required}} photos",
+      "photoN": "Photo {{n}}",
+      "deletePhoto": "Delete photo {{n}}",
+      "addPhoto": "Add another photo",
+      "addFirstPhoto": "Add photo",
+      "progress": "{{done}} of {{total}} documents ready",
+      "cameraDeniedTitle": "No camera access",
+      "cameraDenied": "Allow camera access in settings or pick a photo from your gallery.",
+      "tips": "Tip: place the document on a dark surface, in good light, with every detail readable."
+    },
+    "doc": {
+      "id_card": {
+        "title": "ID card (cédula)",
+        "hint": "Front side, readable"
+      },
+      "rif": {
+        "title": "RIF",
+        "hint": "Current, as PDF or photo"
+      },
+      "drivers_license": {
+        "title": "Driver's license",
+        "hint": "Current, motorcycle class"
+      },
+      "medical_certificate": {
+        "title": "Medical certificate",
+        "hint": "Current"
+      },
+      "vehicle_registration": {
+        "title": "Vehicle registration",
+        "hint": "For the motorcycle you'll use"
+      },
+      "selfie": {
+        "title": "Selfie",
+        "hint": "Your face, front on, no glasses or helmet"
+      },
+      "vehicle_photo": {
+        "title": "Motorcycle photos",
+        "hint": "With the plate visible",
+        "hintCount": "At least {{count}}, with the plate visible"
+      }
+    },
+    "docState": {
+      "missing": "Missing",
+      "partial": "Incomplete",
+      "pending": "Done",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "review": {
+      "title": "Review and submit",
+      "subtitle": "Make sure everything is correct before submitting your application.",
+      "submit": "Submit for review",
+      "missingVehicle": "You haven't added your motorcycle yet.",
+      "incomplete": "Complete the highlighted requirements to submit your application.",
+      "declaration": "By submitting you confirm the details and documents are yours and current."
+    },
+    "status": {
+      "reason": "Reason",
+      "submittedAt": "Submitted on {{date}}",
+      "pending": {
+        "title": "Under review",
+        "body": "We're reviewing your details and documents. It usually takes less than 48 hours.",
+        "notify": "We'll notify you when we're done. There's nothing else you need to do."
+      },
+      "rejected": {
+        "title": "Your application needs changes",
+        "body": "Fix what we pointed out and submit it again.",
+        "cta": "Fix and resubmit"
+      },
+      "suspended": {
+        "title": "Account suspended",
+        "body": "You can't receive trips for now. Contact support to resolve it."
+      }
+    },
+    "home": {
+      "approved": "Approved",
+      "welcome": "You're now a Kuulis driver!",
+      "freeMonths": "Your 3 free months start with your first trip.",
+      "offline": "You're offline",
+      "offlineBody": "Go online to start receiving trip requests near you.",
+      "connect": "Go online",
+      "nextUp": "Very soon you'll be able to go online and receive trips from here."
+    }
   },
   "validation": {
     "email": "Invalid email",
     "password": "At least 8 characters",
-    "required": "Required"
+    "required": "Required field",
+    "invalid": "Check this field"
   },
   "errors": {
     "invalid_credentials": "Wrong email or password",
     "email_taken": "That email is already registered",
     "account_disabled": "Your account is disabled",
-    "http_429": "Too many attempts, please wait",
-    "network": "Cannot reach the server"
+    "user_inactive": "Your account is disabled",
+    "http_429": "Too many attempts, wait a moment",
+    "network": "Can't reach the server. Check your connection and try again.",
+    "server": "The server had a problem. Try again in a moment.",
+    "validation_error": "Check the highlighted fields",
+    "social_token_invalid": "We couldn't verify your account. Try again or use your email.",
+    "social_provider_disabled": "This sign-in method isn't available right now.",
+    "social_provider_unavailable": "The sign-in service isn't responding. Try again in a moment.",
+    "driver_not_found": "You haven't started your driver application yet.",
+    "driver_not_editable": "Your application is under review and can't be edited.",
+    "driver_invalid_transition": "Your application can't be submitted in its current state.",
+    "driver_documents_rejected": "Some documents were rejected. Replace them before submitting.",
+    "driver_requirements_missing": "Some requirements are still missing.",
+    "national_id_taken": "That ID number is already registered to another account",
+    "plate_taken": "That plate is already registered",
+    "document_already_registered": "That file was already registered",
+    "vehicle_type_not_enabled": "That vehicle type isn't enabled yet",
+    "vehicle_too_old": "The motorcycle must be from {{min_year}} or newer",
+    "vehicle_year_invalid": "Invalid vehicle year",
+    "document_key_invalid": "We couldn't register the file. Upload it again.",
+    "document_not_uploaded": "The file didn't finish uploading. Try again.",
+    "file_type_not_allowed": "File type not allowed. Use JPG, PNG, WEBP, HEIC or PDF.",
+    "file_too_large": "The file is too large. Try a lighter photo.",
+    "too_many_documents": "You've reached the maximum number of photos.",
+    "storage_disabled": "File uploads aren't available right now.",
+    "upload_failed": "The file couldn't be uploaded. Check your connection and try again."
   }
 }

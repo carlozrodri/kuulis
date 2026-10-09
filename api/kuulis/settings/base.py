@@ -45,6 +45,9 @@ class BaseAppSettings(BaseSettings):
     REFRESH_TOKEN_TTL_DAYS: int = 30
     PASSWORD_RESET_TTL_MINUTES: int = 30
     EMAIL_VERIFICATION_TTL_HOURS: int = 48
+    # Social login: accepted ``aud`` values. Empty disables the provider.
+    GOOGLE_CLIENT_IDS: CSVList = []  # web, iOS and Android OAuth client ids
+    APPLE_CLIENT_IDS: CSVList = []  # iOS bundle id (and Services ID if web sign-in is added)
 
     # --- Rate limiting ----------------------------------------------------------
     RATE_LIMIT_ENABLED: bool = True
@@ -81,7 +84,9 @@ class BaseAppSettings(BaseSettings):
     FIRST_SUPERUSER_EMAIL: str = ""
     FIRST_SUPERUSER_PASSWORD: str = ""
 
-    @field_validator("ALLOWED_HOSTS", "CORS_ORIGINS", mode="before")
+    @field_validator(
+        "ALLOWED_HOSTS", "CORS_ORIGINS", "GOOGLE_CLIENT_IDS", "APPLE_CLIENT_IDS", mode="before"
+    )
     @classmethod
     def _split_csv(cls, value: object) -> object:
         if isinstance(value, str):

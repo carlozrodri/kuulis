@@ -3,7 +3,9 @@
     "dashboard": "Dashboard",
     "users": "Users",
     "notifications": "Notifications",
-    "profile": "My profile"
+    "profile": "My profile",
+    "drivers": "Drivers",
+    "settings": "Settings"
   },
   "auth": {
     "title": "Admin sign in",
@@ -57,7 +59,11 @@
   "common": {
     "save": "Save",
     "saved": "Changes saved",
-    "empty": "No results"
+    "empty": "No results",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "discard": "Discard changes"
   },
   "validation": {
     "email": "Invalid email",
@@ -75,5 +81,106 @@
     "email_taken": "That email is already registered",
     "validation_error": "Please check the form",
     "http_429": "Too many attempts, please wait"
+  },
+  "vehicleTypes": {
+    "moto": "Motorcycle",
+    "car": "Car"
+  },
+  "drivers": {
+    "name": "Name",
+    "email": "Email",
+    "nationalId": "ID number (cédula)",
+    "rif": "RIF",
+    "phone": "Phone",
+    "city": "City",
+    "birthDate": "Date of birth",
+    "age": "Age",
+    "belowMinAge": "Below minimum age",
+    "plate": "Plate",
+    "status": "Status",
+    "submittedAt": "Submitted",
+    "reviewedAt": "Reviewed",
+    "approvedAt": "Approved",
+    "search": "Search by name, email, ID or plate",
+    "allStatuses": "All",
+    "total": "{n} drivers",
+    "personal": "Personal details",
+    "vehicle": "Vehicle",
+    "vehicleType": "Type",
+    "brandModel": "Make and model",
+    "year": "Year",
+    "color": "Color",
+    "vehicleNotOk": "Below minimum year",
+    "noVehicle": "No vehicle registered yet.",
+    "vehiclePhotos": "Vehicle photos",
+    "rejectionReason": "Rejection reason",
+    "suspensionReason": "Suspension reason",
+    "reason": "Reason",
+    "reasonHelp": "The driver will see this reason in their notification.",
+    "statuses": {
+      "draft": "Draft",
+      "pending_review": "In review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "suspended": "Suspended"
+    },
+    "kinds": {
+      "id_card": "ID card (cédula)",
+      "rif": "RIF (tax ID)",
+      "drivers_license": "Driver's license",
+      "medical_certificate": "Medical certificate",
+      "vehicle_registration": "Vehicle registration",
+      "selfie": "Selfie",
+      "vehicle_photo": "Vehicle photo"
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "suspend": "Suspend",
+      "reinstate": "Reinstate",
+      "rejectTitle": "Reject driver",
+      "suspendTitle": "Suspend driver"
+    },
+    "toast": {
+      "approved": "Driver approved",
+      "rejected": "Driver rejected",
+      "suspended": "Driver suspended",
+      "reinstated": "Driver reinstated"
+    },
+    "documents": {
+      "title": "Documents",
+      "none": "No documents uploaded.",
+      "missing": "Missing: {kind}",
+      "open": "View document",
+      "openNewTab": "Open in new tab",
+      "unavailable": "File unavailable",
+      "approve": "Approve",
+      "reject": "Reject",
+      "rejectTitle": "Reject {kind}",
+      "approved": "Document approved",
+      "rejected": "Document rejected",
+      "statuses": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      }
+    }
+  },
+  "settings": {
+    "readOnly": "Only administrators can change settings.",
+    "drivers": "Drivers",
+    "minAge": "Minimum age",
+    "minAgeHelp": "Age in full years when the application is submitted.",
+    "minPhotos": "Minimum vehicle photos",
+    "minPhotosHelp": "Number of vehicle photos required.",
+    "vehicles": "Vehicles",
+    "enabledTypes": "Accepted types",
+    "enabledTypesHelp": "Only vehicles of these types can be registered.",
+    "minYear": "Minimum year ({type})",
+    "typeDisabled": "Type not enabled",
+    "requiredDocuments": "Required documents",
+    "requiredDocumentsHelp": "Drivers cannot submit their application without these documents.",
+    "identityWarning": "Without ID card and selfie the driver's identity cannot be verified.",
+    "needVehicleType": "Enable at least one vehicle type"
   }
 }

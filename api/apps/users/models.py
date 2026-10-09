@@ -44,7 +44,7 @@ class User(BaseModel):
 
 
 class SocialAccount(BaseModel):
-    """Prepared for social login (Google / Apple). Not exposed by any endpoint yet."""
+    """A Google or Apple identity linked to a user (see apps/auth/social.py)."""
 
     __tablename__ = "social_accounts"
     __table_args__ = (UniqueConstraint("provider", "provider_user_id"),)

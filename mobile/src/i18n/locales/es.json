@@ -3,22 +3,61 @@
     "loading": "Cargando…",
     "retry": "Reintentar",
     "save": "Guardar",
+    "continue": "Continuar",
+    "done": "Listo",
+    "edit": "Editar",
+    "back": "Volver",
+    "close": "Cerrar",
+    "comingSoon": "Próximamente",
+    "openSettings": "Abrir ajustes",
     "error": "Algo salió mal, inténtalo de nuevo"
   },
+  "a11y": {
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
+  },
   "auth": {
-    "welcome": "Bienvenido a Kuulis",
+    "welcome": "Hola de nuevo",
+    "welcomeSubtitle": "Entra para pedir tu moto o empezar a ganar con la tuya.",
+    "registerTitle": "Crea tu cuenta",
+    "registerSubtitle": "Una sola cuenta para viajar y para manejar.",
     "email": "Correo",
+    "emailPlaceholder": "tu@correo.com",
     "password": "Contraseña",
-    "fullName": "Nombre",
+    "fullName": "Nombre y apellido",
     "login": "Entrar",
     "register": "Crear cuenta",
     "logout": "Cerrar sesión",
-    "noAccount": "¿No tienes cuenta? Regístrate",
-    "haveAccount": "¿Ya tienes cuenta? Entra",
+    "noAccountPrefix": "¿No tienes cuenta?",
+    "noAccountAction": "Regístrate",
+    "haveAccountPrefix": "¿Ya tienes cuenta?",
+    "haveAccountAction": "Entra",
     "forgot": "¿Olvidaste tu contraseña?",
-    "resetTitle": "Recuperar contraseña",
+    "resetTitle": "Recupera tu contraseña",
+    "resetSubtitle": "Te enviamos un enlace a tu correo para crear una nueva.",
     "resetSend": "Enviar enlace",
-    "resetSent": "Si el correo existe, te enviamos un enlace para restablecer la contraseña."
+    "resetSentTitle": "Revisa tu correo",
+    "resetSent": "Si el correo existe, te enviamos un enlace para restablecer la contraseña.",
+    "backToLogin": "Volver a entrar",
+    "terms": "Al crear tu cuenta aceptas los términos y la política de privacidad de Kuulis.",
+    "social": {
+      "google": "Continuar con Google",
+      "or": "o con tu correo",
+      "installedOnly": "Entrar con Google está disponible en la app instalada. Mientras tanto, usa tu correo."
+    }
+  },
+  "mode": {
+    "title": "¿Cómo quieres usar Kuulis hoy?",
+    "subtitle": "Puedes cambiar de modo cuando quieras desde tu perfil.",
+    "passenger": {
+      "title": "Pasajero",
+      "body": "Pide una moto y llega rápido a donde vas"
+    },
+    "driver": {
+      "title": "Motorizado",
+      "body": "Gana con tu moto. Sin comisión por viaje"
+    },
+    "driverPromo": "Motorizados: 3 meses gratis desde tu primer viaje y sin comisión nunca. Después, una cuota mensual baja solo en los meses que trabajes."
   },
   "tabs": {
     "home": "Inicio",
@@ -26,30 +65,248 @@
     "profile": "Perfil"
   },
   "home": {
-    "greeting": "Hola, {{name}}",
-    "verifyEmail": "Confirma tu correo para activar todas las funciones.",
+    "goodMorning": "Buenos días",
+    "goodAfternoon": "Buenas tardes",
+    "goodEvening": "Buenas noches",
+    "greetingName": "{{greeting}}, {{name}}",
+    "whereTo": "¿A dónde vamos?",
+    "verifyTitle": "Confirma tu correo",
+    "verifyEmail": "Te enviamos un enlace para activar todas las funciones.",
+    "verifySent": "Listo, revisa tu bandeja de entrada.",
     "resend": "Reenviar correo",
-    "realtime": "Tiempo real: {{status}}"
+    "howItWorks": "Así funciona Kuulis",
+    "how": {
+      "price": {
+        "title": "Precio fijo en dólares",
+        "body": "Lo ves antes de pedir, con su equivalente en bolívares."
+      },
+      "pay": {
+        "title": "Pagas directo al motorizado",
+        "body": "En efectivo, pago móvil, Binance o Zelle."
+      },
+      "safe": {
+        "title": "Motorizados verificados",
+        "body": "Revisamos sus documentos y su moto antes de activarlos."
+      }
+    }
   },
   "notifications": {
     "empty": "No tienes notificaciones",
-    "markAll": "Marcar todo como leído"
+    "emptyBody": "Aquí verás las novedades de tus viajes y de tu cuenta.",
+    "markAll": "Marcar todo como leído",
+    "unread": "Sin leer"
   },
   "profile": {
     "language": "Idioma",
     "environment": "Entorno",
-    "version": "Versión"
+    "version": "Versión",
+    "mode": "Modo de uso",
+    "modeHint": "Cambia el modo de la app",
+    "current": "Actual",
+    "verified": "Correo verificado",
+    "about": "Acerca de la app"
+  },
+  "driver": {
+    "intro": {
+      "badge": "Gana con tu moto",
+      "title": "Conviértete en motorizado Kuulis",
+      "continueTitle": "Sigue con tu registro",
+      "subtitle": "Antes de empezar, revisa los requisitos y ten tus documentos a mano.",
+      "requirements": "Requisitos",
+      "age": "Tener {{age}} años o más",
+      "vehicleYear": "Moto año {{year}} o más nueva",
+      "vehicleOnlyMoto": "Por ahora solo aceptamos motos",
+      "documents": "Documentos",
+      "review": "Un administrador revisa tus datos y documentos antes de activarte. Te avisaremos por notificación.",
+      "progress": "{{done}} de {{total}} listos",
+      "start": "Comenzar registro",
+      "continue": "Continuar registro"
+    },
+    "requirement": {
+      "personal": "Datos personales",
+      "age": "Edad mínima: {{age}} años",
+      "vehicle": "Datos de la moto",
+      "vehicle_year": "Moto año {{year}} o más nueva",
+      "documents": "Documentos completos"
+    },
+    "step": {
+      "counter": "Paso {{current}} de {{total}}",
+      "locked": "Tu solicitud ya fue enviada y no se puede editar en este momento."
+    },
+    "personal": {
+      "title": "Tus datos",
+      "subtitle": "Usamos estos datos para verificar tu identidad.",
+      "birthDate": "Fecha de nacimiento",
+      "birthPlaceholder": "DD/MM/AAAA",
+      "birthHint": "Debes tener {{age}} años o más.",
+      "birthInvalid": "Escribe una fecha válida (DD/MM/AAAA)",
+      "tooYoung": "Debes tener al menos {{age}} años",
+      "nationalId": "Cédula",
+      "nationalIdInvalid": "Escribe V o E seguido de 6 a 9 números",
+      "rif": "RIF",
+      "rifHint": "Letra y 9 números, por ejemplo V123456789",
+      "rifInvalid": "Escribe la letra (V, E, J, P o G) y 9 números",
+      "phone": "Teléfono",
+      "phoneHint": "Te contactaremos por aquí si hace falta.",
+      "phoneInvalid": "Escribe un celular válido, por ejemplo 0412 123 4567"
+    },
+    "vehicle": {
+      "title": "Tu moto",
+      "subtitle": "Aceptamos motos año {{year}} o más nuevas.",
+      "type": "Tipo de vehículo",
+      "brand": "Marca",
+      "model": "Modelo",
+      "modelPlaceholder": "Por ejemplo, SBR 150",
+      "year": "Año",
+      "plate": "Placa",
+      "color": "Color",
+      "yearInvalid": "El año debe estar entre {{min}} y {{max}}",
+      "plateInvalid": "Escribe la placa: de 5 a 8 letras y números"
+    },
+    "vehicleType": {
+      "moto": "Moto",
+      "car": "Carro"
+    },
+    "colors": {
+      "black": "Negra",
+      "white": "Blanca",
+      "red": "Roja",
+      "blue": "Azul",
+      "gray": "Gris",
+      "silver": "Plateada"
+    },
+    "documents": {
+      "title": "Tus documentos",
+      "subtitle": "Toma fotos claras y sin reflejos. Un administrador revisa todo antes de activarte.",
+      "upload": "Subir",
+      "take": "Tomar foto",
+      "uploading": "Subiendo…",
+      "takePhoto": "Tomar foto",
+      "takeSelfie": "Tomar selfie",
+      "fromLibrary": "Elegir de la galería",
+      "fromFiles": "Elegir archivo",
+      "fromFilesHint": "PDF o imagen",
+      "replaceHint": "Toca para reemplazar el archivo",
+      "rejectedHint": "Rechazado: vuelve a subirlo",
+      "photosCount": "{{count}} de {{required}} fotos",
+      "photoN": "Foto {{n}}",
+      "deletePhoto": "Eliminar foto {{n}}",
+      "addPhoto": "Agregar otra foto",
+      "addFirstPhoto": "Agregar foto",
+      "progress": "{{done}} de {{total}} documentos listos",
+      "cameraDeniedTitle": "Sin acceso a la cámara",
+      "cameraDenied": "Permite el acceso a la cámara en los ajustes o elige una foto de tu galería.",
+      "tips": "Consejo: apoya el documento en una superficie oscura, con buena luz y que se lean todos los datos."
+    },
+    "doc": {
+      "id_card": {
+        "title": "Cédula de identidad",
+        "hint": "Foto del frente, legible"
+      },
+      "rif": {
+        "title": "RIF",
+        "hint": "Vigente, en PDF o foto"
+      },
+      "drivers_license": {
+        "title": "Licencia de conducir",
+        "hint": "Vigente, para moto"
+      },
+      "medical_certificate": {
+        "title": "Certificado médico",
+        "hint": "Vigente"
+      },
+      "vehicle_registration": {
+        "title": "Carnet de circulación",
+        "hint": "De la moto que vas a usar"
+      },
+      "selfie": {
+        "title": "Selfie",
+        "hint": "Tu cara de frente, sin lentes ni casco"
+      },
+      "vehicle_photo": {
+        "title": "Fotos de la moto",
+        "hint": "Con la placa visible",
+        "hintCount": "Mínimo {{count}}, con la placa visible"
+      }
+    },
+    "docState": {
+      "missing": "Falta",
+      "partial": "Incompleto",
+      "pending": "Listo",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
+    },
+    "review": {
+      "title": "Revisa y envía",
+      "subtitle": "Confirma que todo esté correcto antes de enviar tu solicitud.",
+      "submit": "Enviar a revisión",
+      "missingVehicle": "Aún no registras tu moto.",
+      "incomplete": "Completa los requisitos marcados para poder enviar tu solicitud.",
+      "declaration": "Al enviar confirmas que los datos y documentos son tuyos y están vigentes."
+    },
+    "status": {
+      "reason": "Motivo",
+      "submittedAt": "Enviada el {{date}}",
+      "pending": {
+        "title": "En revisión",
+        "body": "Estamos revisando tus datos y documentos. Suele tomar menos de 48 horas.",
+        "notify": "Te avisaremos por notificación cuando terminemos. No necesitas hacer nada más."
+      },
+      "rejected": {
+        "title": "Tu solicitud necesita cambios",
+        "body": "Corrige lo que te indicamos y vuelve a enviarla.",
+        "cta": "Corregir y reenviar"
+      },
+      "suspended": {
+        "title": "Cuenta suspendida",
+        "body": "Por ahora no puedes recibir viajes. Escríbenos a soporte para resolverlo."
+      }
+    },
+    "home": {
+      "approved": "Aprobado",
+      "welcome": "¡Ya eres motorizado Kuulis!",
+      "freeMonths": "Tus 3 meses gratis empiezan con tu primer viaje.",
+      "offline": "Estás desconectado",
+      "offlineBody": "Conéctate para empezar a recibir solicitudes de viaje cerca de ti.",
+      "connect": "Conectarme",
+      "nextUp": "Muy pronto podrás conectarte y recibir viajes desde aquí."
+    }
   },
   "validation": {
     "email": "Correo no válido",
     "password": "Mínimo 8 caracteres",
-    "required": "Campo obligatorio"
+    "required": "Campo obligatorio",
+    "invalid": "Revisa este dato"
   },
   "errors": {
     "invalid_credentials": "Correo o contraseña incorrectos",
     "email_taken": "Ese correo ya está registrado",
     "account_disabled": "Tu cuenta está desactivada",
+    "user_inactive": "Tu cuenta está desactivada",
     "http_429": "Demasiados intentos, espera un momento",
-    "network": "Sin conexión con el servidor"
+    "network": "Sin conexión con el servidor. Revisa tu internet e inténtalo de nuevo.",
+    "server": "El servidor tuvo un problema. Inténtalo de nuevo en un momento.",
+    "validation_error": "Revisa los datos marcados",
+    "social_token_invalid": "No pudimos verificar tu cuenta. Inténtalo de nuevo o usa tu correo.",
+    "social_provider_disabled": "Este método de acceso no está disponible por ahora.",
+    "social_provider_unavailable": "El servicio de acceso no responde. Inténtalo en un momento.",
+    "driver_not_found": "Aún no has empezado tu registro como motorizado.",
+    "driver_not_editable": "Tu solicitud está en revisión y no se puede editar.",
+    "driver_invalid_transition": "Tu solicitud no se puede enviar en su estado actual.",
+    "driver_documents_rejected": "Tienes documentos rechazados. Reemplázalos antes de enviar.",
+    "driver_requirements_missing": "Aún faltan requisitos para enviar tu solicitud.",
+    "national_id_taken": "Esa cédula ya está registrada en otra cuenta",
+    "plate_taken": "Esa placa ya está registrada",
+    "document_already_registered": "Ese archivo ya fue registrado",
+    "vehicle_type_not_enabled": "Ese tipo de vehículo no está habilitado por ahora",
+    "vehicle_too_old": "La moto debe ser año {{min_year}} o más nueva",
+    "vehicle_year_invalid": "Año del vehículo no válido",
+    "document_key_invalid": "No pudimos registrar el archivo. Súbelo de nuevo.",
+    "document_not_uploaded": "El archivo no terminó de subir. Inténtalo de nuevo.",
+    "file_type_not_allowed": "Formato no permitido. Usa JPG, PNG, WEBP, HEIC o PDF.",
+    "file_too_large": "El archivo es muy pesado. Prueba con una foto más liviana.",
+    "too_many_documents": "Llegaste al máximo de fotos permitidas.",
+    "storage_disabled": "La subida de archivos no está disponible por ahora.",
+    "upload_failed": "No se pudo subir el archivo. Revisa tu conexión e inténtalo de nuevo."
   }
 }

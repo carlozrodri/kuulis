@@ -1,8 +1,10 @@
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
+import { DRIVER_QUERY_KEY, isDriverNotification } from '@/hooks/useDriver';
 import { api } from '@/lib/api';
 import { config } from '@/lib/config';
 
@@ -20,6 +22,20 @@ Notifications.setNotificationHandler({
  * Requires a physical device and an EAS projectId (see docs/blockers.md).
  */
 export function usePushNotifications(enabled: boolean) {
+  const queryClient = useQueryClient();
+
+  // Driver status / document review pushes refresh the onboarding screens and the inbox right away.
+  useEffect(() => {
+    if (!enabled || Platform.OS === 'web') return;
+    const sub = Notifications.addNotificationReceivedListener((notification) => {
+      void queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      if (isDriverNotification(notification.request.content.data)) {
+        void queryClient.invalidateQueries({ queryKey: DRIVER_QUERY_KEY });
+      }
+    });
+    return () => sub.remove();
+  }, [enabled, queryClient]);
+
   useEffect(() => {
     if (!enabled || Platform.OS === 'web' || !Device.isDevice || !config.easProjectId) return;
 

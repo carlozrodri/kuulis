@@ -16,7 +16,7 @@ dependencies = [
     "redis[hiredis]>=5.2",
     "taskiq>=0.11",
     "taskiq-redis>=1.0",
-    "pyjwt>=2.10",
+    "pyjwt[crypto]>=2.10",
     "pwdlib[argon2]>=0.2",
     "slowapi>=0.1.9",
     "httpx>=0.28",
@@ -25,6 +25,7 @@ dependencies = [
     "orjson>=3.10",
     "typer>=0.15",
     "python-multipart>=0.0.18",
+    "tzdata>=2024.1",
 ]
 
 [dependency-groups]

@@ -7,10 +7,12 @@ one bucket without colliding.
 import re
 import uuid
 from functools import lru_cache
+from typing import Any
 
 import boto3
 from botocore.client import BaseClient
 from botocore.config import Config
+from botocore.exceptions import ClientError
 
 from kuulis.core.exceptions import ServiceUnavailableError
 from kuulis.settings import settings
@@ -32,9 +34,31 @@ def get_s3_client() -> BaseClient:
     )
 
 
+def folder_prefix(folder: str) -> str:
+    """Key prefix of a folder, with trailing slash (``<STORAGE_PREFIX>/<folder>/``)."""
+    return f"{settings.STORAGE_PREFIX}/{folder.strip('/')}/"
+
+
 def build_key(folder: str, filename: str) -> str:
     safe = _SAFE_NAME.sub("-", filename).strip("-")[:120] or "file"
-    return f"{settings.STORAGE_PREFIX}/{folder.strip('/')}/{uuid.uuid4().hex}-{safe}"
+    return f"{folder_prefix(folder)}{uuid.uuid4().hex}-{safe}"
+
+
+def key_in_folder(key: str, folder: str) -> bool:
+    """True when ``key`` was built by ``build_key(folder, ...)`` (no traversal, no subfolders)."""
+    prefix = folder_prefix(folder)
+    rest = key[len(prefix) :]
+    return key.startswith(prefix) and bool(rest) and "/" not in rest and ".." not in key
+
+
+def head_object(key: str) -> dict[str, Any] | None:
+    """Object metadata (``ContentType``, ``ContentLength``...) or None if it does not exist."""
+    try:
+        return get_s3_client().head_object(Bucket=settings.AWS_S3_BUCKET, Key=key)
+    except ClientError as exc:
+        if exc.response.get("Error", {}).get("Code") in ("404", "NoSuchKey", "NotFound"):
+            return None
+        raise
 
 
 def presigned_upload(key: str, content_type: str) -> str:

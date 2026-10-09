@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Request, status
 
-from apps.auth import services
+from apps.auth import services, social
 from apps.auth.schemas import (
+    AppleLoginRequest,
     AuthResponse,
+    GoogleLoginRequest,
     LoginRequest,
     PasswordResetConfirm,
     PasswordResetRequest,
@@ -14,7 +16,7 @@ from apps.auth.schemas import (
 from apps.users import services as users
 from apps.users.dependencies import CurrentUser, DBSession
 from apps.users.schemas import UserCreate, UserRead
-from kuulis.core.exceptions import NotImplementedAppError, PermissionDeniedError
+from kuulis.core.exceptions import PermissionDeniedError
 from kuulis.core.rate_limit import limiter
 from kuulis.settings import settings
 
@@ -93,9 +95,25 @@ async def password_reset_confirm(
     await services.confirm_password_reset(session, data.token, data.new_password)
 
 
-@router.post("/social/{provider}", status_code=status.HTTP_501_NOT_IMPLEMENTED)
-async def social_login(provider: str) -> None:
-    """Placeholder: social login (Google / Apple) is planned, see docs/roadmap.md."""
-    raise NotImplementedAppError(
-        f"Social login with {provider} is not available yet", code="social_login_not_available"
-    )
+@router.post("/social/google", response_model=AuthResponse)
+@limiter.limit(settings.RATE_LIMIT_AUTH)
+async def google_login(
+    request: Request, data: GoogleLoginRequest, session: DBSession
+) -> AuthResponse:
+    identity = await social.verify_google_token(data.id_token)
+    user = await services.social_login(session, identity)
+    await session.commit()
+    tokens = await services.issue_tokens(user)
+    return AuthResponse(**tokens.model_dump(), user=UserRead.model_validate(user))
+
+
+@router.post("/social/apple", response_model=AuthResponse)
+@limiter.limit(settings.RATE_LIMIT_AUTH)
+async def apple_login(
+    request: Request, data: AppleLoginRequest, session: DBSession
+) -> AuthResponse:
+    identity = await social.verify_apple_token(data.id_token)
+    user = await services.social_login(session, identity, data.full_name)
+    await session.commit()
+    tokens = await services.issue_tokens(user)
+    return AuthResponse(**tokens.model_dump(), user=UserRead.model_validate(user))

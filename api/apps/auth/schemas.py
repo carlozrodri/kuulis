@@ -41,3 +41,13 @@ class PasswordResetConfirm(BaseModel):
 
 class TokenRequest(BaseModel):
     token: str
+
+
+class GoogleLoginRequest(BaseModel):
+    id_token: str = Field(min_length=1, max_length=8192)
+
+
+class AppleLoginRequest(BaseModel):
+    id_token: str = Field(min_length=1, max_length=8192)
+    # Apple only shares the name on the first authorization; the app forwards it here.
+    full_name: str | None = Field(default=None, max_length=150)

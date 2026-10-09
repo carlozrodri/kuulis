@@ -1,13 +1,15 @@
 """JWT access tokens + rotating refresh tokens stored in Redis (revocable)."""
 
 import uuid
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.auth.schemas import TokenPair
+from apps.auth.social import SocialIdentity
 from apps.users import services as users
-from apps.users.models import User
+from apps.users.models import SocialAccount, User
 from apps.users.tasks import send_templated_email
 from kuulis.core.exceptions import AuthenticationError
 from kuulis.core.redis import redis_client
@@ -125,3 +127,57 @@ async def confirm_password_reset(session: AsyncSession, token: str, new_password
     user = await users.get_or_404(session, uuid.UUID(payload["sub"]))
     await users.set_password(user, new_password)
     await revoke_all(str(user.id))
+
+
+async def social_login(
+    session: AsyncSession, identity: SocialIdentity, full_name: str | None = None
+) -> User:
+    """Finds the user by social account, then by verified email (linking it), else creates one."""
+    account = await session.scalar(
+        select(SocialAccount).where(
+            SocialAccount.provider == identity.provider,
+            SocialAccount.provider_user_id == identity.subject,
+        )
+    )
+    user: User | None = None
+    if account is not None:
+        user = await users.get_by_id(session, account.user_id)
+        if identity.email:
+            account.email = identity.email
+    if user is None:
+        if not identity.email or not identity.email_verified:
+            # Apple omits the email after the first sign-in; without it we cannot link or create.
+            raise AuthenticationError(
+                "Social token has no verified email", code="social_token_invalid"
+            )
+        user = await users.get_by_email(session, identity.email)
+        if user is None:
+            user = User(
+                email=users.normalize_email(identity.email),
+                hashed_password=None,
+                full_name=(full_name or identity.name or "").strip()[:150],
+                is_verified=True,
+            )
+            session.add(user)
+            await session.flush()
+        elif not user.is_verified:
+            # Someone registered this email with a password but never proved they own it: the
+            # provider just did. Drop that password so a squatter cannot keep access.
+            user.hashed_password = None
+            user.is_verified = True
+            await revoke_all(str(user.id))
+        session.add(
+            SocialAccount(
+                user_id=user.id,
+                provider=identity.provider,
+                provider_user_id=identity.subject,
+                email=identity.email,
+            )
+        )
+    if not user.is_active:
+        raise AuthenticationError("Account disabled", code="user_inactive")
+    if full_name and not user.full_name:
+        user.full_name = full_name.strip()[:150]
+    user.last_login_at = datetime.now(UTC)
+    await session.flush()
+    return user
