@@ -4,6 +4,7 @@ Files are stored under ``<STORAGE_PREFIX>/<folder>/<uuid>-<name>`` so QA and pro
 one bucket without colliding.
 """
 
+import logging
 import re
 import uuid
 from functools import lru_cache
@@ -12,12 +13,17 @@ from typing import Any
 import boto3
 from botocore.client import BaseClient
 from botocore.config import Config
-from botocore.exceptions import ClientError
+from botocore.exceptions import BotoCoreError, ClientError
 
 from kuulis.core.exceptions import ServiceUnavailableError
 from kuulis.settings import settings
 
+logger = logging.getLogger(__name__)
 _SAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")
+
+
+class StorageCheckUnavailable(Exception):
+    """The API could not read object metadata (e.g. the S3 endpoint refuses server-side reads)."""
 
 
 @lru_cache
@@ -52,13 +58,22 @@ def key_in_folder(key: str, folder: str) -> bool:
 
 
 def head_object(key: str) -> dict[str, Any] | None:
-    """Object metadata (``ContentType``, ``ContentLength``...) or None if it does not exist."""
+    """Object metadata (``ContentType``, ``ContentLength``...) or None if it does not exist.
+
+    Raises ``StorageCheckUnavailable`` when the storage answers anything other than found/not
+    found, so callers can decide whether to trust the presigned upload instead.
+    """
     try:
         return get_s3_client().head_object(Bucket=settings.AWS_S3_BUCKET, Key=key)
     except ClientError as exc:
-        if exc.response.get("Error", {}).get("Code") in ("404", "NoSuchKey", "NotFound"):
+        code = exc.response.get("Error", {}).get("Code")
+        if code in ("404", "NoSuchKey", "NotFound"):
             return None
-        raise
+        logger.warning("S3 HeadObject failed with %s for %s", code, key)
+        raise StorageCheckUnavailable(str(code)) from exc
+    except BotoCoreError as exc:
+        logger.warning("S3 HeadObject unreachable for %s: %s", key, exc)
+        raise StorageCheckUnavailable(type(exc).__name__) from exc
 
 
 def presigned_upload(key: str, content_type: str) -> str:

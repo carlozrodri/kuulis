@@ -301,3 +301,13 @@ async def test_suspend_and_reinstate(client, user_headers, staff_headers):
 
 async def test_regular_user_cannot_use_admin_endpoints(client, user_headers):
     assert (await client.get("/api/v1/admin/drivers", headers=user_headers)).status_code == 403
+
+
+async def test_register_document_when_storage_refuses_reads(client, user_headers, monkeypatch):
+    def refuse(key):
+        raise storage.StorageCheckUnavailable("403")
+
+    monkeypatch.setattr(storage, "head_object", refuse)
+    await client.put("/api/v1/drivers/me", json=PROFILE, headers=user_headers)
+    body = await _upload(client, user_headers, "selfie")
+    assert [d["content_type"] for d in body["documents"]] == ["image/jpeg"]

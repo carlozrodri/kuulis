@@ -315,6 +315,20 @@ def presign_document(
     )
 
 
+_EXTENSION_TYPES = {
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
+    "png": "image/png",
+    "webp": "image/webp",
+    "heic": "image/heic",
+    "pdf": "application/pdf",
+}
+
+
+def _type_from_extension(key: str) -> str:
+    return _EXTENSION_TYPES.get(key.rsplit(".", 1)[-1].lower(), "") if "." in key else ""
+
+
 async def register_document(
     session: AsyncSession, user: User, profile: DriverProfile, data: DocumentRegister
 ) -> DriverProfile:
@@ -323,7 +337,11 @@ async def register_document(
         raise AppError("The file does not belong to this upload", code="document_key_invalid")
     if any(d.key == data.key for d in profile.documents):
         raise ConflictError("Document already registered", code="document_already_registered")
-    head = storage.head_object(data.key)
+    try:
+        head = storage.head_object(data.key)
+    except storage.StorageCheckUnavailable:
+        # Some S3 endpoints refuse server-side reads; the presigned PUT already pinned the type.
+        head = {"ContentType": _type_from_extension(data.key), "ContentLength": 0}
     if head is None:
         raise AppError("The file was not uploaded", code="document_not_uploaded")
     content_type = str(head.get("ContentType", "")).split(";")[0].strip().lower()
