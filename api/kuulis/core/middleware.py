@@ -68,3 +68,21 @@ class SecurityHeadersMiddleware:
             await send(message)
 
         await self.app(scope, receive, send_wrapper)
+
+
+class RestoreApiPrefixMiddleware:
+    """Coolify's Traefik strips the ``/api`` path prefix when a domain has a path
+    (``https://host/api``). Put it back so routes are identical with or without the proxy."""
+
+    def __init__(self, app: ASGIApp, prefix: str = "/api") -> None:
+        self.app = app
+        self.prefix = prefix
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] in ("http", "websocket"):
+            path: str = scope.get("path", "")
+            if not path.startswith((self.prefix + "/", "/health")) and path != self.prefix:
+                scope = dict(scope)
+                scope["path"] = self.prefix + path
+                scope["raw_path"] = self.prefix.encode() + scope.get("raw_path", path.encode())
+        await self.app(scope, receive, send)

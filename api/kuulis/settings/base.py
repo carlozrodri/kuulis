@@ -60,7 +60,7 @@ class BaseAppSettings(BaseSettings):
 
     # --- Email (Resend) ---------------------------------------------------------
     RESEND_API_KEY: str = ""
-    EMAIL_FROM: str = "Kuulis <no-reply@top8.uk>"
+    EMAIL_FROM: str = "Kuulis <no-reply@email.top8.uk>"
     EMAIL_ENABLED: bool = False
     FRONTEND_URL: str = "http://localhost:3000"
 

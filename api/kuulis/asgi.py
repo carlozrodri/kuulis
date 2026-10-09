@@ -16,7 +16,11 @@ from apps.realtime.manager import manager
 from kuulis.core.db import engine
 from kuulis.core.exceptions import register_exception_handlers
 from kuulis.core.logging import configure_logging
-from kuulis.core.middleware import RequestContextMiddleware, SecurityHeadersMiddleware
+from kuulis.core.middleware import (
+    RequestContextMiddleware,
+    RestoreApiPrefixMiddleware,
+    SecurityHeadersMiddleware,
+)
 from kuulis.core.rate_limit import limiter
 from kuulis.core.redis import redis_client
 from kuulis.core.sentry import init_sentry
@@ -69,6 +73,7 @@ def create_app() -> FastAPI:
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(RequestContextMiddleware)
+    app.add_middleware(RestoreApiPrefixMiddleware)
 
     app.include_router(root)
     app.include_router(root, prefix="/api")
