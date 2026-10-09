@@ -1,0 +1,19 @@
+# Expo dev server (Metro) for opening the QA app in Expo Go without a local machine.
+# Deployed by Coolify from the `qa` branch at https://kuulis-expo.top8.uk (see docs/deployment.md).
+FROM node:22-slim
+ENV CI=1 \
+    EXPO_OFFLINE=1 \
+    EXPO_NO_TELEMETRY=1 \
+    APP_ENV=qa \
+    EXPO_PACKAGER_PROXY_URL=https://kuulis-expo.top8.uk
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY --chown=node:node package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY --chown=node:node . .
+RUN chown -R node:node /app
+USER node
+EXPOSE 8081
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD curl -fsS http://127.0.0.1:8081/status || exit 1
+CMD ["npx", "expo", "start", "--port", "8081"]
