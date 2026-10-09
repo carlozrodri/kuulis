@@ -10,8 +10,10 @@ import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { VesTiles } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, Card, IconButton, Notice, Skeleton, Txt } from '@/components/ui';
+import { SuspendedPanel } from '@/features/account/SuspendedPanel';
 import { useAppConfig } from '@/hooks/useDriver';
 import { fetchQuote, quoteKey, rideKeys, useQuote, useRequestRide } from '@/hooks/useRides';
+import { useSuspension } from '@/hooks/useSuspension';
 import { apiErrorMessage } from '@/i18n';
 import { ApiError } from '@/lib/api';
 import { confirmHaptic, selectionHaptic } from '@/lib/feedback';
@@ -28,6 +30,7 @@ import {
   secondsUntil,
 } from '@/lib/ride';
 import { useStore } from '@/lib/store';
+import { isAccountSuspended, suspensionFromError } from '@/lib/suspension';
 import { fonts, radius, space, useTheme } from '@/theme';
 
 import { PaymentChips, PlaceRows } from './components';
@@ -48,6 +51,7 @@ export function QuoteScreen() {
   const quote = useQuote(draft.pickup, draft.dropoff, 'moto', draft.promoCode);
   const request = useRequestRide();
   const [now, setNow] = useState(() => Date.now());
+  const { suspension, handleError: handleSuspended } = useSuspension();
 
   const methods = config.payment_methods?.length ? config.payment_methods : DEFAULT_PAYMENT_METHODS;
   // Last used method, else the first one (cash): asking every time would add a tap.
@@ -81,6 +85,14 @@ export function QuoteScreen() {
     );
   }, [draft.promoCode, quote.isError, quote.error, t]);
 
+  // 403 account_suspended on the quote: refresh the user so home shows the suspension too.
+  const suspendedFor = useRef<unknown>(null);
+  useEffect(() => {
+    if (!isAccountSuspended(quote.error) || suspendedFor.current === quote.error) return;
+    suspendedFor.current = quote.error;
+    handleSuspended(quote.error);
+  }, [quote.error, handleSuspended]);
+
   const route = useMemo(() => decodePolyline(quote.data?.polyline), [quote.data?.polyline]);
 
   const submit = async () => {
@@ -94,6 +106,7 @@ export function QuoteScreen() {
       rideDraft.set((d) => ({ ...d, dropoff: null, promoCode: null }));
       router.replace({ pathname: '/ride', params: { id: ride.id } });
     } catch (error) {
+      if (handleSuspended(error)) return;
       if (error instanceof ApiError) {
         if (error.code === 'quote_expired') {
           await quote.refetch();
@@ -122,6 +135,8 @@ export function QuoteScreen() {
   // A promotion_invalid while a code is applied is handled above (the code is dropped and the price re-quoted).
   const quoteError = quote.isError && !(draft.promoCode && isPromoInvalid(quote.error)) ? quote.error : null;
   const outside = quoteError instanceof ApiError && quoteError.code === 'outside_service_area';
+  // Suspended accounts cannot request rides: the suspension replaces the price and the request button.
+  const suspendedBy = suspension ?? suspensionFromError(quoteError) ?? suspensionFromError(request.error);
 
   return (
     <MapSheetLayout
@@ -142,7 +157,9 @@ export function QuoteScreen() {
         </View>
       }
       footer={
-        quoteError ? (
+        suspendedBy ? (
+          <Button title={t('ride.backHome')} variant="secondary" onPress={() => router.dismissTo('/')} />
+        ) : quoteError ? (
           <Button title={t('quote.changeDestination')} variant="secondary" onPress={() => router.back()} />
         ) : (
           <Button
@@ -163,7 +180,9 @@ export function QuoteScreen() {
         onPressDropoff={() => router.push({ pathname: '/ride/search', params: { field: 'dropoff' } })}
       />
 
-      {quoteError ? (
+      {suspendedBy ? (
+        <SuspendedPanel suspension={suspendedBy} variant="passenger" />
+      ) : quoteError ? (
         <Notice tone={outside ? 'warning' : 'danger'} icon={CircleX} title={outside ? t('quote.outsideTitle') : t('common.error')}>
           <Txt variant="caption" style={{ fontSize: 14, lineHeight: 20 }}>
             {apiErrorMessage(quoteError)}
@@ -241,7 +260,7 @@ export function QuoteScreen() {
         </Card>
       )}
 
-      {!quoteError && quote.data ? (
+      {!quoteError && !suspendedBy && quote.data ? (
         <>
           {discounted || draft.promoCode ? (
             <PromotionBanner
@@ -260,7 +279,7 @@ export function QuoteScreen() {
         </>
       ) : null}
 
-      {!quoteError ? (
+      {!quoteError && !suspendedBy ? (
         <View style={{ gap: space.xs }}>
           <Txt variant="overline" color="muted">
             {t('ride.paymentMethod')}

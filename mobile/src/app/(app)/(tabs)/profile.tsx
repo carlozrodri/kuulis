@@ -1,10 +1,11 @@
 import * as Application from 'expo-application';
 import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
-import { BadgeCheck, Bike, Languages, LogOut, MapPin, Smartphone } from '@/components/icons';
+import { BadgeCheck, Bike, Languages, LifeBuoy, LogOut, MapPin, Smartphone } from '@/components/icons';
 import { Button, Card, Chip, ErrorText, IconTile, ListRow, Screen, StatusPill, Txt } from '@/components/ui';
 import { apiErrorMessage, SUPPORTED_LOCALES, type Locale } from '@/i18n';
 import { api } from '@/lib/api';
@@ -100,6 +101,18 @@ export default function ProfileScreen() {
         </View>
       </Card>
       <ErrorText>{error}</ErrorText>
+
+      <Txt variant="overline" color="muted" style={{ marginTop: space.xl, marginBottom: space.xs }}>
+        {t('profile.support')}
+      </Txt>
+      <Card style={{ paddingVertical: space.xxs }}>
+        <ListRow
+          icon={LifeBuoy}
+          title={t('profile.help')}
+          subtitle={t('profile.helpHint')}
+          onPress={() => router.push('/reports')}
+        />
+      </Card>
 
       <Txt variant="overline" color="muted" style={{ marginTop: space.xl, marginBottom: space.xs }}>
         {t('profile.about')}

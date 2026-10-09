@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { ChevronLeft, Star } from '@/components/icons';
+import { ChevronLeft, Flag, Star } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { DiscountNote, VesLine } from '@/components/Money';
@@ -122,6 +122,15 @@ export function RideDetailScreen() {
         <Button
           title={t('home.activeRide')}
           onPress={() => router.replace({ pathname: role === 'driver' ? '/drive' : '/ride', params: { id: ride.id } })}
+        />
+      ) : null}
+      {ride.driver ? (
+        // Only rides that had a driver can be reported (409 ride_without_driver otherwise).
+        <Button
+          title={t('ride.reportProblem')}
+          variant="secondary"
+          icon={Flag}
+          onPress={() => router.push({ pathname: '/report', params: { ride_id: ride.id } })}
         />
       ) : null}
       {ride.cancel_reason ? (

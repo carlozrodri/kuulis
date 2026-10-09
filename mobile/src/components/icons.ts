@@ -85,3 +85,11 @@ export { default as ArrowUpRight } from 'lucide-react-native/icons/arrow-up-righ
 export { default as ArrowDownLeft } from 'lucide-react-native/icons/arrow-down-left';
 export { default as LockKeyhole } from 'lucide-react-native/icons/lock-keyhole';
 export { default as UserSearch } from 'lucide-react-native/icons/user-search';
+export { default as MessageCircleWarning } from 'lucide-react-native/icons/message-circle-warning';
+export { default as Gauge } from 'lucide-react-native/icons/gauge';
+export { default as UserX } from 'lucide-react-native/icons/user-x';
+export { default as Backpack } from 'lucide-react-native/icons/backpack';
+export { default as Bug } from 'lucide-react-native/icons/bug';
+export { default as CircleEllipsis } from 'lucide-react-native/icons/circle-ellipsis';
+export { default as LifeBuoy } from 'lucide-react-native/icons/life-buoy';
+export { default as MessageSquareWarning } from 'lucide-react-native/icons/message-square-warning';

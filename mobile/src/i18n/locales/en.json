@@ -129,7 +129,10 @@
     "modeHint": "Switches the app mode",
     "current": "Current",
     "verified": "Email verified",
-    "about": "About the app"
+    "about": "About the app",
+    "support": "Help",
+    "help": "Help and reports",
+    "helpHint": "Report a problem and follow your reports"
   },
   "driver": {
     "intro": {
@@ -354,7 +357,13 @@
     "transfer_limit_exceeded": "That's over your monthly transfer limit. You can send up to {{available}} USDT more this month.",
     "recipient_not_found": "We couldn't find a Kuulis driver with that email or phone.",
     "transfer_to_self": "You can't transfer balance to yourself.",
-    "subscription_overdue": "You have an overdue fee. Top up your wallet to go online again."
+    "subscription_overdue": "You have an overdue fee. Top up your wallet to go online again.",
+    "account_suspended": "Your account is suspended. You can't request rides or go online for now.",
+    "report_already_open": "You already have an open report about this ride.",
+    "too_many_open_reports": "You have 5 open reports. Wait for the team to answer one before sending another.",
+    "not_ride_participant": "You can only report rides you were part of.",
+    "ride_without_driver": "This ride never had a driver assigned, so it can't be reported.",
+    "report_not_found": "We couldn't find this report."
   },
   "map": {
     "recenter": "Recenter map"
@@ -516,7 +525,8 @@
     "adminCancelled": {
       "title": "Kuulis cancelled this ride",
       "body": "Our support team cancelled the ride. If you still need it, you can request another moto right now."
-    }
+    },
+    "reportProblem": "Report a problem"
   },
   "cancel": {
     "title": "Why are you cancelling?",
@@ -540,7 +550,9 @@
     "call911": "Call 911",
     "call911Hint": "Emergencies in Venezuela",
     "share": "Share my ride",
-    "shareHint": "Send the driver's details and your destination to someone you trust"
+    "shareHint": "Send the driver's details and your destination to someone you trust",
+    "report": "Report a problem",
+    "reportHint": "Tell the Kuulis team what happened"
   },
   "chat": {
     "title": "Chat",
@@ -590,7 +602,8 @@
       "clean_helmet": "Clean helmet",
       "respectful": "Respectful",
       "ready_at_pickup": "Ready at pickup"
-    }
+    },
+    "reportLink": "Something went wrong? Report it"
   },
   "history": {
     "title": "Your rides",
@@ -882,5 +895,158 @@
     "tierAbove": "Over {{from}}",
     "yourTier": "Your tier",
     "howNote": "A month with no rides is free. Your first 3 months from your first ride are free. If your balance falls short, you have 7 days to top up."
+  },
+  "report": {
+    "title": "Report a problem",
+    "step": "Step {{current}} of {{total}}",
+    "categoryTitle": "What happened?",
+    "categorySubtitleRide": "Tell us about your ride on {{date}}.",
+    "categorySubtitleGeneral": "Pick a topic. If it happened on a ride, report it from Your rides so we can look into it.",
+    "groupSafety": "Your safety",
+    "groupOther": "Other problems",
+    "urgentPill": "Urgent",
+    "category": {
+      "safety": {
+        "title": "I felt unsafe",
+        "body": "Something during the ride put your safety at risk"
+      },
+      "harassment": {
+        "title": "Harassment or insults",
+        "body": "Comments, advances or aggressive behavior"
+      },
+      "driving": {
+        "title": "Reckless driving",
+        "body": "Speeding or dangerous maneuvers"
+      },
+      "fare": {
+        "title": "Charged a different amount",
+        "body": "The amount was not what the app showed"
+      },
+      "vehicle_mismatch": {
+        "title": "Bike or person didn't match",
+        "body": "The plate, bike or person weren't the ones in the app"
+      },
+      "no_show": {
+        "title": "They didn't show up",
+        "body": "The other person never came to the meeting point"
+      },
+      "lost_item": {
+        "title": "Lost item",
+        "body": "You left something on the bike or found something"
+      },
+      "app_issue": {
+        "title": "App problem",
+        "body": "Something didn't work as it should"
+      },
+      "other": {
+        "title": "Something else",
+        "body": "Anything else we should know"
+      }
+    },
+    "placeholder": {
+      "safety": "Tell us what happened, where and when. Everything you remember helps.",
+      "harassment": "Tell us what they said or did. We handle it with full discretion.",
+      "driving": "What happened? For example: going too fast, running a red light, no helmet…",
+      "fare": "How much was charged or paid, and how much did the app show?",
+      "vehicle_mismatch": "What didn't match? The plate, the bike's color, the person…",
+      "no_show": "How long did you wait? Could you reach them through the chat?",
+      "lost_item": "What was left behind and what does it look like? If it was on a ride, we'll help you reach the other person.",
+      "app_issue": "What were you doing and what happened? If you saw an error message, paste it here.",
+      "other": "Tell us what happened."
+    },
+    "urgent": {
+      "title": "We treat this as urgent",
+      "body": "The Kuulis team reviews these reports first. If you are in danger right now, call 911.",
+      "call": "Call 911"
+    },
+    "detailsTitle": "Tell us what happened",
+    "detailsSubtitle": "More details help us help you. Only the Kuulis team will read it.",
+    "aboutRide": "About your ride",
+    "yourDriver": "Your driver: {{name}}",
+    "yourPassenger": "Your passenger: {{name}}",
+    "rideDate": "{{date}} · {{time}}",
+    "change": "Change",
+    "changeCategory": "Change the report topic",
+    "descriptionLabel": "Description",
+    "counter": "{{count}}/{{max}}",
+    "counterA11y": "{{count}} of {{max}} characters",
+    "minHint": "Write at least {{min}} characters.",
+    "tooLong": "{{max}} characters at most.",
+    "submit": "Send report",
+    "sentTitle": "We got your report",
+    "sentBody": "The Kuulis team will review it and we'll let you know when we have an answer.",
+    "sentBodyUrgent": "We're treating it as urgent. If you are in danger right now, call 911.",
+    "viewReport": "View my report",
+    "alreadyOpen": {
+      "title": "You already reported this ride",
+      "body": "Your report is still open and the team is on it. You can check its status.",
+      "open": "View the report"
+    },
+    "tooMany": {
+      "title": "You have too many open reports",
+      "action": "See my reports"
+    },
+    "rideProblem": {
+      "title": "This ride can't be reported",
+      "general": "Make a general report"
+    },
+    "noDriver": "This ride never had a driver assigned. If something went wrong, make a general report."
+  },
+  "reports": {
+    "title": "Help and reports",
+    "subtitle": "Tell us if something went wrong and follow the team's answer here.",
+    "new": "Report a problem",
+    "newHint": "About the app, a lost item or anything else",
+    "rideHint": "For a ride, open it in Your rides and tap “Report a problem”.",
+    "emergency": "Are you in danger?",
+    "emergencyHint": "Call 911, Venezuela's emergency line",
+    "mine": "My reports",
+    "empty": "No reports yet",
+    "emptyBody": "If something goes wrong on a ride or in the app, tell us and we'll sort it out.",
+    "aboutRide": "About a ride",
+    "general": "General report",
+    "itemA11y": "{{category}}. {{status}}. {{date}}",
+    "status": {
+      "open": "Received",
+      "in_review": "In review",
+      "resolved": "Resolved",
+      "dismissed": "Closed"
+    },
+    "detailTitle": "Your report",
+    "sentOn": "Sent on {{date}}",
+    "priority": "Priority",
+    "youWrote": "What you told us",
+    "progress": "Progress",
+    "timeline": {
+      "created": "We got your report",
+      "in_review": "In review",
+      "resolved": "Resolved",
+      "dismissed": "Closed",
+      "reviewing": "The team is looking into it",
+      "waiting": "We'll review it soon",
+      "waitingUrgent": "We're reviewing it first",
+      "pending": "We'll let you know when there's an answer",
+      "stepA11y": "{{label}}: {{state}}",
+      "state": {
+        "done": "done",
+        "current": "in progress",
+        "upcoming": "pending"
+      }
+    },
+    "resolution": "Answer from the Kuulis team",
+    "noResolution": "The team closed this report.",
+    "newAboutRide": "Make another report"
+  },
+  "suspension": {
+    "title": "Your account is suspended",
+    "passengerBody": "You can't request rides for now. Your history, wallet and reports are still available.",
+    "driverBody": "You can't go online or receive rides while the suspension lasts.",
+    "reason": "Reason",
+    "until": "Until",
+    "duration": "Duration",
+    "indefinite": "Indefinite",
+    "todayAt": "Today at {{time}}",
+    "help": "Help and reports",
+    "helpHint": "Think it's a mistake? Write to us from Help and reports."
   }
 }

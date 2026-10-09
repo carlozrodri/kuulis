@@ -12,9 +12,13 @@ import {
 import { AppState } from 'react-native';
 
 import { DRIVER_QUERY_KEY, isDriverNotification } from '@/hooks/useDriver';
+import { refreshReports } from '@/hooks/useReports';
+import { rideKeys } from '@/hooks/useRides';
 import { isSubscriptionNotification, isWalletNotification, refreshSubscription, refreshWallet } from '@/hooks/useWallet';
 import { tokens } from '@/lib/api';
 import { config } from '@/lib/config';
+import { isAccountNotification, isReportNotification } from '@/lib/reports';
+import { useAuth } from '@/providers/AuthProvider';
 
 export type RealtimeStatus = 'connecting' | 'open' | 'closed';
 export type RealtimeHandler = (data: unknown) => void;
@@ -38,6 +42,11 @@ const RealtimeContext = createContext<RealtimeContextValue | null>(null);
  */
 export function RealtimeProvider({ enabled, children }: PropsWithChildren<{ enabled: boolean }>) {
   const queryClient = useQueryClient();
+  const { refreshUser } = useAuth();
+  const refreshUserRef = useRef(refreshUser);
+  useEffect(() => {
+    refreshUserRef.current = refreshUser;
+  });
   const [status, setStatus] = useState<RealtimeStatus>('closed');
   const [generation, setGeneration] = useState(0);
   const socketRef = useRef<WebSocket | null>(null);
@@ -84,6 +93,12 @@ export function RealtimeProvider({ enabled, children }: PropsWithChildren<{ enab
           if (isDriverNotification(message.data)) void queryClient.invalidateQueries({ queryKey: DRIVER_QUERY_KEY });
           if (isWalletNotification(message.data)) refreshWallet(queryClient);
           if (isSubscriptionNotification(message.data)) refreshSubscription(queryClient);
+          // Suspended / suspension lifted: re-read the user (and the driver's online state).
+          if (isAccountNotification(message.data)) {
+            void refreshUserRef.current().catch(() => undefined);
+            void queryClient.invalidateQueries({ queryKey: rideKeys.driverState });
+          }
+          if (isReportNotification(message.data)) refreshReports(queryClient);
         }
         listenersRef.current.get(message.event)?.forEach((handler) => {
           try {

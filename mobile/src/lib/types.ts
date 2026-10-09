@@ -11,6 +11,8 @@ export interface User {
   is_verified: boolean;
   created_at: string;
   last_login_at: string | null;
+  /** Phase 1E: the account suspension in force, null when there is none (older servers omit it). */
+  suspension?: Suspension | null;
 }
 
 export interface TokenPair {
@@ -470,4 +472,70 @@ export interface SubscriptionSummary {
   blocked: boolean;
   /** Not in the written contract: completed trips this month, shown when the API sends it. */
   trips?: number | null;
+}
+
+// ── Phase 1E: reports and account suspensions (docs/api/phase-1e.md) ──
+
+/** A staff member or user as the API names them in moderation data. */
+export interface UserBrief {
+  id: string;
+  name: string;
+  email: string;
+}
+
+/** An account suspension in force. `until` null means indefinite; an expired one stops applying by itself. */
+export interface Suspension {
+  reason: string;
+  suspended_at: string;
+  until: string | null;
+  by: UserBrief | null;
+}
+
+/** `details` of a 403 account_suspended (quote, ride request, going online). */
+export interface AccountSuspendedDetails {
+  until: string | null;
+  reason: string;
+}
+
+export type ReportCategory =
+  | "safety"
+  | "harassment"
+  | "driving"
+  | "fare"
+  | "vehicle_mismatch"
+  | "lost_item"
+  | "no_show"
+  | "app_issue"
+  | "other";
+
+export type ReportStatus = "open" | "in_review" | "resolved" | "dismissed";
+
+export type ReportPriority = "urgent" | "normal";
+
+/** POST /reports, GET /reports/me and /reports/me/{id}. */
+export interface Report {
+  id: string;
+  category: ReportCategory;
+  description: string;
+  status: ReportStatus;
+  priority: ReportPriority;
+  ride_id: string | null;
+  /** The side of the ride the report was made from; null for a general report. */
+  reporter_role: "passenger" | "driver" | null;
+  created_at: string;
+  updated_at: string;
+  /** The team's answer, shown to the reporter once resolved or dismissed. */
+  resolution: string | null;
+  resolved_at: string | null;
+}
+
+export interface ReportInput {
+  category: ReportCategory;
+  description: string;
+  ride_id?: string;
+}
+
+/** `details` of a 409 report_already_open. */
+export interface ReportAlreadyOpenDetails {
+  report_id: string;
 }

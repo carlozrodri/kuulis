@@ -11,6 +11,7 @@ import { DiscountNote, VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, EmptyState, IconButton, ProgressSteps, StatusPill, Txt } from '@/components/ui';
 import { applyRide, requestAgain, useActiveRide, useCancelRide, useRide } from '@/hooks/useRides';
+import { useSuspension } from '@/hooks/useSuspension';
 import { apiErrorMessage } from '@/i18n';
 import { amountToPay } from '@/lib/money';
 import {
@@ -264,6 +265,7 @@ function EndedSheet({ ride }: { ride: Ride }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [retrying, setRetrying] = useState(false);
+  const { handleError: handleSuspended } = useSuspension();
 
   const retry = async () => {
     setRetrying(true);
@@ -273,6 +275,8 @@ function EndedSheet({ ride }: { ride: Ride }) {
       applyRide(queryClient, next);
       router.replace({ pathname: '/ride', params: { id: next.id } });
     } catch (error) {
+      // 403 account_suspended: refresh the user so home shows the suspension.
+      handleSuspended(error);
       showToast(apiErrorMessage(error), 'danger');
     } finally {
       setRetrying(false);

@@ -7,11 +7,13 @@ import { Bike, ChevronRight, Clock, Mail, Search } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { Button, Card, IconTile, ListRow, Notice, Txt, Wordmark } from '@/components/ui';
+import { SuspendedPanel } from '@/features/account/SuspendedPanel';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
 import { rideDraft, setDraftPlace } from '@/features/ride/store';
 import { useCurrentPickup } from '@/features/ride/useCurrentPickup';
 import { useUserLocation } from '@/hooks/useLocation';
 import { useActiveRide, useRideHistory } from '@/hooks/useRides';
+import { useSuspension } from '@/hooks/useSuspension';
 import { api } from '@/lib/api';
 import { isActiveStatus, shortAddress } from '@/lib/ride';
 import type { Place } from '@/lib/types';
@@ -56,6 +58,7 @@ export function PassengerHome() {
   const { permission } = useUserLocation();
   const active = useActiveRide();
   const recents = useRecentDestinations();
+  const { suspension } = useSuspension();
   useCurrentPickup();
 
   useEffect(() => {
@@ -98,6 +101,9 @@ export function PassengerHome() {
           </View>
           <ChevronRight size={20} color={theme.muted} />
         </Card>
+      ) : suspension ? (
+        // Suspended: no ride requests (the API answers 403 account_suspended); a ride in progress still shows.
+        <SuspendedPanel suspension={suspension} variant="passenger" />
       ) : (
         <Pressable
           accessibilityRole="search"
@@ -115,9 +121,9 @@ export function PassengerHome() {
         </Pressable>
       )}
 
-      {permission !== 'granted' ? <LocationPrompt /> : null}
+      {permission !== 'granted' && !suspension ? <LocationPrompt /> : null}
 
-      {!activeRide && recents.length ? (
+      {!activeRide && !suspension && recents.length ? (
         <View>
           {recents.map((place, index) => (
             <ListRow

@@ -1,8 +1,9 @@
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, Share } from 'react-native';
 
-import { CircleHelp, CircleX, PhoneCall, Share2 } from '@/components/icons';
+import { CircleHelp, CircleX, Flag, PhoneCall, Share2 } from '@/components/icons';
 import { Sheet } from '@/components/ui';
 import { CANCEL_REASONS, formatPlate, shortAddress } from '@/lib/ride';
 import type { Ride } from '@/lib/types';
@@ -59,7 +60,7 @@ export function shareRide(ride: Ride, t: (key: string, options?: Record<string, 
   return Share.share({ message }).catch(() => undefined);
 }
 
-/** Safety tools: call emergencies, share the trip. */
+/** Safety tools: call emergencies, report a problem, share the trip. */
 export function SafetySheet({ visible, ride, onClose }: { visible: boolean; ride: Ride; onClose: () => void }) {
   const { t } = useTranslation();
   return (
@@ -75,6 +76,12 @@ export function SafetySheet({ visible, ride, onClose }: { visible: boolean; ride
           icon: PhoneCall,
           destructive: true,
           onPress: () => void Linking.openURL('tel:911').catch(() => undefined),
+        },
+        {
+          label: t('safety.report'),
+          hint: t('safety.reportHint'),
+          icon: Flag,
+          onPress: () => router.push({ pathname: '/report', params: { ride_id: ride.id } }),
         },
         {
           label: t('safety.share'),

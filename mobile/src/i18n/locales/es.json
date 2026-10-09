@@ -129,7 +129,10 @@
     "modeHint": "Cambia el modo de la app",
     "current": "Actual",
     "verified": "Correo verificado",
-    "about": "Acerca de la app"
+    "about": "Acerca de la app",
+    "support": "Ayuda",
+    "help": "Ayuda y reportes",
+    "helpHint": "Reporta un problema y sigue tus reportes"
   },
   "driver": {
     "intro": {
@@ -354,7 +357,13 @@
     "transfer_limit_exceeded": "Supera tu límite mensual de transferencias. Este mes puedes enviar hasta {{available}} USDT más.",
     "recipient_not_found": "No encontramos un motorizado Kuulis con ese correo o teléfono.",
     "transfer_to_self": "No puedes transferirte saldo a ti mismo.",
-    "subscription_overdue": "Tienes una cuota vencida. Recarga tu billetera para volver a conectarte."
+    "subscription_overdue": "Tienes una cuota vencida. Recarga tu billetera para volver a conectarte.",
+    "account_suspended": "Tu cuenta está suspendida. Por ahora no puedes pedir viajes ni conectarte.",
+    "report_already_open": "Ya tienes un reporte abierto sobre este viaje.",
+    "too_many_open_reports": "Tienes 5 reportes abiertos. Espera a que el equipo responda alguno para enviar otro.",
+    "not_ride_participant": "Solo puedes reportar viajes en los que estuviste.",
+    "ride_without_driver": "Este viaje no tuvo motorizado asignado, así que no se puede reportar.",
+    "report_not_found": "No encontramos este reporte."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -516,7 +525,8 @@
     "adminCancelled": {
       "title": "Kuulis canceló este viaje",
       "body": "Nuestro equipo de soporte canceló el viaje. Si lo necesitas, puedes pedir otra moto ahora mismo."
-    }
+    },
+    "reportProblem": "Reportar un problema"
   },
   "cancel": {
     "title": "¿Por qué cancelas?",
@@ -540,7 +550,9 @@
     "call911": "Llamar al 911",
     "call911Hint": "Emergencias en Venezuela",
     "share": "Compartir mi viaje",
-    "shareHint": "Envía los datos del motorizado y tu destino a alguien de confianza"
+    "shareHint": "Envía los datos del motorizado y tu destino a alguien de confianza",
+    "report": "Reportar un problema",
+    "reportHint": "Cuéntale al equipo de Kuulis qué pasó"
   },
   "chat": {
     "title": "Chat",
@@ -590,7 +602,8 @@
       "clean_helmet": "Casco limpio",
       "respectful": "Respetuoso",
       "ready_at_pickup": "Listo al llegar"
-    }
+    },
+    "reportLink": "¿Algo salió mal? Repórtalo"
   },
   "history": {
     "title": "Tus viajes",
@@ -882,5 +895,158 @@
     "tierAbove": "Más de {{from}}",
     "yourTier": "Tu tramo",
     "howNote": "Un mes sin viajes no paga. Los primeros 3 meses desde tu primer viaje son gratis. Si tu saldo no alcanza, tienes 7 días para recargar."
+  },
+  "report": {
+    "title": "Reportar un problema",
+    "step": "Paso {{current}} de {{total}}",
+    "categoryTitle": "¿Qué pasó?",
+    "categorySubtitleRide": "Cuéntanos sobre tu viaje del {{date}}.",
+    "categorySubtitleGeneral": "Elige el tema. Si fue en un viaje, repórtalo desde Tus viajes para que podamos verlo.",
+    "groupSafety": "Tu seguridad",
+    "groupOther": "Otros problemas",
+    "urgentPill": "Urgente",
+    "category": {
+      "safety": {
+        "title": "Me sentí en peligro",
+        "body": "Algo durante el viaje puso en riesgo tu seguridad"
+      },
+      "harassment": {
+        "title": "Acoso o insultos",
+        "body": "Comentarios, insinuaciones o un trato agresivo"
+      },
+      "driving": {
+        "title": "Manejo imprudente",
+        "body": "Exceso de velocidad o maniobras peligrosas"
+      },
+      "fare": {
+        "title": "Cobro distinto al acordado",
+        "body": "El monto no fue el que mostró la app"
+      },
+      "vehicle_mismatch": {
+        "title": "La moto o la persona no coinciden",
+        "body": "La placa, la moto o la persona no eran las de la app"
+      },
+      "no_show": {
+        "title": "No se presentó",
+        "body": "La otra persona nunca llegó al punto de encuentro"
+      },
+      "lost_item": {
+        "title": "Objeto olvidado",
+        "body": "Dejaste algo en la moto o encontraste algo"
+      },
+      "app_issue": {
+        "title": "Falla de la app",
+        "body": "Algo no funcionó como debía"
+      },
+      "other": {
+        "title": "Otro problema",
+        "body": "Cualquier otra cosa que debamos saber"
+      }
+    },
+    "placeholder": {
+      "safety": "Cuéntanos qué pasó, dónde y a qué hora. Todo lo que recuerdes nos ayuda.",
+      "harassment": "Cuéntanos qué te dijeron o hicieron. Lo tratamos con total discreción.",
+      "driving": "¿Qué pasó? Por ejemplo: iba muy rápido, se comió un semáforo, no llevaba casco…",
+      "fare": "¿Cuánto se cobró o se pagó y cuánto decía la app?",
+      "vehicle_mismatch": "¿Qué no coincidía? La placa, el color de la moto, la persona…",
+      "no_show": "¿Cuánto tiempo esperaste? ¿Pudiste comunicarte por el chat?",
+      "lost_item": "¿Qué se quedó y cómo es? Si es sobre un viaje, te ayudamos a contactar a la otra persona.",
+      "app_issue": "¿Qué estabas haciendo y qué pasó? Si viste un mensaje de error, cópialo aquí.",
+      "other": "Cuéntanos qué pasó."
+    },
+    "urgent": {
+      "title": "Lo tratamos como urgente",
+      "body": "El equipo de Kuulis revisa estos reportes primero. Si estás en peligro ahora mismo, llama al 911.",
+      "call": "Llamar al 911"
+    },
+    "detailsTitle": "Cuéntanos qué pasó",
+    "detailsSubtitle": "Con más detalles podemos ayudarte mejor. Solo el equipo de Kuulis lo leerá.",
+    "aboutRide": "Sobre tu viaje",
+    "yourDriver": "Tu motorizado: {{name}}",
+    "yourPassenger": "Tu pasajero: {{name}}",
+    "rideDate": "{{date}} · {{time}}",
+    "change": "Cambiar",
+    "changeCategory": "Cambiar el tema del reporte",
+    "descriptionLabel": "Descripción",
+    "counter": "{{count}}/{{max}}",
+    "counterA11y": "{{count}} de {{max}} caracteres",
+    "minHint": "Escribe al menos {{min}} caracteres.",
+    "tooLong": "Máximo {{max}} caracteres.",
+    "submit": "Enviar reporte",
+    "sentTitle": "Recibimos tu reporte",
+    "sentBody": "El equipo de Kuulis lo va a revisar y te avisaremos cuando tengamos una respuesta.",
+    "sentBodyUrgent": "Lo estamos tratando como urgente. Si estás en peligro ahora mismo, llama al 911.",
+    "viewReport": "Ver mi reporte",
+    "alreadyOpen": {
+      "title": "Ya reportaste este viaje",
+      "body": "Tu reporte sigue abierto y el equipo lo está atendiendo. Puedes ver su estado.",
+      "open": "Ver el reporte"
+    },
+    "tooMany": {
+      "title": "Tienes muchos reportes abiertos",
+      "action": "Ver mis reportes"
+    },
+    "rideProblem": {
+      "title": "No se puede reportar este viaje",
+      "general": "Hacer un reporte general"
+    },
+    "noDriver": "Este viaje no tuvo motorizado asignado. Si algo falló, haz un reporte general."
+  },
+  "reports": {
+    "title": "Ayuda y reportes",
+    "subtitle": "Cuéntanos si algo salió mal y sigue aquí la respuesta del equipo.",
+    "new": "Reportar un problema",
+    "newHint": "De la app, un objeto olvidado u otra cosa",
+    "rideHint": "Para un viaje, ábrelo en Tus viajes y toca «Reportar un problema».",
+    "emergency": "¿Estás en peligro?",
+    "emergencyHint": "Llama al 911, la línea de emergencias de Venezuela",
+    "mine": "Mis reportes",
+    "empty": "Aún no tienes reportes",
+    "emptyBody": "Si algo sale mal en un viaje o en la app, cuéntanos y lo resolvemos.",
+    "aboutRide": "Sobre un viaje",
+    "general": "Reporte general",
+    "itemA11y": "{{category}}. {{status}}. {{date}}",
+    "status": {
+      "open": "Recibido",
+      "in_review": "En revisión",
+      "resolved": "Resuelto",
+      "dismissed": "Cerrado"
+    },
+    "detailTitle": "Tu reporte",
+    "sentOn": "Enviado el {{date}}",
+    "priority": "Prioritario",
+    "youWrote": "Lo que nos contaste",
+    "progress": "Seguimiento",
+    "timeline": {
+      "created": "Recibimos tu reporte",
+      "in_review": "En revisión",
+      "resolved": "Resuelto",
+      "dismissed": "Cerrado",
+      "reviewing": "El equipo lo está revisando",
+      "waiting": "Lo revisaremos pronto",
+      "waitingUrgent": "Lo revisamos con prioridad",
+      "pending": "Te avisaremos cuando haya respuesta",
+      "stepA11y": "{{label}}: {{state}}",
+      "state": {
+        "done": "listo",
+        "current": "en curso",
+        "upcoming": "pendiente"
+      }
+    },
+    "resolution": "Respuesta del equipo Kuulis",
+    "noResolution": "El equipo cerró este reporte.",
+    "newAboutRide": "Hacer otro reporte"
+  },
+  "suspension": {
+    "title": "Tu cuenta está suspendida",
+    "passengerBody": "Por ahora no puedes pedir viajes. Tu historial, tu billetera y tus reportes siguen disponibles.",
+    "driverBody": "No puedes conectarte ni recibir viajes mientras dure la suspensión.",
+    "reason": "Motivo",
+    "until": "Hasta",
+    "duration": "Duración",
+    "indefinite": "Indefinida",
+    "todayAt": "Hoy a las {{time}}",
+    "help": "Ayuda y reportes",
+    "helpHint": "¿Crees que es un error? Escríbenos desde Ayuda y reportes."
   }
 }

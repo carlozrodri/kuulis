@@ -9,11 +9,13 @@ import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { showToast } from '@/components/Toast';
 import { Button, Card, IconTile, Notice, Skeleton, StatusPill, Txt } from '@/components/ui';
+import { SuspendedPanel } from '@/features/account/SuspendedPanel';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
 import { useWalletFormat } from '@/features/wallet/format';
 import { EarningsCard, goToTopUp } from '@/features/wallet/SubscriptionCard';
 import { getFreshPosition, requestLocationPermission, useUserLocation } from '@/hooks/useLocation';
 import { useActiveRide, useDriverState, useGoOffline, useGoOnline } from '@/hooks/useRides';
+import { useSuspension } from '@/hooks/useSuspension';
 import { isSubscriptionOverdue, refreshSubscription, useSubscription, useWallet } from '@/hooks/useWallet';
 import { apiErrorMessage } from '@/i18n';
 import { confirmHaptic, heavyHaptic } from '@/lib/feedback';
@@ -57,7 +59,7 @@ function LiveDot({ online }: { online: boolean }) {
  * Approved driver's home: this month's earnings and fee on top (Motorizado-Inicio) and a huge CONECTARME /
  * DESCONECTARME over the map. Going online sends the current position (POST /drivers/me/online); the
  * DriverController then streams it every ~4 s over the socket. A driver blocked for an unpaid fee sees why
- * and a Recargar button instead.
+ * and a Recargar button instead; a suspended account (phase 1E) sees the suspension and Ayuda y reportes.
  */
 export function DriverDashboard() {
   const { t } = useTranslation();
@@ -73,6 +75,7 @@ export function DriverDashboard() {
   const goOffline = useGoOffline();
   const { permission } = useUserLocation();
   const [locating, setLocating] = useState(false);
+  const { suspension, handleError: handleSuspended } = useSuspension();
 
   const online = !!state.data?.online;
   const activeRide = active.data && isActiveStatus(active.data.status) ? active.data : null;
@@ -80,6 +83,8 @@ export function DriverDashboard() {
   const fee = subscriptionState(summary);
   const blocked =
     fee === 'blocked' || (overdueAt !== null && (!summary || subscription.dataUpdatedAt <= overdueAt));
+  // The API disconnects a suspended driver; while the state catches up the disconnect button stays.
+  const suspended = !!suspension && !online;
 
   const connect = async () => {
     setLocating(true);
@@ -96,6 +101,11 @@ export function DriverDashboard() {
       await goOnline.mutateAsync({ lat: position.lat, lng: position.lng });
       confirmHaptic();
     } catch (error) {
+      if (handleSuspended(error)) {
+        // 403 account_suspended: the suspension panel replaces the button.
+        heavyHaptic();
+        return;
+      }
       if (isSubscriptionOverdue(error)) {
         // The blocked banner explains it; refresh the fee so it shows the amount.
         heavyHaptic();
@@ -135,7 +145,9 @@ export function DriverDashboard() {
         </View>
       ) : (
         <>
-          {blocked && !online ? (
+          {suspended && suspension ? (
+            <SuspendedPanel suspension={suspension} variant="driver" />
+          ) : blocked && !online ? (
             <BlockedPanel summary={summary} balance={wallet.data?.balance} />
           ) : (
             <View style={{ gap: 4 }}>
@@ -161,7 +173,7 @@ export function DriverDashboard() {
 
           {fee === 'pending' && summary && !blocked ? <PendingFeeNotice summary={summary} /> : null}
 
-          {permission !== 'granted' && !(blocked && !online) ? <LocationPrompt variant="driver" /> : null}
+          {permission !== 'granted' && !(blocked && !online) && !suspended ? <LocationPrompt variant="driver" /> : null}
 
           {online ? (
             <Button
@@ -173,7 +185,7 @@ export function DriverDashboard() {
               disabled={!!activeRide}
               onPress={disconnect}
             />
-          ) : blocked ? (
+          ) : suspended ? null : blocked ? (
             <Button title={t('wallet.topUpNow')} size="lg" variant="accent" icon={Wallet} onPress={goToTopUp} />
           ) : (
             <Button
@@ -189,7 +201,7 @@ export function DriverDashboard() {
             <Notice tone="info" icon={Info}>
               {t('drive.home.foregroundOnly')}
             </Notice>
-          ) : blocked ? (
+          ) : suspended ? null : blocked ? (
             <Button title={t('home.blocked.details')} variant="ghost" size="sm" onPress={() => router.push('/wallet')} />
           ) : !summary || fee === 'not_started' ? (
             <View style={{ alignItems: 'center' }}>

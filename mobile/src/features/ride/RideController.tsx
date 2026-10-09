@@ -148,7 +148,8 @@ export function RideNavigator() {
     };
 
     if (pending.data) {
-      if (pathname !== '/ride/rate') go('/ride/rate');
+      // "¿Algo salió mal? Repórtalo" opens the report flow on top of the rating; it comes back to it.
+      if (pathname !== '/ride/rate' && !pathname.startsWith('/report')) go('/ride/rate');
       return;
     }
     const ride = active.data;

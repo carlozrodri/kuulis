@@ -1,9 +1,9 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, BackHandler, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, BackHandler, Pressable, StyleSheet, View } from 'react-native';
 
-import { CircleCheck, HandCoins } from '@/components/icons';
+import { CircleCheck, Flag, HandCoins } from '@/components/icons';
 import { DiscountNote, VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, Card, Chip, EmptyState, Field, Notice, Screen, Txt } from '@/components/ui';
@@ -169,6 +169,18 @@ export function RateScreen() {
         </Txt>
         <PlaceRows pickup={ride.pickup} dropoff={ride.dropoff} compact />
       </Card>
+
+      {/* Discreet way out to report the ride; the report flow comes back here (rating is still mandatory). */}
+      <Pressable
+        accessibilityRole="link"
+        hitSlop={8}
+        onPress={() => router.push({ pathname: '/report', params: { ride_id: ride.id } })}
+        style={({ pressed }) => [styles.reportLink, { opacity: pressed ? 0.6 : 1 }]}>
+        <Flag size={14} color={theme.muted} strokeWidth={2.2} />
+        <Txt variant="label" color="muted" style={{ textDecorationLine: 'underline' }}>
+          {t('rating.reportLink')}
+        </Txt>
+      </Pressable>
     </Screen>
   );
 }
@@ -178,4 +190,14 @@ const styles = StyleSheet.create({
   hero: { alignItems: 'center', gap: space.xs, paddingTop: space.xl, paddingBottom: space.lg },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: space.xs },
   summary: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  reportLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    alignSelf: 'center',
+    minHeight: 44,
+    paddingHorizontal: space.md,
+    marginTop: space.sm,
+  },
 });
