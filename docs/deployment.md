@@ -5,6 +5,10 @@ existente de Carlos. No comparte nada con los proyectos NDS ni bidding-market.
 
 ## Entornos y recursos
 
+> **Producción apagada (2026-10-09, pedido de Carlos).** API, worker, admin, Postgres y Redis de
+> producción están detenidos, con el auto-deploy desactivado y el backup de Postgres pausado. No se borró nada.
+> Para volver: iniciar Postgres y Redis, luego API, worker y admin; reactivar auto-deploy y el backup.
+
 | Recurso | QA (entorno `qa-env`, rama `qa`) | Producción (entorno `production`, rama `main`) |
 | --- | --- | --- |
 | Dominio | `kuulis-qa.top8.uk` | `kuulis-prod.top8.uk` |
