@@ -11,6 +11,7 @@ from taskiq_redis import RedisAsyncResultBackend, RedisStreamBroker
 
 from kuulis.settings import settings
 
+# Keep in sync with docker/entrypoint.sh (the container lists the modules explicitly).
 TASK_MODULES = [
     "apps.users.tasks",
     "apps.notifications.tasks",
