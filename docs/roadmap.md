@@ -45,7 +45,11 @@ funcionando en QA antes de pasar a la siguiente.
 - [x] Transferencias entre motorizados con límite mensual de lo enviado.
 
 ### 1E · Operación en el admin
-- [ ] Viajes en vivo e historial, reportes y suspensiones, conciliación de pagos, métricas.
+- [x] Viajes en vivo e historial (desde 1B).
+- [x] Reportes de pasajeros y motorizados (sobre un viaje o generales), bandeja en el admin con notas, prioridad y respuesta.
+- [x] Suspensiones de cuenta con motivo y fecha de fin opcional (bloquean pedir viajes y conectarse).
+- [x] Finanzas: resumen para conciliar con Binance y exportación CSV de movimientos y recargas.
+- [x] Métricas (viajes, cancelaciones, tiempos, GMV, horas pico, mejores motorizados, por ciudad) y portada operativa.
 
 ## Fase 2 · Lanzamiento móvil
 - [ ] Cuentas Apple Developer y Google Play (bloqueo, ver `blockers.md`).

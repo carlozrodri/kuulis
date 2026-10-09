@@ -31,6 +31,7 @@ from apps.config.schemas import AppConfig
 from apps.config.services import get_app_config
 from apps.drivers.models import DriverProfile, DriverStatus, Vehicle, VehicleType
 from apps.geo.clients import estimate_route
+from apps.moderation import services as moderation
 from apps.rides import events, presence
 from apps.rides.models import (
     ACTIVE_STATUSES,
@@ -127,6 +128,7 @@ async def _eligible(
         )
     )
     busy |= await subscriptions.overdue_user_ids(session, list(approved))  # unpaid fee
+    busy |= await moderation.suspended_user_ids(session, list(approved))
     return {str(u) for u in approved - busy}
 
 

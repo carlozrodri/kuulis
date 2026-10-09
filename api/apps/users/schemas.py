@@ -9,6 +9,21 @@ from apps.users.models import Role
 Locale = Literal["es", "en"]
 
 
+class UserBrief(BaseModel):
+    id: uuid.UUID
+    name: str
+    email: str
+
+
+class SuspensionRead(BaseModel):
+    """An account suspension in force (see apps.moderation)."""
+
+    reason: str
+    suspended_at: datetime
+    until: datetime | None
+    by: UserBrief | None
+
+
 class UserRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -25,6 +40,7 @@ class UserRead(BaseModel):
     # Rating received as a passenger.
     rating_avg: float | None = None
     rating_count: int = 0
+    suspension: SuspensionRead | None = None
 
 
 class UserCreate(BaseModel):

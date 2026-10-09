@@ -1,6 +1,6 @@
 """Calendar months in Caracas time (fees, transfer limits and earnings are per local month)."""
 
-from datetime import UTC, date, datetime, time
+from datetime import UTC, date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 CARACAS_TZ = ZoneInfo("America/Caracas")
@@ -53,3 +53,10 @@ def parse_month(value: str) -> date:
 
 def format_month(value: date) -> str:
     return f"{value.year:04d}-{value.month:02d}"
+
+
+def days_bounds(first: date, last: date) -> tuple[datetime, datetime]:
+    """[start of ``first``, start of the day after ``last``) in Caracas, as UTC datetimes."""
+    start = datetime.combine(first, time(0), tzinfo=CARACAS_TZ)
+    end = datetime.combine(last + timedelta(days=1), time(0), tzinfo=CARACAS_TZ)
+    return start.astimezone(UTC), end.astimezone(UTC)

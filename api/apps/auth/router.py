@@ -13,6 +13,7 @@ from apps.auth.schemas import (
     TokenPair,
     TokenRequest,
 )
+from apps.moderation import services as moderation
 from apps.users import services as users
 from apps.users.dependencies import CurrentUser, DBSession
 from apps.users.schemas import UserCreate, UserRead
@@ -30,7 +31,7 @@ async def register(request: Request, data: RegisterRequest, session: DBSession) 
     await session.commit()
     await services.send_verification_email(user)
     tokens = await services.issue_tokens(user)
-    return AuthResponse(**tokens.model_dump(), user=UserRead.model_validate(user))
+    return AuthResponse(**tokens.model_dump(), user=await moderation.user_read(session, user))
 
 
 @router.post("/login", response_model=AuthResponse)
@@ -38,7 +39,7 @@ async def register(request: Request, data: RegisterRequest, session: DBSession) 
 async def login(request: Request, data: LoginRequest, session: DBSession) -> AuthResponse:
     user = await users.authenticate(session, data.email, data.password)
     tokens = await services.issue_tokens(user)
-    return AuthResponse(**tokens.model_dump(), user=UserRead.model_validate(user))
+    return AuthResponse(**tokens.model_dump(), user=await moderation.user_read(session, user))
 
 
 @router.post("/admin/login", response_model=AuthResponse)
@@ -49,7 +50,7 @@ async def admin_login(request: Request, data: LoginRequest, session: DBSession) 
     if not user.can_access_admin:
         raise PermissionDeniedError("Admin access required", code="admin_required")
     tokens = await services.issue_tokens(user)
-    return AuthResponse(**tokens.model_dump(), user=UserRead.model_validate(user))
+    return AuthResponse(**tokens.model_dump(), user=await moderation.user_read(session, user))
 
 
 @router.post("/refresh", response_model=TokenPair)
@@ -104,7 +105,7 @@ async def google_login(
     user = await services.social_login(session, identity)
     await session.commit()
     tokens = await services.issue_tokens(user)
-    return AuthResponse(**tokens.model_dump(), user=UserRead.model_validate(user))
+    return AuthResponse(**tokens.model_dump(), user=await moderation.user_read(session, user))
 
 
 @router.post("/social/apple", response_model=AuthResponse)
@@ -116,4 +117,4 @@ async def apple_login(
     user = await services.social_login(session, identity, data.full_name)
     await session.commit()
     tokens = await services.issue_tokens(user)
-    return AuthResponse(**tokens.model_dump(), user=UserRead.model_validate(user))
+    return AuthResponse(**tokens.model_dump(), user=await moderation.user_read(session, user))

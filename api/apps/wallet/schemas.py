@@ -6,6 +6,7 @@ from typing import Annotated, Any, Literal
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, PlainSerializer, field_validator
 
+from apps.users.schemas import UserBrief
 from apps.wallet.models import EntryKind, TopUpMethod, TopUpStatus
 
 MoneyStr = Annotated[Decimal, PlainSerializer(lambda v: f"{v:.2f}", return_type=str)]
@@ -97,12 +98,6 @@ class TopUpRead(BaseModel):
     rejection_reason: str | None
     created_at: datetime
     completed_at: datetime | None
-
-
-class UserBrief(BaseModel):
-    id: uuid.UUID
-    name: str
-    email: str
 
 
 class TopUpAdminRead(TopUpRead):

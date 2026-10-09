@@ -3,7 +3,7 @@
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.users.models import Role, User
@@ -106,8 +106,11 @@ async def list_users(
     search: str | None = None,
     role: Role | None = None,
     is_active: bool | None = None,
+    where: ColumnElement[bool] | None = None,
 ) -> tuple[list[User], int]:
     stmt = select(User).order_by(User.created_at.desc())
+    if where is not None:
+        stmt = stmt.where(where)
     if search:
         term = f"%{search.strip().lower()}%"
         stmt = stmt.where(

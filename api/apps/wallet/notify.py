@@ -110,9 +110,14 @@ def date_label(value: datetime, locale: str) -> str:
     return f"{local.day} de {names[local.month - 1]}"
 
 
-def render(event: str, locale: str, **values: Any) -> tuple[str, str]:
+def render(
+    event: str,
+    locale: str,
+    templates: dict[str, dict[str, tuple[str, str]]] | None = None,
+    **values: Any,
+) -> tuple[str, str]:
     locale = locale if locale in ("es", "en") else "es"
-    title, body = TEMPLATES[event][locale]
+    title, body = (templates or TEMPLATES)[event][locale]
     return title.format(**values), body.format(**values)
 
 
@@ -122,15 +127,18 @@ async def send(
     event: str,
     kind: str = "wallet",
     localized: Callable[[str], dict[str, Any]] | None = None,
+    templates: dict[str, dict[str, tuple[str, str]]] | None = None,
+    data: dict[str, Any] | None = None,
     **values: Any,
 ) -> None:
-    """``localized(locale)`` returns extra values that depend on the language (dates, months)."""
+    """``localized(locale)`` returns extra values that depend on the language (dates, months).
+    ``templates`` lets other apps reuse this with their own texts; ``data`` goes in the push."""
     user = await session.get(User, user_id)
     if user is None:
         return
     if localized is not None:
         values |= localized(user.locale)
-    title, body = render(event, user.locale, **values)
-    data = {"type": kind, "event": event}
-    await notifications.create_notifications(session, [user.id], title, body, data)
-    await notification_tasks.send_push.kiq([str(user.id)], title, body, data)
+    title, body = render(event, user.locale, templates, **values)
+    payload = {"type": kind, "event": event} | (data or {})
+    await notifications.create_notifications(session, [user.id], title, body, payload)
+    await notification_tasks.send_push.kiq([str(user.id)], title, body, payload)

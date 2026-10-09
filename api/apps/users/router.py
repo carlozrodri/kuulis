@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
 
+from apps.moderation import services as moderation
 from apps.users import services
 from apps.users.dependencies import AdminUser, CurrentUser, DBSession, StaffUser
 from apps.users.models import Role
@@ -21,13 +22,13 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/me", response_model=UserRead)
-async def read_me(user: CurrentUser) -> UserRead:
-    return UserRead.model_validate(user)
+async def read_me(user: CurrentUser, session: DBSession) -> UserRead:
+    return await moderation.user_read(session, user)
 
 
 @router.patch("/me", response_model=UserRead)
-async def update_me(data: UserUpdateMe, user: CurrentUser) -> UserRead:
-    return UserRead.model_validate(await services.update_me(user, data))
+async def update_me(data: UserUpdateMe, user: CurrentUser, session: DBSession) -> UserRead:
+    return await moderation.user_read(session, await services.update_me(user, data))
 
 
 @router.post("/me/password", status_code=status.HTTP_204_NO_CONTENT)
@@ -51,12 +52,18 @@ async def list_users(
     search: Annotated[str | None, Query(max_length=100)] = None,
     role: Role | None = None,
     is_active: bool | None = None,
+    suspended: bool | None = None,
 ) -> Page[UserRead]:
     items, total = await services.list_users(
-        session, params, search=search, role=role, is_active=is_active
+        session,
+        params,
+        search=search,
+        role=role,
+        is_active=is_active,
+        where=moderation.suspended_filter(suspended) if suspended is not None else None,
     )
     return Page[UserRead](
-        items=[UserRead.model_validate(u) for u in items],
+        items=await moderation.user_reads(session, items),
         total=total,
         limit=params.limit,
         offset=params.offset,
@@ -75,7 +82,7 @@ async def create_user(data: UserAdminCreate, _: AdminUser, session: DBSession) -
 
 @router.get("/{user_id}", response_model=UserRead)
 async def get_user(user_id: uuid.UUID, _: StaffUser, session: DBSession) -> UserRead:
-    return UserRead.model_validate(await services.get_or_404(session, user_id))
+    return await moderation.user_read(session, await services.get_or_404(session, user_id))
 
 
 @router.patch("/{user_id}", response_model=UserRead)
@@ -85,4 +92,4 @@ async def update_user(
     user = await services.get_or_404(session, user_id)
     if user.id == admin.id and (data.role not in (None, Role.ADMIN) or data.is_active is False):
         raise PermissionDeniedError("You cannot demote or disable yourself", code="self_demotion")
-    return UserRead.model_validate(await services.admin_update_user(user, data))
+    return await moderation.user_read(session, await services.admin_update_user(user, data))

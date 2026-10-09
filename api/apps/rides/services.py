@@ -18,6 +18,7 @@ from apps.config.schemas import AppConfig
 from apps.config.services import get_app_config
 from apps.drivers.models import DriverProfile, DriverStatus
 from apps.geo import clients as geo
+from apps.moderation import services as moderation
 from apps.promotions import services as promotions
 from apps.promotions.schemas import PromotionBrief
 from apps.rates import services as rates
@@ -159,6 +160,7 @@ def _check_area(config: AppConfig, *points: tuple[float, float]) -> str:
 
 
 async def create_quote(session: AsyncSession, user: User, data: QuoteRequest) -> Quote:
+    await moderation.ensure_not_suspended(session, user.id)
     config = await get_app_config(session)
     if data.vehicle_type not in config.enabled_vehicle_types:
         raise AppError(
@@ -201,6 +203,7 @@ async def create_quote(session: AsyncSession, user: User, data: QuoteRequest) ->
 
 
 async def create_ride(session: AsyncSession, user: User, data: RideCreate) -> Ride:
+    await moderation.ensure_not_suspended(session, user.id)
     config = await get_app_config(session)
     if data.payment_method not in {m.value for m in config.payment_methods}:
         raise PaymentMethodInvalidError(
@@ -316,6 +319,7 @@ async def driver_state(session: AsyncSession, user: User) -> DriverState:
 
 async def go_online(session: AsyncSession, user: User, lat: float, lng: float) -> DriverState:
     profile = await _approved_profile(session, user)
+    await moderation.ensure_not_suspended(session, user.id)
     await subscriptions.ensure_not_overdue(session, user.id)
     config = await get_app_config(session)
     vehicle = profile.vehicle
