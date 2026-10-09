@@ -1,7 +1,8 @@
 # Expo dev server (Metro) for opening the QA app in Expo Go without a local machine.
 # Deployed by Coolify from the `qa` branch at https://kuulis-expo.top8.uk (see docs/deployment.md).
 # Expo Go only opens remote dev servers with a signed manifest, which needs these env vars in Coolify:
-#   EXPO_TOKEN (Expo access token, secret), EAS_PROJECT_ID and EXPO_OWNER (Expo account name).
+#   EXPO_TOKEN (Expo access token, secret) and EXPO_OWNER (Expo account name).
+#   The EAS project id lives in app.config.ts.
 FROM node:22-slim
 ENV CI=1 \
     EXPO_NO_TELEMETRY=1 \

@@ -55,7 +55,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     appEnv: APP_ENV,
     apiUrl: API_URLS[APP_ENV],
-    // Filled in once the EAS project exists (`npx eas-cli init`). Needed for Expo push tokens.
-    eas: { projectId: process.env.EAS_PROJECT_ID },
+    // EAS project "kuulis" on expo.dev. Needed to sign Expo Go manifests and for push tokens.
+    eas: { projectId: process.env.EAS_PROJECT_ID ?? '91bc2a11-022d-4f60-81bf-32eeba5384ba' },
   },
 });
