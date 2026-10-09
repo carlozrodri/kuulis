@@ -255,6 +255,7 @@ async def test_suspension_blocks_rides(client, staff_headers, passenger, monkeyp
     assert quote.status_code == 403
     me = (await client.get(f"{API}/users/me", headers=luis.headers)).json()
     assert me["suspension"]["reason"] == "Reporte de seguridad"
+    assert me["suspension"]["by"] is None  # staff identity stays private
     assert "Tu cuenta está suspendida" in await _titles(luis.user.id)
 
     listing = await client.get(f"{API}/users?suspended=true", headers=staff_headers)

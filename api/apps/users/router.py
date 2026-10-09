@@ -63,7 +63,7 @@ async def list_users(
         where=moderation.suspended_filter(suspended) if suspended is not None else None,
     )
     return Page[UserRead](
-        items=await moderation.user_reads(session, items),
+        items=await moderation.user_reads(session, items, staff_view=True),
         total=total,
         limit=params.limit,
         offset=params.offset,
@@ -82,7 +82,9 @@ async def create_user(data: UserAdminCreate, _: AdminUser, session: DBSession) -
 
 @router.get("/{user_id}", response_model=UserRead)
 async def get_user(user_id: uuid.UUID, _: StaffUser, session: DBSession) -> UserRead:
-    return await moderation.user_read(session, await services.get_or_404(session, user_id))
+    return await moderation.user_read(
+        session, await services.get_or_404(session, user_id), staff_view=True
+    )
 
 
 @router.patch("/{user_id}", response_model=UserRead)
@@ -92,4 +94,5 @@ async def update_user(
     user = await services.get_or_404(session, user_id)
     if user.id == admin.id and (data.role not in (None, Role.ADMIN) or data.is_active is False):
         raise PermissionDeniedError("You cannot demote or disable yourself", code="self_demotion")
-    return await moderation.user_read(session, await services.admin_update_user(user, data))
+    updated = await services.admin_update_user(user, data)
+    return await moderation.user_read(session, updated, staff_view=True)

@@ -277,17 +277,21 @@ async def suspension_reads(
     return {uid: suspension_read(s, users) for uid, s in active.items()}
 
 
-async def user_reads(session: AsyncSession, users: Sequence[User]) -> list[UserRead]:
-    """UserRead with the suspension in force, if any."""
+async def user_reads(
+    session: AsyncSession, users: Sequence[User], *, staff_view: bool = False
+) -> list[UserRead]:
+    """UserRead with the suspension in force, if any. Who suspended is only shown to staff."""
     suspensions = await suspension_reads(session, [u.id for u in users])
+    if not staff_view:
+        suspensions = {k: v.model_copy(update={"by": None}) for k, v in suspensions.items()}
     return [
         UserRead.model_validate(u).model_copy(update={"suspension": suspensions.get(u.id)})
         for u in users
     ]
 
 
-async def user_read(session: AsyncSession, user: User) -> UserRead:
-    return (await user_reads(session, [user]))[0]
+async def user_read(session: AsyncSession, user: User, *, staff_view: bool = False) -> UserRead:
+    return (await user_reads(session, [user], staff_view=staff_view))[0]
 
 
 # --- Reports: users ----------------------------------------------------------------------------
