@@ -1,7 +1,7 @@
 # Visión
 
 ## En una frase
-Kuulis es una app de transporte en moto para Venezuela donde el pasajero pide un viaje y ve el precio
+Kuulis es una app de transporte para Venezuela, que arranca solo con motos, donde el pasajero pide un viaje y ve el precio
 en dólares, y el motorizado no paga comisión por viaje sino una mensualidad que depende de lo que ganó.
 
 ## Decidido (palabras de Carlos)
@@ -12,6 +12,8 @@ en dólares, y el motorizado no paga comisión por viaje sino una mensualidad qu
 - El pasajero **paga directamente al motorizado**, como ellos acuerden.
 - El precio del viaje se muestra **en dólares**.
 - La app móvil debe verse **de primer nivel mundial**: que al verla den ganas de usarla.
+- **Solo motos al lanzamiento**; los carros se agregan después.
+- **Es una app de producción, no un MVP**: cada detalle se revisa y las dudas se resuelven con Carlos.
 
 ## Propuesta de valor (supuesto, a validar)
 - **Para el motorizado:** se queda con el 100 % de cada viaje. Paga una cuota pequeña y predecible
@@ -26,4 +28,4 @@ espera para el pasajero.
 
 ## Qué no es (supuesto)
 - No procesa pagos de viajes en la primera versión.
-- No empieza con carros ni delivery; empieza con viajes en moto (ver `open-questions.md`).
+- No empieza con carros (decidido: vendrán después). Delivery y encomiendas no están en el alcance por ahora (supuesto).

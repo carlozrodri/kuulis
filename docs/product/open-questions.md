@@ -1,23 +1,34 @@
 # Preguntas abiertas, supuestos y riesgos
 
+## Resuelto (2026-10-09)
+- Tramos de la cuota: confirmados (tabla en `business-model.md`), configurables desde el admin.
+- Método de pago de la suscripción: USDT.
+- Vehículos: solo motos al inicio, carros después.
+
 ## Preguntas para Carlos
-### Modelo de negocio
-1. ¿Cuáles son los tramos exactos de la cuota? ¿Se cobra algo por debajo de 100 USD?
-2. ¿La ganancia del mes se calcula con el precio que muestra la app o con lo que declara el motorizado?
-3. ¿Cómo pagan los motorizados la suscripción (pago móvil, Zelle, USDT, efectivo)?
-4. ¿Qué pasa si un motorizado no paga? ¿Se bloquea, hay días de gracia?
-5. Los 3 meses gratis, ¿cuentan desde el lanzamiento general o desde que cada motorizado se registra?
+### Precio y pago del viaje
+1. Dijiste que el pasajero paga "como ellos lo acuerden". ¿Lo que se acuerda es solo **el método de
+   pago** (efectivo, pago móvil, USDT…) o también **el monto**? Si el monto se puede negociar, el precio
+   en USD de la app sería una referencia y no el precio final.
+2. ¿El precio lo calcula la app con una tarifa (base + km + minuto) configurable desde el admin?
+3. ¿Se muestra también el equivalente en bolívares? ¿Con qué tasa (BCV u otra)?
 
-### Producto
-6. ¿Solo motos al inicio, o también carros, delivery o encomiendas?
-7. ¿El precio lo calcula la app (tarifa base + km + minuto) o el motorizado puede negociarlo?
-8. ¿El pasajero puede elegir método de pago en la app (para que el motorizado sepa si es efectivo)?
-9. ¿En qué ciudad se lanza primero?
-10. ¿Qué requisitos debe cumplir un motorizado (documentos, antigüedad de la moto)?
-11. ¿Se necesitan calificaciones, chat in-app o llamadas enmascaradas?
+### Cuota mensual
+4. La "ganancia del mes" que define el tramo, ¿es la suma de los precios que mostró la app en los viajes
+   completados? (Si el monto se negocia, esto cambia.)
+5. ¿El mes es calendario (del 1 al último día) y se cobra a mes vencido?
+6. Los 3 meses gratis, ¿cuentan desde el lanzamiento general o desde que cada motorizado se registra?
 
-### Precio en dólares
-12. ¿Se muestra también el equivalente en bolívares con la tasa del BCV o la paralela?
+### USDT
+7. ¿Qué red: TRON (TRC-20), BNB Chain (BEP-20) u otra? ¿Aceptamos más de una?
+8. ¿Billetera propia de Kuulis o un proveedor como Binance Pay?
+9. ¿Verificación manual (el admin confirma el pago) o automática? Para producción recomiendo automática.
+10. ¿Cuántos días de gracia hay, y qué pasa si no paga: se bloquea recibir viajes hasta pagar?
+
+### Lanzamiento y operación
+11. ¿En qué ciudad se lanza primero?
+12. ¿Qué requisitos y documentos debe tener un motorizado para ser aprobado?
+13. ¿Hace falta chat dentro de la app, llamadas enmascaradas y calificaciones?
 
 ## Riesgos
 | Riesgo | Por qué importa | Mitigación propuesta (supuesto) |

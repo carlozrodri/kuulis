@@ -26,13 +26,18 @@ Supuesto: una misma persona podría tener cuenta de pasajero y de motorizado (do
 4. Va a buscar al pasajero, inicia el viaje y lo termina.
 5. Recibe el pago directo del pasajero.
 6. Ve sus ganancias del mes y la cuota que le toca según los tramos.
-7. Paga la suscripción (método a definir).
+7. Paga la suscripción en **USDT** (detalles en `business-model.md`).
 
 ## Flujo del admin (supuesto)
 - Aprobar o rechazar motorizados.
 - Ver viajes en curso y el historial.
 - Ver ganancias y cuotas por motorizado; marcar pagos de suscripción.
 - Atender reportes y suspender cuentas.
+
+## Tipos de vehículo (decidido)
+Al lanzamiento solo **motos**; **carros** después. Requisito: el modelo de datos admite varios tipos de
+vehículo desde el inicio (tipo de vehículo en el motorizado, en la solicitud y en la tarifa), aunque la app
+solo muestre motos. Así agregar carros es configuración y pantallas, no una migración grande.
 
 ## Qué reutiliza de la plantilla
 Auth con roles, usuarios, notificaciones push y en tiempo real (WebSocket), subida de archivos (documentos
