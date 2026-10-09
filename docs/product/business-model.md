@@ -60,6 +60,13 @@ respaldo es la confirmación manual en el admin. Como segunda vía, **TRC-20** p
 exista empresa, pasar a Binance Pay Merchant. Antes de construir hay que validar técnicamente la conciliación
 con la API de Binance.
 
+**Implementado (fase 1D):** la conciliación lee los pagos recibidos con `GET /sapi/v1/pay/transactions` (clave de
+solo lectura) cada minuto. Un pago entrante en USDT se acredita al motorizado cuyo Binance Pay ID coincide con
+el del pagador; si no hay coincidencia queda "sin asignar" y el admin lo asigna. Sin clave, el motorizado avisa
+desde la app y el admin confirma, rechaza o asigna a mano. Supuestos tomados: la cuota pendiente se cobra sola
+en cuanto entra saldo suficiente; si la ganancia del mes no supera el primer tramo, el cargo queda "exonerado";
+un cambio de tramos solo aplica desde el mes siguiente.
+
 ## Precio del viaje (decidido)
 - Lo calcula Kuulis **como las otras empresas** (tarifa base, distancia, tiempo, mínimo y recargos por horario
   o demanda), y **todo es configurable desde el admin** para competir.

@@ -9,8 +9,9 @@ from apps.notifications.models import Device, Notification  # noqa: F401
 from apps.promotions.models import Promotion  # noqa: F401
 from apps.rates.models import ExchangeRate  # noqa: F401
 from apps.rides.models import Rating, Ride, RideMessage, RideOffer  # noqa: F401
+from apps.subscriptions.models import Charge, FeeSchedule  # noqa: F401
 from apps.users.models import SocialAccount, User  # noqa: F401
-from apps.wallet.models import Wallet, WalletEntry  # noqa: F401
+from apps.wallet.models import TopUp, Wallet, WalletEntry  # noqa: F401
 from kuulis.core.models import Base
 
 metadata = Base.metadata

@@ -201,6 +201,14 @@ class AppConfig(BaseModel):
     promo_pair_alert_threshold: int = Field(default=3, ge=2, le=100)
     promo_pair_alert_days: int = Field(default=30, ge=1, le=365)
 
+    # --- Wallet and subscription (phase 1D) ----------------------------------------------------
+    topup_min_amount: Money = Decimal("5.00")
+    topup_binance_pay_id: str = Field(default="", max_length=30, pattern=r"^\d*$")
+    topup_account_name: str = Field(default="Kuulis", max_length=60)
+    transfer_monthly_limit: Money = Decimal("50.00")
+    subscription_free_months: int = Field(default=3, ge=0, le=24)
+    subscription_grace_days: int = Field(default=7, ge=0, le=60)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -252,6 +260,12 @@ class AppConfigUpdate(BaseModel):
     rates_manual_hold_hours: int | None = Field(default=None, ge=1, le=168)
     promo_pair_alert_threshold: int | None = Field(default=None, ge=2, le=100)
     promo_pair_alert_days: int | None = Field(default=None, ge=1, le=365)
+    topup_min_amount: Money | None = None
+    topup_binance_pay_id: str | None = Field(default=None, max_length=30, pattern=r"^\d*$")
+    topup_account_name: str | None = Field(default=None, max_length=60)
+    transfer_monthly_limit: Money | None = None
+    subscription_free_months: int | None = Field(default=None, ge=0, le=24)
+    subscription_grace_days: int | None = Field(default=None, ge=0, le=60)
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

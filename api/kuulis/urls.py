@@ -17,7 +17,10 @@ from apps.rides.router import admin_drivers_router as rides_admin_drivers_router
 from apps.rides.router import admin_router as rides_admin_router
 from apps.rides.router import driver_router as rides_driver_router
 from apps.rides.router import router as rides_router
+from apps.subscriptions.router import admin_router as subscriptions_admin_router
+from apps.subscriptions.router import router as subscriptions_router
 from apps.users.router import router as users_router
+from apps.wallet.router import admin_router as wallet_admin_router
 from apps.wallet.router import router as wallet_router
 
 api_v1 = APIRouter()
@@ -38,6 +41,9 @@ api_v1.include_router(rides_admin_router)
 api_v1.include_router(rates_router)
 api_v1.include_router(promotions_admin_router)
 api_v1.include_router(wallet_router)
+api_v1.include_router(wallet_admin_router)
+api_v1.include_router(subscriptions_router)
+api_v1.include_router(subscriptions_admin_router)
 
 root = APIRouter()
 root.include_router(health_router)

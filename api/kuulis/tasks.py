@@ -17,6 +17,7 @@ TASK_MODULES = [
     "apps.notifications.tasks",
     "apps.rides.tasks",
     "apps.rates.tasks",
+    "apps.wallet.tasks",
 ]
 
 if settings.APP_ENV == "test":

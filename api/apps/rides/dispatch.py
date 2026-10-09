@@ -41,6 +41,7 @@ from apps.rides.models import (
     RideStatus,
 )
 from apps.rides.state import OFFER_GRACE, lock_ride, transition, utcnow
+from apps.subscriptions import services as subscriptions
 from apps.users.models import User
 from kuulis.core.db import SessionLocal
 from kuulis.core.redis import redis_client
@@ -125,6 +126,7 @@ async def _eligible(
             )
         )
     )
+    busy |= await subscriptions.overdue_user_ids(session, list(approved))  # unpaid fee
     return {str(u) for u in approved - busy}
 
 

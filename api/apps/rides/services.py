@@ -62,6 +62,7 @@ from apps.rides.state import (
     transition,
     utcnow,
 )
+from apps.subscriptions import services as subscriptions
 from apps.users.models import User
 from apps.wallet import services as wallet
 from apps.wallet.models import EntryKind
@@ -315,6 +316,7 @@ async def driver_state(session: AsyncSession, user: User) -> DriverState:
 
 async def go_online(session: AsyncSession, user: User, lat: float, lng: float) -> DriverState:
     profile = await _approved_profile(session, user)
+    await subscriptions.ensure_not_overdue(session, user.id)
     config = await get_app_config(session)
     vehicle = profile.vehicle
     assert vehicle is not None
@@ -460,7 +462,7 @@ async def _credit_promotion(session: AsyncSession, ride: Ride) -> bool:
         return False
     promotion = await session.get(promotions.Promotion, ride.promotion_id)
     passenger = await session.get(User, ride.passenger_id)
-    await wallet.post_entry(
+    await wallet.credit(
         session,
         ride.driver_id,
         EntryKind.PROMO_CREDIT,

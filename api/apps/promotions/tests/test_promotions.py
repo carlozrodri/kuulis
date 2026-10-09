@@ -161,7 +161,7 @@ async def test_automatic_promotion_quote_ride_and_credit(
     done = await _complete(client, driver, ride["id"])
     assert done["total"] == quote["total"]
     wallet = (await client.get(f"{API}/wallet/me", headers=driver.headers)).json()
-    assert wallet == {"balance": quote["discount"], "currency": "USDT"}
+    assert wallet["balance"] == quote["discount"] and wallet["currency"] == "USDT"
     entries = (await client.get(f"{API}/wallet/me/entries", headers=driver.headers)).json()
     assert entries["total"] == 1
     entry = entries["items"][0]

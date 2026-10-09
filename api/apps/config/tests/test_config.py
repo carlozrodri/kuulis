@@ -37,6 +37,12 @@ DEFAULTS = {
     "rates_manual_hold_hours": 6,
     "promo_pair_alert_threshold": 3,
     "promo_pair_alert_days": 30,
+    "topup_min_amount": "5.00",
+    "topup_binance_pay_id": "",
+    "topup_account_name": "Kuulis",
+    "transfer_monthly_limit": "50.00",
+    "subscription_free_months": 3,
+    "subscription_grace_days": 7,
 }
 
 

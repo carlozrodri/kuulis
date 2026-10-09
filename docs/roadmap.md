@@ -38,10 +38,11 @@ funcionando en QA antes de pasar a la siguiente.
 - [x] Billetera del motorizado (solo lectura: saldo y movimientos). Contrato en `docs/api/phase-1c.md`.
 
 ### 1D · Billetera y suscripción
-- [ ] Libro contable de la billetera (recargas, cuotas, promociones, transferencias).
-- [ ] Recarga con Binance Pay (validar API de conciliación) y TRC-20 como respaldo; confirmación manual en el admin.
-- [ ] Cuota el día 1 por tramos, 3 meses gratis desde el primer viaje, 1 semana de gracia y bloqueo.
-- [ ] Transferencias entre motorizados con límite mensual de lo enviado.
+- [x] Libro contable de la billetera (recargas, cuotas, promociones, transferencias, ajustes del admin).
+- [x] Recarga con Binance Pay: conciliación automática con la API de la cuenta (se activa al poner `BINANCE_API_KEY`/`BINANCE_API_SECRET`, ver bloqueo 10) y confirmación, rechazo o asignación manual en el admin.
+- [ ] TRC-20 como respaldo (pospuesto hasta ver si hace falta).
+- [x] Cuota el día 1 por tramos editables desde el admin, 3 meses gratis desde el primer viaje, 1 semana de gracia, recordatorios y bloqueo.
+- [x] Transferencias entre motorizados con límite mensual de lo enviado.
 
 ### 1E · Operación en el admin
 - [ ] Viajes en vivo e historial, reportes y suspensiones, conciliación de pagos, métricas.

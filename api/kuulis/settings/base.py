@@ -91,6 +91,12 @@ class BaseAppSettings(BaseSettings):
     RATES_BINANCE_INTERVAL_MINUTES: int = 15
     RATES_TIMEOUT_SECONDS: float = 10.0
 
+    # --- Binance Pay reconciliation (read-only API key of Kuulis' Binance account) ------------
+    # Empty: top-ups are confirmed by hand in the admin.
+    BINANCE_API_KEY: str = ""
+    BINANCE_API_SECRET: str = ""
+    BINANCE_API_URL: str = "https://api.binance.com"
+
     # --- Observability ----------------------------------------------------------
     SENTRY_ENABLED: bool = False
     SENTRY_DSN: str = ""
