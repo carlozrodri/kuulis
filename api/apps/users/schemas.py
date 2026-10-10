@@ -33,6 +33,8 @@ class UserRead(BaseModel):
     role: Role
     locale: str
     avatar_key: str | None
+    # Presigned GET of the profile photo (expires; re-read /users/me for a fresh one).
+    avatar_url: str | None = None
     is_active: bool
     is_verified: bool
     created_at: datetime
@@ -53,6 +55,7 @@ class UserCreate(BaseModel):
 class UserUpdateMe(BaseModel):
     full_name: str | None = Field(default=None, max_length=150)
     locale: Locale | None = None
+    # A key from POST /files/presign-upload with folder "avatars"; null or "" removes the photo.
     avatar_key: str | None = Field(default=None, max_length=512)
 
 

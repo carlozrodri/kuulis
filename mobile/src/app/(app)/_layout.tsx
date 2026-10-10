@@ -13,7 +13,7 @@ export const unstable_settings = { initialRouteName: '(tabs)' };
 
 /**
  * Signed-in area: the tabs plus full-screen flows pushed over them (driver onboarding, ride screens, wallet
- * top-ups, transfers and fees, reports).
+ * top-ups, transfers and fees, reports, profile editing).
  * Owns the realtime socket and the ride state machinery shared by every screen.
  */
 export default function AppLayout() {
@@ -41,6 +41,8 @@ export default function AppLayout() {
           <Stack.Screen name="report" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="reports/index" />
           <Stack.Screen name="reports/[id]" />
+          <Stack.Screen name="profile/edit" />
+          <Stack.Screen name="profile/password" />
         </Stack>
         <RideSync />
         <RideNavigator />

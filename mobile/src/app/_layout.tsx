@@ -22,10 +22,12 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { installCrashReporting, reportError, setCrashRoute } from '@/lib/crashReport';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import { ModeProvider, useMode } from '@/providers/ModeProvider';
-import { useTheme } from '@/theme';
+import { loadThemePreference, useTheme } from '@/theme';
 
 // Uncaught JS errors and the last native crash (Android) are sent to the API logs.
 installCrashReporting();
+// Light / dark chosen in Profile (read while the splash is still up).
+void loadThemePreference();
 
 // Keep the native splash until fonts, the session and the chosen mode are ready.
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);

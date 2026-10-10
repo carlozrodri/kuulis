@@ -17,6 +17,7 @@ from apps.rides.schemas import (
     MessageRead,
     OfferAdminRead,
     OnlineDriver,
+    PassengerStats,
     Quote,
     QuoteRequest,
     RatingAdminRead,
@@ -53,6 +54,11 @@ async def quote(data: QuoteRequest, user: CurrentUser, session: DBSession) -> Qu
 async def create_ride(data: RideCreate, user: CurrentUser, session: DBSession) -> RideRead:
     ride = await services.create_ride(session, user, data)
     return await _read(session, ride, user)
+
+
+@router.get("/me/stats", response_model=PassengerStats)
+async def passenger_stats(user: CurrentUser, session: DBSession) -> PassengerStats:
+    return await stats.passenger_stats(session, user.id)
 
 
 @router.get("/active", response_model=RideRead | None)

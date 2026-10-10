@@ -8,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.users.models import Role, User
 from apps.users.schemas import UserAdminCreate, UserAdminUpdate, UserCreate, UserUpdateMe
-from kuulis.core.exceptions import AuthenticationError, ConflictError, NotFoundError
+from kuulis.core import storage
+from kuulis.core.exceptions import AppError, AuthenticationError, ConflictError, NotFoundError
 from kuulis.core.pagination import PageParams, paginate
 from kuulis.core.security import hash_password, verify_password
 
@@ -77,7 +78,16 @@ async def authenticate(session: AsyncSession, email: str, password: str) -> User
 
 
 async def update_me(user: User, data: UserUpdateMe) -> User:
-    for field, value in data.model_dump(exclude_unset=True).items():
+    changes = data.model_dump(exclude_unset=True)
+    if "full_name" in changes:
+        changes["full_name"] = (changes["full_name"] or "").strip()
+    if "avatar_key" in changes:
+        key = changes["avatar_key"] or None
+        # Only a photo this user uploaded to their own avatars folder.
+        if key is not None and not storage.key_in_folder(key, f"avatars/{user.id}"):
+            raise AppError("Invalid avatar key", code="invalid_avatar_key")
+        changes["avatar_key"] = key
+    for field, value in changes.items():
         setattr(user, field, value)
     return user
 

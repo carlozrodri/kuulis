@@ -97,3 +97,16 @@ def presigned_download(key: str) -> str:
         Params={"Bucket": settings.AWS_S3_BUCKET, "Key": key},
         ExpiresIn=settings.STORAGE_PRESIGN_TTL_SECONDS,
     )
+
+
+def download_url_or_none(key: str | None) -> str | None:
+    """Presigned GET for a photo shown in the apps; None when there is no key or storage is off."""
+    if not key:
+        return None
+    try:
+        return presigned_download(key)
+    except ServiceUnavailableError:
+        return None  # storage not configured (local development, tests)
+    except Exception:
+        logger.warning("Could not sign download URL", exc_info=True)
+        return None

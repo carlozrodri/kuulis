@@ -123,16 +123,151 @@
   },
   "profile": {
     "language": "Language",
-    "environment": "Environment",
     "version": "Version",
     "mode": "App mode",
-    "modeHint": "Switches the app mode",
-    "current": "Current",
-    "verified": "Email verified",
-    "about": "About the app",
-    "support": "Help",
     "help": "Help and reports",
-    "helpHint": "Report a problem and follow your reports"
+    "helpHint": "Report a problem and follow your reports",
+    "noName": "Your profile",
+    "verifiedShort": "Verified",
+    "since": "Since {{date}}",
+    "account": "Account",
+    "preferences": "Preferences",
+    "security": "Security",
+    "activity": "Activity",
+    "history": "Ride history",
+    "historyHint": "All your rides and receipts",
+    "footer": "Version {{version}} · {{env}}",
+    "stats": {
+      "trips": "Rides",
+      "rating": "Rating",
+      "km": "Km travelled",
+      "month": "This month"
+    },
+    "photo": {
+      "change": "Change profile photo",
+      "title": "Profile photo",
+      "subtitle": "A clear photo of your face helps people recognise you at pickup.",
+      "camera": "Take photo",
+      "library": "Choose from gallery",
+      "remove": "Remove photo",
+      "saved": "Photo updated",
+      "cameraDenied": "Allow camera access in settings or choose a photo from your gallery."
+    },
+    "complete": {
+      "title": "Complete your profile",
+      "progress": "{{done}} of {{total}} done",
+      "photo": "Add a photo",
+      "photoHint": "So people recognise you at pickup",
+      "name": "Add your first and last name",
+      "nameHint": "Your driver or passenger sees it",
+      "email": "Confirm your email",
+      "emailHint": "Tap to resend the link"
+    },
+    "edit": {
+      "title": "Edit profile",
+      "hint": "Name and photo",
+      "heading": "Your details",
+      "subtitle": "The other person sees your name and photo on every ride.",
+      "saved": "Profile updated",
+      "nameHint": "First and last name, as on your ID",
+      "nameTooShort": "Type at least 2 letters",
+      "emailHint": "It is your login; it can't be changed here."
+    },
+    "password": {
+      "title": "Change password",
+      "hint": "Use one you don't use anywhere else",
+      "heading": "New password",
+      "subtitle": "Type your current password and choose a new one with at least 8 characters.",
+      "current": "Current password",
+      "new": "New password",
+      "repeat": "Repeat the new password",
+      "save": "Change password",
+      "saved": "Password updated",
+      "same": "It must be different from the current one",
+      "mismatch": "The passwords don't match",
+      "wrongCurrent": "The current password is not correct",
+      "socialNote": "If you sign in with Google or Apple and never created a password, sign out and use “Forgot your password?” to create one."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "places": {
+      "title": "Your frequent places",
+      "visits_one": "{{count}} ride here",
+      "visits_other": "{{count}} rides here",
+      "goHint": "Request a moto to this place",
+      "empty": "No frequent places yet",
+      "emptyBody": "The places you go to most will show up here so you can request with one tap."
+    },
+    "payment": {
+      "title": "Preferred payment",
+      "body": "We pick it for you when you request a ride. You always pay the driver directly."
+    },
+    "logoutAll": {
+      "title": "Sign out everywhere",
+      "hint": "On all your phones, including this one",
+      "confirmTitle": "Sign out of all sessions?",
+      "confirmBody": "You'll have to sign in again on every phone where you use Kuulis, including this one.",
+      "confirm": "Yes, sign out everywhere"
+    },
+    "deactivate": {
+      "title": "Deactivate my account",
+      "hint": "You won't be able to sign in or request rides",
+      "confirmTitle": "Deactivate your account?",
+      "confirmBody": "We sign you out and your account stops working. To get it back you'll have to contact support.",
+      "confirm": "Yes, deactivate my account"
+    },
+    "driver": {
+      "vehicle": "Your moto",
+      "account": "Your driver account",
+      "application": "Earn with your moto",
+      "earnings": "Your earnings",
+      "earningsHint": "{{amount}} this month · {{rides}}",
+      "status": {
+        "none": {
+          "title": "Become a driver",
+          "body": "No commission per ride and 3 free months from your first ride.",
+          "action": "Start sign-up"
+        },
+        "draft": {
+          "title": "Continue your sign-up",
+          "body": "Almost there: complete your details and documents to send them for review.",
+          "action": "Continue sign-up"
+        },
+        "pending_review": {
+          "title": "Application in review",
+          "body": "We're reviewing your details and documents. We'll notify you.",
+          "action": "See application"
+        },
+        "rejected": {
+          "title": "Your application needs changes",
+          "body": "Fix what we pointed out and send it again.",
+          "action": "Fix application"
+        }
+      },
+      "fee": {
+        "title": "Subscription",
+        "notStarted": "Your 3 free months start with your first ride",
+        "free": "You're in your free months",
+        "estimated": "Estimated {{month}} fee: {{amount}}",
+        "pending": "Pending fee: {{amount}}",
+        "blocked": "Overdue fee: top up to receive rides"
+      },
+      "docs": {
+        "title": "Documents",
+        "allApproved": "All approved",
+        "inReview_one": "{{count}} in review",
+        "inReview_other": "{{count}} in review",
+        "missing_one": "{{count}} document missing",
+        "missing_other": "{{count}} documents missing",
+        "rejected_one": "{{count}} rejected",
+        "rejected_other": "{{count}} rejected",
+        "help": "Contact support"
+      }
+    }
   },
   "driver": {
     "intro": {

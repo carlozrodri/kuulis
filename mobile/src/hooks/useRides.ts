@@ -9,6 +9,7 @@ import type {
   GeoResult,
   Offer,
   Page,
+  PassengerStats,
   PaymentMethod,
   Place,
   Quote,
@@ -26,6 +27,7 @@ export const rideKeys = {
   history: (role: 'passenger' | 'driver') => ['rides', 'history', role] as const,
   // Under 'rides' so every ride re-sync also refreshes the driver's earnings.
   driverStats: ['rides', 'driver-stats'] as const,
+  passengerStats: ['rides', 'passenger-stats'] as const,
   driverState: ['drivers', 'me', 'state'] as const,
 };
 
@@ -133,6 +135,23 @@ export function useDriverStats(enabled = true) {
     queryKey: rideKeys.driverStats,
     queryFn: () => api<DriverStats>('/drivers/me/stats'),
     enabled,
+  });
+}
+
+/** Not every server has it yet: 404 reads as "no stats" so the profile still renders. */
+export function usePassengerStats(enabled = true) {
+  return useQuery({
+    queryKey: rideKeys.passengerStats,
+    queryFn: async () => {
+      try {
+        return await api<PassengerStats>('/rides/me/stats');
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 404) return null;
+        throw error;
+      }
+    },
+    enabled,
+    staleTime: 5 * 60_000,
   });
 }
 

@@ -123,16 +123,151 @@
   },
   "profile": {
     "language": "Idioma",
-    "environment": "Entorno",
     "version": "Versión",
     "mode": "Modo de uso",
-    "modeHint": "Cambia el modo de la app",
-    "current": "Actual",
-    "verified": "Correo verificado",
-    "about": "Acerca de la app",
-    "support": "Ayuda",
     "help": "Ayuda y reportes",
-    "helpHint": "Reporta un problema y sigue tus reportes"
+    "helpHint": "Reporta un problema y sigue tus reportes",
+    "noName": "Tu perfil",
+    "verifiedShort": "Verificado",
+    "since": "Desde {{date}}",
+    "account": "Cuenta",
+    "preferences": "Preferencias",
+    "security": "Seguridad",
+    "activity": "Actividad",
+    "history": "Historial de viajes",
+    "historyHint": "Todos tus viajes y recibos",
+    "footer": "Versión {{version}} · {{env}}",
+    "stats": {
+      "trips": "Viajes",
+      "rating": "Calificación",
+      "km": "Km recorridos",
+      "month": "Este mes"
+    },
+    "photo": {
+      "change": "Cambiar foto de perfil",
+      "title": "Foto de perfil",
+      "subtitle": "Una foto clara de tu cara ayuda a que te reconozcan al llegar.",
+      "camera": "Tomar foto",
+      "library": "Elegir de la galería",
+      "remove": "Quitar foto",
+      "saved": "Foto actualizada",
+      "cameraDenied": "Permite el acceso a la cámara en los ajustes o elige una foto de tu galería."
+    },
+    "complete": {
+      "title": "Completa tu perfil",
+      "progress": "{{done}} de {{total}} listos",
+      "photo": "Agrega una foto",
+      "photoHint": "Así te reconocen al llegar",
+      "name": "Escribe tu nombre y apellido",
+      "nameHint": "Lo ve el motorizado o el pasajero",
+      "email": "Confirma tu correo",
+      "emailHint": "Toca para reenviar el enlace"
+    },
+    "edit": {
+      "title": "Editar perfil",
+      "hint": "Nombre y foto",
+      "heading": "Tus datos",
+      "subtitle": "Tu nombre y tu foto los ve la otra persona en cada viaje.",
+      "saved": "Perfil actualizado",
+      "nameHint": "Nombre y apellido, como en tu cédula",
+      "nameTooShort": "Escribe al menos 2 letras",
+      "emailHint": "Es tu usuario para entrar; no se puede cambiar aquí."
+    },
+    "password": {
+      "title": "Cambiar contraseña",
+      "hint": "Usa una que no uses en otro lado",
+      "heading": "Nueva contraseña",
+      "subtitle": "Escribe tu contraseña actual y elige una nueva de al menos 8 caracteres.",
+      "current": "Contraseña actual",
+      "new": "Contraseña nueva",
+      "repeat": "Repite la contraseña nueva",
+      "save": "Cambiar contraseña",
+      "saved": "Contraseña actualizada",
+      "same": "Debe ser distinta a la actual",
+      "mismatch": "Las contraseñas no coinciden",
+      "wrongCurrent": "La contraseña actual no es correcta",
+      "socialNote": "Si entras con Google o Apple y nunca creaste una contraseña, cierra sesión y usa «¿Olvidaste tu contraseña?» para crear una."
+    },
+    "appearance": {
+      "title": "Apariencia",
+      "system": "Sistema",
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
+    "places": {
+      "title": "Tus lugares frecuentes",
+      "visits_one": "{{count}} viaje hasta aquí",
+      "visits_other": "{{count}} viajes hasta aquí",
+      "goHint": "Pide una moto hasta este lugar",
+      "empty": "Aún no tienes lugares frecuentes",
+      "emptyBody": "Los destinos a los que más vas aparecerán aquí para pedir con un toque."
+    },
+    "payment": {
+      "title": "Pago preferido",
+      "body": "Lo elegimos por ti al pedir un viaje. Siempre le pagas directo al motorizado."
+    },
+    "logoutAll": {
+      "title": "Cerrar sesión en todos lados",
+      "hint": "En todos tus teléfonos, incluido este",
+      "confirmTitle": "¿Cerrar todas tus sesiones?",
+      "confirmBody": "Tendrás que volver a entrar en cada teléfono donde uses Kuulis, incluido este.",
+      "confirm": "Sí, cerrar todas"
+    },
+    "deactivate": {
+      "title": "Desactivar mi cuenta",
+      "hint": "Ya no podrás entrar ni pedir viajes",
+      "confirmTitle": "¿Desactivar tu cuenta?",
+      "confirmBody": "Cerramos tu sesión y tu cuenta deja de funcionar. Para recuperarla tendrás que escribirle a soporte.",
+      "confirm": "Sí, desactivar mi cuenta"
+    },
+    "driver": {
+      "vehicle": "Tu moto",
+      "account": "Tu cuenta de motorizado",
+      "application": "Gana con tu moto",
+      "earnings": "Tus ganancias",
+      "earningsHint": "{{amount}} este mes · {{rides}}",
+      "status": {
+        "none": {
+          "title": "Conviértete en motorizado",
+          "body": "Sin comisión por viaje y 3 meses gratis desde tu primer viaje.",
+          "action": "Comenzar registro"
+        },
+        "draft": {
+          "title": "Sigue con tu registro",
+          "body": "Te falta poco: completa tus datos y documentos para enviarlos a revisión.",
+          "action": "Continuar registro"
+        },
+        "pending_review": {
+          "title": "Solicitud en revisión",
+          "body": "Estamos revisando tus datos y documentos. Te avisaremos por notificación.",
+          "action": "Ver solicitud"
+        },
+        "rejected": {
+          "title": "Tu solicitud necesita cambios",
+          "body": "Corrige lo que te indicamos y vuelve a enviarla.",
+          "action": "Corregir solicitud"
+        }
+      },
+      "fee": {
+        "title": "Suscripción",
+        "notStarted": "Tus 3 meses gratis empiezan con tu primer viaje",
+        "free": "Estás en tus meses gratis",
+        "estimated": "Cuota estimada de {{month}}: {{amount}}",
+        "pending": "Cuota pendiente: {{amount}}",
+        "blocked": "Cuota vencida: recarga para recibir viajes"
+      },
+      "docs": {
+        "title": "Documentos",
+        "allApproved": "Todos aprobados",
+        "inReview_one": "{{count}} en revisión",
+        "inReview_other": "{{count}} en revisión",
+        "missing_one": "Falta {{count}} documento",
+        "missing_other": "Faltan {{count}} documentos",
+        "rejected_one": "{{count}} rechazado",
+        "rejected_other": "{{count}} rechazados",
+        "help": "Escríbele a soporte"
+      }
+    }
   },
   "driver": {
     "intro": {

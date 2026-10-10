@@ -14,7 +14,6 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
       Alternativa: deep links a la app móvil.
 - [ ] Plantillas HTML de email con diseño.
 - [ ] Scheduler de Taskiq desplegado cuando haya tareas periódicas (hoy no hay ninguna).
-- [ ] Endpoint de avatar (subida con presign ya existe; falta guardar `avatar_key` y mostrarlo).
 - [ ] Limpieza periódica de notificaciones antiguas y dispositivos inactivos.
 
 ## Admin
@@ -22,6 +21,5 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
 - [ ] Gráficas de registros por día.
 
 ## Mobile
-- [ ] Pantallas de cambio de contraseña y edición de perfil.
 - [ ] Manejo de toque en notificación push (navegar a la pantalla correspondiente).
 - [ ] Tests de componentes.

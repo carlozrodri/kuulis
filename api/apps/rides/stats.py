@@ -13,11 +13,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.drivers.models import DriverProfile
 from apps.rides.models import Ride, RideStatus
-from apps.rides.schemas import DriverStats, PeriodStats, StatsDay
+from apps.rides.schemas import DriverStats, FrequentPlace, PassengerStats, PeriodStats, StatsDay
 from kuulis.core.calendar import CARACAS_TZ, add_months, days_bounds, local_now, month_start
 
 ZERO = Decimal("0.00")
 DAYS = 7
+FREQUENT_PLACES = 3
 
 
 def _period(rows: list[tuple[date, int, Decimal]], first: date, last: date) -> PeriodStats:
@@ -73,4 +74,48 @@ async def driver_stats(session: AsyncSession, user_id: uuid.UUID) -> DriverStats
         ],
         total_rides=total_rides or 0,
         rating=float(rating) if rating is not None else None,
+    )
+
+
+async def passenger_stats(session: AsyncSession, user_id: uuid.UUID) -> PassengerStats:
+    completed = (Ride.passenger_id == user_id, Ride.status == RideStatus.COMPLETED)
+    rides, distance, spent = (
+        await session.execute(
+            select(
+                func.count(),
+                func.coalesce(func.sum(Ride.distance_m), 0),
+                func.coalesce(func.sum(Ride.fare - Ride.discount), 0),
+            ).where(*completed)
+        )
+    ).one()
+
+    # Same address = same place; the coordinates of the latest ride there are good enough.
+    visits = func.count().label("visits")
+    places = await session.execute(
+        select(
+            Ride.dropoff_address,
+            func.max(Ride.completed_at).label("last"),
+            visits,
+        )
+        .where(*completed, Ride.dropoff_address != "")
+        .group_by(Ride.dropoff_address)
+        .order_by(visits.desc(), func.max(Ride.completed_at).desc())
+        .limit(FREQUENT_PLACES)
+    )
+    frequent: list[FrequentPlace] = []
+    for address, last, count in places:
+        lat, lng = (
+            await session.execute(
+                select(Ride.dropoff_lat, Ride.dropoff_lng)
+                .where(*completed, Ride.dropoff_address == address, Ride.completed_at == last)
+                .limit(1)
+            )
+        ).one()
+        frequent.append(FrequentPlace(address=address, lat=lat, lng=lng, rides=count))
+
+    return PassengerStats(
+        rides=rides,
+        distance_m=int(distance),
+        spent=Decimal(spent).quantize(Decimal("0.01")),
+        frequent_places=frequent,
     )

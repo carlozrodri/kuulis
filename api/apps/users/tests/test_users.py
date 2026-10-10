@@ -14,6 +14,38 @@ async def test_me_and_update(client, user_headers):
     assert me["locale"] == "en"
 
 
+async def test_avatar_key_must_be_own_avatar(client, user_headers):
+    me = (await client.get("/api/v1/users/me", headers=user_headers)).json()
+    own = f"test/avatars/{me['id']}/0123abcd-photo.jpg"
+    for key in (
+        "test/avatars/00000000-0000-0000-0000-000000000000/x.jpg",  # someone else's folder
+        f"test/uploads/{me['id']}/x.jpg",  # not the avatars folder
+        f"test/avatars/{me['id']}/../x.jpg",
+    ):
+        response = await client.patch(
+            "/api/v1/users/me", json={"avatar_key": key}, headers=user_headers
+        )
+        assert response.status_code == 400, key
+        assert response.json()["error"]["code"] == "invalid_avatar_key"
+
+    response = await client.patch(
+        "/api/v1/users/me", json={"avatar_key": own}, headers=user_headers
+    )
+    assert response.status_code == 200
+    assert response.json()["avatar_key"] == own
+    assert "avatar_url" in response.json()  # null in tests: storage is not configured
+
+    response = await client.patch("/api/v1/users/me", json={"avatar_key": ""}, headers=user_headers)
+    assert response.json()["avatar_key"] is None
+
+
+async def test_full_name_is_trimmed(client, user_headers):
+    response = await client.patch(
+        "/api/v1/users/me", json={"full_name": "  Ana Pérez  "}, headers=user_headers
+    )
+    assert response.json()["full_name"] == "Ana Pérez"
+
+
 async def test_change_password(client, user_headers):
     response = await client.post(
         "/api/v1/users/me/password",

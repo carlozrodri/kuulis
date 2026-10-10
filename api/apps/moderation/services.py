@@ -27,6 +27,7 @@ from apps.rides.models import Ride, RideStatus
 from apps.users.models import Role, User
 from apps.users.schemas import SuspensionRead, UserBrief, UserRead
 from apps.wallet import notify
+from kuulis.core import storage
 from kuulis.core.exceptions import AppError, ConflictError, NotFoundError, PermissionDeniedError
 from kuulis.core.pagination import PageParams
 
@@ -285,7 +286,12 @@ async def user_reads(
     if not staff_view:
         suspensions = {k: v.model_copy(update={"by": None}) for k, v in suspensions.items()}
     return [
-        UserRead.model_validate(u).model_copy(update={"suspension": suspensions.get(u.id)})
+        UserRead.model_validate(u).model_copy(
+            update={
+                "suspension": suspensions.get(u.id),
+                "avatar_url": storage.download_url_or_none(u.avatar_key),
+            }
+        )
         for u in users
     ]
 

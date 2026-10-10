@@ -1,8 +1,11 @@
-import { useColorScheme } from 'react-native';
+import { Appearance, Platform, useColorScheme } from 'react-native';
+
+import { secureStorage } from '@/lib/storage';
+import { createStore, useStore } from '@/lib/store';
 
 /**
  * Kuulis design system v1 ("Verde Ávila"). Source of truth: docs/product/mobile-design.md.
- * Light and dark follow the system setting.
+ * Light and dark follow the system setting unless the user picks one in Profile.
  */
 const light = {
   primary: '#0E7C5A',
@@ -86,8 +89,42 @@ const themes: Record<'light' | 'dark', Theme> = {
   dark: { ...dark, scheme: 'dark' },
 };
 
+export type ThemePreference = 'system' | 'light' | 'dark';
+
+const THEME_KEY = 'kuulis.theme';
+/** Appearance chosen in Profile, stored on the device. */
+export const themePreference = createStore<ThemePreference>('system');
+
+const isPreference = (value: string | null): value is ThemePreference =>
+  value === 'system' || value === 'light' || value === 'dark';
+
+function applyPreference(preference: ThemePreference) {
+  themePreference.set(preference);
+  // Native: also switches system UI (status bar, keyboard, alerts). The web follows the store only.
+  if (Platform.OS !== 'web') {
+    try {
+      Appearance.setColorScheme(preference === 'system' ? 'unspecified' : preference);
+    } catch {
+      // Older runtimes without setColorScheme: the app colors still follow the store.
+    }
+  }
+}
+
+export async function loadThemePreference() {
+  const stored = await secureStorage.get(THEME_KEY).catch(() => null);
+  if (isPreference(stored) && stored !== 'system') applyPreference(stored);
+}
+
+export function setThemePreference(preference: ThemePreference) {
+  applyPreference(preference);
+  void secureStorage.set(THEME_KEY, preference).catch(() => undefined);
+}
+
 export function useTheme(): Theme {
-  return themes[useColorScheme() === 'dark' ? 'dark' : 'light'];
+  const preference = useStore(themePreference);
+  const system = useColorScheme();
+  const scheme = preference === 'system' ? (system === 'dark' ? 'dark' : 'light') : preference;
+  return themes[scheme];
 }
 
 /** Spacing in multiples of 4. */

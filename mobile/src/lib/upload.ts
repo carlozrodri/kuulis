@@ -39,6 +39,23 @@ export async function uploadDriverDocument(kind: DocumentKind, file: LocalFile):
   return api<DriverProfile>('/drivers/me/documents', { method: 'POST', body: { kind, key: presign.key } });
 }
 
+/** Profile photo: presign in the avatars folder → PUT → returns the key to save with PATCH /users/me. */
+export async function uploadAvatar(file: LocalFile): Promise<string> {
+  const filename = file.name || file.uri.split('/').pop() || 'avatar.jpg';
+  const contentType = contentTypeFor(filename, file.mimeType);
+  if (!contentType || contentType === 'application/pdf') throw new UploadError('file_type_not_allowed');
+
+  const size = await fileSize(file.uri);
+  const presign = await api<PresignResponse>('/files/presign-upload', {
+    method: 'POST',
+    body: { filename, content_type: contentType, size, folder: 'avatars' },
+  });
+  const headers = { 'Content-Type': contentType, ...presign.headers };
+  const status = await putFile(presign.upload_url, presign.method ?? 'PUT', file.uri, headers);
+  if (status < 200 || status >= 300) throw new UploadError('upload_failed');
+  return presign.key;
+}
+
 async function fileSize(uri: string): Promise<number> {
   if (Platform.OS === 'web') return (await (await fetch(uri)).blob()).size;
   const info = await FileSystem.getInfoAsync(uri);

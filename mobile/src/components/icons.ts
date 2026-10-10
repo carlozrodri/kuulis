@@ -93,3 +93,8 @@ export { default as Bug } from 'lucide-react-native/icons/bug';
 export { default as CircleEllipsis } from 'lucide-react-native/icons/circle-ellipsis';
 export { default as LifeBuoy } from 'lucide-react-native/icons/life-buoy';
 export { default as MessageSquareWarning } from 'lucide-react-native/icons/message-square-warning';
+export { default as Sun } from 'lucide-react-native/icons/sun';
+export { default as Moon } from 'lucide-react-native/icons/moon';
+export { default as History } from 'lucide-react-native/icons/clock-arrow-up';
+export { default as MonitorSmartphone } from 'lucide-react-native/icons/monitor-smartphone';
+export { default as TrendingUp } from 'lucide-react-native/icons/trending-up';

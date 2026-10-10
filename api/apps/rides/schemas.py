@@ -304,3 +304,19 @@ class DriverStats(BaseModel):
     by_day: list[StatsDay]  # last 7 days, oldest first
     total_rides: int
     rating: float | None
+
+
+class FrequentPlace(BaseModel):
+    address: str
+    lat: float
+    lng: float
+    rides: int
+
+
+class PassengerStats(BaseModel):
+    """GET /rides/me/stats: what the passenger has done with Kuulis (completed rides only)."""
+
+    rides: int
+    distance_m: int
+    spent: MoneyStr  # what the passenger paid: fare - promo discount
+    frequent_places: list[FrequentPlace]  # most visited destinations, most rides first

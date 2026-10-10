@@ -34,7 +34,6 @@ from apps.rides.schemas import (
 )
 from apps.users.models import User
 from kuulis.core import storage
-from kuulis.core.exceptions import ServiceUnavailableError
 
 logger = logging.getLogger(__name__)
 
@@ -71,18 +70,6 @@ async def _promotions(
 
 def _rating(value: Any) -> float | None:
     return float(value) if value is not None else None
-
-
-def _photo_url(key: str | None) -> str | None:
-    if not key:
-        return None
-    try:
-        return storage.presigned_download(key)
-    except ServiceUnavailableError:
-        return None  # storage not configured (local development)
-    except Exception:
-        logger.warning("Could not sign driver photo URL", exc_info=True)
-        return None
 
 
 def _place(lat: float, lng: float, address: str) -> dict[str, Any]:
@@ -162,7 +149,7 @@ async def serialize_rides(
                 id=driver_user.id,
                 first_name=first_name(driver_user),
                 rating=_rating(profile.rating_avg) if profile else None,
-                photo_url=_photo_url(selfie),
+                photo_url=storage.download_url_or_none(selfie),
                 vehicle=VehicleBrief.model_validate(ride.vehicle) if ride.vehicle else None,
             )
         location = None

@@ -7,10 +7,15 @@ export interface User {
   role: Role;
   locale: "es" | "en";
   avatar_key: string | null;
+  /** Presigned URL of the profile photo; it expires, so a failed load falls back to the initials. */
+  avatar_url?: string | null;
   is_active: boolean;
   is_verified: boolean;
   created_at: string;
   last_login_at: string | null;
+  /** Rating received as a passenger (older servers omit it). */
+  rating_avg?: number | null;
+  rating_count?: number;
   /** Phase 1E: the account suspension in force, null when there is none (older servers omit it). */
   suspension?: Suspension | null;
 }
@@ -561,4 +566,18 @@ export interface DriverStats {
   by_day: (PeriodStats & { date: string })[];
   total_rides: number;
   rating: number | null;
+}
+
+/** GET /rides/me/stats: the passenger's completed rides. */
+export interface FrequentPlace extends Place {
+  rides: number;
+}
+
+export interface PassengerStats {
+  rides: number;
+  distance_m: number;
+  /** Paid in USD (fare minus promo discount). */
+  spent: string;
+  /** Most visited destinations, most rides first. */
+  frequent_places: FrequentPlace[];
 }
