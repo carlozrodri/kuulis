@@ -459,7 +459,10 @@ export interface Charge {
 /** GET /wallet/me/subscription: the current month (Caracas time). */
 export interface SubscriptionSummary {
   month: string;
+  /** What counts for the fee (rides inside the free period are excluded). */
   earnings: string;
+  /** Everything earned this month (fare minus promo discount); older APIs don't send it. */
+  earned?: string;
   estimated_fee: string;
   /** End of the free period; null until the first completed trip. */
   free_until: string | null;
@@ -470,7 +473,7 @@ export interface SubscriptionSummary {
   overdue: boolean;
   /** Past the grace week with a pending charge: cannot go online nor receive offers. */
   blocked: boolean;
-  /** Not in the written contract: completed trips this month, shown when the API sends it. */
+  /** Completed trips this month. */
   trips?: number | null;
 }
 
@@ -538,4 +541,24 @@ export interface ReportInput {
 /** `details` of a 409 report_already_open. */
 export interface ReportAlreadyOpenDetails {
   report_id: string;
+}
+
+/** GET /drivers/me/stats: completed rides and earnings (fare minus promo discount), Caracas days. */
+export interface PeriodStats {
+  rides: number;
+  earnings: string;
+}
+
+export interface DriverStats {
+  today: PeriodStats;
+  yesterday: PeriodStats;
+  /** Monday to today. */
+  week: PeriodStats;
+  /** 1st of the month to today. */
+  month: PeriodStats;
+  last_month: PeriodStats;
+  /** Last 7 days, oldest first ("YYYY-MM-DD"). */
+  by_day: (PeriodStats & { date: string })[];
+  total_rides: number;
+  rating: number | null;
 }

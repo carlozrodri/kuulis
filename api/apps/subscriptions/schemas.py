@@ -102,7 +102,11 @@ class ChargesPage(BaseModel):
 
 class SubscriptionSummary(BaseModel):
     month: Month
+    # What counts for the fee (excludes rides inside the free period).
     earnings: Annotated[Decimal, MoneyStr]
+    # Everything earned this month (fare minus promo discount), shown as "Ganado en <mes>".
+    earned: Annotated[Decimal, MoneyStr]
+    trips: int  # completed rides this month
     estimated_fee: Annotated[Decimal, MoneyStr]
     free_until: datetime | None
     in_free_period: bool

@@ -425,6 +425,8 @@ def charge_read(charge: Charge) -> ChargeRead:
 class Summary:
     month: date
     earnings: Decimal
+    earned: Decimal
+    trips: int
     estimated_fee: Decimal
     free_until: datetime | None
     in_free_period: bool
@@ -440,6 +442,16 @@ async def summary(session: AsyncSession, user_id: uuid.UUID) -> Summary:
     month = month_start(local_now())
     schedule = await schedule_for(session, month)
     total, _ = await month_earnings(session, profile, month, config)
+    start, end = month_bounds(month)
+    earned = (await earnings(session, [profile.user_id], start, end)).get(profile.user_id, ZERO)
+    trips = await session.scalar(
+        select(func.count()).where(
+            Ride.driver_id == profile.user_id,
+            Ride.status == RideStatus.COMPLETED,
+            Ride.completed_at >= start,
+            Ride.completed_at < end,
+        )
+    )
     until = free_until(profile, config)
     pending = list(
         await session.scalars(
@@ -452,6 +464,8 @@ async def summary(session: AsyncSession, user_id: uuid.UUID) -> Summary:
     return Summary(
         month=month,
         earnings=total,
+        earned=earned,
+        trips=trips or 0,
         estimated_fee=fee_for(schedule.tiers, total),
         free_until=until,
         in_free_period=until is None or until > utcnow(),

@@ -140,6 +140,12 @@ async def test_free_period(client, recorder):
     assert summary["in_free_period"] is True and summary["blocked"] is False
     assert summary["estimated_fee"] == "0.00" and len(summary["tiers"]) == 7
 
+    # Rides inside the free period don't count for the fee but still show as earned this month.
+    await _ride(new, "25", 0, day=1)
+    summary = (await client.get(f"{API}/wallet/me/subscription", headers=new.headers)).json()
+    assert summary["earnings"] == "0.00" and summary["earned"] == "25.00"
+    assert summary["trips"] == 1
+
 
 async def test_month_not_closed(client, admin_headers, staff_headers):
     url = f"{API}/admin/subscriptions/run"

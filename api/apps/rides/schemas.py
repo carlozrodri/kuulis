@@ -1,6 +1,6 @@
 import re
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Annotated
 
@@ -279,3 +279,28 @@ class LocationUpdate(Point):
 
     heading: float | None = Field(default=None, ge=0, le=360)
     speed: float | None = Field(default=None, ge=0, le=100)
+
+
+# --- Driver stats ------------------------------------------------------------------------------
+
+
+class PeriodStats(BaseModel):
+    rides: int
+    earnings: MoneyStr
+
+
+class StatsDay(PeriodStats):
+    date: date
+
+
+class DriverStats(BaseModel):
+    """GET /drivers/me/stats: completed rides and earnings (fare - promo discount), Caracas time."""
+
+    today: PeriodStats
+    yesterday: PeriodStats
+    week: PeriodStats  # Monday to today
+    month: PeriodStats  # 1st to today
+    last_month: PeriodStats
+    by_day: list[StatsDay]  # last 7 days, oldest first
+    total_rides: int
+    rating: float | None

@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CircleX, Route } from '@/components/icons';
 import { Button, Card, EmptyState, Skeleton, StatusPill, TAB_BAR_SPACE, type Tone, Txt } from '@/components/ui';
-import { useRideHistory } from '@/hooks/useRides';
+import { DriverStatsPanel } from '@/features/driver/DriverStatsPanel';
+import { useDriverStats, useRideHistory } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { amountToPay } from '@/lib/money';
 import { formatFare } from '@/lib/ride';
@@ -35,6 +36,7 @@ export function HistoryScreen() {
   const { mode } = useMode();
   const role = mode === 'driver' ? 'driver' : 'passenger';
   const history = useRideHistory(role);
+  const stats = useDriverStats(role === 'driver');
   const rides = history.data?.pages.flatMap((page) => page.items) ?? [];
 
   const renderItem = ({ item }: { item: Ride }) => {
@@ -66,7 +68,10 @@ export function HistoryScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ paddingHorizontal: space.lg, paddingBottom: TAB_BAR_SPACE + insets.bottom, gap: space.sm, flexGrow: 1 }}
-        refreshControl={<RefreshControl refreshing={history.isRefetching && !history.isFetchingNextPage} onRefresh={() => void history.refetch()} tintColor={theme.primary} />}
+        refreshControl={<RefreshControl refreshing={history.isRefetching && !history.isFetchingNextPage} onRefresh={() => {
+              void history.refetch();
+              if (role === 'driver') void stats.refetch();
+            }} tintColor={theme.primary} />}
         onEndReachedThreshold={0.4}
         onEndReached={() => {
           if (history.hasNextPage && !history.isFetchingNextPage) void history.fetchNextPage();
@@ -77,6 +82,12 @@ export function HistoryScreen() {
               {t('history.title')}
             </Txt>
             <Txt color="muted">{role === 'driver' ? t('history.subtitleDriver') : t('history.subtitlePassenger')}</Txt>
+            {role === 'driver' ? (
+              <View style={{ gap: space.md, marginTop: space.md }}>
+                <DriverStatsPanel stats={stats.data} loading={stats.isPending} />
+                {rides.length > 0 ? <Txt variant="overline" color="muted">{t('stats.recent')}</Txt> : null}
+              </View>
+            ) : null}
           </View>
         }
         ListFooterComponent={history.isFetchingNextPage ? <ActivityIndicator color={theme.primary} style={{ margin: space.md }} /> : null}

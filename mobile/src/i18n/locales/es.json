@@ -1055,5 +1055,18 @@
     "title": "Algo salió mal",
     "body": "Ya avisamos al equipo de Kuulis. Toca Reintentar para volver a la app.",
     "retry": "Reintentar"
+  },
+  "stats": {
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "week": "Esta semana",
+    "month": "Este mes",
+    "rides_one": "{{count}} viaje",
+    "rides_other": "{{count}} viajes",
+    "lastMonth": "Mes pasado: {{earnings}} · {{rides}}",
+    "total_one": "{{count}} viaje en total",
+    "total_other": "{{count}} viajes en total",
+    "rating": "Tu calificación: {{rating}}",
+    "recent": "Viajes recientes"
   }
 }

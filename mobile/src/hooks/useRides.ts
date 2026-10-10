@@ -5,6 +5,7 @@ import { ApiError, api } from '@/lib/api';
 import { isActiveStatus, isTerminalStatus, mergeRide } from '@/lib/ride';
 import type {
   DriverState,
+  DriverStats,
   GeoResult,
   Offer,
   Page,
@@ -23,6 +24,8 @@ export const rideKeys = {
   detail: (id: string) => ['rides', 'detail', id] as const,
   messages: (id: string) => ['rides', 'messages', id] as const,
   history: (role: 'passenger' | 'driver') => ['rides', 'history', role] as const,
+  // Under 'rides' so every ride re-sync also refreshes the driver's earnings.
+  driverStats: ['rides', 'driver-stats'] as const,
   driverState: ['drivers', 'me', 'state'] as const,
 };
 
@@ -122,6 +125,14 @@ export function useRideMessages(id: string | undefined) {
     queryFn: () => api<RideMessage[]>(`/rides/${id}/messages`),
     enabled: !!id,
     staleTime: 30_000,
+  });
+}
+
+export function useDriverStats(enabled = true) {
+  return useQuery({
+    queryKey: rideKeys.driverStats,
+    queryFn: () => api<DriverStats>('/drivers/me/stats'),
+    enabled,
   });
 }
 

@@ -85,7 +85,7 @@ completados el mes anterior:
 
 | Método | Ruta | Quién | Respuesta |
 | --- | --- | --- | --- |
-| GET | `/wallet/me/subscription` | motorizado | `{month, earnings, estimated_fee, free_until, in_free_period, tiers, next_charge_at, pending: [Charge], overdue, blocked}` (mes en curso) |
+| GET | `/wallet/me/subscription` | motorizado | `{month, earnings, earned, trips, estimated_fee, free_until, in_free_period, tiers, next_charge_at, pending: [Charge], overdue, blocked}` (mes en curso; `earnings` = lo que cuenta para la cuota, sin el periodo gratis; `earned` = todo lo ganado en el mes; `trips` = viajes completados del mes) |
 | GET | `/wallet/me/charges` | motorizado | Paginado de `Charge` |
 | GET | `/admin/subscriptions/charges` | staff | `?month&status&q&limit&offset`, con nombre y email |
 | POST | `/admin/subscriptions/charges/{id}/waive` | admin | `{reason}` → `Charge` (desbloquea) |

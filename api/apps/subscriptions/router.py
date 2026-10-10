@@ -51,6 +51,8 @@ async def my_subscription(user: CurrentUser, session: DBSession) -> Subscription
     return SubscriptionSummary(
         month=data.month,
         earnings=data.earnings,
+        earned=data.earned,
+        trips=data.trips,
         estimated_fee=data.estimated_fee,
         free_until=data.free_until,
         in_free_period=data.in_free_period,

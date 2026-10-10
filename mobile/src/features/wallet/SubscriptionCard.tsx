@@ -180,13 +180,15 @@ export function SubscriptionCard({
           tone: "accent",
         }
       : null;
+    // In the free period nothing counts for the fee yet: show what was earned and what it would cost.
+    const earned = summary.earned ?? summary.earnings;
     body = t("wallet.sub.freeBody", {
-      earnings: formatFare(summary.earnings),
+      earnings: formatFare(earned),
       month: format.monthName(summary.month),
     });
-    const wouldPay = feeFor(summary.tiers, summary.earnings);
+    const wouldPay = feeFor(summary.tiers, earned);
     if (wouldPay > 0) {
-      const tier = feeTierFor(summary.tiers, summary.earnings);
+      const tier = feeTierFor(summary.tiers, earned);
       extra = t("wallet.sub.wouldPay", {
         fee: formatFare(wouldPay),
         tier: tier ? format.tierText(tier) : "",
@@ -331,6 +333,8 @@ export function EarningsCard({
   const owed = pendingTotal(pending);
   const dueAt = nextDueAt(pending);
   const trips = typeof summary.trips === "number" ? summary.trips : null;
+  // Everything earned this month; `earnings` leaves out the rides inside the free period (fee only).
+  const earned = summary.earned ?? summary.earnings;
 
   let label: string;
   let pill: string | null;
@@ -383,7 +387,7 @@ export function EarningsCard({
       accessibilityRole="button"
       accessibilityLabel={[
         t("home.earned", { month }),
-        formatFare(summary.earnings),
+        formatFare(earned),
         trips !== null ? t("home.trips", { count: trips }) : null,
         label,
         pill,
@@ -405,7 +409,7 @@ export function EarningsCard({
             {t("home.earned", { month })}
           </Txt>
           <Txt style={[styles.earned, { color: theme.text }]} tabular>
-            {formatFare(summary.earnings)}
+            {formatFare(earned)}
           </Txt>
         </View>
         {trips !== null ? (

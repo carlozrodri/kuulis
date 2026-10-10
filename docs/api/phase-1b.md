@@ -118,6 +118,10 @@ Las ofertas y los cambios de estado también envían push (por si la app está e
 socket, para el servicio de ubicación en segundo plano de Android (el socket puede estar dormido). Se ignora
 si el motorizado no está conectado ni tiene viaje, o si llega antes de 1 s desde la anterior.
 
+`GET /drivers/me/stats` → `{today, yesterday, week, month, last_month: {rides, earnings}, by_day: [{date,
+rides, earnings}] (últimos 7 días, del más viejo al de hoy), total_rides, rating}`. Viajes completados y
+ganancia (tarifa menos descuento de promoción) en días de Caracas; la semana va de lunes a hoy.
+
 ## Admin (staff)
 
 | Método | Ruta | Notas |
