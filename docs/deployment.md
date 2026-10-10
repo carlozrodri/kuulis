@@ -73,3 +73,21 @@ crear una migración nueva que lo revierta (no editar migraciones ya aplicadas).
 Configurados en Coolify para cada Postgres. **Pendiente de Carlos:** activar "Save to S3" y elegir su S3
 en cada backup (la API de Coolify 4.1.2 no expone el id del S3, ver `blockers.md`).
 Restaurar: Coolify → base de datos → Backups → Restore, o `pg_restore` del dump descargado de S3.
+
+## Compilador de APK (`kuulis-builder-qa`)
+App de Coolify en QA que compila el APK en nuestro servidor, sin la cola de EAS Build (~25 min).
+- Imagen: `mobile/builder/Dockerfile` (base `/mobile`), con JDK 17, Android SDK 36 y NDK 27.
+- Al arrancar compila con `eas build --local --profile qa` (mismas credenciales y variables de EAS que en
+  la nube) y sube el APK a S3 en `builds/qa/` (con fecha y hash) y como `builds/qa/kuulis-qa-qa-latest.apk`.
+  El enlace firmado de 7 días queda en los logs del contenedor.
+- `watch_paths`: solo archivos que cambian la parte nativa (`package.json`, `app.config.ts`, `eas.json`,
+  `plugins/`, `builder/`). Para un APK con cambios solo de JS, redeplegar la app a mano.
+- Variables: `EXPO_TOKEN`, `EXPO_OWNER` (las mismas de `kuulis-expo-qa`) y las `AWS_*` de la API de QA.
+- Volumen persistente en `/cache` (caché de Gradle y npm): acelera las siguientes compilaciones y evita
+  recompilar el mismo código si el contenedor se reinicia.
+- Necesita unos 6 GB de RAM libres mientras compila; la imagen ocupa ~10 GB.
+
+## Build de desarrollo (Android)
+Perfil `qa-dev` de `eas.json`: APK de desarrollo (`uk.top8.kuulis.qa`) que carga el JS desde
+`https://kuulis-expo.top8.uk`. Los cambios solo de JS llegan al cerrar y abrir la app, sin APK nuevo. Hace
+falta un build nuevo solo cuando cambia algo nativo (dependencias nativas, plugins, permisos).
