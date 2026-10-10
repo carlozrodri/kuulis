@@ -18,4 +18,6 @@ USER node
 EXPOSE 8081
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
     CMD curl -fsS http://127.0.0.1:8081/status || exit 1
-CMD ["npx", "expo", "start", "--port", "8081"]
+# --go keeps the QR and links in Expo Go mode; the Kuulis development build (eas profile qa-dev) opens the
+# same server by URL, so JS changes reach Android testers without a new APK.
+CMD ["npx", "expo", "start", "--go", "--port", "8081"]
