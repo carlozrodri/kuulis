@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
 /**
@@ -30,6 +32,14 @@ function reversedClientId(clientId: string) {
   return clientId.split('.').reverse().join('.');
 }
 
+/**
+ * Firebase config for Android push (FCM). Not a secret: it ships inside the app. Committed per
+ * environment as google-services.<env>.json, or given as an EAS file variable GOOGLE_SERVICES_JSON.
+ */
+const GOOGLE_SERVICES_FILE =
+  process.env.GOOGLE_SERVICES_JSON ||
+  (existsSync(`./google-services.${APP_ENV}.json`) ? `./google-services.${APP_ENV}.json` : undefined);
+
 const suffix = APP_ENV === 'production' ? '' : `.${APP_ENV}`;
 const nameSuffix = APP_ENV === 'production' ? '' : ` (${APP_ENV.toUpperCase()})`;
 
@@ -56,6 +66,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     package: `uk.top8.kuulis${suffix}`,
+    googleServicesFile: GOOGLE_SERVICES_FILE,
     adaptiveIcon: {
       backgroundColor: '#E6F4FE',
       foregroundImage: './assets/android-icon-foreground.png',
