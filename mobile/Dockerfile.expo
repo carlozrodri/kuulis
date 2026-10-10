@@ -4,9 +4,12 @@
 #   EXPO_TOKEN (Expo access token, secret) and EXPO_OWNER (Expo account name).
 #   The EAS project id lives in app.config.ts.
 FROM node:22-slim
+# EXPO_NO_METRO_LAZY: one full bundle instead of lazy chunks. A lazy chunk fetched after a redeploy asks the
+# new Metro for module ids from the old bundle and crashes with "Requiring unknown module".
 ENV CI=1 \
     EXPO_NO_TELEMETRY=1 \
     APP_ENV=qa \
+    EXPO_NO_METRO_LAZY=1 \
     EXPO_PACKAGER_PROXY_URL=https://kuulis-expo.top8.uk
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
