@@ -29,3 +29,15 @@ def test_settings_parse_csv_env_for_every_environment(monkeypatch):
         s = cls()
         assert s.CORS_ORIGINS == ["https://a.example.com", "https://b.example.com"]
         assert str(s.DATABASE_URL).startswith("postgresql+asyncpg://")
+
+
+async def test_client_error_is_logged(client, user_headers, caplog):
+    caplog.set_level("WARNING", logger="kuulis.client_errors")
+    body = {"kind": "native", "message": "java.lang.NullPointerException", "stack": "at Foo.bar"}
+    response = await client.post("/api/v1/client-errors", json=body, headers=user_headers)
+    assert response.status_code == 204
+    anonymous = await client.post("/api/v1/client-errors", json={"kind": "js", "message": "boom"})
+    assert anonymous.status_code == 204
+    assert "java.lang.NullPointerException" in caplog.text and "at Foo.bar" in caplog.text
+    bad = await client.post("/api/v1/client-errors", json={"kind": "other", "message": "x"})
+    assert bad.status_code == 422

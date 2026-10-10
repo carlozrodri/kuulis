@@ -117,6 +117,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     ['expo-audio', { microphonePermission: false }],
+    './plugins/withCrashLog',
     ...(GOOGLE_MAPS_ANDROID_API_KEY
       ? [['react-native-maps', { androidGoogleMapsApiKey: GOOGLE_MAPS_ANDROID_API_KEY }] as [string, object]]
       : []),

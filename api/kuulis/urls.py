@@ -9,6 +9,7 @@ from apps.drivers.router import admin_router as drivers_admin_router
 from apps.drivers.router import router as drivers_router
 from apps.files.router import router as files_router
 from apps.geo.router import router as geo_router
+from apps.health.client_errors import router as client_errors_router
 from apps.health.router import router as health_router
 from apps.moderation.router import admin_router as moderation_admin_router
 from apps.moderation.router import router as moderation_router
@@ -50,6 +51,7 @@ api_v1.include_router(subscriptions_admin_router)
 api_v1.include_router(moderation_router)
 api_v1.include_router(moderation_admin_router)
 api_v1.include_router(analytics_router)
+api_v1.include_router(client_errors_router)
 
 root = APIRouter()
 root.include_router(health_router)

@@ -8,16 +8,22 @@ import { PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans/70
 import { PlusJakartaSans_800ExtraBold } from '@expo-google-fonts/plus-jakarta-sans/800ExtraBold';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, usePathname, type ErrorBoundaryProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Pressable, Text, View } from 'react-native';
 
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { installCrashReporting, reportError, setCrashRoute } from '@/lib/crashReport';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import { ModeProvider, useMode } from '@/providers/ModeProvider';
 import { useTheme } from '@/theme';
+
+// Uncaught JS errors and the last native crash (Android) are sent to the API logs.
+installCrashReporting();
 
 // Keep the native splash until fonts, the session and the chosen mode are ready.
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -28,6 +34,10 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
   const { user, isLoading } = useAuth();
   const { mode, isLoading: modeLoading } = useMode();
   usePushNotifications(!!user);
+  const pathname = usePathname();
+  useEffect(() => {
+    setCrashRoute(pathname);
+  }, [pathname]);
 
   const ready = fontsReady && !isLoading && !modeLoading;
 
@@ -77,5 +87,29 @@ export default function RootLayout() {
         </ModeProvider>
       </AuthProvider>
     </QueryClientProvider>
+  );
+}
+
+/**
+ * A screen that throws while rendering shows this instead of closing the app; the error goes to the API
+ * logs. Rendered outside the providers, so it only uses plain components.
+ */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  useEffect(() => {
+    void reportError('render', error);
+  }, [error]);
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16, backgroundColor: theme.background }}>
+      <Text style={{ fontSize: 22, fontWeight: '700', color: theme.text, textAlign: 'center' }}>{t('crash.title')}</Text>
+      <Text style={{ fontSize: 16, color: theme.muted, textAlign: 'center' }}>{t('crash.body')}</Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => void retry()}
+        style={{ backgroundColor: theme.primary, borderRadius: 999, paddingHorizontal: 28, paddingVertical: 14 }}>
+        <Text style={{ color: theme.onPrimary, fontSize: 16, fontWeight: '700' }}>{t('crash.retry')}</Text>
+      </Pressable>
+    </View>
   );
 }

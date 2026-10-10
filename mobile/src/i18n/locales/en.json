@@ -1048,5 +1048,10 @@
     "todayAt": "Today at {{time}}",
     "help": "Help and reports",
     "helpHint": "Think it's a mistake? Write to us from Help and reports."
+  },
+  "crash": {
+    "title": "Something went wrong",
+    "body": "The Kuulis team has been notified. Tap Try again to go back to the app.",
+    "retry": "Try again"
   }
 }
