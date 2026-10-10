@@ -77,10 +77,11 @@ def parse(item: dict) -> tuple[str, Decimal, str | None, str | None] | None:
     )
 
 
-async def reconcile(session: AsyncSession) -> int:
-    """One pass. Returns how many new payments were recorded."""
+async def reconcile(session: AsyncSession) -> int | None:
+    """One pass. Returns how many new payments were recorded, or None when another worker
+    holds the turn."""
     if not await redis_client.set(LOCK_KEY, "1", nx=True, ex=POLL_SECONDS - 5):
-        return 0
+        return None
     now_ms = int(time.time() * 1000)
     cursor = await redis_client.get(CURSOR_KEY)
     start = int(cursor) - OVERLAP_MS if cursor else now_ms - FIRST_LOOKBACK_MS

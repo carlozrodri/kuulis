@@ -145,6 +145,8 @@ async def test_binance_payments_match_or_wait(client, admin_headers, monkeypatch
     await binance.redis_client.delete(binance.LOCK_KEY)
     async with SessionLocal() as session:  # the same payments again: ignored
         assert await binance.reconcile(session) == 0
+    async with SessionLocal() as session:  # lock still held: not this worker's turn
+        assert await binance.reconcile(session) is None
 
     assert (await client.get(f"{API}/wallet/me", headers=luis.headers)).json()["balance"] == "5.00"
     async with SessionLocal() as session:

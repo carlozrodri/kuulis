@@ -19,14 +19,23 @@ _tasks: list[asyncio.Task] = []
 
 
 async def _binance_loop() -> None:
+    logger.info("Binance Pay reconciliation enabled (every %ss)", binance.POLL_SECONDS)
+    healthy: bool | None = None  # logs the first success and every change, not each poll
     while True:
         try:
             async with SessionLocal() as session:
-                await binance.reconcile(session)
+                credited = await binance.reconcile(session)
+            if credited is None:  # another worker's turn
+                await asyncio.sleep(binance.POLL_SECONDS)
+                continue
+            if healthy is not True:
+                logger.info("Binance Pay API reachable (%s new payments)", credited)
+            healthy = True
         except asyncio.CancelledError:
             raise
         except Exception:
             logger.exception("Binance Pay reconciliation failed")
+            healthy = False
         await asyncio.sleep(binance.POLL_SECONDS)
 
 
