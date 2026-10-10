@@ -124,7 +124,9 @@ export function RideMap({
         initialRegion={initialRegion}
         customMapStyle={Platform.OS === 'android' ? (dark ? darkMapStyle : lightMapStyle) : undefined}
         userInterfaceStyle={dark ? 'dark' : 'light'}
-        mapPadding={{ top: insets.top, bottom: insets.bottom, left: 0, right: 0 }}
+        // Only once the map is ready: react-native-maps on Android crashes (GoogleMap.setPadding on null) when the
+        // padding changes after layout but before Google Maps finished loading, e.g. when the sheet resizes.
+        mapPadding={ready ? { top: insets.top, bottom: insets.bottom, left: 0, right: 0 } : undefined}
         showsUserLocation={showUser && permission === 'granted'}
         showsMyLocationButton={false}
         showsCompass={false}
