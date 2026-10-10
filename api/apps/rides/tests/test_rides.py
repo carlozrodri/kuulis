@@ -598,6 +598,20 @@ async def test_driver_presence(client, user_headers):
     await presence.handle_location(driver.id, {"type": "location", "lat": 10.6, "lng": -66.9})
     assert (await presence.get_location(driver.id)).lat == 10.6
 
+    # The background service sends the same update over HTTP.
+    await age_location(driver, 5)
+    response = await client.post(
+        f"{API}/drivers/me/location",
+        json={"lat": 10.61, "lng": -66.9, "heading": 45, "speed": 8.5},
+        headers=driver.headers,
+    )
+    assert response.status_code == 204
+    assert (await presence.get_location(driver.id)).lat == 10.61
+    bad = await client.post(
+        f"{API}/drivers/me/location", json={"lat": 100, "lng": 0}, headers=driver.headers
+    )
+    assert bad.status_code == 422
+
     response = await client.post(f"{API}/drivers/me/offline", headers=driver.headers)
     assert response.status_code == 200 and response.json()["online"] is False
     # Offline drivers' locations are ignored.

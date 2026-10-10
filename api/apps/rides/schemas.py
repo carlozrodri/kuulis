@@ -272,3 +272,10 @@ class OnlineDriver(BaseModel):
 
 class GoOnline(Point):
     pass
+
+
+class LocationUpdate(Point):
+    """Position sent over HTTP by the background location service (the socket may be asleep)."""
+
+    heading: float | None = Field(default=None, ge=0, le=360)
+    speed: float | None = Field(default=None, ge=0, le=100)

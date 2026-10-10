@@ -114,6 +114,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         locationAlwaysPermission: false,
         isIosBackgroundLocationEnabled: false,
         isAndroidBackgroundLocationEnabled: false,
+        // Online drivers keep sharing their position with the app minimized through a foreground service
+        // (fixed notification); this does not need the "allow all the time" permission.
+        isAndroidForegroundServiceEnabled: true,
       },
     ],
     ['expo-audio', { microphonePermission: false }],

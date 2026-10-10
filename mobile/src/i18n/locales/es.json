@@ -620,7 +620,9 @@
       "onlineChip": "Conectado",
       "offlineChip": "Desconectado",
       "disconnect": "Desconectarme",
-      "foregroundOnly": "Mantén Kuulis abierto en pantalla mientras estés conectado: por ahora tu ubicación solo se comparte con la app en primer plano."
+      "foregroundOnly": "Mantén Kuulis abierto en pantalla mientras estés conectado: en este teléfono tu ubicación solo se comparte con la app en primer plano.",
+      "bgTitle": "Kuulis está compartiendo tu ubicación",
+      "bgBody": "Estás conectado y puedes recibir viajes. Desconéctate en la app para dejar de compartirla."
     },
     "offer": {
       "title": "Nueva solicitud",

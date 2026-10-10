@@ -620,7 +620,9 @@
       "onlineChip": "Online",
       "offlineChip": "Offline",
       "disconnect": "Go offline",
-      "foregroundOnly": "Keep Kuulis open on screen while you're online: for now your location is only shared while the app is in the foreground."
+      "foregroundOnly": "Keep Kuulis open on screen while you're online: on this phone your location is only shared while the app is in the foreground.",
+      "bgTitle": "Kuulis is sharing your location",
+      "bgBody": "You're online and can receive rides. Go offline in the app to stop sharing it."
     },
     "offer": {
       "title": "New request",

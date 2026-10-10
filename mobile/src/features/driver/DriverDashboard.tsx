@@ -19,8 +19,10 @@ import { useSuspension } from '@/hooks/useSuspension';
 import { isSubscriptionOverdue, refreshSubscription, useSubscription, useWallet } from '@/hooks/useWallet';
 import { apiErrorMessage } from '@/i18n';
 import { confirmHaptic, heavyHaptic } from '@/lib/feedback';
+import { backgroundLocationActive } from '@/lib/backgroundLocation';
 import { formatAmount } from '@/lib/money';
 import { formatFare, isActiveStatus } from '@/lib/ride';
+import { useStore } from '@/lib/store';
 import type { SubscriptionSummary } from '@/lib/types';
 import { nextDueAt, pendingTotal, shortfall, subscriptionState } from '@/lib/wallet';
 import { elevation, radius, space, useTheme } from '@/theme';
@@ -76,6 +78,8 @@ export function DriverDashboard() {
   const { permission } = useUserLocation();
   const [locating, setLocating] = useState(false);
   const { suspension, handleError: handleSuspended } = useSuspension();
+  // Android shares the position from the background while online; elsewhere the app must stay on screen.
+  const sharingInBackground = useStore(backgroundLocationActive);
 
   const online = !!state.data?.online;
   const activeRide = active.data && isActiveStatus(active.data.status) ? active.data : null;
@@ -198,9 +202,11 @@ export function DriverDashboard() {
           )}
 
           {online ? (
-            <Notice tone="info" icon={Info}>
-              {t('drive.home.foregroundOnly')}
-            </Notice>
+            sharingInBackground ? null : (
+              <Notice tone="info" icon={Info}>
+                {t('drive.home.foregroundOnly')}
+              </Notice>
+            )
           ) : suspended ? null : blocked ? (
             <Button title={t('home.blocked.details')} variant="ghost" size="sm" onPress={() => router.push('/wallet')} />
           ) : !summary || fee === 'not_started' ? (

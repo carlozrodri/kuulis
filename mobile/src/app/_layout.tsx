@@ -1,4 +1,6 @@
 import '@/i18n';
+// Registers the driver's background location task at startup (TaskManager needs it in the global scope).
+import '@/lib/backgroundLocation';
 
 // Per-weight imports so only the five weights we use are bundled.
 import { PlusJakartaSans_400Regular } from '@expo-google-fonts/plus-jakarta-sans/400Regular';

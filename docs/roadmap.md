@@ -30,7 +30,7 @@ funcionando en QA antes de pasar a la siguiente.
 - [x] Mapas: `react-native-maps` (gratis). Rutas con OSRM y búsqueda con Photon. En QA usan los
       servidores públicos de demostración.
 - [ ] Antes del lanzamiento: alojar OSRM y Photon en Coolify (los públicos no son para producción).
-- [ ] Ubicación en segundo plano del motorizado (requiere build instalada, no funciona en Expo Go).
+- [x] Ubicación en segundo plano del motorizado (Android, servicio en primer plano con notificación fija; `POST /drivers/me/location`). iOS pendiente: necesita build de iOS.
 
 ### 1C · Tasas y promociones
 - [x] Tasas BCV y Binance P2P (worker), historial y corrección manual en el admin.

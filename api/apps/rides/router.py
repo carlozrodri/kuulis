@@ -4,13 +4,14 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, status
 
-from apps.rides import events, services
+from apps.rides import events, presence, services
 from apps.rides.models import Ride, RideStatus
 from apps.rides.schemas import (
     AdminCancelRequest,
     CancelRequest,
     DriverState,
     GoOnline,
+    LocationUpdate,
     MessageCreate,
     MessageRead,
     OfferAdminRead,
@@ -135,6 +136,12 @@ async def go_online(data: GoOnline, user: CurrentUser, session: DBSession) -> Dr
 @driver_router.post("/offline", response_model=DriverState)
 async def go_offline(user: CurrentUser, session: DBSession) -> DriverState:
     return await services.go_offline(session, user)
+
+
+@driver_router.post("/location", status_code=status.HTTP_204_NO_CONTENT)
+async def update_location(data: LocationUpdate, user: CurrentUser) -> None:
+    """Same as the socket's ``location`` message, for the background service (app minimized)."""
+    await presence.handle_location(str(user.id), data.model_dump())
 
 
 @driver_router.get("/state", response_model=DriverState)

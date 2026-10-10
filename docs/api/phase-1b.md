@@ -114,6 +114,10 @@ puede pedir otro; mientras un motorizado lo tenga no recibe ofertas. Promedios e
 
 Las ofertas y los cambios de estado también envían push (por si la app está en segundo plano).
 
+`POST /drivers/me/location` `{lat, lng, heading?, speed?}` → 204: igual que el mensaje `location` del
+socket, para el servicio de ubicación en segundo plano de Android (el socket puede estar dormido). Se ignora
+si el motorizado no está conectado ni tiene viaje, o si llega antes de 1 s desde la anterior.
+
 ## Admin (staff)
 
 | Método | Ruta | Notas |

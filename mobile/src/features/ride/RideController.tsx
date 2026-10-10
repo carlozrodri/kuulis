@@ -21,6 +21,7 @@ import {
   usePendingRating,
 } from '@/hooks/useRides';
 import { api } from '@/lib/api';
+import { setBackgroundLocation } from '@/lib/backgroundLocation';
 import { confirmHaptic, heavyHaptic, preloadRideSounds, tick } from '@/lib/feedback';
 import { isActiveStatus, rideRole, rideRoleStrict } from '@/lib/ride';
 import type { DriverLocationEvent, DriverState, Offer, Ride, RideMessage } from '@/lib/types';
@@ -215,6 +216,15 @@ export function DriverController() {
   }, [state.data?.online, driving]);
 
   useLocationBroadcast(online);
+
+  // Keep sharing the position with the app minimized (Android foreground service) while online.
+  const { t } = useTranslation();
+  const bgTitle = t('drive.home.bgTitle');
+  const bgBody = t('drive.home.bgBody');
+  useEffect(() => {
+    void setBackgroundLocation(online ? { title: bgTitle, body: bgBody } : null);
+  }, [online, bgTitle, bgBody]);
+  useEffect(() => () => void setBackgroundLocation(null), []);
 
   useEffect(() => {
     if (approved) preloadRideSounds();
