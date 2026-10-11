@@ -7,6 +7,7 @@ import logging
 
 from taskiq import TaskiqEvents, TaskiqState
 
+from apps.monitoring import stats
 from apps.subscriptions import tasks as subscription_tasks
 from apps.wallet import binance
 from kuulis.core.db import SessionLocal
@@ -25,6 +26,7 @@ async def _binance_loop() -> None:
         try:
             async with SessionLocal() as session:
                 credited = await binance.reconcile(session)
+            await stats.beat("binance")
             if credited is None:  # another worker's turn
                 await asyncio.sleep(binance.POLL_SECONDS)
                 continue

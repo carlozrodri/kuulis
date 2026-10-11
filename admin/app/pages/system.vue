@@ -1,0 +1,236 @@
+<script setup lang="ts">
+import type { HealthStatus, SystemHealth } from '~/types/api'
+
+const { t, locale } = useI18n()
+const { request } = useApi()
+const apiError = useApiError()
+
+const { data: health, status, error, refresh } = await useAsyncData(
+  'system-health',
+  () => request<SystemHealth>('/admin/system/health'),
+)
+
+let timer: ReturnType<typeof setInterval> | undefined
+onMounted(() => {
+  timer = setInterval(() => {
+    if (document.visibilityState === 'visible') refresh()
+  }, 30_000)
+})
+onBeforeUnmount(() => clearInterval(timer))
+
+const statusColor: Record<HealthStatus, 'success' | 'warning' | 'error' | 'neutral'> = {
+  ok: 'success',
+  warning: 'warning',
+  down: 'error',
+  off: 'neutral',
+}
+
+const label = (group: 'serviceNames' | 'loopNames', name: string) => {
+  const key = `system.${group}.${name}`
+  return t(key) === key ? name : t(key)
+}
+
+const numbers = computed(() => {
+  const h = health.value
+  if (!h) return []
+  return [
+    {
+      title: t('system.queues'),
+      rows: [
+        { label: t('system.tasksPending'), value: h.queues.taskiq_pending === null ? '—' : formatNumber(h.queues.taskiq_pending, locale.value) },
+        { label: t('system.dispatchDue'), value: formatNumber(h.queues.dispatch_due, locale.value) },
+        { label: t('system.dispatchOverdue'), value: formatNumber(h.queues.dispatch_overdue, locale.value), bad: h.queues.dispatch_overdue > 0 },
+      ],
+    },
+    {
+      title: t('system.traffic'),
+      rows: [
+        { label: t('system.requests'), value: formatNumber(h.traffic.requests_5m, locale.value) },
+        { label: t('system.errors'), value: `${formatNumber(h.traffic.errors_5m, locale.value)} (${formatPercent(h.traffic.error_rate_5m, locale.value)})`, bad: h.traffic.error_rate_5m > 0.02 },
+        { label: t('system.avgLatency'), value: `${formatNumber(h.traffic.avg_ms_5m, locale.value, 1)} ms` },
+      ],
+    },
+    {
+      title: t('system.rides'),
+      rows: [
+        { label: t('system.searching'), value: formatNumber(h.rides.searching, locale.value) },
+        { label: t('system.requestedLastHour'), value: formatNumber(h.rides.requested_last_hour, locale.value) },
+        { label: t('system.noDriversLastHour'), value: formatNumber(h.rides.no_drivers_last_hour, locale.value) },
+        { label: t('system.disk'), value: h.disk_used_percent === null ? '—' : `${formatNumber(h.disk_used_percent, locale.value, 1)} %`, bad: (h.disk_used_percent ?? 0) > 85 },
+      ],
+    },
+  ]
+})
+</script>
+
+<template>
+  <UDashboardPanel id="system">
+    <template #header>
+      <UDashboardNavbar :title="t('system.title')">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+        <template #right>
+          <span
+            v-if="health"
+            class="hidden text-sm text-(--ui-text-muted) sm:inline"
+          >
+            {{ t('system.checkedAt', { time: formatDate(health.checked_at, locale) }) }}
+          </span>
+          <UButton
+            icon="i-lucide-refresh-cw"
+            color="neutral"
+            variant="outline"
+            :label="t('system.refresh')"
+            :loading="status === 'pending'"
+            @click="refresh()"
+          />
+        </template>
+      </UDashboardNavbar>
+    </template>
+
+    <template #body>
+      <UAlert
+        v-if="error && !health"
+        color="error"
+        variant="subtle"
+        icon="i-lucide-circle-alert"
+        :title="apiError(error)"
+      />
+      <USkeleton
+        v-if="status === 'pending' && !health"
+        class="h-64"
+      />
+
+      <template v-if="health">
+        <UCard>
+          <template #header>
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="font-semibold">
+                {{ t('system.alerts') }}
+              </h2>
+              <span class="text-xs text-(--ui-text-muted)">
+                {{ t('system.version', { commit: health.commit ?? '—', env: health.env }) }} · {{ t('system.autoRefresh') }}
+              </span>
+            </div>
+          </template>
+          <p
+            v-if="!health.alerts.length"
+            class="text-sm text-(--ui-text-muted)"
+          >
+            {{ t('system.noAlerts') }}
+          </p>
+          <ul
+            v-else
+            class="space-y-2"
+          >
+            <li
+              v-for="alert in health.alerts"
+              :key="alert.key"
+              class="flex flex-wrap items-center gap-2 text-sm"
+            >
+              <UIcon
+                name="i-lucide-circle-alert"
+                class="size-4 text-(--ui-error)"
+              />
+              <span class="font-medium">{{ alert.message }}</span>
+              <span class="text-(--ui-text-muted)">{{ t('system.since', { time: formatDate(alert.since, locale) }) }}</span>
+            </li>
+          </ul>
+        </UCard>
+
+        <div class="grid gap-6 lg:grid-cols-2">
+          <UCard>
+            <template #header>
+              <h2 class="font-semibold">
+                {{ t('system.services') }}
+              </h2>
+            </template>
+            <ul class="divide-y divide-(--ui-border)">
+              <li
+                v-for="service in health.services"
+                :key="service.name"
+                class="flex items-center justify-between gap-2 py-2 text-sm"
+              >
+                <span>{{ label('serviceNames', service.name) }}</span>
+                <span class="flex items-center gap-2">
+                  <span
+                    v-if="service.latency_ms !== null"
+                    class="tabular-nums text-(--ui-text-muted)"
+                  >{{ formatNumber(service.latency_ms, locale, 1) }} ms</span>
+                  <UBadge
+                    :color="statusColor[service.status]"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    {{ t(`system.statuses.${service.status}`) }}
+                  </UBadge>
+                </span>
+              </li>
+            </ul>
+          </UCard>
+
+          <UCard>
+            <template #header>
+              <h2 class="font-semibold">
+                {{ t('system.loops') }}
+              </h2>
+            </template>
+            <ul class="divide-y divide-(--ui-border)">
+              <li
+                v-for="loop in health.loops"
+                :key="loop.name"
+                class="flex items-center justify-between gap-2 py-2 text-sm"
+              >
+                <span>
+                  {{ label('loopNames', loop.name) }}
+                  <span class="block text-xs text-(--ui-text-muted)">
+                    {{ loop.last_beat_at ? t('system.lastBeat', { time: formatDate(loop.last_beat_at, locale) }) : t('system.neverBeat') }}
+                    · {{ t('system.maxAge', { minutes: Math.round(loop.max_age_seconds / 60) }) }}
+                  </span>
+                </span>
+                <UBadge
+                  :color="statusColor[loop.status]"
+                  variant="subtle"
+                  size="sm"
+                >
+                  {{ t(`system.statuses.${loop.status}`) }}
+                </UBadge>
+              </li>
+            </ul>
+          </UCard>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-3">
+          <UCard
+            v-for="block in numbers"
+            :key="block.title"
+          >
+            <template #header>
+              <h2 class="font-semibold">
+                {{ block.title }}
+              </h2>
+            </template>
+            <dl class="space-y-2 text-sm">
+              <div
+                v-for="row in block.rows"
+                :key="row.label"
+                class="flex justify-between gap-2"
+              >
+                <dt class="text-(--ui-text-muted)">
+                  {{ row.label }}
+                </dt>
+                <dd
+                  class="tabular-nums"
+                  :class="row.bad ? 'font-semibold text-(--ui-error)' : ''"
+                >
+                  {{ row.value }}
+                </dd>
+              </div>
+            </dl>
+          </UCard>
+        </div>
+      </template>
+    </template>
+  </UDashboardPanel>
+</template>

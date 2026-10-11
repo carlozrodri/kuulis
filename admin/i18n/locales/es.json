@@ -14,7 +14,8 @@
     "transfers": "Transferencias",
     "subscriptions": "Suscripciones",
     "reports": "Reportes",
-    "finance": "Finanzas"
+    "finance": "Finanzas",
+    "system": "Sistema"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -1198,5 +1199,56 @@
       "allKinds": "Todos los tipos",
       "download": "Descargar CSV"
     }
+  },
+  "system": {
+    "title": "Estado del sistema",
+    "refresh": "Actualizar",
+    "autoRefresh": "Se actualiza cada 30 s",
+    "checkedAt": "Revisado {time}",
+    "version": "Versión {commit} · {env}",
+    "alerts": "Alertas abiertas",
+    "noAlerts": "Sin alertas abiertas.",
+    "since": "desde {time}",
+    "services": "Servicios",
+    "loops": "Procesos de fondo",
+    "lastBeat": "Último latido {time}",
+    "neverBeat": "Sin latidos todavía",
+    "maxAge": "Límite {minutes} min",
+    "queues": "Colas",
+    "tasksPending": "Tareas pendientes",
+    "dispatchDue": "Viajes en el despacho",
+    "dispatchOverdue": "Viajes atrasados en el despacho",
+    "traffic": "Tráfico (5 min)",
+    "requests": "Peticiones",
+    "errors": "Errores 500",
+    "avgLatency": "Latencia media",
+    "rides": "Viajes",
+    "searching": "Buscando motorizado",
+    "requestedLastHour": "Pedidos en la última hora",
+    "noDriversLastHour": "Sin motorizado en la última hora",
+    "disk": "Disco usado",
+    "statuses": {
+      "ok": "Bien",
+      "warning": "Lento",
+      "down": "Caído",
+      "off": "Sin configurar"
+    },
+    "serviceNames": {
+      "database": "Postgres",
+      "redis": "Redis",
+      "osrm": "OSRM (rutas)",
+      "photon": "Photon (direcciones)"
+    },
+    "loopNames": {
+      "dispatch": "Despacho",
+      "subscriptions": "Cuotas",
+      "account_erasure": "Borrado de cuentas",
+      "monitoring": "Monitoreo",
+      "rates": "Tasas",
+      "binance": "Binance Pay"
+    },
+    "dashboardAlert": "Hay {count} alertas del sistema abiertas",
+    "dashboardAlertHelp": "Algún servicio o proceso de fondo tiene problemas.",
+    "open": "Ver estado"
   }
 }

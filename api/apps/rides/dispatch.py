@@ -32,6 +32,7 @@ from apps.config.services import get_app_config
 from apps.drivers.models import DriverProfile, DriverStatus, Vehicle, VehicleType
 from apps.geo.clients import estimate_route
 from apps.moderation import services as moderation
+from apps.monitoring import stats
 from apps.rides import events, presence
 from apps.rides.models import (
     ACTIVE_STATUSES,
@@ -296,6 +297,7 @@ async def loop() -> None:
             if time.monotonic() - last_maintenance >= MAINTENANCE_EVERY:
                 last_maintenance = time.monotonic()
                 await maintenance()
+            await stats.beat("dispatch")
         except asyncio.CancelledError:
             raise
         except Exception:

@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 
 import orjson
 
-from kuulis.core.request_context import request_id_ctx
+from kuulis.core.request_context import log_fields_ctx, request_id_ctx
 from kuulis.settings import settings
 
 
@@ -19,6 +19,7 @@ class JSONFormatter(logging.Formatter):
             "msg": record.getMessage(),
             "request_id": request_id_ctx.get(),
             "env": settings.APP_ENV,
+            **(log_fields_ctx.get() or {}),
         }
         if record.exc_info:
             payload["exc"] = self.formatException(record.exc_info)

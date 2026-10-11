@@ -7,6 +7,7 @@ import logging
 
 from taskiq import TaskiqEvents, TaskiqState
 
+from apps.monitoring import stats
 from apps.rates import services
 from kuulis.core.db import SessionLocal
 from kuulis.settings import settings
@@ -23,6 +24,7 @@ async def loop() -> None:
         try:
             async with SessionLocal() as session:
                 await services.poll_due(session)
+            await stats.beat("rates")
         except asyncio.CancelledError:
             raise
         except Exception:

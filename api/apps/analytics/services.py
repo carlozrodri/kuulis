@@ -27,6 +27,7 @@ from apps.analytics.schemas import (
 from apps.config.schemas import AppConfig, ServiceArea
 from apps.drivers.models import DriverProfile, DriverStatus
 from apps.moderation import services as moderation
+from apps.monitoring import alerts
 from apps.rates import services as rates
 from apps.rides import presence
 from apps.rides.models import ACTIVE_STATUSES, Rating, RatingRole, Ride, RideStatus
@@ -566,4 +567,5 @@ async def overview(session: AsyncSession) -> Overview:
         urgent_reports=reports["urgent_open"],
         overdue_drivers=overdue or 0,
         stale_rates=stale,
+        open_alerts=len(await alerts.open_alerts()),
     )

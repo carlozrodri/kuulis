@@ -69,7 +69,11 @@ Están puestas en Coolify (no en el repo). Lista completa en `api/.env.example` 
 | `FIRST_SUPERUSER_EMAIL/PASSWORD` | ✓ | | crea el primer admin al desplegar (idempotente) |
 | `WEB_CONCURRENCY` | 4 | | workers gunicorn |
 | `WORKER_CONCURRENCY`, `DB_POOL_SIZE`, `DB_MAX_OVERFLOW` | | 2 / 5 / 5 | |
-| `SENTRY_ENABLED` | false | false | instalado, apagado |
+| `SENTRY_ENABLED`, `SENTRY_DSN` | ✓ | ✓ | errores a GlitchTip (ver Monitoreo) |
+| `ALERT_TELEGRAM_BOT_TOKEN` | ✓ | ✓ | bot de alertas; el chat se toma del primer mensaje privado al bot |
+| `ALERT_TELEGRAM_CHAT_ID` | opcional | opcional | fija el chat de alertas |
+| `ALERT_EMAILS` | ✓ | ✓ | resumen diario 08:00 (y alertas si no hay Telegram), separados por coma |
+| `METRICS_TOKEN` | ✓ | | token de `/api/metrics` (sin él, 404) |
 | `NUXT_PUBLIC_APP_ENV`, `NUXT_PUBLIC_API_BASE` | | | solo admin |
 
 La contraseña del primer admin está en la variable `FIRST_SUPERUSER_PASSWORD` de la app API de cada entorno
@@ -111,6 +115,16 @@ porque Coolify hace rolling update y la versión vieja convive unos segundos con
   `providers` (`true`, `false`, o `null` si no están configurados). Si solo cae un proveedor responde 200 con
   `status: degraded`: la cotización usa la línea recta × 1,3 y la búsqueda no sugiere direcciones.
 - En el admin, Configuración muestra al pie el commit de la API y del admin.
+
+## Monitoreo y alertas
+- Cada proceso de fondo del worker (despacho, tasas, Binance, cuotas, borrado de cuentas) deja un latido en
+  Redis. Cada minuto, un proceso (API o worker, con lock en Redis) revisa servicios, latidos, colas, errores
+  500, tasas vencidas, disco y viajes sin motorizado, y avisa por Telegram. No repite la misma alerta antes de
+  30 min y avisa cuando se resuelve. Corre también en la API, así que un worker detenido se detecta.
+- Admin → **Sistema** muestra todo eso en vivo; la portada avisa si hay alertas abiertas.
+- `GET /api/metrics` (Prometheus) con `Authorization: Bearer <METRICS_TOKEN>`.
+- Los logs JSON llevan `request_id`, `user_id` y `ride_id` cuando aplican.
+- Monitor externo (fuera del homelab): UptimeRobot sobre `/api/health/ready`.
 
 ## Encender producción (lista)
 Orden a seguir; no saltar pasos.

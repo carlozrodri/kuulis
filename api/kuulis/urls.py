@@ -13,6 +13,8 @@ from apps.health.client_errors import router as client_errors_router
 from apps.health.router import router as health_router
 from apps.moderation.router import admin_router as moderation_admin_router
 from apps.moderation.router import router as moderation_router
+from apps.monitoring.router import metrics_router
+from apps.monitoring.router import router as monitoring_router
 from apps.notifications.router import router as notifications_router
 from apps.places.router import router as places_router
 from apps.promotions.router import admin_router as promotions_admin_router
@@ -56,6 +58,8 @@ api_v1.include_router(moderation_router)
 api_v1.include_router(moderation_admin_router)
 api_v1.include_router(analytics_router)
 api_v1.include_router(client_errors_router)
+api_v1.include_router(monitoring_router)
 
 root = APIRouter()
 root.include_router(health_router)
+root.include_router(metrics_router)

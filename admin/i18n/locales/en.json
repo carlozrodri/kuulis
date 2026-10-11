@@ -14,7 +14,8 @@
     "transfers": "Transfers",
     "subscriptions": "Subscriptions",
     "reports": "Reports",
-    "finance": "Finance"
+    "finance": "Finance",
+    "system": "System"
   },
   "auth": {
     "title": "Admin sign in",
@@ -1198,5 +1199,56 @@
       "allKinds": "All kinds",
       "download": "Download CSV"
     }
+  },
+  "system": {
+    "title": "System status",
+    "refresh": "Refresh",
+    "autoRefresh": "Refreshes every 30 s",
+    "checkedAt": "Checked {time}",
+    "version": "Version {commit} · {env}",
+    "alerts": "Open alerts",
+    "noAlerts": "No open alerts.",
+    "since": "since {time}",
+    "services": "Services",
+    "loops": "Background loops",
+    "lastBeat": "Last heartbeat {time}",
+    "neverBeat": "No heartbeat yet",
+    "maxAge": "Limit {minutes} min",
+    "queues": "Queues",
+    "tasksPending": "Pending tasks",
+    "dispatchDue": "Rides in dispatch",
+    "dispatchOverdue": "Overdue rides in dispatch",
+    "traffic": "Traffic (5 min)",
+    "requests": "Requests",
+    "errors": "500 errors",
+    "avgLatency": "Average latency",
+    "rides": "Rides",
+    "searching": "Looking for a driver",
+    "requestedLastHour": "Requested in the last hour",
+    "noDriversLastHour": "No driver in the last hour",
+    "disk": "Disk used",
+    "statuses": {
+      "ok": "Good",
+      "warning": "Slow",
+      "down": "Down",
+      "off": "Not configured"
+    },
+    "serviceNames": {
+      "database": "Postgres",
+      "redis": "Redis",
+      "osrm": "OSRM (routes)",
+      "photon": "Photon (addresses)"
+    },
+    "loopNames": {
+      "dispatch": "Dispatch",
+      "subscriptions": "Fees",
+      "account_erasure": "Account erasure",
+      "monitoring": "Monitoring",
+      "rates": "Rates",
+      "binance": "Binance Pay"
+    },
+    "dashboardAlert": "There are {count} open system alerts",
+    "dashboardAlertHelp": "A service or background loop has problems.",
+    "open": "View status"
   }
 }

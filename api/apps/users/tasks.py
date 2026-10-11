@@ -47,6 +47,7 @@ async def send_templated_email(to: str, template: str, locale: str, name: str, l
 
 
 async def erase_loop() -> None:
+    from apps.monitoring import stats
     from apps.users import services
     from kuulis.core.db import SessionLocal
 
@@ -56,6 +57,7 @@ async def erase_loop() -> None:
                 erased = await services.erase_due(session)
             if erased:
                 logger.info("Erased %s deleted accounts", erased)
+            await stats.beat("account_erasure")
         except asyncio.CancelledError:
             raise
         except Exception:

@@ -105,13 +105,25 @@ class BaseAppSettings(BaseSettings):
     SENTRY_ENABLED: bool = False
     SENTRY_DSN: str = ""
     SENTRY_TRACES_SAMPLE_RATE: float = 0.05
+    # Alerts (apps/monitoring). Without a chat id the first private chat that wrote to the bot is
+    # used. Email gets the daily summary, and the alerts too when Telegram is not configured.
+    ALERT_TELEGRAM_BOT_TOKEN: str = ""
+    ALERT_TELEGRAM_CHAT_ID: str = ""
+    ALERT_EMAILS: CSVList = []
+    # Bearer token for /api/metrics (Prometheus). Empty: the endpoint answers 404.
+    METRICS_TOKEN: str = ""
 
     # --- Bootstrap --------------------------------------------------------------
     FIRST_SUPERUSER_EMAIL: str = ""
     FIRST_SUPERUSER_PASSWORD: str = ""
 
     @field_validator(
-        "ALLOWED_HOSTS", "CORS_ORIGINS", "GOOGLE_CLIENT_IDS", "APPLE_CLIENT_IDS", mode="before"
+        "ALLOWED_HOSTS",
+        "CORS_ORIGINS",
+        "GOOGLE_CLIENT_IDS",
+        "APPLE_CLIENT_IDS",
+        "ALERT_EMAILS",
+        mode="before",
     )
     @classmethod
     def _split_csv(cls, value: object) -> object:
