@@ -12,13 +12,6 @@ export default defineNuxtConfig({
   },
   css: ['~/assets/css/main.css'],
 
-  // Every icon ships in the bundle (scanned from the source): no requests to api.iconify.design,
-  // which the CSP's connect-src would block anyway.
-  icon: {
-    clientBundle: { scan: true, sizeLimitKb: 512 },
-    fallbackToApi: false,
-  },
-
   runtimeConfig: {
     public: {
       // Same origin in QA/production (https://<host>/api/v1). Override with NUXT_PUBLIC_API_BASE.
@@ -81,5 +74,12 @@ export default defineNuxtConfig({
       { code: 'en', language: 'en-US', name: 'English', file: 'en.json' },
     ],
     detectBrowserLanguage: { useCookie: true, cookieKey: 'kuulis_locale', fallbackLocale: 'es' },
+  },
+
+  // Every icon ships in the bundle (scanned from the source): no requests to api.iconify.design,
+  // which the CSP's connect-src would block anyway.
+  icon: {
+    clientBundle: { scan: true, sizeLimitKb: 512 },
+    fallbackToApi: false,
   },
 })
