@@ -1,6 +1,6 @@
 # 02 · Infraestructura de producción
 
-**Prioridad:** P0 · **Área:** Infra · **Depende de:** 01 · **Estado:** en curso (2026-10-11)
+**Prioridad:** P0 · **Área:** Infra · **Depende de:** 01 · **Estado:** hecho en QA (2026-10-11); producción se configura al encenderla
 
 ## Objetivo
 Dejar producción lista para encender: servicios propios para mapas, Redis y Postgres configurados para no
@@ -87,9 +87,12 @@ servidor de Carlos.
 - `/api/health/live` y `/ready` muestran `env` y `commit`; `/ready` revisa OSRM y Photon y responde
   `degraded` (sin 503) si se cae uno. Sentry usa el commit como `release`. Configuración del admin muestra el
   commit de API y admin.
-- QA usa `kuulis-osrm` desde el 2026-10-11: una cotización de 8,5 km en Caracas responde en unos 450 ms medidos
+- QA usa `kuulis-osrm` y `kuulis-photon` desde el 2026-10-11. Búsqueda ("altamira", "ruzafa") y dirección
+  inversa funcionan con Photon propio. una cotización de 8,5 km en Caracas responde en unos 450 ms medidos
   desde fuera, casi todo red (el mismo viaje a `/health/live` tarda ~450 ms), así que el cálculo en el servidor es
   de decenas de ms.
+- Pendiente: aplicar la misma configuración de Redis y Postgres en producción al encenderla (lista en
+  `docs/deployment.md`), el dominio propio y el VPS de contingencia (`docs/pending.md`).
 - Redis de QA con AOF y `noeviction` (probado: una sesión sigue válida tras reiniciarlo) y Postgres de QA con la
   configuración ajustada.
 - Migración que activa `pg_stat_statements` (sin bloquear el despliegue si no se puede).

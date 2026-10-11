@@ -60,6 +60,8 @@ funcionando en QA antes de pasar a la siguiente.
 ## Camino a producción (desde 2026-10-11)
 Plan completo en `docs/produccion/README.md`; Carlos aprobó todas las recomendaciones. Se hace en orden.
 - [x] 01 · CI y calidad: GitHub Actions, Dependabot, gitleaks, tests del admin, smoke E2E, cuentas de prueba.
+- [x] 02 · Infraestructura: OSRM y Photon propios, Redis persistente, Postgres ajustado, commit en `/health` y
+      en el admin, listas de encendido y de despliegue (en QA; producción al encenderla).
 
 ## Fase 3 · Operación
 - [ ] Activar Sentry (API, admin, mobile).

@@ -19,7 +19,7 @@ existente de Carlos. No comparte nada con los proyectos NDS ni bidding-market.
 | Redis 7.4 | `kuulis-redis-qa` · `miq3v8c99isk848ps719a7dn` | `kuulis-redis-production` · `mgtsa16kwmktv0jl55belww8` |
 | Backup Postgres | diario 03:00, 7 días | cada 6 h, 14 días |
 | OSRM (rutas) | `kuulis-osrm` · `nqbbvoaqqvzkthxeq6vts7zc`, compartido (ver `infra/README.md`) | el mismo |
-| Photon (direcciones) | `kuulis-photon`, compartido | el mismo |
+| Photon (direcciones) | `kuulis-photon` · `owcfbizidzhgftvwksyxqkis`, compartido | el mismo |
 
 Cada app usa `base_directory` (`/api` o `/admin`), su `Dockerfile` y `watch_paths` (`api/**`, `admin/**`),
 así que solo se redepliega lo que cambió. Auto-deploy activado: hacer push a `qa` o `main` despliega.
