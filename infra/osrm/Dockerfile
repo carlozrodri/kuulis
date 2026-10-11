@@ -28,10 +28,10 @@ RUN osrm-extract -p /opt/car.lua /data/map.osm.pbf \
     && osrm-customize /data/map.osrm \
     && rm /data/map.osm.pbf
 
+# The OSRM image is Alpine: busybox wget serves the health check, nothing to install.
 FROM ${OSRM_IMAGE}
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 COPY --from=build /data /data
 EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-  CMD curl -fsS "http://127.0.0.1:5000/route/v1/driving/-66.88,10.49;-66.85,10.50?overview=false" | grep -q '"Ok"' || exit 1
+  CMD wget -qO- "http://127.0.0.1:5000/route/v1/driving/-66.88,10.49;-66.85,10.50?overview=false" | grep -q '"Ok"' || exit 1
 CMD ["osrm-routed", "--algorithm", "mld", "--max-table-size", "1000", "/data/map.osrm"]
