@@ -7,7 +7,7 @@ class QASettings(BaseAppSettings):
     DOCS_ENABLED: bool = True
     STORAGE_PREFIX: str = "qa"
     PUBLIC_URL: str = "https://kuulis-qa.top8.uk"
-    FRONTEND_URL: str = "https://kuulis-qa.top8.uk"
+    FRONTEND_URL: str = "https://kuulis.top8.uk"
     ADMIN_URL: str = "https://admin.top8.uk"
     CORS_ORIGINS: CSVList = ["https://kuulis-qa.top8.uk"]
     EMAIL_ENABLED: bool = True
