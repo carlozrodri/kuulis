@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Bike,
   Camera,
+  Download,
   HeartHandshake,
   LifeBuoy,
   LockKeyhole,
@@ -48,7 +49,7 @@ import { HEADER_OVERLAP, ProfileHeader } from './ProfileHeader';
 
 const LANGUAGE_LABELS: Record<Locale, string> = { es: 'Español', en: 'English' };
 
-type Confirm = 'logoutAll' | 'deactivate' | null;
+type Confirm = 'logoutAll' | null;
 
 export function ProfileScreen() {
   const { t, i18n } = useTranslation();
@@ -143,17 +144,6 @@ export function ProfileScreen() {
       showToast(apiErrorMessage(e), 'danger');
       return;
     }
-    await signOut();
-  }
-
-  async function deactivate() {
-    try {
-      await api('/users/me', { method: 'DELETE' });
-    } catch (e) {
-      showToast(apiErrorMessage(e), 'danger');
-      return;
-    }
-    showToast(t('profile.deactivate.done'), 'info');
     await signOut();
   }
 
@@ -271,11 +261,19 @@ export function ProfileScreen() {
                 onPress={() => setConfirm('logoutAll')}
               />
               <ListRow
+                icon={Download}
+                iconTone="neutral"
+                title={t('privacy.export.title')}
+                subtitle={t('privacy.export.rowHint')}
+                divider
+                onPress={() => router.push('/profile/data')}
+              />
+              <ListRow
                 icon={UserX}
                 iconTone="danger"
                 title={t('profile.deactivate.title')}
                 subtitle={t('profile.deactivate.hint')}
-                onPress={() => setConfirm('deactivate')}
+                onPress={() => router.push('/profile/delete')}
               />
             </Card>
           </Section>
@@ -318,14 +316,10 @@ export function ProfileScreen() {
 
       <Sheet
         visible={confirm !== null}
-        title={confirm === 'deactivate' ? t('profile.deactivate.confirmTitle') : t('profile.logoutAll.confirmTitle')}
-        subtitle={confirm === 'deactivate' ? t('profile.deactivate.confirmBody') : t('profile.logoutAll.confirmBody')}
+        title={t('profile.logoutAll.confirmTitle')}
+        subtitle={t('profile.logoutAll.confirmBody')}
         onClose={() => setConfirm(null)}
-        options={
-          confirm === 'deactivate'
-            ? [{ label: t('profile.deactivate.confirm'), icon: UserX, destructive: true, onPress: () => void deactivate() }]
-            : [{ label: t('profile.logoutAll.confirm'), icon: LogOut, destructive: true, onPress: () => void logoutEverywhere() }]
-        }
+        options={[{ label: t('profile.logoutAll.confirm'), icon: LogOut, destructive: true, onPress: () => void logoutEverywhere() }]}
       />
     </View>
   );

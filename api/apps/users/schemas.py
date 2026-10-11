@@ -50,6 +50,11 @@ class UserRead(BaseModel):
     permissions: list[str] | None = None
     # Legal texts (doc 07) this user still has to accept; only on their own account.
     pending_legal: list[str] | None = None
+    # Explicit permissions in force (apps.privacy); only on their own account.
+    consents: list[str] | None = None
+    # Account deletion: asked for (inactive, restorable by signing in until erase) and carried out.
+    deletion_requested_at: datetime | None = None
+    deleted_at: datetime | None = None
 
 
 class UserCreate(BaseModel):

@@ -21,11 +21,11 @@ case "${PROCESS_TYPE:-api}" in
       --access-logfile -
     ;;
   worker)
-    exec taskiq worker kuulis.tasks:broker apps.users.tasks apps.notifications.tasks apps.rides.tasks apps.rates.tasks apps.wallet.tasks apps.monitoring.tasks apps.backups.tasks apps.files.metadata \
+    exec taskiq worker kuulis.tasks:broker apps.users.tasks apps.notifications.tasks apps.rides.tasks apps.rates.tasks apps.wallet.tasks apps.monitoring.tasks apps.backups.tasks apps.files.metadata apps.privacy.tasks \
       --workers "${WORKER_CONCURRENCY:-2}" --max-async-tasks "${WORKER_MAX_ASYNC_TASKS:-100}"
     ;;
   scheduler)
-    exec taskiq scheduler kuulis.tasks:scheduler apps.users.tasks apps.notifications.tasks apps.rides.tasks apps.rates.tasks apps.wallet.tasks apps.monitoring.tasks apps.backups.tasks apps.files.metadata
+    exec taskiq scheduler kuulis.tasks:scheduler apps.users.tasks apps.notifications.tasks apps.rides.tasks apps.rates.tasks apps.wallet.tasks apps.monitoring.tasks apps.backups.tasks apps.files.metadata apps.privacy.tasks
     ;;
   *)
     exec "$@"

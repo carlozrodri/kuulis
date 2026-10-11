@@ -20,7 +20,8 @@
     "team": "Equipo",
     "roles": "Roles",
     "approvals": "Aprobaciones",
-    "legal": "Legal"
+    "legal": "Legal",
+    "privacy": "Privacidad"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -1360,7 +1361,8 @@
       "account_erasure": "Borrado de cuentas",
       "monitoring": "Monitoreo",
       "rates": "Tasas",
-      "binance": "Binance Pay"
+      "binance": "Binance Pay",
+      "privacy_retention": "Retención de datos"
     },
     "dashboardAlert": "Hay {count} alertas del sistema abiertas",
     "dashboardAlertHelp": "Algún servicio o proceso de fondo tiene problemas.",
@@ -1658,5 +1660,31 @@
       "driver_terms": "Términos para motorizados",
       "wallet": "Condiciones de la billetera"
     }
+  },
+  "privacy": {
+    "deletions": "Eliminaciones",
+    "exports": "Descargas de datos",
+    "deletionsHelp": "Cuentas cuyo dueño pidió eliminarlas. Durante 30 días puede recuperarla entrando de nuevo; después se borran sus datos personales y sus viajes y pagos quedan sin nombre.",
+    "exportsHelp": "Copias de sus datos que pidieron los usuarios (una al día). El enlace dura 24 horas y luego se borra el archivo.",
+    "user": "Usuario",
+    "requestedAt": "Pedido",
+    "state": "Estado",
+    "states": {
+      "all": "Todas",
+      "scheduled": "Programadas",
+      "erased": "Ejecutadas"
+    },
+    "eraseOn": "Se borra el {date}",
+    "erasedOn": "Borrada el {date}",
+    "exportStatus": {
+      "pending": "Preparando",
+      "ready": "Enviada",
+      "failed": "Falló",
+      "expired": "Vencida"
+    },
+    "total": "{n} en total",
+    "userErased": "Cuenta eliminada el {date}: sus datos personales ya se borraron.",
+    "userScheduled": "Eliminación programada para el {date}",
+    "userScheduledHelp": "La pidió el {date}. Si entra a la app antes, la cuenta se recupera."
   }
 }

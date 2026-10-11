@@ -12,6 +12,7 @@ from apps.legal.models import LegalAcceptance, LegalDocument  # noqa: F401
 from apps.moderation.models import Report, ReportNote, Suspension  # noqa: F401
 from apps.notifications.models import Device, Notification  # noqa: F401
 from apps.places.models import SavedPlace  # noqa: F401
+from apps.privacy.models import DataExport, ErasedEmail, UserConsent  # noqa: F401
 from apps.promotions.models import Promotion  # noqa: F401
 from apps.rates.models import ExchangeRate  # noqa: F401
 from apps.referrals.models import Referral  # noqa: F401

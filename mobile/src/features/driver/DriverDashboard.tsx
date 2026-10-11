@@ -2,13 +2,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, Platform, StyleSheet, View } from 'react-native';
 
-import { Bike, ChevronRight, Clock, Info, LockKeyhole, Power, Wallet } from '@/components/icons';
+import { Bike, ChevronRight, Clock, Info, LockKeyhole, MapPinned, Power, Wallet } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { showToast } from '@/components/Toast';
-import { Button, Card, IconTile, Notice, Skeleton, StatusPill, Txt } from '@/components/ui';
+import { Button, Card, IconTile, Notice, Sheet, Skeleton, StatusPill, Txt } from '@/components/ui';
 import { SuspendedPanel } from '@/features/account/SuspendedPanel';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
 import { useWalletFormat } from '@/features/wallet/format';
@@ -18,6 +18,7 @@ import { useActiveRide, useDriverState, useGoOffline, useGoOnline } from '@/hook
 import { useSuspension } from '@/hooks/useSuspension';
 import { isSubscriptionOverdue, refreshSubscription, useSubscription, useWallet } from '@/hooks/useWallet';
 import { apiErrorMessage } from '@/i18n';
+import { api } from '@/lib/api';
 import { confirmHaptic, heavyHaptic } from '@/lib/feedback';
 import { backgroundLocationActive } from '@/lib/backgroundLocation';
 import { formatAmount } from '@/lib/money';
@@ -25,6 +26,7 @@ import { formatFare, isActiveStatus } from '@/lib/ride';
 import { useStore } from '@/lib/store';
 import type { SubscriptionSummary } from '@/lib/types';
 import { nextDueAt, pendingTotal, shortfall, subscriptionState } from '@/lib/wallet';
+import { useAuth } from '@/providers/AuthProvider';
 import { elevation, radius, space, useTheme } from '@/theme';
 
 /** Breathing green dot while online. */
@@ -90,7 +92,29 @@ export function DriverDashboard() {
   // The API disconnects a suspended driver; while the state catches up the disconnect button stays.
   const suspended = !!suspension && !online;
 
-  const connect = async () => {
+  // Android keeps sharing the position with the app minimized: Google Play requires saying so, and the
+  // driver's explicit OK is recorded once (doc 07).
+  const { user, refreshUser } = useAuth();
+  const [disclosure, setDisclosure] = useState(false);
+  const needsDisclosure = Platform.OS === 'android' && !user?.consents?.includes('background_location');
+
+  const acceptDisclosure = async () => {
+    setDisclosure(false);
+    try {
+      await api('/users/me/consents', { method: 'PUT', body: { kind: 'background_location', granted: true } });
+      await refreshUser();
+    } catch (error) {
+      showToast(apiErrorMessage(error), 'danger');
+      return;
+    }
+    await connect(true);
+  };
+
+  const connect = async (disclosed = false) => {
+    if (needsDisclosure && !disclosed) {
+      setDisclosure(true);
+      return;
+    }
     setLocating(true);
     try {
       if (permission !== 'granted' && !(await requestLocationPermission())) {
@@ -216,6 +240,13 @@ export function DriverDashboard() {
           ) : null}
         </>
       )}
+      <Sheet
+        visible={disclosure}
+        title={t('privacy.location.title')}
+        subtitle={t('privacy.location.body')}
+        onClose={() => setDisclosure(false)}
+        options={[{ label: t('privacy.location.accept'), icon: MapPinned, onPress: () => void acceptDisclosure() }]}
+      />
     </MapSheetLayout>
   );
 }

@@ -167,6 +167,16 @@ class ActiveRideError(ConflictError):
     message = "Finish your ride before deleting your account"
 
 
+class OpenReportsError(ConflictError):
+    code = "account_open_reports"
+    message = "There are open reports about your account; support must close them first"
+
+
+class FeePendingError(ConflictError):
+    code = "account_fee_pending"
+    message = "Pay your pending subscription fee before deleting your account"
+
+
 def erase_at(user: User) -> datetime:
     assert user.deletion_requested_at is not None
     return user.deletion_requested_at + timedelta(days=settings.ACCOUNT_DELETION_GRACE_DAYS)
@@ -200,18 +210,42 @@ async def request_deletion(session: AsyncSession, user: User) -> datetime:
     )
     if busy is not None:
         raise ActiveRideError()
+    await ensure_deletable(session, user)
     user.is_active = False
     user.deletion_requested_at = datetime.now(UTC)
     await session.flush()
     return erase_at(user)
 
 
+async def ensure_deletable(session: AsyncSession, user: User) -> None:
+    """Open reports against the user and unpaid fees must be settled first (doc 07)."""
+    from apps.moderation.models import OPEN_STATUSES, Report
+    from apps.subscriptions.models import Charge, ChargeStatus
+
+    reported = await session.scalar(
+        select(Report.id)
+        .where(Report.reported_user_id == user.id, Report.status.in_(OPEN_STATUSES))
+        .limit(1)
+    )
+    if reported is not None:
+        raise OpenReportsError()
+    owed = await session.scalar(
+        select(Charge.id)
+        .where(Charge.user_id == user.id, Charge.status == ChargeStatus.PENDING)
+        .limit(1)
+    )
+    if owed is not None:
+        raise FeePendingError()
+
+
 async def erase_due(session: AsyncSession, now: datetime | None = None, limit: int = 50) -> int:
     """Erases the personal data of accounts whose grace period ended. Rides, payments, fees and
     reports stay (accounting and safety records) but no longer point to a person."""
     from apps.drivers.models import DriverDocument, DriverProfile, Vehicle
+    from apps.moderation.models import Suspension
     from apps.notifications.models import Device, Notification
     from apps.places.models import SavedPlace
+    from apps.privacy import services as privacy
 
     now = now or datetime.now(UTC)
     cutoff = now - timedelta(days=settings.ACCOUNT_DELETION_GRACE_DAYS)
@@ -252,6 +286,11 @@ async def erase_due(session: AsyncSession, now: datetime | None = None, limit: i
             profile.rif = ""
             profile.phone = ""
             profile.birth_date = date(1900, 1, 1)
+            profile.rejection_reason = None
+        suspended = await session.scalar(
+            select(func.count(Suspension.id)).where(Suspension.user_id == user.id)
+        )
+        keys += await privacy.scrub(session, user, was_suspended=bool(suspended))
         for model in (SocialAccount, Device, Notification, SavedPlace):
             await session.execute(delete(model).where(model.user_id == user.id))
         user.email = f"deleted-{tag}@deleted.invalid"

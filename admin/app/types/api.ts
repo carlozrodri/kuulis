@@ -14,6 +14,9 @@ export interface User {
   last_login_at: string | null
   /** Admin panel accounts, from /users/me only. */
   permissions?: string[] | null
+  /** Doc 07: deletion asked for (account inactive, restorable by signing in) and carried out. */
+  deletion_requested_at?: string | null
+  deleted_at?: string | null
 }
 
 export interface Page<T> {
@@ -1044,4 +1047,26 @@ export interface LegalAcceptance {
   ip: string | null
   platform: string | null
   created_at: string
+}
+
+// ---- Privacy (doc 07) ----
+
+export interface DeletionRequest {
+  user_id: string
+  email: string
+  full_name: string
+  requested_at: string
+  erase_at: string
+  erased_at: string | null
+}
+
+export interface AdminDataExport {
+  id: string
+  user_id: string
+  email: string
+  status: 'pending' | 'ready' | 'failed' | 'expired'
+  error: string | null
+  created_at: string
+  completed_at: string | null
+  expires_at: string | null
 }

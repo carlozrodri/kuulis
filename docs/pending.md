@@ -20,6 +20,9 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
 - [ ] Revisión de los textos legales por un abogado venezolano antes del lanzamiento, y completar los datos
   entre corchetes (responsable, RIF, domicilio, correo de contacto, tribunales, seguro). Se publican como versión
   nueva desde el admin → Legal (doc 07).
+- [ ] Qué hacer cuando alguien con una cuenta suspendida y eliminada se registra de nuevo con el mismo email: la
+  tabla `erased_emails` ya guarda el hash (doc 16 decide si se bloquea o se avisa a soporte).
+- [ ] Plazos de conservación de la auditoría y el libro contable (supuesto: 5 años) a validar con el abogado.
 
 ## API
 - [ ] Páginas web para `verify-email` y `reset-password` (los enlaces de los emails apuntan a
@@ -27,7 +30,7 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
       Alternativa: deep links a la app móvil.
 - [ ] Plantillas HTML de email con diseño.
 - [ ] Scheduler de Taskiq desplegado cuando haya tareas periódicas (hoy no hay ninguna).
-- [ ] Limpieza periódica de notificaciones antiguas y dispositivos inactivos.
+- [ ] Limpieza periódica de dispositivos inactivos (las notificaciones de más de 90 días ya se borran, doc 07).
 - [ ] Mostrar en el admin las invitaciones entre motorizados y los meses gratis ganados.
 - [ ] Revisar en el admin las cuentas en proceso de borrado (`deletion_requested_at`); el worker
       borra los datos personales a los 30 días (`ACCOUNT_DELETION_GRACE_DAYS`).

@@ -32,6 +32,13 @@ watchEffect(() => {
   }
 })
 
+// Grace period before an account is erased (API settings.ACCOUNT_DELETION_GRACE_DAYS).
+const ERASE_AFTER_DAYS = 30
+const eraseOn = computed(() => {
+  const requested = user.value?.deletion_requested_at
+  return requested ? new Date(new Date(requested).getTime() + ERASE_AFTER_DAYS * 86_400_000).toISOString() : null
+})
+
 const saving = ref(false)
 const roleItems = computed(() => (['user', 'staff', 'admin'] as Role[]).map(r => ({ label: t(`roles.${r}`), value: r })))
 
@@ -97,6 +104,21 @@ async function save() {
         v-if="user"
         class="grid max-w-3xl gap-6"
       >
+        <UAlert
+          v-if="user.deleted_at"
+          color="neutral"
+          variant="subtle"
+          icon="i-lucide-user-x"
+          :title="t('privacy.userErased', { date: formatDate(user.deleted_at, locale) })"
+        />
+        <UAlert
+          v-else-if="user.deletion_requested_at"
+          color="warning"
+          variant="subtle"
+          icon="i-lucide-clock"
+          :title="t('privacy.userScheduled', { date: formatDate(eraseOn, locale) })"
+          :description="t('privacy.userScheduledHelp', { date: formatDate(user.deletion_requested_at, locale) })"
+        />
         <UCard>
           <dl class="grid grid-cols-2 gap-4 text-sm">
             <div>

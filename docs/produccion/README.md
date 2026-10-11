@@ -59,9 +59,10 @@ construir. Las preguntas de cada documento están en su sección final.
 - **06** hecho (2026-10-11): registro de auditoría de toda acción del admin y de las lecturas sensibles,
   permisos por rol (Soporte, Verificador, Finanzas, Operaciones), gestión del equipo con invitaciones y doble
   aprobación (ajustes de más de 20 USD, tarifas y tramos, notificaciones masivas).
-- **07** parte 1 en QA (2026-10-11): términos, privacidad, normas, términos de motorizado y billetera como
-  borradores versionados (pendientes de abogado), aceptación obligatoria en el registro y al publicar una versión
-  mayor, y página Legal en el admin. Falta la parte 2 (eliminación, descarga de datos y retención).
+- **07** hecho (2026-10-11): términos, privacidad, normas, términos de motorizado y billetera como borradores
+  versionados (pendientes de abogado) con aceptación obligatoria; eliminación de cuenta que no deja datos
+  personales en ninguna tabla, descarga de mis datos por email, limpieza diaria de datos viejos, aviso de
+  ubicación del motorizado y página Privacidad en el admin.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay
