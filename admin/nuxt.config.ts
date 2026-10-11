@@ -17,6 +17,8 @@ export default defineNuxtConfig({
       // Same origin in QA/production (https://<host>/api/v1). Override with NUXT_PUBLIC_API_BASE.
       apiBase: '/api/v1',
       appEnv: 'local',
+      // Git commit of the build (NUXT_PUBLIC_COMMIT, set from Coolify's SOURCE_COMMIT in the Dockerfile).
+      commit: '',
       // Raster tiles for the ride maps (Leaflet). OpenStreetMap's standard tiles are fine for a
       // low-volume internal panel per https://operations.osmfoundation.org/policies/tiles/ (attribution
       // required, no bulk downloads). Point NUXT_PUBLIC_MAP_TILE_URL at a self-hosted/commercial server if usage grows.

@@ -1,7 +1,7 @@
 async def test_live(client):
     response = await client.get("/health/live")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    assert response.json() == {"status": "ok", "env": "test", "commit": None}
 
 
 async def test_ready_checks_db_and_redis(client):
@@ -9,6 +9,21 @@ async def test_ready_checks_db_and_redis(client):
     assert response.status_code == 200
     body = response.json()
     assert body["checks"] == {"database": True, "redis": True}
+    # Tests never configure the map providers.
+    assert body["providers"] == {"osrm": None, "photon": None}
+
+
+async def test_ready_reports_providers_without_failing(client, monkeypatch):
+    from kuulis.settings import settings
+
+    monkeypatch.setattr(settings, "SOURCE_COMMIT", "0123456789abcdef")
+    monkeypatch.setattr(settings, "OSRM_URL", "http://127.0.0.1:9")  # nothing listens there
+    response = await client.get("/api/health/ready")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["commit"] == "0123456789ab"
+    assert body["status"] == "degraded"
+    assert body["providers"] == {"osrm": False, "photon": None}
 
 
 async def test_stripped_prefix_is_restored(client, user_headers):

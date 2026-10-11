@@ -22,6 +22,13 @@ watch(config, (value) => {
 }, { immediate: true })
 
 const readOnly = computed(() => !auth.isAdmin.value)
+
+// Which build is running: helps confirm a deploy replaced the old containers.
+const runtime = useRuntimeConfig().public
+const shortCommit = (commit?: string | null) => (commit ? commit.slice(0, 7) : '—')
+const { data: apiVersion } = await useAsyncData('api-version', () =>
+  $fetch<{ commit: string | null }>(`${runtime.apiBase.replace(/\/v1\/?$/, '')}/health/live`).catch(() => null),
+)
 const currentYear = new Date().getFullYear()
 
 const vehicleTypeItems = computed(() => VEHICLE_TYPES.map(v => ({ label: t(`vehicleTypes.${v}`), value: v })))
@@ -839,6 +846,9 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           />
         </div>
       </form>
+      <p class="pt-4 text-xs text-(--ui-text-muted)">
+        {{ t('settings.version', { api: shortCommit(apiVersion?.commit), admin: shortCommit(runtime.commit) }) }}
+      </p>
     </template>
   </UDashboardPanel>
 </template>

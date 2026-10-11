@@ -298,6 +298,7 @@
     "profileSuspensionHelp": "Driver-profile suspension (documents and approval): they cannot work as a driver but can still request rides. To sanction the whole account, use the account suspension."
   },
   "settings": {
+    "version": "Version: API {api} · Admin {admin}",
     "readOnly": "Only administrators can change settings.",
     "drivers": "Drivers",
     "minAge": "Minimum age",

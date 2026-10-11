@@ -298,6 +298,7 @@
     "profileSuspensionHelp": "Suspensión del perfil de motorizado (documentos y aprobación): no puede trabajar como motorizado, pero sí pedir viajes. Para sancionar la cuenta completa usa la suspensión de cuenta."
   },
   "settings": {
+    "version": "Versión: API {api} · Admin {admin}",
     "readOnly": "Solo los administradores pueden cambiar la configuración.",
     "drivers": "Motorizados",
     "minAge": "Edad mínima",

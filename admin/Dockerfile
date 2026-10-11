@@ -9,7 +9,9 @@ COPY . .
 RUN pnpm nuxt prepare && pnpm build
 
 FROM node:22-alpine AS runtime
-ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
+# Coolify passes SOURCE_COMMIT when "Include source commit in build" is on; shown in Settings.
+ARG SOURCE_COMMIT=""
+ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000 NUXT_PUBLIC_COMMIT=$SOURCE_COMMIT
 RUN apk add --no-cache curl
 WORKDIR /app
 COPY --from=build --chown=node:node /app/.output ./.output

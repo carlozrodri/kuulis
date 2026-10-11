@@ -15,6 +15,8 @@ class BaseAppSettings(BaseSettings):
     # --- Core -----------------------------------------------------------------
     APP_ENV: Literal["local", "test", "qa", "production"] = "local"
     APP_NAME: str = "Kuulis"
+    # Git commit of the running build (Coolify: "Include source commit in build").
+    SOURCE_COMMIT: str = ""
     DEBUG: bool = False
     SECRET_KEY: str = Field(default="change-me-in-env", min_length=16)
     API_V1_PREFIX: str = "/api/v1"
