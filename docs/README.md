@@ -11,6 +11,7 @@
 | [pending.md](pending.md) | Lista de trabajo pendiente concreto |
 | [blockers.md](blockers.md) | Bloqueos que dependen de Carlos o de terceros |
 | [product/](product/README.md) | Plan de negocio y de producto de Kuulis |
+| [produccion/](produccion/README.md) | Lo que falta para producción: un documento por funcionalidad, en orden |
 | [template.md](template.md) | Tag `template-v1.0.0`: la plantilla para crear otros productos |
 
 Regla: cada cambio relevante actualiza `roadmap.md` / `pending.md`, y cada bloqueo nuevo va a `blockers.md`.
