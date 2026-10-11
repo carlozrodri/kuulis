@@ -6,6 +6,7 @@ definePageMeta({ permission: 'notifications.send' })
 const { t } = useI18n()
 const { request } = useApi()
 const toast = useToast()
+const approvals = useApprovalCount()
 const apiError = useApiError()
 
 const audience = ref<'all' | Role | 'user_id'>('all')
@@ -25,8 +26,9 @@ async function send() {
     const body: Record<string, unknown> = { title: form.title, body: form.body }
     if (audience.value === 'user_id') body.user_id = form.user_id
     else if (audience.value !== 'all') body.role = audience.value
-    await request('/notifications/send', { method: 'POST', body })
-    toast.add({ title: t('notifications.queued'), color: 'success' })
+    const result = await request<unknown>('/notifications/send', { method: 'POST', body })
+    if (isHeld(result)) await approvals.notifyHeld(result)
+    else toast.add({ title: t('notifications.queued'), color: 'success' })
     Object.assign(form, { title: '', body: '', user_id: '' })
   }
   catch (error) {

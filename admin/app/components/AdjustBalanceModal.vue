@@ -8,6 +8,7 @@ const { t, locale } = useI18n()
 const { request } = useApi()
 const toast = useToast()
 const apiError = useApiError()
+const approvals = useApprovalCount()
 
 const ADJUST_MAX = 10_000
 const amount = ref<number | null>(null)
@@ -31,12 +32,16 @@ async function submit() {
   if (!canSubmit.value || amount.value === null) return
   saving.value = true
   try {
-    await request(`/admin/wallets/${props.userId}/adjust`, {
+    const result = await request<unknown>(`/admin/wallets/${props.userId}/adjust`, {
       method: 'POST',
       body: { amount: amount.value.toFixed(2), reason: reason.value.trim() },
     })
-    toast.add({ title: t('wallet.adjust.done'), color: 'success' })
     open.value = false
+    if (isHeld(result)) {
+      await approvals.notifyHeld(result)
+      return
+    }
+    toast.add({ title: t('wallet.adjust.done'), color: 'success' })
     emit('adjusted')
   }
   catch (err) {

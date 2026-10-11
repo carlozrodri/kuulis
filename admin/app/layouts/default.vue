@@ -19,15 +19,24 @@ const reportsBadge = computed(() => {
     ...(urgent ? { title: t('reports.urgentOpen', { n: counts.urgent_open }) } : {}),
   }
 })
+// Requests waiting for this account's approval.
+const approvalCount = useApprovalCount()
+const approvalsBadge = computed(() =>
+  approvalCount.pending.value ? { label: String(approvalCount.pending.value), color: 'warning' as const, variant: 'solid' as const } : undefined,
+)
+function refreshCounts() {
+  reportCounts.refresh()
+  approvalCount.refresh()
+}
 let countsTimer: ReturnType<typeof setInterval> | undefined
 onMounted(() => {
-  reportCounts.refresh()
+  refreshCounts()
   countsTimer = setInterval(() => {
-    if (document.visibilityState === 'visible') reportCounts.refresh()
+    if (document.visibilityState === 'visible') refreshCounts()
   }, 60_000)
 })
 onBeforeUnmount(() => clearInterval(countsTimer))
-watch(() => route.path, () => reportCounts.refresh())
+watch(() => route.path, refreshCounts)
 
 const links = computed<NavigationMenuItem[]>(() =>
   NAV.filter(entry => navAllowed(entry, auth.isAdmin.value, auth.can)).map(entry => ({
@@ -35,6 +44,7 @@ const links = computed<NavigationMenuItem[]>(() =>
     icon: entry.icon,
     to: entry.to,
     ...(entry.key === 'reports' ? { badge: reportsBadge.value } : {}),
+    ...(entry.key === 'approvals' ? { badge: approvalsBadge.value } : {}),
   })),
 )
 

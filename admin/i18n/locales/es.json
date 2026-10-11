@@ -18,7 +18,8 @@
     "system": "Sistema",
     "audit": "Auditoría",
     "team": "Equipo",
-    "roles": "Roles"
+    "roles": "Roles",
+    "approvals": "Aprobaciones"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -307,7 +308,10 @@
     "invite_invalid": "Esta invitación ya no es válida. Pide una nueva.",
     "token_used": "Este enlace ya se usó.",
     "staff_role_exists": "Ya existe un rol con ese nombre.",
-    "staff_role_not_found": "Ese rol no existe."
+    "staff_role_not_found": "Ese rol no existe.",
+    "approval_not_found": "Solicitud no encontrada",
+    "approval_closed": "La solicitud ya se decidió o venció",
+    "approval_own_request": "Otra persona tiene que aprobar tu solicitud"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -437,7 +441,8 @@
       "accountName": "El nombre de la cuenta es obligatorio (máximo {max} caracteres).",
       "transferLimit": "Límite de transferencias: entre 0 y {max} USDT.",
       "freeMonths": "Meses gratis: entero entre {min} y {max}.",
-      "graceDays": "Días de gracia: entero entre {min} y {max}."
+      "graceDays": "Días de gracia: entero entre {min} y {max}.",
+      "approvalLimit": "Límite de doble aprobación: entre 0 y {max} USD."
     },
     "fares": {
       "title": "Tarifas",
@@ -524,6 +529,16 @@
       "graceDays": "Días de gracia",
       "graceDaysHelp": "Días para pagar desde el cobro antes de quedar bloqueado.",
       "tiersHint": "Los tramos de la cuota se editan en"
+    },
+    "approvals": {
+      "title": "Doble aprobación",
+      "help": "Acciones que una persona propone y otra aprueba en Aprobaciones. Mientras solo haya un admin, las tarifas y los tramos no tienen quién los apruebe: apágalo aquí si hace falta.",
+      "adjustLimit": "Ajustes de saldo mayores a (USD)",
+      "adjustLimitHelp": "Los ajustes por encima de este monto, a favor o en contra, esperan aprobación. 0 la desactiva.",
+      "fares": "Tarifas y tramos de suscripción",
+      "faresHelp": "Cambios de tarifas o redondeo en Configuración y nuevos tramos. Solo otro admin los aprueba.",
+      "broadcasts": "Notificaciones masivas",
+      "broadcastsHelp": "Notificaciones a todos o a un rol completo. Las de un solo usuario salen al momento."
     }
   },
   "paymentMethods": {
@@ -1494,6 +1509,11 @@
       "staff": {
         "invite": "Invitó a alguien al equipo",
         "update": "Cambió a alguien del equipo"
+      },
+      "approval": {
+        "request": "Pidió una aprobación",
+        "approve": "Aprobó una solicitud",
+        "reject": "Rechazó una solicitud"
       }
     },
     "entities": {
@@ -1513,7 +1533,8 @@
       "finance": "Finanzas",
       "file": "Archivo",
       "audit": "Auditoría",
-      "staff_role": "Rol del equipo"
+      "staff_role": "Rol del equipo",
+      "approval": "Aprobación"
     }
   },
   "team": {
@@ -1551,5 +1572,49 @@
     "done": "Listo, tu contraseña quedó creada. Ya puedes entrar.",
     "goLogin": "Ir a entrar",
     "noToken": "El enlace está incompleto. Pide una nueva invitación."
+  },
+  "approvals": {
+    "help": "Cambios de alto impacto que esperan la firma de una segunda persona: ajustes de saldo grandes, tarifas y tramos, y notificaciones masivas. Quien pide un cambio no puede aprobarlo. Las solicitudes vencen a las 48 horas.",
+    "all": "Todas",
+    "empty": "No hay solicitudes.",
+    "date": "Fecha",
+    "request": "Solicitud",
+    "requester": "Pedido por",
+    "state": "Estado",
+    "reason": "Motivo",
+    "detail": "Ver datos",
+    "expires": "Vence {date}",
+    "waitingOther": "Espera a otra persona",
+    "open": "Abrir",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "approveTitle": "Aprobar solicitud",
+    "rejectTitle": "Rechazar solicitud",
+    "approveHint": "El cambio se aplica ahora, a nombre de {email}.",
+    "note": "Comentario (opcional)",
+    "rejectNote": "Motivo del rechazo",
+    "approved": "Solicitud aprobada y aplicada",
+    "rejected": "Solicitud rechazada",
+    "held": "Enviado a aprobación: otra persona tiene que aprobarlo",
+    "status": {
+      "pending": "Pendiente",
+      "approved": "Aprobada",
+      "rejected": "Rechazada",
+      "expired": "Vencida"
+    },
+    "actions": {
+      "wallet": {
+        "adjust": "Ajuste de saldo"
+      },
+      "fee_schedule": {
+        "create": "Nuevos tramos de suscripción"
+      },
+      "config": {
+        "update": "Cambio de tarifas"
+      },
+      "notification": {
+        "broadcast": "Notificación masiva"
+      }
+    }
   }
 }

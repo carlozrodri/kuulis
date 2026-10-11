@@ -209,6 +209,13 @@ class AppConfig(BaseModel):
     subscription_free_months: int = Field(default=3, ge=0, le=24)
     subscription_grace_days: int = Field(default=7, ge=0, le=60)
 
+    # --- Four-eyes approvals (doc 06) ---------------------------------------------------------
+    # Balance adjustments above this many USD wait for a second person (0: never).
+    approval_adjust_limit: Money = Decimal("20.00")
+    # Fare and fee schedule changes, and notifications to a whole role or everyone.
+    approval_fares: bool = True
+    approval_broadcasts: bool = True
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -266,6 +273,9 @@ class AppConfigUpdate(BaseModel):
     transfer_monthly_limit: Money | None = None
     subscription_free_months: int | None = Field(default=None, ge=0, le=24)
     subscription_grace_days: int | None = Field(default=None, ge=0, le=60)
+    approval_adjust_limit: Money | None = None
+    approval_fares: bool | None = None
+    approval_broadcasts: bool | None = None
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

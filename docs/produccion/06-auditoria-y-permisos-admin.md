@@ -126,3 +126,27 @@ Sin cambios.
 - El menú y los botones se ocultan según los permisos (`/users/me` trae `permissions`), y una página sin
   permiso lleva a la primera que sí puede ver.
 - Los staff que ya existían quedan sin rol hasta que un admin les asigne uno en Equipo.
+
+### Parte 3 (2026-10-11)
+- Tabla `pending_approvals` (acción, resumen, datos de la acción en JSONB, motivo, estado, quién pidió, quién
+  decidió, nota, resultado y vencimiento). Las solicitudes vencen a las 48 horas.
+- Qué espera una segunda firma (se cambia en **Configuración → Doble aprobación**):
+  - Ajustes de saldo de más de **20 USD**, a favor o en contra (`approval_adjust_limit`, 0 la desactiva).
+  - Cambios de tarifas o del redondeo y tramos de suscripción nuevos (`approval_fares`). Solo otro admin los
+    aprueba. Si el panel manda la configuración entera, solo cuentan los valores que de verdad cambian, y al
+    aprobar se aplican solo esas claves, así que no deshace otros cambios hechos mientras tanto.
+  - Notificaciones a todos o a un rol completo (`approval_broadcasts`). Las de un solo usuario salen al momento.
+- El endpoint responde **202** con `{"status": "pending_approval", "approval": {...}}` en lugar de actuar. Lo
+  inválido (mes pasado, motorizado inexistente) se rechaza antes de crear la solicitud.
+- `GET /admin/approvals`, `GET /admin/approvals/count`, `POST /admin/approvals/{id}/approve` (pide código 2FA
+  reciente) y `POST /admin/approvals/{id}/reject` (nota obligatoria). Quien pidió no puede aprobar
+  (`approval_own_request`); aprobar exige el permiso de la acción (`wallet.adjust`, `notifications.send`) o ser
+  admin si la acción es solo de admin. Cada quien ve sus propias solicitudes y las que puede decidir.
+- Al aprobar, la acción corre en la misma transacción y queda a nombre de quien la pidió. Si falla (por ejemplo,
+  saldo insuficiente) la solicitud sigue pendiente.
+- Auditoría: `approval.request` (con los datos de la acción), `approval.approve` y `approval.reject`.
+- Admin: página **Aprobaciones** con contador en el menú, filtro por estado, datos de cada solicitud y botones de
+  aprobar o rechazar. Ajustar saldo, crear tramos, guardar tarifas y enviar notificaciones avisan cuando el
+  cambio quedó esperando aprobación.
+- Mientras Carlos sea el único admin, las tarifas y los tramos no tienen quién los apruebe; se puede apagar
+  `approval_fares` en Configuración hasta que haya un segundo admin.

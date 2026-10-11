@@ -7,6 +7,7 @@ const { t, locale } = useI18n()
 const { request } = useApi()
 const auth = useAuth()
 const toast = useToast()
+const approvals = useApprovalCount()
 const apiError = useApiError()
 
 const { data: schedules, status, error, refresh } = useAsyncData(
@@ -91,12 +92,16 @@ async function save() {
   if (issues.value.length) return
   saving.value = true
   try {
-    await request<FeeSchedule>('/admin/subscriptions/schedules', {
+    const result = await request<unknown>('/admin/subscriptions/schedules', {
       method: 'POST',
       body: { effective_month: effectiveMonth.value, tiers: tiersToPayload(tiers.value) },
     })
-    toast.add({ title: t('subscriptions.schedules.saved', { month: formatMonth(effectiveMonth.value, locale.value) }), color: 'success' })
     formOpen.value = false
+    if (isHeld(result)) {
+      await approvals.notifyHeld(result)
+      return
+    }
+    toast.add({ title: t('subscriptions.schedules.saved', { month: formatMonth(effectiveMonth.value, locale.value) }), color: 'success' })
     await refresh()
   }
   catch (err) {

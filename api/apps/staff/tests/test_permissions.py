@@ -13,7 +13,15 @@ from kuulis.core.db import SessionLocal
 
 API = "/api/v1"
 # Any staff member may confirm their own second factor and read the settings every page uses.
-OPEN_TO_ALL_STAFF = {"/auth/admin/reauth", "/admin/config"}
+# Approvals check the permission of each request's action themselves.
+OPEN_TO_ALL_STAFF = {
+    "/auth/admin/reauth",
+    "/admin/config",
+    "/admin/approvals",
+    "/admin/approvals/count",
+    "/admin/approvals/{approval_id}/approve",
+    "/admin/approvals/{approval_id}/reject",
+}
 
 
 async def _staff(client, email: str, role: str) -> dict[str, str]:

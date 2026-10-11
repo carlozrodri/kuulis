@@ -59,8 +59,25 @@ async def get_app_config(session: AsyncSession) -> AppConfig:
     )
 
 
+async def preview_app_config(session: AsyncSession, data: AppConfigUpdate) -> AppConfig:
+    """The settings as they would be after ``data``, validated but not saved."""
+    merged, _ = await _merge(session, data)
+    return merged
+
+
 async def update_app_config(session: AsyncSession, data: AppConfigUpdate) -> AppConfig:
     """Upserts the given keys. The caller commits, then calls ``invalidate_cache``."""
+    merged, changes = await _merge(session, data)
+    values = merged.model_dump(mode="json")
+    for key in changes:
+        stmt = insert(AppSetting).values(key=key, value=values[key])
+        await session.execute(
+            stmt.on_conflict_do_update(index_elements=[AppSetting.key], set_={"value": values[key]})
+        )
+    return merged
+
+
+async def _merge(session: AsyncSession, data: AppConfigUpdate) -> tuple[AppConfig, dict]:
     current = AppConfig.model_validate(await _load(session))
     changes = data.model_dump(exclude_unset=True, exclude_none=True)
     for key in MERGED_KEYS:
@@ -75,13 +92,7 @@ async def update_app_config(session: AsyncSession, data: AppConfigUpdate) -> App
             for err in exc.errors(include_url=False, include_context=False, include_input=False)
         ]
         raise ConfigInvalidError(details=details) from exc
-    values = merged.model_dump(mode="json")
-    for key in changes:
-        stmt = insert(AppSetting).values(key=key, value=values[key])
-        await session.execute(
-            stmt.on_conflict_do_update(index_elements=[AppSetting.key], set_={"value": values[key]})
-        )
-    return merged
+    return merged, changes
 
 
 async def invalidate_cache() -> None:

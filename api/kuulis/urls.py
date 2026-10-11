@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from apps.analytics.router import router as analytics_router
+from apps.approvals.router import router as approvals_router
 from apps.audit.router import router as audit_router
 from apps.auth.router import router as auth_router
 from apps.config.router import router as config_router
@@ -61,6 +62,7 @@ api_v1.include_router(moderation_router)
 api_v1.include_router(moderation_admin_router)
 api_v1.include_router(analytics_router)
 api_v1.include_router(audit_router)
+api_v1.include_router(approvals_router)
 api_v1.include_router(staff_router)
 api_v1.include_router(staff_public_router)
 api_v1.include_router(client_errors_router)

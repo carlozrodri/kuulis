@@ -177,6 +177,11 @@ export interface AppConfig {
   transfer_monthly_limit?: Decimal
   subscription_free_months?: number
   subscription_grace_days?: number
+  // ---- Four-eyes approvals (doc 06). ----
+  /** Balance adjustments above this many USD wait for a second person ("0.00" = never). */
+  approval_adjust_limit?: Decimal
+  approval_fares?: boolean
+  approval_broadcasts?: boolean
 }
 
 // ---- Phase 1B: rides (docs/api/phase-1b.md) ----
@@ -981,4 +986,35 @@ export interface StaffMember {
   invite_pending: boolean
   last_login_at: string | null
   created_at: string
+}
+
+// ---- Four-eyes approvals (doc 06) ----
+
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected' | 'expired'
+
+export interface ApprovalRead {
+  id: string
+  action: string
+  entity_type: string
+  entity_id: string | null
+  summary: string
+  payload: Record<string, unknown>
+  reason: string | null
+  status: ApprovalStatus
+  requested_by_id: string | null
+  requested_by_email: string
+  decided_by_email: string | null
+  decided_at: string | null
+  decision_note: string | null
+  result: Record<string, unknown> | null
+  expires_at: string
+  created_at: string
+  /** This account may approve or reject it now. */
+  can_decide: boolean
+}
+
+/** 202 answer of an action that now waits for a second approval. */
+export interface ApprovalHeld {
+  status: 'pending_approval'
+  approval: ApprovalRead
 }

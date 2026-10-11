@@ -31,6 +31,9 @@ export interface SettingsForm {
   transfer_monthly_limit: number
   subscription_free_months: number
   subscription_grace_days: number
+  approval_adjust_limit: number
+  approval_fares: boolean
+  approval_broadcasts: boolean
 }
 
 export const FARE_FIELDS = ['base', 'per_km', 'per_minute', 'minimum'] as const
@@ -52,6 +55,7 @@ export const TOPUP_MIN_MAX = 1000
 export const BINANCE_PAY_ID = /^\d{6,20}$/
 export const ACCOUNT_NAME_MAX = 60
 export const TRANSFER_LIMIT_MAX = 10_000
+export const APPROVAL_LIMIT_MAX = 1000
 export const FREE_MONTHS_MAX = 24
 export const GRACE_DAYS_MAX = 60
 
@@ -86,6 +90,9 @@ export function defaultSettings(): SettingsForm {
     transfer_monthly_limit: 50,
     subscription_free_months: 3,
     subscription_grace_days: 7,
+    approval_adjust_limit: 20,
+    approval_fares: true,
+    approval_broadcasts: true,
   }
 }
 
@@ -144,6 +151,9 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
     transfer_monthly_limit: num(config.transfer_monthly_limit, d.transfer_monthly_limit),
     subscription_free_months: num(config.subscription_free_months, d.subscription_free_months),
     subscription_grace_days: num(config.subscription_grace_days, d.subscription_grace_days),
+    approval_adjust_limit: num(config.approval_adjust_limit, d.approval_adjust_limit),
+    approval_fares: config.approval_fares ?? d.approval_fares,
+    approval_broadcasts: config.approval_broadcasts ?? d.approval_broadcasts,
   }
 }
 
@@ -191,6 +201,9 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
     transfer_monthly_limit: money(form.transfer_monthly_limit),
     subscription_free_months: form.subscription_free_months,
     subscription_grace_days: form.subscription_grace_days,
+    approval_adjust_limit: money(form.approval_adjust_limit),
+    approval_fares: form.approval_fares,
+    approval_broadcasts: form.approval_broadcasts,
   }
 }
 
@@ -271,6 +284,9 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
   }
   if (!between(form.subscription_grace_days, 0, GRACE_DAYS_MAX)) {
     issues.push({ key: 'graceDays', params: { min: 0, max: GRACE_DAYS_MAX } })
+  }
+  if (!(Number.isFinite(form.approval_adjust_limit) && form.approval_adjust_limit >= 0 && form.approval_adjust_limit <= APPROVAL_LIMIT_MAX)) {
+    issues.push({ key: 'approvalLimit', params: { max: APPROVAL_LIMIT_MAX } })
   }
   return issues
 }

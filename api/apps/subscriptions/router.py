@@ -3,8 +3,11 @@ from datetime import date
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import JSONResponse
 from sqlalchemy import select
 
+from apps.approvals import services as approvals
+from apps.approvals.schemas import ApprovalHeld
 from apps.audit.services import audit
 from apps.subscriptions import services
 from apps.subscriptions.models import ChargeStatus
@@ -165,10 +168,21 @@ async def schedules(_: Can("subscriptions.view"), session: DBSession) -> list[Sc
     dependencies=[audit("fee_schedule.create", "fee_schedule")],
     response_model=ScheduleRead,
     status_code=201,
+    responses={202: {"model": ApprovalHeld, "description": "Waiting for a second approval"}},
 )
 async def create_schedule(
     data: ScheduleCreate, admin: AdminUser, session: DBSession
-) -> ScheduleRead:
+) -> ScheduleRead | JSONResponse:
+    if await approvals.required(session, "fee_schedule.create"):
+        await services.check_schedule_month(session, data.effective_month)
+        return await approvals.hold(
+            session,
+            admin,
+            "fee_schedule.create",
+            entity_type="fee_schedule",
+            summary=f"Tramos desde {data.effective_month:%Y-%m}",
+            payload=data.model_dump(mode="json"),
+        )
     row = await services.create_schedule(session, admin, data.effective_month, data.tiers)
     await session.commit()
     await session.refresh(row)

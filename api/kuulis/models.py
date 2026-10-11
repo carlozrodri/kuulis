@@ -3,6 +3,7 @@
 Add new apps here, like INSTALLED_APPS in Django.
 """
 
+from apps.approvals.models import PendingApproval  # noqa: F401
 from apps.audit.models import AuditLog  # noqa: F401
 from apps.auth.models import UserTotp  # noqa: F401
 from apps.config.models import AppSetting  # noqa: F401

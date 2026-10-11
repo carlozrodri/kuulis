@@ -80,6 +80,17 @@ async def _make_user(email: str, role: Role = Role.USER, staff_role: StaffRole |
         return user
 
 
+async def set_config(**values) -> None:
+    """Saves settings directly (e.g. turn four-eyes approvals off for a test)."""
+    from apps.config import services
+    from apps.config.schemas import AppConfigUpdate
+
+    async with SessionLocal() as session:
+        await services.update_app_config(session, AppConfigUpdate(**values))
+        await session.commit()
+    await services.invalidate_cache()
+
+
 async def _login(client: AsyncClient, email: str) -> dict[str, str]:
     response = await client.post("/api/v1/auth/login", json={"email": email, "password": PASSWORD})
     assert response.status_code == 200, response.text

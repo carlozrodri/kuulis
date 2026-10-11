@@ -12,7 +12,7 @@ from apps.subscriptions import services
 from apps.subscriptions.models import Charge, ChargeStatus
 from apps.subscriptions.schemas import Tier
 from apps.wallet import services as wallet
-from conftest import _make_user
+from conftest import _make_user, set_config
 from kuulis.core.calendar import add_months, format_month, local_now, month_bounds, month_start
 from kuulis.core.db import SessionLocal
 
@@ -252,6 +252,7 @@ async def test_waive_and_admin_listing(client, admin_headers, staff_headers, rec
 
 
 async def test_schedules(client, admin_headers, staff_headers):
+    await set_config(approval_fares=False)
     url = f"{API}/admin/subscriptions/schedules"
     initial = (await client.get(url, headers=staff_headers)).json()
     assert len(initial) == 1 and initial[0]["current"] is True and initial[0]["id"] is None

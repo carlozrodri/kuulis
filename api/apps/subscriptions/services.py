@@ -142,9 +142,8 @@ async def list_schedules(session: AsyncSession) -> list[tuple[Schedule, FeeSched
     return result
 
 
-async def create_schedule(
-    session: AsyncSession, admin: User, effective_month: date, tiers: list[Tier]
-) -> FeeSchedule:
+async def check_schedule_month(session: AsyncSession, effective_month: date) -> None:
+    """A new schedule starts in a future month that has none yet."""
     if effective_month <= month_start(local_now()):
         raise ScheduleMonthInvalidError()
     exists = await session.scalar(
@@ -152,6 +151,12 @@ async def create_schedule(
     )
     if exists:
         raise ScheduleExistsError()
+
+
+async def create_schedule(
+    session: AsyncSession, admin: User, effective_month: date, tiers: list[Tier]
+) -> FeeSchedule:
+    await check_schedule_month(session, effective_month)
     row = FeeSchedule(
         effective_month=effective_month,
         tiers=[t.model_dump(mode="json") for t in tiers],

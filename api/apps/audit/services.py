@@ -98,9 +98,11 @@ def note(
     after: dict[str, Any] | None = None,
     reason: str | None = None,
     entity_id: object = None,
+    action: str | None = None,
+    entity_type: str | None = None,
 ) -> None:
-    """Adds detail to the open entry: the record before and after the change, the reason, or the
-    id of a record created by the action."""
+    """Adds detail to the open entry: the record before and after the change, the reason, the id
+    of a record created by the action, or another action (a request held for approval)."""
     holder = _holder() or {}
     entry = holder.get("entry")
     if entry is None:
@@ -114,6 +116,10 @@ def note(
         changes["reason"] = reason
     if entity_id is not None:
         changes["entity_id"] = str(entity_id)
+    if action is not None:
+        changes["action"] = action
+    if entity_type is not None:
+        changes["entity_type"] = entity_type
     entry.update(changes)
     row = holder.get("row")
     if row is not None:  # already staged by an earlier commit: the request's last commit saves it

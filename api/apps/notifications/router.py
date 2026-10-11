@@ -2,7 +2,9 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
+from fastapi.responses import JSONResponse
 
+from apps.approvals import services as approvals
 from apps.audit.services import audit
 from apps.notifications import services, tasks
 from apps.notifications.schemas import (
@@ -70,8 +72,11 @@ async def mark_read(
     "/send",
     dependencies=[audit("notification.send", "notification")],
     status_code=status.HTTP_202_ACCEPTED,
+    response_model=None,
 )
-async def send(data: NotificationSend, _: Can("notifications.send"), session: DBSession) -> dict:
+async def send(
+    data: NotificationSend, admin: Can("notifications.send"), session: DBSession
+) -> dict | JSONResponse:
     """Admin panel: send a notification to one user, a role, or everyone."""
     if data.user_id:
         target = await users.get_or_404(session, data.user_id)
@@ -79,6 +84,21 @@ async def send(data: NotificationSend, _: Can("notifications.send"), session: DB
         await session.commit()
         await tasks.send_push.kiq([str(target.id)], data.title, data.body, data.data)
         return {"queued": 1}
+    if await approvals.required(session, "notification.broadcast"):
+        audience = data.role.value if data.role else "todos"
+        return await approvals.hold(
+            session,
+            admin,
+            "notification.broadcast",
+            entity_type="notification",
+            summary=f"Notificación a {audience}: {data.title}",
+            payload={
+                "title": data.title,
+                "body": data.body,
+                "data": data.data,
+                "role": data.role.value if data.role else None,
+            },
+        )
     await tasks.broadcast.kiq(
         data.title, data.body, data.data, data.role.value if data.role else None
     )
