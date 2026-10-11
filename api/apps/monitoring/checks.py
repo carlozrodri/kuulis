@@ -51,6 +51,7 @@ def expected_loops() -> dict[str, int]:
         "dispatch": 120,
         "subscriptions": 15 * 60,  # runs every 5 min
         "account_erasure": 3 * 3600,  # runs every hour
+        "privacy_retention": 3 * 3600,  # checks every hour, works once a day
         "monitoring": 5 * 60,
     }
     if settings.RATES_ENABLED:

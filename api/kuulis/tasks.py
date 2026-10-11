@@ -21,6 +21,7 @@ TASK_MODULES = [
     "apps.monitoring.tasks",
     "apps.backups.tasks",
     "apps.files.metadata",
+    "apps.privacy.tasks",
 ]
 
 if settings.APP_ENV == "test":

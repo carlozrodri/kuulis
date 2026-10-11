@@ -584,7 +584,10 @@
     "account_ride_active": "Termina tu viaje en curso antes de eliminar tu cuenta.",
     "session_not_found": "Esa sesión ya estaba cerrada",
     "legal_acceptance_required": "Acepta los términos actualizados para continuar",
-    "legal_document_not_found": "Texto no encontrado"
+    "legal_document_not_found": "Texto no encontrado",
+    "account_open_reports": "Hay reportes abiertos sobre tu cuenta. Soporte debe cerrarlos antes de eliminarla.",
+    "account_fee_pending": "Paga tu cuota pendiente antes de eliminar tu cuenta.",
+    "export_too_soon": "Puedes descargar tus datos una vez al día."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -1320,5 +1323,33 @@
     "signUpPrefix": "Acepto los ",
     "signUpAnd": " y la ",
     "socialNote": "Si entras con Google o Apple te pediremos aceptar los términos al entrar."
+  },
+  "privacy": {
+    "delete": {
+      "intro": "Cerramos tu sesión en todos tus equipos. Tienes 30 días para arrepentirte: si vuelves a entrar antes, recuperas tu cuenta tal como estaba.",
+      "erasedTitle": "Lo que borramos",
+      "erasedBody": "Tu nombre, email, foto, contacto de confianza, lugares guardados, mensajes del chat, notificaciones y, si eres motorizado, tus documentos, cédula, teléfono y placa.",
+      "keptTitle": "Lo que se queda sin tu nombre",
+      "keptBody": "Los viajes, pagos, cuotas y reportes se guardan sin datos que te identifiquen, porque los necesitamos para la contabilidad y la seguridad de todos.",
+      "balanceTitle": "Pierdes tu saldo de {{amount}} USDT",
+      "balanceBody": "El saldo de la billetera no se puede retirar ni devolver. Úsalo o transfiérelo antes de eliminar tu cuenta.",
+      "blocks": "No se puede eliminar la cuenta con un viaje en curso, con reportes abiertos sobre ti o con una cuota pendiente.",
+      "check": "Entiendo que en 30 días mis datos se borran para siempre."
+    },
+    "export": {
+      "title": "Descargar mis datos",
+      "rowHint": "Te enviamos una copia por email",
+      "body": "Preparamos un archivo con tu perfil, tus viajes, las calificaciones que recibiste (sin el autor), los movimientos de tu billetera y tus reportes, y te lo enviamos por email. El enlace dura 24 horas.",
+      "button": "Enviarme mis datos",
+      "sentTitle": "Revisa tu correo",
+      "sentBody": "Enviamos el enlace a {{email}}. Si no lo ves, revisa la carpeta de spam.",
+      "failed": "No pudimos preparar tu archivo. Intenta de nuevo.",
+      "next": "Podrás pedir otra copia a partir del {{time}}."
+    },
+    "location": {
+      "title": "Tu ubicación mientras estás conectado",
+      "body": "Mientras estés conectado, Kuulis usa tu ubicación para ofrecerte viajes cercanos y mostrarle al pasajero dónde vienes, incluso con la app minimizada o la pantalla apagada. Verás un aviso fijo mientras ocurre. Al desconectarte dejamos de usarla.",
+      "accept": "Entendido, conectarme"
+    }
   }
 }

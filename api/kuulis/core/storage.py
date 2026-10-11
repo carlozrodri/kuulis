@@ -91,6 +91,13 @@ def presigned_upload(key: str, content_type: str) -> str:
     )
 
 
+def put_object(key: str, body: bytes, content_type: str) -> None:
+    """Server-side upload (files the API builds itself, like a data export)."""
+    get_s3_client().put_object(
+        Bucket=settings.AWS_S3_BUCKET, Key=key, Body=body, ContentType=content_type
+    )
+
+
 def presigned_download(key: str, expires_in: int | None = None) -> str:
     return get_s3_client().generate_presigned_url(
         "get_object",

@@ -20,6 +20,7 @@ from apps.monitoring.router import metrics_router
 from apps.monitoring.router import router as monitoring_router
 from apps.notifications.router import router as notifications_router
 from apps.places.router import router as places_router
+from apps.privacy.router import router as privacy_router
 from apps.promotions.router import admin_router as promotions_admin_router
 from apps.rates.router import router as rates_router
 from apps.realtime.router import router as realtime_router
@@ -41,6 +42,7 @@ api_v1.include_router(auth_router)
 api_v1.include_router(places_router)
 api_v1.include_router(users_router)
 api_v1.include_router(legal_router)
+api_v1.include_router(privacy_router)
 api_v1.include_router(referrals_router)
 api_v1.include_router(notifications_router)
 api_v1.include_router(files_router)

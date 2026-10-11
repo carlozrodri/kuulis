@@ -125,3 +125,31 @@ de Carlos al operar sin empresa registrada.
   idiomas y publicación de una versión nueva (con «qué cambió» y si exige aceptar de nuevo; queda en la
   auditoría como `legal.publish`). La ficha de cada usuario muestra qué versiones aceptó, cuándo y desde dónde.
 - Las licencias de código abierto y la web pública (08) quedan para cuando se haga el doc 08.
+
+### Parte 2 (2026-10-11)
+- **Eliminar la cuenta** (Perfil → Seguridad → Eliminar mi cuenta) abre una pantalla que explica qué se borra, qué
+  se conserva sin nombre, que el saldo de la billetera se pierde (muestra el monto) y los 30 días para arrepentirse.
+  La API la rechaza con viaje activo (`account_ride_active`), con reportes abiertos en su contra
+  (`account_open_reports`) o con una cuota pendiente (`account_fee_pending`).
+- **Al borrar** (30 días después), además de lo que ya se hacía: se borran sus mensajes de chat, consentimientos,
+  2FA y descargas (con sus archivos); los viajes que pidió quedan sin direcciones, con coordenadas redondeadas a
+  ~1 km y sin recorrido; los que manejó quedan sin placa; sus comentarios en calificaciones, el nombre e ID de
+  Binance de sus recargas y su ID de Binance Pay se borran; su nombre desaparece de las transferencias de la otra
+  persona; la IP de sus aceptaciones legales se borra. El hash del email queda en `erased_emails` (con la marca de
+  si tuvo suspensiones) para el doc 16. Una prueba recorre **todas** las tablas y verifica que no queda ningún dato
+  personal del pasajero ni del motorizado, y que el viaje sigue contando.
+- **Descargar mis datos** (Perfil → Seguridad): `POST /users/me/export` arma un JSON con perfil, ficha de
+  motorizado, lugares, viajes, calificaciones recibidas (sin autor) y dadas, billetera, recargas, cuotas, reportes
+  propios, aceptaciones legales y consentimientos; lo sube al almacenamiento privado y envía por email un enlace
+  firmado de 24 h. Una por día (`export_too_soon`); si falla se puede reintentar enseguida.
+- **Retención** (tarea diaria `privacy_retention` con lock, vigilada por el monitoreo): chats de más de 180 días y
+  recorridos de más de 180 días salvo que el viaje tenga un reporte, documentos rechazados de más de 30 días (con
+  su archivo), notificaciones de más de 90 días y archivos de descargas vencidos.
+- **Consentimiento de ubicación** (Android): la primera vez que el motorizado se conecta, una hoja explica que su
+  ubicación se usa también con la app minimizada mientras está conectado; al aceptar se guarda en
+  `user_consents` (`PUT /users/me/consents`) y no se vuelve a preguntar. El consentimiento para compartir el viaje
+  queda para el doc 11.
+- **Admin → Privacidad** (permiso `users.view`): eliminaciones (programadas y ejecutadas, con la fecha de borrado) y
+  descargas de datos con su estado. La ficha del usuario avisa si su eliminación está programada o ya se hizo.
+- No se creó la tabla `account_deletions` del borrador: las fechas viven en el usuario
+  (`deletion_requested_at`, `deleted_at`), como ya estaba.

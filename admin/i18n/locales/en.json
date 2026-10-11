@@ -20,7 +20,8 @@
     "team": "Team",
     "roles": "Roles",
     "approvals": "Approvals",
-    "legal": "Legal"
+    "legal": "Legal",
+    "privacy": "Privacy"
   },
   "auth": {
     "title": "Admin sign in",
@@ -1360,7 +1361,8 @@
       "account_erasure": "Account erasure",
       "monitoring": "Monitoring",
       "rates": "Rates",
-      "binance": "Binance Pay"
+      "binance": "Binance Pay",
+      "privacy_retention": "Data retention"
     },
     "dashboardAlert": "There are {count} open system alerts",
     "dashboardAlertHelp": "A service or background loop has problems.",
@@ -1658,5 +1660,31 @@
       "driver_terms": "Driver terms",
       "wallet": "Wallet conditions"
     }
+  },
+  "privacy": {
+    "deletions": "Deletions",
+    "exports": "Data downloads",
+    "deletionsHelp": "Accounts whose owner asked to delete them. For 30 days they can get it back by signing in; then their personal data is erased and their rides and payments stay without a name.",
+    "exportsHelp": "Copies of their data that users asked for (one a day). The link lasts 24 hours, then the file is deleted.",
+    "user": "User",
+    "requestedAt": "Requested",
+    "state": "State",
+    "states": {
+      "all": "All",
+      "scheduled": "Scheduled",
+      "erased": "Done"
+    },
+    "eraseOn": "Will be erased on {date}",
+    "erasedOn": "Erased {date}",
+    "exportStatus": {
+      "pending": "Preparing",
+      "ready": "Sent",
+      "failed": "Failed",
+      "expired": "Expired"
+    },
+    "total": "{n} in total",
+    "userErased": "Account deleted on {date}: its personal data is already erased.",
+    "userScheduled": "Deletion scheduled for {date}",
+    "userScheduledHelp": "Asked for on {date}. Signing in to the app before then restores the account."
   }
 }

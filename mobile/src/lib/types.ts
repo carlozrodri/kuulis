@@ -23,6 +23,19 @@ export interface User {
   suspension?: Suspension | null;
   /** Doc 07: legal texts this user still has to accept (older servers omit it). */
   pending_legal?: string[] | null;
+  /** Doc 07: explicit permissions in force, e.g. "background_location" (older servers omit it). */
+  consents?: string[] | null;
+}
+
+/** "Download my data" (doc 07): a JSON file emailed as a link that lasts 24 h. */
+export interface DataExport {
+  id: string;
+  status: 'pending' | 'ready' | 'failed' | 'expired';
+  created_at: string;
+  completed_at: string | null;
+  expires_at: string | null;
+  /** When the next export can be asked for (null after a failure: retry now). */
+  next_at: string | null;
 }
 
 export interface TokenPair {

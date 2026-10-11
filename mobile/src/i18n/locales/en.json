@@ -584,7 +584,10 @@
     "account_ride_active": "Finish your current ride before deleting your account.",
     "session_not_found": "That session was already closed",
     "legal_acceptance_required": "Accept the updated terms to continue",
-    "legal_document_not_found": "Text not found"
+    "legal_document_not_found": "Text not found",
+    "account_open_reports": "There are open reports about your account. Support must close them before it can be deleted.",
+    "account_fee_pending": "Pay your pending fee before deleting your account.",
+    "export_too_soon": "You can download your data once a day."
   },
   "map": {
     "recenter": "Recenter map"
@@ -1320,5 +1323,33 @@
     "signUpPrefix": "I accept the ",
     "signUpAnd": " and the ",
     "socialNote": "If you sign in with Google or Apple we will ask you to accept the terms when you sign in."
+  },
+  "privacy": {
+    "delete": {
+      "intro": "We sign you out on every device. You have 30 days to change your mind: if you sign in again before then, you get your account back as it was.",
+      "erasedTitle": "What we erase",
+      "erasedBody": "Your name, email, photo, trusted contact, saved places, chat messages, notifications and, if you drive, your documents, ID number, phone and plate.",
+      "keptTitle": "What stays without your name",
+      "keptBody": "Rides, payments, fees and reports are kept without anything that identifies you, because we need them for accounting and everyone's safety.",
+      "balanceTitle": "You lose your {{amount}} USDT balance",
+      "balanceBody": "The wallet balance cannot be withdrawn or refunded. Use it or transfer it before deleting your account.",
+      "blocks": "An account cannot be deleted during a ride, with open reports about you or with an unpaid fee.",
+      "check": "I understand that in 30 days my data is erased for good."
+    },
+    "export": {
+      "title": "Download my data",
+      "rowHint": "We email you a copy",
+      "body": "We put together a file with your profile, your rides, the ratings you received (without their author), your wallet movements and your reports, and email it to you. The link lasts 24 hours.",
+      "button": "Send me my data",
+      "sentTitle": "Check your email",
+      "sentBody": "We sent the link to {{email}}. If you do not see it, check your spam folder.",
+      "failed": "We could not prepare your file. Please try again.",
+      "next": "You can ask for another copy from {{time}}."
+    },
+    "location": {
+      "title": "Your location while you are online",
+      "body": "While you are online, Kuulis uses your location to offer you nearby rides and show the passenger where you are coming from, even with the app minimized or the screen off. You will see a fixed notice while it happens. When you go offline we stop using it.",
+      "accept": "Got it, go online"
+    }
   }
 }
