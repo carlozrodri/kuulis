@@ -902,5 +902,15 @@ export interface SystemHealth {
   rides: { searching: number, requested_last_hour: number, no_drivers_last_hour: number }
   stale_rates: RateSource[]
   disk_used_percent: number | null
+  backups: {
+    configured: boolean
+    last_backup_at?: string | null
+    last_backup_bytes?: number | null
+    last_ledger_at?: string | null
+    last_files_mirror_at?: string | null
+    last_restore_check_at?: string | null
+    last_restore_ok?: boolean | null
+    errors: Record<string, string>
+  }
   alerts: { key: string, message: string, since: string }[]
 }

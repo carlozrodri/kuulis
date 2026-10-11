@@ -74,6 +74,13 @@ jobs:
           cache-dependency-glob: api/uv.lock
       - run: uv python install 3.13
       - run: uv sync --frozen
+      - name: PostgreSQL 17 client (the backup tests dump the 17 server)
+        working-directory: .
+        run: |
+          sudo apt-get install -y --no-install-recommends postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y --no-install-recommends postgresql-client-17
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
       - name: Lint
         run: uv run ruff check .
       - name: Format

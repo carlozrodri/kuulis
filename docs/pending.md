@@ -9,7 +9,8 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
       `produccion/02-infraestructura-produccion.md`).
 - [ ] Verificar QA y producción de punta a punta cuando estén los dominios en NPM (login admin, registro
       desde la app, email de verificación, push, WebSocket).
-- [ ] Probar una restauración de backup en QA.
+- [ ] Activar los backups en QA y producción con el bucket de R2 y hacer el simulacro de restauración
+      medido (ver `deployment.md` → Backups).
 - [ ] Prueba de carga (k6/Locust) contra QA: objetivo 50 req/s y 500 WebSockets sin errores.
 
 ## API

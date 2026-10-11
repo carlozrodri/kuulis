@@ -1249,6 +1249,17 @@
     },
     "dashboardAlert": "Hay {count} alertas del sistema abiertas",
     "dashboardAlertHelp": "Algún servicio o proceso de fondo tiene problemas.",
-    "open": "Ver estado"
+    "open": "Ver estado",
+    "backups": {
+      "title": "Backups",
+      "notConfigured": "Los backups fuera del servidor no están configurados (variables BACKUP_* del worker).",
+      "never": "Nunca",
+      "database": "Base de datos (cada 15 min)",
+      "ledger": "Libro contable (diario)",
+      "files": "Archivos (diario)",
+      "restore": "Prueba de restauración (semanal)",
+      "restoreOk": "Correcta",
+      "restoreFailed": "Falló"
+    }
   }
 }

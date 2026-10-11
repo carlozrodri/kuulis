@@ -38,6 +38,17 @@ class RidesHealth(BaseModel):
     no_drivers_last_hour: int
 
 
+class BackupsHealth(BaseModel):
+    configured: bool
+    last_backup_at: datetime | None = None
+    last_backup_bytes: int | None = None
+    last_ledger_at: datetime | None = None
+    last_files_mirror_at: datetime | None = None
+    last_restore_check_at: datetime | None = None
+    last_restore_ok: bool | None = None
+    errors: dict[str, str] = {}  # job -> last error, while it keeps failing
+
+
 class OpenAlert(BaseModel):
     key: str
     message: str
@@ -55,4 +66,5 @@ class SystemHealth(BaseModel):
     rides: RidesHealth
     stale_rates: list[str]
     disk_used_percent: float | None
+    backups: BackupsHealth
     alerts: list[OpenAlert]

@@ -74,6 +74,7 @@ Están puestas en Coolify (no en el repo). Lista completa en `api/.env.example` 
 | `ALERT_TELEGRAM_CHAT_ID` | opcional | opcional | fija el chat de alertas |
 | `ALERT_EMAILS` | ✓ | ✓ | resumen diario 08:00 (y alertas si no hay Telegram), separados por coma |
 | `METRICS_TOKEN` | ✓ | | token de `/api/metrics` (sin él, 404) |
+| `BACKUP_ENABLED`, `BACKUP_S3_*`, `BACKUP_PASSPHRASE` | | ✓ | backups a Cloudflare R2 (ver Backups) |
 | `NUXT_PUBLIC_APP_ENV`, `NUXT_PUBLIC_API_BASE` | | | solo admin |
 
 La contraseña del primer admin está en la variable `FIRST_SUPERUSER_PASSWORD` de la app API de cada entorno
@@ -154,7 +155,7 @@ Todo corre en el servidor de casa de Carlos. Si se va la luz o internet, la app 
 vuelva; no se pierden datos (Postgres y Redis persisten en disco).
 - Aviso a los usuarios: página de estado externa (ver `docs/produccion/03-observabilidad-y-alertas.md`).
 - Si la caída va a durar horas: VPS de 5–10 USD/mes (decidido: preparado pero apagado) con Coolify,
-  restaurar el último backup de Postgres desde S3, desplegar las mismas apps y apuntar el DNS de Cloudflare
+  restaurar el último backup de Postgres desde R2 (ver Backups), desplegar las mismas apps y apuntar el DNS de Cloudflare
   al VPS. Las sesiones de Redis se pierden en ese caso (los usuarios vuelven a entrar).
 
 ## Rollback
@@ -162,9 +163,61 @@ Coolify → app → Deployments → elegir un despliegue anterior → Redeploy. 
 crear una migración nueva que lo revierta (no editar migraciones ya aplicadas).
 
 ## Backups
-Configurados en Coolify para cada Postgres. **Pendiente de Carlos:** activar "Save to S3" y elegir su S3
-en cada backup (la API de Coolify 4.1.2 no expone el id del S3, ver `blockers.md`).
-Restaurar: Coolify → base de datos → Backups → Restore, o `pg_restore` del dump descargado de S3.
+Los hace el worker (`api/apps/backups`), no Coolify, y van a un bucket de **Cloudflare R2** fuera del homelab.
+Todo se cifra con `openssl enc -aes-256-cbc -pbkdf2` y `BACKUP_PASSPHRASE`, bajo `<APP_ENV>/` en el bucket:
+
+| Qué | Cuándo | Dónde |
+| --- | --- | --- |
+| Dump de Postgres (`pg_dump -Fc`) | cada `BACKUP_EVERY_MINUTES` (15) | `postgres/recent/AAAA/MM/DD/…dump.enc` |
+| Primer dump del día (copia) | diario | `postgres/daily/AAAA/MM/…dump.enc` |
+| Libro contable en CSV (billeteras, movimientos, recargas, cobros de cuota) | diario, 03:00 Caracas | `ledger/AAAA/MM/AAAA-MM-DD.tar.gz.enc` |
+| Copia de documentos y avatares del S3 de la app | diario, 03:00 Caracas | `files/…enc` |
+| Prueba de restauración (base temporal, cuenta filas, la borra) | domingos 04:00 Caracas | — |
+
+El estado se ve en el admin (Sistema → Backups) y hay alerta si no hay dump en 35 min, si falla un trabajo o
+si falla la prueba de restauración. La app **nunca borra dumps ni el libro contable**; solo borra en `files/`
+la copia de un archivo borrado en la app (borrado de cuentas).
+
+### Configurar (una vez por entorno)
+1. Cloudflare → R2 → crear el bucket `kuulis-backups`.
+2. Bucket → Settings → **Object lifecycle rules** (retención), una regla por prefijo y entorno (`qa/`,
+   `production/`; R2 no acepta comodines):
+   - `<entorno>/postgres/recent/`: borrar a los 2 días;
+   - `<entorno>/postgres/daily/`: borrar a los 14 días (producción) o 7 (QA);
+   - `<entorno>/ledger/`: borrar a los 365 días.
+3. Bucket → Settings → **Bucket lock rules** con los mismos prefijos y plazos, para que nadie los pueda borrar
+   antes (ni con las credenciales de la app).
+4. R2 → Manage API tokens → token **Object Read & Write** solo para ese bucket.
+5. En el **worker** del entorno: `BACKUP_ENABLED=true`, `BACKUP_S3_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com`,
+   `BACKUP_S3_BUCKET=kuulis-backups`, `BACKUP_S3_ACCESS_KEY_ID`, `BACKUP_S3_SECRET_ACCESS_KEY` y
+   `BACKUP_PASSPHRASE` (larga y aleatoria, distinta por entorno). **Guardar la frase también fuera de Coolify**
+   (gestor de contraseñas): sin ella los backups no se pueden leer.
+6. Redeploy del worker y revisar Sistema → Backups a los pocos minutos.
+
+### Restaurar Postgres
+Necesita `openssl`, `pg_restore` 17 y la frase (`export BACKUP_PASSPHRASE=…`, sin pegarla en el historial).
+1. Descargar el dump elegido de R2 (panel de Cloudflare o `aws s3 cp --endpoint-url …`). Para volver a un
+   momento concreto, el último dump anterior a ese momento (hay uno cada 15 min de los últimos 2 días).
+2. Descifrar: `openssl enc -d -aes-256-cbc -pbkdf2 -pass env:BACKUP_PASSPHRASE -in X.dump.enc -out X.dump`
+3. Detener el worker y la API en Coolify (que nadie escriba durante la restauración).
+4. Restaurar:
+   - a una base nueva para recuperar filas sueltas: `createdb kuulis_rescate` y
+     `pg_restore --no-owner --no-acl -d "$URL/kuulis_rescate" X.dump`, y copiar lo necesario;
+   - o encima de la base: `pg_restore --no-owner --no-acl --clean --if-exists -d "$DATABASE_URL" X.dump`.
+5. Encender API y worker; revisar `/api/health/ready` y el resumen del admin.
+
+La misma herramienta descifra el libro contable (`tar xzf` después) y los archivos.
+
+### Desastre (servidor perdido)
+1. Coolify en otro servidor (VPS de contingencia), con Postgres 16+, Redis y las apps de este repo (mismas
+   variables, ver arriba).
+2. Restaurar Postgres desde R2 como arriba y subir de nuevo `files/` descifrado al S3 nuevo si el de la app
+   también se perdió.
+3. Apuntar el DNS de Cloudflare al servidor nuevo.
+
+Redis no se respalda: tiene AOF (02) y lo que se perdería se rehace solo. Las sesiones (los usuarios vuelven
+a entrar), las ubicaciones en vivo (los motorizados las reenvían en segundos), los turnos de despacho
+(`reconcile` del despacho reprograma las ofertas de viajes en búsqueda) y los contadores de monitoreo.
 
 ## Compilador de APK (`kuulis-builder-qa`)
 App de Coolify en QA que compila el APK en nuestro servidor, sin la cola de EAS Build (~25 min).
