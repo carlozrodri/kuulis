@@ -3,6 +3,8 @@ import type { FinanceSummary, TopUpStatus, WalletEntryKind } from '~/types/api'
 import { TOP_UP_STATUSES, WALLET_ENTRY_KINDS } from '~/types/api'
 import type { DayRange, RangePreset } from '~/utils/dates'
 
+definePageMeta({ permission: 'finance.view' })
+
 const { t, locale } = useI18n()
 const { request, download } = useApi()
 const route = useRoute()

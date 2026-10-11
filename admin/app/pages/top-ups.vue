@@ -3,6 +3,8 @@ import type { TableColumn } from '@nuxt/ui'
 import type { AdminDriver, AdminTopUp, AppConfig, Page, TopUpInfo, TopUpStatus } from '~/types/api'
 import { TOP_UP_STATUSES } from '~/types/api'
 
+definePageMeta({ permission: 'top_ups.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const auth = useAuth()
@@ -78,7 +80,7 @@ const columns = computed<TableColumn<AdminTopUp>[]>(() => [
   { id: 'payer', header: t('topUps.payer') },
   { accessorKey: 'reference', header: t('topUps.reference') },
   { accessorKey: 'status', header: t('topUps.status') },
-  ...(auth.isAdmin.value ? [{ id: 'actions', header: '' }] : []),
+  ...(auth.can('top_ups.manage') ? [{ id: 'actions', header: '' }] : []),
 ])
 
 // ---- Admin actions (one modal: confirm / reject / assign) ------------------------------------

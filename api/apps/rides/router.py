@@ -29,7 +29,7 @@ from apps.rides.schemas import (
     RideRead,
 )
 from apps.rides.state import RideNotFoundError
-from apps.users.dependencies import CurrentUser, DBSession, StaffUser
+from apps.users.dependencies import Can, CurrentUser, DBSession
 from apps.users.models import User
 from kuulis.core.pagination import Page, PageParams, page_params
 from kuulis.core.rate_limit import limiter
@@ -201,7 +201,7 @@ async def rate(
 
 @admin_router.get("", response_model=Page[RideAdminRead])
 async def admin_list(
-    _: StaffUser,
+    _: Can("rides.view"),
     session: DBSession,
     params: Annotated[PageParams, Depends(page_params)],
     status: RideStatus | None = None,
@@ -222,13 +222,15 @@ async def admin_list(
 
 
 @admin_router.get("/live", response_model=list[RideAdminRead])
-async def admin_live(_: StaffUser, session: DBSession) -> list[RideAdminRead]:
+async def admin_live(_: Can("live.view"), session: DBSession) -> list[RideAdminRead]:
     rides = await services.live_rides(session)
     return await events.serialize_rides(session, rides, admin=True)  # type: ignore[return-value]
 
 
 @admin_router.get("/{ride_id}", response_model=RideAdminDetail)
-async def admin_detail(ride_id: uuid.UUID, _: StaffUser, session: DBSession) -> RideAdminDetail:
+async def admin_detail(
+    ride_id: uuid.UUID, _: Can("rides.view"), session: DBSession
+) -> RideAdminDetail:
     ride = await session.get(Ride, ride_id)
     if ride is None:
         raise RideNotFoundError()
@@ -265,12 +267,12 @@ async def admin_detail(ride_id: uuid.UUID, _: StaffUser, session: DBSession) -> 
     response_model=RideAdminRead,
 )
 async def admin_cancel(
-    ride_id: uuid.UUID, data: AdminCancelRequest, admin: StaffUser, session: DBSession
+    ride_id: uuid.UUID, data: AdminCancelRequest, admin: Can("rides.cancel"), session: DBSession
 ) -> RideAdminRead:
     ride = await services.admin_cancel(session, admin, ride_id, data.reason)
     return (await events.serialize_rides(session, [ride], admin=True))[0]  # type: ignore[return-value]
 
 
 @admin_drivers_router.get("/online", response_model=list[OnlineDriver])
-async def online_drivers(_: StaffUser, session: DBSession) -> list[OnlineDriver]:
+async def online_drivers(_: Can("live.view"), session: DBSession) -> list[OnlineDriver]:
     return await services.online_drivers(session)

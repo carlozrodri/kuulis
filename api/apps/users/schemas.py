@@ -46,6 +46,8 @@ class UserRead(BaseModel):
     trusted_contact_name: str | None = None
     trusted_contact_phone: str | None = None
     suspension: SuspensionRead | None = None
+    # Admin panel accounts only (/users/me): what their role lets them do (apps.staff).
+    permissions: list[str] | None = None
 
 
 class UserCreate(BaseModel):

@@ -16,7 +16,9 @@
     "reports": "Reportes",
     "finance": "Finanzas",
     "system": "Sistema",
-    "audit": "Auditoría"
+    "audit": "Auditoría",
+    "team": "Equipo",
+    "roles": "Roles"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -118,7 +120,90 @@
   "roles": {
     "user": "Usuario",
     "staff": "Staff",
-    "admin": "Administrador"
+    "admin": "Administrador",
+    "help": "Qué puede hacer cada rol del equipo. Los cambios aplican la próxima vez que esas personas entren.",
+    "adminNote": "Configuración, tramos, equipo, roles y auditoría son solo para administradores.",
+    "permission": "Permiso",
+    "members": "nadie | 1 persona | {n} personas",
+    "save": "Guardar",
+    "saved": "Rol {role} guardado",
+    "new": "Nuevo rol",
+    "label": "Nombre del rol",
+    "create": "Crear rol",
+    "groups": {
+      "users": "Usuarios",
+      "reports": "Reportes",
+      "drivers": "Motorizados",
+      "rides": "Viajes",
+      "promotions": "Promociones",
+      "rates": "Tasas",
+      "notifications": "Notificaciones",
+      "wallet": "Saldos y recargas",
+      "subscriptions": "Suscripciones",
+      "finance": "Finanzas",
+      "system": "Sistema"
+    },
+    "permissions": {
+      "users": {
+        "view": "Ver usuarios y sus datos",
+        "suspend": "Suspender cuentas hasta 7 días",
+        "suspend_long": "Suspender más de 7 días o sin fecha"
+      },
+      "reports": {
+        "manage": "Atender reportes"
+      },
+      "drivers": {
+        "view": "Ver motorizados y documentos",
+        "review": "Aprobar o rechazar motorizados y documentos",
+        "suspend": "Suspender o reactivar motorizados"
+      },
+      "rides": {
+        "view": "Ver viajes",
+        "cancel": "Cancelar viajes"
+      },
+      "live": {
+        "view": "Mapa en vivo"
+      },
+      "promotions": {
+        "view": "Ver promociones",
+        "manage": "Crear y editar promociones"
+      },
+      "rates": {
+        "view": "Ver tasas",
+        "manage": "Fijar y actualizar tasas"
+      },
+      "notifications": {
+        "send": "Enviar notificaciones"
+      },
+      "wallet": {
+        "view": "Ver saldos",
+        "adjust": "Ajustar saldos"
+      },
+      "top_ups": {
+        "view": "Ver recargas",
+        "manage": "Confirmar, rechazar y asignar recargas"
+      },
+      "transfers": {
+        "view": "Ver transferencias"
+      },
+      "subscriptions": {
+        "view": "Ver suscripciones y cobros",
+        "manage": "Condonar cobros y ejecutar los cobros del mes"
+      },
+      "finance": {
+        "view": "Ver finanzas",
+        "export": "Exportar CSV de finanzas"
+      },
+      "dashboard": {
+        "view": "Panel principal"
+      },
+      "system": {
+        "view": "Estado del sistema"
+      },
+      "config": {
+        "view": "Ver la configuración"
+      }
+    }
   },
   "notifications": {
     "audience": "Destinatarios",
@@ -218,7 +303,11 @@
     "totp_challenge_expired": "Pasó demasiado tiempo o hubo muchos intentos. Entra de nuevo.",
     "admin_mfa_required": "Entra al panel con tu código de verificación",
     "reauth_required": "Confirma la acción con tu código",
-    "session_not_found": "Esa sesión ya estaba cerrada"
+    "session_not_found": "Esa sesión ya estaba cerrada",
+    "invite_invalid": "Esta invitación ya no es válida. Pide una nueva.",
+    "token_used": "Este enlace ya se usó.",
+    "staff_role_exists": "Ya existe un rol con ese nombre.",
+    "staff_role_not_found": "Ese rol no existe."
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -1397,6 +1486,14 @@
       },
       "wallet": {
         "adjust": "Ajustó un saldo"
+      },
+      "role": {
+        "create": "Creó un rol",
+        "update": "Cambió los permisos de un rol"
+      },
+      "staff": {
+        "invite": "Invitó a alguien al equipo",
+        "update": "Cambió a alguien del equipo"
       }
     },
     "entities": {
@@ -1415,7 +1512,44 @@
       "notification": "Notificación",
       "finance": "Finanzas",
       "file": "Archivo",
-      "audit": "Auditoría"
+      "audit": "Auditoría",
+      "staff_role": "Rol del equipo"
     }
+  },
+  "team": {
+    "help": "Las personas con acceso al admin. Cada una ve y hace solo lo que permite su rol; los administradores pueden todo.",
+    "invite": "Invitar",
+    "inviteHelp": "Le llega un correo con un enlace (válido 3 días) para crear su contraseña. Al entrar configura su 2FA.",
+    "name": "Nombre",
+    "email": "Correo",
+    "role": "Rol",
+    "person": "Persona",
+    "totp": "2FA",
+    "lastLogin": "Último acceso",
+    "never": "Nunca",
+    "admin": "Administrador",
+    "noRole": "Sin rol",
+    "inactive": "Desactivada",
+    "invitePending": "Invitación pendiente",
+    "totpOn": "Activo",
+    "totpOff": "Sin configurar",
+    "resend": "Reenviar invitación",
+    "deactivate": "Desactivar",
+    "activate": "Reactivar",
+    "send": "Enviar invitación",
+    "saved": "Cambios guardados",
+    "invited": "Invitación enviada a {email}"
+  },
+  "invite": {
+    "title": "Únete al equipo de Kuulis",
+    "help": "Crea la contraseña de tu cuenta. Después entra al admin y configura tu autenticador (2FA).",
+    "password": "Contraseña",
+    "passwordHint": "Mínimo 8 caracteres",
+    "confirm": "Repite la contraseña",
+    "mismatch": "Las contraseñas no coinciden",
+    "submit": "Crear contraseña",
+    "done": "Listo, tu contraseña quedó creada. Ya puedes entrar.",
+    "goLogin": "Ir a entrar",
+    "noToken": "El enlace está incompleto. Pide una nueva invitación."
   }
 }

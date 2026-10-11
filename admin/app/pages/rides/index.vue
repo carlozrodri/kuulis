@@ -3,6 +3,8 @@ import type { TableColumn } from '@nuxt/ui'
 import type { Page, Ride, RideStatus } from '~/types/api'
 import { RIDE_STATUSES } from '~/types/api'
 
+definePageMeta({ permission: 'rides.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const route = useRoute()

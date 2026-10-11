@@ -21,10 +21,9 @@ from apps.subscriptions.schemas import (
 )
 from apps.users.dependencies import (
     AdminUser,
+    Can,
     CurrentUser,
     DBSession,
-    StaffUser,
-    VerifiedAdminUser,
 )
 from apps.users.models import User
 from apps.wallet.schemas import ReasonBody
@@ -89,7 +88,7 @@ async def my_charges(
 
 @admin_router.get("/charges", response_model=ChargesPage)
 async def charges(
-    _: StaffUser,
+    _: Can("subscriptions.view"),
     session: DBSession,
     params: Annotated[PageParams, Depends(page_params)],
     month: Annotated[str | None, Query(max_length=7)] = None,
@@ -116,7 +115,10 @@ async def charges(
     response_model=ChargeRead,
 )
 async def waive(
-    charge_id: uuid.UUID, data: ReasonBody, admin: VerifiedAdminUser, session: DBSession
+    charge_id: uuid.UUID,
+    data: ReasonBody,
+    admin: Can("subscriptions.manage", verified=True),
+    session: DBSession,
 ) -> ChargeRead:
     charge = await services.waive(session, admin, charge_id, data.reason)
     await session.commit()
@@ -127,13 +129,15 @@ async def waive(
 @admin_router.post(
     "/run", dependencies=[audit("subscription.run", "charge")], response_model=RunResultRead
 )
-async def run(data: RunRequest, _: AdminUser, session: DBSession) -> RunResultRead:
+async def run(
+    data: RunRequest, _: Can("subscriptions.manage"), session: DBSession
+) -> RunResultRead:
     result = await services.charge_month(session, data.month)
     return RunResultRead(**result.__dict__)
 
 
 @admin_router.get("/schedules", response_model=list[ScheduleRead])
-async def schedules(_: StaffUser, session: DBSession) -> list[ScheduleRead]:
+async def schedules(_: Can("subscriptions.view"), session: DBSession) -> list[ScheduleRead]:
     rows = await services.list_schedules(session)
     authors = {r.created_by_id for _, r in rows if r and r.created_by_id}
     users = {}

@@ -22,6 +22,8 @@ export function useAuth() {
   const isAuthenticated = computed(() => !!refreshToken.value)
   const isAdmin = computed(() => user.value?.role === 'admin')
   const hasRole = (...roles: Role[]) => !!user.value && roles.includes(user.value.role)
+  /** What the staff role allows (admins can do everything); the API enforces the same. */
+  const can = (permission: string) => isAdmin.value || !!user.value?.permissions?.includes(permission)
 
   function setSession(data: AuthResponse) {
     accessToken.value = data.access_token
@@ -99,6 +101,7 @@ export function useAuth() {
     isAuthenticated,
     isAdmin,
     hasRole,
+    can,
     login,
     verifyTotp,
     logout,

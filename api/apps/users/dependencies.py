@@ -1,7 +1,7 @@
 """Auth dependencies: current user and role-based permissions."""
 
 import uuid
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -89,3 +89,31 @@ async def _verified_admin(user: AdminUser) -> User:
 
 
 VerifiedAdminUser = Annotated[User, Depends(_verified_admin)]
+
+
+def require_permission(permission: str, *, verified: bool = False):
+    """Staff whose role has ``permission`` (admins have all of them); ``verified`` also asks for a
+    fresh second-factor code, like :data:`VerifiedAdminUser`."""
+    from apps.staff.permissions import ALL_PERMISSIONS
+    from apps.staff.services import permissions_of
+
+    if permission not in ALL_PERMISSIONS:
+        raise ValueError(f"Unknown permission {permission!r}")
+
+    async def _checker(user: StaffUser, session: DBSession) -> User:
+        if permission not in await permissions_of(session, user):
+            raise PermissionDeniedError(
+                "Your role does not allow this", details={"permission": permission}
+            )
+        if verified:
+            await ensure_recently_verified(user)
+        return user
+
+    _checker.admin_roles = (Role.STAFF, Role.ADMIN)  # type: ignore[attr-defined]
+    _checker.permission = permission  # type: ignore[attr-defined]
+    return _checker
+
+
+def Can(permission: str, *, verified: bool = False) -> Any:
+    """``admin: Can("wallet.adjust")`` in an admin endpoint's signature."""
+    return Annotated[User, Depends(require_permission(permission, verified=verified))]

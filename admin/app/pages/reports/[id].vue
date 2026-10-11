@@ -2,6 +2,8 @@
 import type { PersonSummary, ReportAdminDetail, ReportNote, ReportPriority, ReportUpdate } from '~/types/api'
 import { REPORT_PRIORITIES } from '~/types/api'
 
+definePageMeta({ permission: 'reports.manage' })
+
 const { t, locale } = useI18n()
 const route = useRoute()
 const { request } = useApi()

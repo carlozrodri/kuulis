@@ -79,7 +79,8 @@ export default defineNuxtConfig({
   // Every icon ships in the bundle (scanned from the source): no requests to api.iconify.design,
   // which the CSP's connect-src would block anyway.
   icon: {
-    clientBundle: { scan: true, sizeLimitKb: 512 },
+    // .ts too: the menu's icons live in app/utils/nav.ts.
+    clientBundle: { scan: { globInclude: ['**/*.{vue,ts}'] }, sizeLimitKb: 512 },
     fallbackToApi: false,
   },
 })

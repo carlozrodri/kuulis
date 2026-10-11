@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { AdminUser, Role } from '~/types/api'
 
+definePageMeta({ permission: 'users.view' })
+
 const { t, locale } = useI18n()
 const route = useRoute()
 const { request } = useApi()

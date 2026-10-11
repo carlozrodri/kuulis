@@ -8,12 +8,13 @@ from apps.auth import services as auth
 from apps.auth import totp
 from apps.moderation import services as moderation
 from apps.rides import presence
+from apps.staff.services import permissions_of
 from apps.users import services
 from apps.users.dependencies import (
     AdminUser,
+    Can,
     CurrentUser,
     DBSession,
-    StaffUser,
     VerifiedAdminUser,
     ensure_recently_verified,
 )
@@ -35,7 +36,10 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/me", response_model=UserRead)
 async def read_me(user: CurrentUser, session: DBSession) -> UserRead:
-    return await moderation.user_read(session, user)
+    read = await moderation.user_read(session, user)
+    if user.can_access_admin:
+        read.permissions = sorted(await permissions_of(session, user))
+    return read
 
 
 @router.patch("/me", response_model=UserRead)
@@ -64,7 +68,7 @@ async def delete_me(user: CurrentUser, session: DBSession) -> DeletionScheduled:
 
 @router.get("", response_model=Page[UserRead])
 async def list_users(
-    _: StaffUser,
+    _: Can("users.view"),
     session: DBSession,
     params: Annotated[PageParams, Depends(page_params)],
     search: Annotated[str | None, Query(max_length=100)] = None,
@@ -89,7 +93,7 @@ async def list_users(
 
 
 @router.get("/stats", response_model=UserStats)
-async def user_stats(_: StaffUser, session: DBSession) -> UserStats:
+async def user_stats(_: Can("users.view"), session: DBSession) -> UserStats:
     return UserStats(**await services.stats(session))
 
 
@@ -110,7 +114,7 @@ async def create_user(data: UserAdminCreate, _: VerifiedAdminUser, session: DBSe
     dependencies=[audit("user.view", "user", "user_id")],  # full personal data
     response_model=UserRead,
 )
-async def get_user(user_id: uuid.UUID, _: StaffUser, session: DBSession) -> UserRead:
+async def get_user(user_id: uuid.UUID, _: Can("users.view"), session: DBSession) -> UserRead:
     return await moderation.user_read(
         session, await services.get_or_404(session, user_id), staff_view=True
     )

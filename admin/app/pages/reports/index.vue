@@ -3,6 +3,8 @@ import type { TableColumn, TableRow } from '@nuxt/ui'
 import type { ReportAdminRead, ReportCategory, ReportPage, ReportPriority, ReportStatus } from '~/types/api'
 import { REPORT_CATEGORIES, REPORT_PRIORITIES, REPORT_STATUSES } from '~/types/api'
 
+definePageMeta({ permission: 'reports.manage' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const route = useRoute()

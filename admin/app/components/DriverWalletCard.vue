@@ -51,7 +51,7 @@ const adjustOpen = ref(false)
           class="flex gap-2"
         >
           <UButton
-            v-if="auth.isAdmin.value"
+            v-if="auth.can('wallet.adjust')"
             icon="i-lucide-scale"
             color="neutral"
             variant="outline"

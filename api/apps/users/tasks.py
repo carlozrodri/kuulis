@@ -38,6 +38,18 @@ TEMPLATES = {
             "Hi {name}, reset your password here: <a href='{link}'>{link}</a>",
         ),
     },
+    "invite": {
+        "es": (
+            "Te invitaron al equipo de Kuulis",
+            "Hola {name}, te invitaron al panel de administración de Kuulis. Crea tu contraseña "
+            "aquí (el enlace vence en 3 días): <a href='{link}'>{link}</a>",
+        ),
+        "en": (
+            "You were invited to the Kuulis team",
+            "Hi {name}, you were invited to the Kuulis admin panel. Create your password here "
+            "(the link expires in 3 days): <a href='{link}'>{link}</a>",
+        ),
+    },
     "login_locked": {
         "es": (
             "Intentos fallidos de entrar a tu cuenta",

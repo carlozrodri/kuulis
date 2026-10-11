@@ -10,7 +10,7 @@ from pwdlib import PasswordHash
 from kuulis.core.exceptions import AuthenticationError
 from kuulis.settings import settings
 
-TokenType = Literal["access", "refresh", "password_reset", "email_verification"]
+TokenType = Literal["access", "refresh", "password_reset", "email_verification", "staff_invite"]
 
 password_hasher = PasswordHash.recommended()
 

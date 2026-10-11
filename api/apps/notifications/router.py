@@ -13,7 +13,7 @@ from apps.notifications.schemas import (
     UnreadCount,
 )
 from apps.users import services as users
-from apps.users.dependencies import CurrentUser, DBSession, StaffUser
+from apps.users.dependencies import Can, CurrentUser, DBSession
 from kuulis.core.pagination import Page, PageParams, page_params
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
@@ -71,7 +71,7 @@ async def mark_read(
     dependencies=[audit("notification.send", "notification")],
     status_code=status.HTTP_202_ACCEPTED,
 )
-async def send(data: NotificationSend, _: StaffUser, session: DBSession) -> dict:
+async def send(data: NotificationSend, _: Can("notifications.send"), session: DBSession) -> dict:
     """Admin panel: send a notification to one user, a role, or everyone."""
     if data.user_id:
         target = await users.get_or_404(session, data.user_id)

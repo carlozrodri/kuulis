@@ -12,6 +12,8 @@ export interface User {
   is_test_account?: boolean
   created_at: string
   last_login_at: string | null
+  /** Admin panel accounts, from /users/me only. */
+  permissions?: string[] | null
 }
 
 export interface Page<T> {
@@ -951,5 +953,32 @@ export interface AuditEntry {
   ip: string | null
   user_agent: string | null
   request_id: string | null
+  created_at: string
+}
+
+export interface StaffRole {
+  id: string
+  name: string
+  label: string
+  permissions: string[]
+  members: number
+}
+
+export interface RolesOverview {
+  catalog: { group: string, permissions: string[] }[]
+  roles: StaffRole[]
+}
+
+export interface StaffMember {
+  id: string
+  email: string
+  full_name: string
+  role: Role
+  staff_role_id: string | null
+  staff_role_label: string | null
+  is_active: boolean
+  totp_enabled: boolean
+  invite_pending: boolean
+  last_login_at: string | null
   created_at: string
 }

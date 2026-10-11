@@ -8,7 +8,7 @@ from apps.analytics import services
 from apps.analytics.schemas import FinanceSummary, Metrics, Overview
 from apps.audit.services import audit
 from apps.config.services import get_app_config
-from apps.users.dependencies import DBSession, StaffUser
+from apps.users.dependencies import Can, DBSession
 from apps.wallet.models import EntryKind, TopUpStatus
 
 router = APIRouter(prefix="/admin", tags=["analytics"])
@@ -27,7 +27,7 @@ def _csv_response(body: str, name: str, first: date, last: date) -> Response:
 
 @router.get("/finance/summary", response_model=FinanceSummary)
 async def finance_summary(
-    _: StaffUser, session: DBSession, first: From = None, last: To = None
+    _: Can("finance.view"), session: DBSession, first: From = None, last: To = None
 ) -> FinanceSummary:
     first, last = services.check_range(first, last)
     return await services.finance_summary(session, first, last)
@@ -39,7 +39,7 @@ async def finance_summary(
     response_class=Response,
 )
 async def entries_csv(
-    _: StaffUser,
+    _: Can("finance.export"),
     session: DBSession,
     first: From = None,
     last: To = None,
@@ -56,7 +56,7 @@ async def entries_csv(
     response_class=Response,
 )
 async def top_ups_csv(
-    _: StaffUser,
+    _: Can("finance.export"),
     session: DBSession,
     first: From = None,
     last: To = None,
@@ -69,7 +69,7 @@ async def top_ups_csv(
 
 @router.get("/metrics", response_model=Metrics)
 async def metrics(
-    _: StaffUser,
+    _: Can("dashboard.view"),
     session: DBSession,
     first: From = None,
     last: To = None,
@@ -81,5 +81,5 @@ async def metrics(
 
 
 @router.get("/overview", response_model=Overview)
-async def overview(_: StaffUser, session: DBSession) -> Overview:
+async def overview(_: Can("dashboard.view"), session: DBSession) -> Overview:
     return await services.overview(session)

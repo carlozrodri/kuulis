@@ -8,7 +8,7 @@ from apps.audit.services import audit, note, snapshot
 from apps.config.services import get_app_config
 from apps.subscriptions import services as subscriptions
 from apps.subscriptions.schemas import ChargeRead
-from apps.users.dependencies import AdminUser, CurrentUser, DBSession, StaffUser, VerifiedAdminUser
+from apps.users.dependencies import Can, CurrentUser, DBSession
 from apps.users.models import User
 from apps.wallet import services
 from apps.wallet.models import TopUp, TopUpStatus
@@ -142,7 +142,7 @@ async def transfer(
 
 @admin_router.get("/top-ups", response_model=Page[TopUpAdminRead])
 async def admin_top_ups(
-    _: StaffUser,
+    _: Can("top_ups.view"),
     session: DBSession,
     params: Params,
     status: Annotated[TopUpStatus | None, Query()] = None,
@@ -165,7 +165,10 @@ async def _top_up_response(session: DBSession, top_up: TopUp) -> TopUpAdminRead:
     response_model=TopUpAdminRead,
 )
 async def confirm(
-    top_up_id: uuid.UUID, data: TopUpConfirm, admin: VerifiedAdminUser, session: DBSession
+    top_up_id: uuid.UUID,
+    data: TopUpConfirm,
+    admin: Can("top_ups.manage", verified=True),
+    session: DBSession,
 ) -> TopUpAdminRead:
     top_up = await services.confirm_top_up(session, admin, top_up_id, data.amount, data.reference)
     note(after=snapshot(top_up, ("status", "user_id", "amount", "reference")))
@@ -178,7 +181,7 @@ async def confirm(
     response_model=TopUpAdminRead,
 )
 async def reject(
-    top_up_id: uuid.UUID, data: ReasonBody, admin: AdminUser, session: DBSession
+    top_up_id: uuid.UUID, data: ReasonBody, admin: Can("top_ups.manage"), session: DBSession
 ) -> TopUpAdminRead:
     top_up = await services.reject_top_up(session, admin, top_up_id, data.reason)
     return await _top_up_response(session, top_up)
@@ -190,7 +193,10 @@ async def reject(
     response_model=TopUpAdminRead,
 )
 async def assign(
-    top_up_id: uuid.UUID, data: TopUpAssign, admin: VerifiedAdminUser, session: DBSession
+    top_up_id: uuid.UUID,
+    data: TopUpAssign,
+    admin: Can("top_ups.manage", verified=True),
+    session: DBSession,
 ) -> TopUpAdminRead:
     top_up = await services.assign_top_up(session, admin, top_up_id, data.user_id)
     return await _top_up_response(session, top_up)
@@ -206,7 +212,9 @@ class AdminWallet(BaseModel):
 
 
 @admin_router.get("/wallets/{user_id}", response_model=AdminWallet)
-async def admin_wallet(user_id: uuid.UUID, _: StaffUser, session: DBSession) -> AdminWallet:
+async def admin_wallet(
+    user_id: uuid.UUID, _: Can("wallet.view"), session: DBSession
+) -> AdminWallet:
     user = await session.get(User, user_id)
     if user is None:
         raise NotFoundError("User not found", code="user_not_found")
@@ -226,7 +234,7 @@ async def admin_wallet(user_id: uuid.UUID, _: StaffUser, session: DBSession) -> 
 
 @admin_router.get("/wallets/{user_id}/entries", response_model=Page[WalletEntryRead])
 async def admin_entries(
-    user_id: uuid.UUID, _: StaffUser, session: DBSession, params: Params
+    user_id: uuid.UUID, _: Can("wallet.view"), session: DBSession, params: Params
 ) -> Page[WalletEntryRead]:
     rows, total = await services.list_entries(session, user_id, params)
     return _page([WalletEntryRead.model_validate(r) for r in rows], total, params)
@@ -239,7 +247,10 @@ async def admin_entries(
     status_code=201,
 )
 async def adjust(
-    user_id: uuid.UUID, data: Adjustment, admin: VerifiedAdminUser, session: DBSession
+    user_id: uuid.UUID,
+    data: Adjustment,
+    admin: Can("wallet.adjust", verified=True),
+    session: DBSession,
 ) -> WalletEntryRead:
     before = await services.get_balance(session, user_id)
     entry = await services.adjust(session, admin, user_id, data.amount, data.reason)
@@ -254,7 +265,7 @@ async def adjust(
 
 @admin_router.get("/transfers", response_model=Page[TransferAdminRead])
 async def transfers(
-    _: StaffUser,
+    _: Can("transfers.view"),
     session: DBSession,
     params: Params,
     q: Annotated[str | None, Query(max_length=100)] = None,

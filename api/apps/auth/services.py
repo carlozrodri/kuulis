@@ -235,7 +235,7 @@ _BROWSERS = (
 )
 
 
-async def _consume_one_time_token(token: str, token_type) -> dict:
+async def consume_one_time_token(token: str, token_type) -> dict:
     payload = decode_token(token, token_type)
     ttl = max(int(payload["exp"] - payload["iat"]), 1)
     first_use = await redis_client.set(_used_token_key(payload["jti"]), "1", ex=ttl, nx=True)
@@ -255,7 +255,7 @@ async def send_verification_email(user: User) -> None:
 
 
 async def verify_email(session: AsyncSession, token: str) -> User:
-    payload = await _consume_one_time_token(token, "email_verification")
+    payload = await consume_one_time_token(token, "email_verification")
     user = await users.get_or_404(session, uuid.UUID(payload["sub"]))
     user.is_verified = True
     return user
@@ -277,7 +277,7 @@ async def request_password_reset(session: AsyncSession, email: str) -> None:
 
 
 async def confirm_password_reset(session: AsyncSession, token: str, new_password: str) -> None:
-    payload = await _consume_one_time_token(token, "password_reset")
+    payload = await consume_one_time_token(token, "password_reset")
     user = await users.get_or_404(session, uuid.UUID(payload["sub"]))
     await users.set_password(user, new_password)
     await revoke_all(str(user.id))

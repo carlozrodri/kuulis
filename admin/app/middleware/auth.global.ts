@@ -1,6 +1,6 @@
 import type { Role } from '~/types/api'
 
-const PUBLIC_ROUTES = new Set(['/login'])
+const PUBLIC_ROUTES = new Set(['/login', '/accept-invite'])
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuth()
@@ -13,7 +13,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!auth.isAuthenticated.value) {
     return navigateTo({ path: '/login', query: { redirect: to.fullPath } })
   }
-  if (!auth.user.value) {
+  // The login response has no permissions; /users/me does.
+  if (!auth.user.value || auth.user.value.permissions == null) {
     try {
       auth.user.value = await request('/users/me')
     }
@@ -26,7 +27,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return abortNavigation()
   }
   const required = to.meta.roles as Role[] | undefined
-  if (required && !auth.hasRole(...required)) {
-    return navigateTo('/')
+  const permission = to.meta.permission as string | undefined
+  if ((required && !auth.hasRole(...required)) || (permission && !auth.can(permission))) {
+    const home = homePath(auth.isAdmin.value, auth.can)
+    return to.path === home ? navigateTo('/profile') : navigateTo(home)
   }
 })

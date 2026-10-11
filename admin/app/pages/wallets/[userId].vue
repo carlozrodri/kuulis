@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { AdminWallet, Page, WalletEntry } from '~/types/api'
 
+definePageMeta({ permission: 'wallet.view' })
+
 const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
@@ -65,7 +67,7 @@ function back() {
         </template>
         <template #right>
           <UButton
-            v-if="auth.isAdmin.value && wallet"
+            v-if="auth.can('wallet.adjust') && wallet"
             icon="i-lucide-scale"
             :label="t('wallet.adjust.title')"
             @click="adjustOpen = true"

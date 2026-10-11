@@ -3,6 +3,8 @@ import type { TableColumn } from '@nuxt/ui'
 import type { Page, Promotion, PromotionStatus } from '~/types/api'
 import { PROMOTION_STATUSES } from '~/types/api'
 
+definePageMeta({ permission: 'promotions.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const auth = useAuth()
@@ -86,7 +88,7 @@ const columns = computed<TableColumn<Promotion>[]>(() => [
             to="/promotions/alerts"
           />
           <UButton
-            v-if="auth.isAdmin.value"
+            v-if="auth.can('promotions.manage')"
             icon="i-lucide-plus"
             :label="t('promotions.new')"
             to="/promotions/new"

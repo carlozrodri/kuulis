@@ -2,6 +2,8 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { AdminUser, Page, Role } from '~/types/api'
 
+definePageMeta({ permission: 'users.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 

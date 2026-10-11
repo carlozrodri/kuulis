@@ -2,6 +2,8 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { AdminTransfer, AppConfig, Page } from '~/types/api'
 
+definePageMeta({ permission: 'transfers.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const route = useRoute()
