@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { HealthStatus, SystemHealth } from '~/types/api'
 
+definePageMeta({ permission: 'system.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const apiError = useApiError()

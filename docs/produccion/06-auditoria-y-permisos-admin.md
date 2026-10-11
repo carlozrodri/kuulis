@@ -107,3 +107,22 @@ Sin cambios.
   blanco pero el correo del actor se conserva.
 - De paso: los correos a dominios reservados (`@example.com`, `.test`, etc.) ya no se envían. Resend los
   rechazaba con 422 y la tarea reintentaba sin sentido (cuentas de prueba y la cuenta del smoke test).
+
+### Parte 2 (2026-10-11)
+- Tabla `staff_roles` (`name`, `label`, `permissions`) y `users.staff_role_id`. La migración crea Soporte,
+  Verificador, Finanzas y Operaciones; un admin los cambia o crea otros en **Roles** (matriz de permisos).
+- Catálogo de permisos en `apps/staff/permissions.py`. Cada endpoint del admin declara el suyo con
+  `Can("wallet.adjust")`; un test recorre las rutas y falla si un endpoint abierto a staff no lo declara. Sin
+  el permiso responde 403 `permission_denied` con `details.permission`.
+- Solo admin, no asignables a un rol: configuración, tramos de suscripción, equipo, roles, auditoría y la
+  edición de usuarios. Leer la configuración queda abierto a todo el staff porque las páginas toman de ahí sus
+  valores por defecto; `config.view` solo muestra la página de Configuración.
+- Soporte suspende hasta 7 días (`users.suspend`); más tiempo o sin fecha pide `users.suspend_long`.
+- Ver recargas (`top_ups.view`) y confirmarlas (`top_ups.manage`) son permisos separados, igual que ver y
+  fijar tasas.
+- **Equipo**: lista con rol, 2FA, último acceso e invitación pendiente; invitar por correo (enlace de un
+  solo uso, 3 días), cambiar rol, reenviar la invitación y desactivar. Cambiar el rol o desactivar cierra sus
+  sesiones. Todo queda en la auditoría (`staff.invite`, `staff.update`, `role.update`).
+- El menú y los botones se ocultan según los permisos (`/users/me` trae `permissions`), y una página sin
+  permiso lleva a la primera que sí puede ver.
+- Los staff que ya existían quedan sin rol hasta que un admin les asigne uno en Equipo.

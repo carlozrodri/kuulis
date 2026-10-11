@@ -141,6 +141,12 @@ Se pone en Coolify (base de datos → Configuration), igual en QA y producción.
   todo el equipo configura su autenticador de nuevo (borrar las filas de `user_totp`).
 - Cada usuario ve y cierra sus sesiones (app: Perfil → Sesiones activas; admin: Mi perfil). Cerrar una
   sesión corta también su token de acceso al instante.
+- Permisos (doc 06): cada staff tiene un rol del equipo (Soporte, Verificador, Finanzas, Operaciones o uno
+  nuevo) y solo ve y usa lo que ese rol permite; la API responde 403 `permission_denied` con
+  `details.permission`. Un staff sin rol no puede usar el admin. Los admins pueden todo, y configuración,
+  tramos, equipo, roles y auditoría son solo suyos.
+- Altas: Equipo → Invitar. Llega un correo con un enlace de 3 días (`/accept-invite`) para crear la contraseña;
+  al entrar configura el 2FA. Cambiar el rol o desactivar a alguien cierra sus sesiones.
 
 ## Límites de uso
 - La IP del cliente la resuelve uvicorn desde `X-Forwarded-For` confiando solo en las redes privadas (NPM y

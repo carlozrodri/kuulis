@@ -12,7 +12,7 @@ from apps.rates.schemas import (
     ManualRate,
     RefreshRequest,
 )
-from apps.users.dependencies import AdminUser, DBSession, StaffUser
+from apps.users.dependencies import Can, DBSession
 from kuulis.core.pagination import Page, PageParams, page_params
 
 router = APIRouter(tags=["rates"])
@@ -26,7 +26,7 @@ async def current(session: DBSession) -> CurrentRates:
 
 @router.get("/admin/rates/history", response_model=Page[ExchangeRateHistory])
 async def history(
-    _: StaffUser,
+    _: Can("rates.view"),
     session: DBSession,
     params: Annotated[PageParams, Depends(page_params)],
     source: Annotated[RateSource | None, Query()] = None,
@@ -41,7 +41,9 @@ async def history(
     response_model=ExchangeRateRead,
     status_code=201,
 )
-async def set_manual(data: ManualRate, user: AdminUser, session: DBSession) -> ExchangeRateRead:
+async def set_manual(
+    data: ManualRate, user: Can("rates.manage"), session: DBSession
+) -> ExchangeRateRead:
     rate = await services.set_manual(session, user, data.source, data.rate, data.note)
     await session.commit()
     await services.after_manual(session, data.source)
@@ -53,5 +55,5 @@ async def set_manual(data: ManualRate, user: AdminUser, session: DBSession) -> E
     dependencies=[audit("rate.refresh", "rate")],
     response_model=CurrentRates,
 )
-async def refresh(data: RefreshRequest, _: AdminUser, session: DBSession) -> CurrentRates:
+async def refresh(data: RefreshRequest, _: Can("rates.manage"), session: DBSession) -> CurrentRates:
     return await services.refresh(session, data.source)

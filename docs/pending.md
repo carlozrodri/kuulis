@@ -28,7 +28,7 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
       borra los datos personales a los 30 días (`ACCOUNT_DELETION_GRACE_DAYS`).
 
 ## Admin
-- [ ] Crear usuarios desde el panel (el endpoint `POST /users` ya existe).
+- [x] Crear usuarios desde el panel: Equipo → Invitar (doc 06).
 - [ ] Gráficas de registros por día.
 
 ## Mobile

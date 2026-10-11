@@ -2,6 +2,8 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { Page, Promotion, PromotionRide } from '~/types/api'
 
+definePageMeta({ permission: 'promotions.view' })
+
 const { t, locale } = useI18n()
 const route = useRoute()
 const { request } = useApi()
@@ -88,7 +90,7 @@ const all = (list: string[] | undefined) => (list?.length ? list : null)
           </UBadge>
         </template>
         <template #right>
-          <template v-if="promotion && auth.isAdmin.value">
+          <template v-if="promotion && auth.can('promotions.manage')">
             <UButton
               :icon="promotion.is_active ? 'i-lucide-pause' : 'i-lucide-play'"
               color="neutral"

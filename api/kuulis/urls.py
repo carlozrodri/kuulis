@@ -26,6 +26,8 @@ from apps.rides.router import admin_drivers_router as rides_admin_drivers_router
 from apps.rides.router import admin_router as rides_admin_router
 from apps.rides.router import driver_router as rides_driver_router
 from apps.rides.router import router as rides_router
+from apps.staff.router import public_router as staff_public_router
+from apps.staff.router import router as staff_router
 from apps.subscriptions.router import admin_router as subscriptions_admin_router
 from apps.subscriptions.router import router as subscriptions_router
 from apps.users.router import router as users_router
@@ -59,6 +61,8 @@ api_v1.include_router(moderation_router)
 api_v1.include_router(moderation_admin_router)
 api_v1.include_router(analytics_router)
 api_v1.include_router(audit_router)
+api_v1.include_router(staff_router)
+api_v1.include_router(staff_public_router)
 api_v1.include_router(client_errors_router)
 api_v1.include_router(monitoring_router)
 

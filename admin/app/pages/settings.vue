@@ -4,6 +4,8 @@ import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/
 import type { MapRectangle } from '~/utils/geo'
 import type { SettingsForm } from '~/utils/settings'
 
+definePageMeta({ permission: 'config.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const auth = useAuth()

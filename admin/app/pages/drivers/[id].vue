@@ -3,6 +3,8 @@ import type { AdminDriver, DocumentKind, DriverDocument } from '~/types/api'
 import { DOCUMENT_KINDS } from '~/types/api'
 import type { DriverAction } from '~/utils/drivers'
 
+definePageMeta({ permission: 'drivers.view' })
+
 const { t, locale } = useI18n()
 const route = useRoute()
 const { request } = useApi()

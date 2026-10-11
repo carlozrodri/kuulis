@@ -1,4 +1,5 @@
 import uuid
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Request, status
@@ -32,8 +33,11 @@ from apps.moderation.schemas import (
 from apps.rides import events
 from apps.rides.models import Ride
 from apps.rides.schemas import RideAdminRead
-from apps.users.dependencies import CurrentUser, DBSession, StaffUser
+from apps.staff.permissions import SHORT_SUSPENSION_DAYS
+from apps.staff.services import permissions_of
+from apps.users.dependencies import Can, CurrentUser, DBSession
 from apps.users.models import User
+from kuulis.core.exceptions import PermissionDeniedError
 from kuulis.core.pagination import Page, PageParams, page_params
 from kuulis.core.rate_limit import limiter
 
@@ -100,7 +104,7 @@ async def _admin_reads(session: DBSession, reports: list[Report]) -> list[Report
 
 @admin_router.get("/reports", response_model=ReportsPage)
 async def admin_reports(
-    _: StaffUser,
+    _: Can("reports.manage"),
     session: DBSession,
     params: Params,
     status: ReportStatus | None = None,
@@ -203,7 +207,9 @@ async def _detail(session: DBSession, report: Report) -> ReportAdminDetail:
 
 
 @admin_router.get("/reports/{report_id}", response_model=ReportAdminDetail)
-async def admin_report(report_id: uuid.UUID, _: StaffUser, session: DBSession) -> ReportAdminDetail:
+async def admin_report(
+    report_id: uuid.UUID, _: Can("reports.manage"), session: DBSession
+) -> ReportAdminDetail:
     return await _detail(session, await services.get_report(session, report_id))
 
 
@@ -213,7 +219,7 @@ async def admin_report(report_id: uuid.UUID, _: StaffUser, session: DBSession) -
     response_model=ReportAdminDetail,
 )
 async def admin_update(
-    report_id: uuid.UUID, data: ReportUpdate, admin: StaffUser, session: DBSession
+    report_id: uuid.UUID, data: ReportUpdate, admin: Can("reports.manage"), session: DBSession
 ) -> ReportAdminDetail:
     report = await services.get_report(session, report_id)
     await services.update_report(
@@ -237,7 +243,7 @@ async def admin_update(
     status_code=status.HTTP_201_CREATED,
 )
 async def admin_note(
-    report_id: uuid.UUID, data: NoteCreate, admin: StaffUser, session: DBSession
+    report_id: uuid.UUID, data: NoteCreate, admin: Can("reports.manage"), session: DBSession
 ) -> ReportNoteRead:
     report = await services.get_report(session, report_id)
     note = await services.add_note(session, admin, report, data.body)
@@ -258,7 +264,7 @@ async def admin_note(
     response_model=ReportAdminDetail,
 )
 async def admin_resolve(
-    report_id: uuid.UUID, data: ReportResolve, admin: StaffUser, session: DBSession
+    report_id: uuid.UUID, data: ReportResolve, admin: Can("reports.manage"), session: DBSession
 ) -> ReportAdminDetail:
     report = await services.get_report(session, report_id)
     await services.resolve(session, admin, report, data.status, data.resolution)
@@ -273,7 +279,7 @@ async def admin_resolve(
     response_model=ReportAdminDetail,
 )
 async def admin_reopen(
-    report_id: uuid.UUID, admin: StaffUser, session: DBSession
+    report_id: uuid.UUID, admin: Can("reports.manage"), session: DBSession
 ) -> ReportAdminDetail:
     report = await services.get_report(session, report_id)
     await services.reopen(session, admin, report)
@@ -291,8 +297,19 @@ async def admin_reopen(
     response_model=SuspensionRead,
 )
 async def suspend(
-    user_id: uuid.UUID, data: SuspendRequest, admin: StaffUser, session: DBSession
+    user_id: uuid.UUID, data: SuspendRequest, admin: Can("users.suspend"), session: DBSession
 ) -> SuspensionRead:
+    limit = datetime.now(UTC) + timedelta(days=SHORT_SUSPENSION_DAYS, minutes=5)
+    until = data.until
+    if until is not None and until.tzinfo is None:
+        until = until.replace(tzinfo=UTC)  # as services.suspend reads it
+    if (until is None or until > limit) and "users.suspend_long" not in (
+        await permissions_of(session, admin)
+    ):
+        raise PermissionDeniedError(
+            f"Your role can suspend for up to {SHORT_SUSPENSION_DAYS} days",
+            details={"permission": "users.suspend_long", "max_days": SHORT_SUSPENSION_DAYS},
+        )
     suspension = await services.suspend(
         session, admin, user_id, data.reason, data.until, data.report_id
     )
@@ -307,14 +324,14 @@ async def suspend(
     dependencies=[audit("user.unsuspend", "user", "user_id")],
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def unsuspend(user_id: uuid.UUID, admin: StaffUser, session: DBSession) -> None:
+async def unsuspend(user_id: uuid.UUID, admin: Can("users.suspend"), session: DBSession) -> None:
     await services.unsuspend(session, admin, user_id)
     await session.commit()
 
 
 @admin_router.get("/users/{user_id}/suspensions", response_model=list[SuspensionHistoryRead])
 async def suspensions(
-    user_id: uuid.UUID, _: StaffUser, session: DBSession
+    user_id: uuid.UUID, _: Can("users.view"), session: DBSession
 ) -> list[SuspensionHistoryRead]:
     rows = await services.suspension_history(session, user_id)
     users = await services.users_by_id(

@@ -16,6 +16,7 @@ export const AUDIT_ENTITY_TYPES = [
   'notification',
   'finance',
   'file',
+  'staff_role',
   'audit',
 ] as const
 
@@ -31,6 +32,7 @@ export function auditEntityLink(entry: Pick<AuditEntry, 'entity_type' | 'entity_
     case 'promotion': return `/promotions/${id}`
     case 'report': return `/reports/${id}`
     case 'wallet': return `/wallets/${id}`
+    case 'staff_role': return '/roles'
     default: return null
   }
 }

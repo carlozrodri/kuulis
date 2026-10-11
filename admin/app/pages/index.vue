@@ -3,6 +3,8 @@ import type { AppConfig, CurrentRates, Metrics, Overview, RateSource, UserStats 
 import { RATE_SOURCES } from '~/types/api'
 import type { DayRange, RangePreset } from '~/utils/dates'
 
+definePageMeta({ permission: 'dashboard.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const apiError = useApiError()

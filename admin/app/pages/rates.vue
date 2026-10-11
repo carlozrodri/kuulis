@@ -3,13 +3,15 @@ import type { TableColumn } from '@nuxt/ui'
 import type { AppConfig, CurrentRates, ExchangeRate, Page, RateHistoryEntry, RateSource } from '~/types/api'
 import { RATE_SOURCES } from '~/types/api'
 
+definePageMeta({ permission: 'rates.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const auth = useAuth()
 const toast = useToast()
 const apiError = useApiError()
 
-const readOnly = computed(() => !auth.isAdmin.value)
+const readOnly = computed(() => !auth.can('rates.manage'))
 
 // ---- Current rates --------------------------------------------------------------------------
 

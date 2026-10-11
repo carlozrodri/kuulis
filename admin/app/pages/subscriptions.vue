@@ -3,6 +3,8 @@ import type { TableColumn, TableRow } from '@nuxt/ui'
 import type { AdminCharge, ChargePage, ChargeStatus, SubscriptionRunResult } from '~/types/api'
 import { CHARGE_STATUSES } from '~/types/api'
 
+definePageMeta({ permission: 'subscriptions.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const auth = useAuth()
@@ -147,7 +149,7 @@ const columns = computed<TableColumn<AdminCharge>[]>(() => [
   { accessorKey: 'fee', header: t('subscriptions.fee') },
   { accessorKey: 'status', header: t('subscriptions.status') },
   { id: 'dates', header: t('subscriptions.dates') },
-  ...(auth.isAdmin.value ? [{ id: 'actions', header: '' }] : []),
+  ...(auth.can('subscriptions.manage') ? [{ id: 'actions', header: '' }] : []),
 ])
 const tableMeta = {
   class: { tr: (row: TableRow<AdminCharge>) => (isOverdue(row.original) ? 'bg-error/5' : '') },
@@ -227,7 +229,7 @@ async function run() {
         </template>
         <template #right>
           <UButton
-            v-if="auth.isAdmin.value && section === 'charges'"
+            v-if="auth.can('subscriptions.manage') && section === 'charges'"
             icon="i-lucide-play"
             :label="t('subscriptions.run.button')"
             @click="askRun"

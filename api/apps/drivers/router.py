@@ -19,7 +19,7 @@ from apps.drivers.schemas import (
 )
 from apps.files.schemas import UploadResponse
 from apps.rides import presence
-from apps.users.dependencies import CurrentUser, DBSession, StaffUser
+from apps.users.dependencies import Can, CurrentUser, DBSession
 from kuulis.core.pagination import Page, PageParams, page_params
 
 router = APIRouter(prefix="/drivers", tags=["drivers"])
@@ -94,7 +94,7 @@ async def submit(user: CurrentUser, session: DBSession) -> DriverProfileRead:
 
 @admin_router.get("", response_model=Page[DriverAdminRead])
 async def list_drivers(
-    _: StaffUser,
+    _: Can("drivers.view"),
     session: DBSession,
     params: Annotated[PageParams, Depends(page_params)],
     status: DriverStatus | None = None,
@@ -116,7 +116,9 @@ async def list_drivers(
     dependencies=[audit("driver.view", "driver", "driver_id")],  # shows the documents
     response_model=DriverAdminRead,
 )
-async def get_driver(driver_id: uuid.UUID, _: StaffUser, session: DBSession) -> DriverAdminRead:
+async def get_driver(
+    driver_id: uuid.UUID, _: Can("drivers.view"), session: DBSession
+) -> DriverAdminRead:
     profile = await services.get_or_404(session, driver_id)
     return services.to_admin_read(profile, await get_app_config(session))
 
@@ -126,7 +128,9 @@ async def get_driver(driver_id: uuid.UUID, _: StaffUser, session: DBSession) -> 
     dependencies=[audit("driver.approve", "driver", "driver_id")],
     response_model=DriverAdminRead,
 )
-async def approve(driver_id: uuid.UUID, admin: StaffUser, session: DBSession) -> DriverAdminRead:
+async def approve(
+    driver_id: uuid.UUID, admin: Can("drivers.review"), session: DBSession
+) -> DriverAdminRead:
     profile = await services.approve(session, await services.get_or_404(session, driver_id), admin)
     await services.notify(session, profile, "approved")
     return services.to_admin_read(profile, await get_app_config(session))
@@ -138,7 +142,7 @@ async def approve(driver_id: uuid.UUID, admin: StaffUser, session: DBSession) ->
     response_model=DriverAdminRead,
 )
 async def reject(
-    driver_id: uuid.UUID, data: ReasonRequest, admin: StaffUser, session: DBSession
+    driver_id: uuid.UUID, data: ReasonRequest, admin: Can("drivers.review"), session: DBSession
 ) -> DriverAdminRead:
     profile = await services.get_or_404(session, driver_id)
     profile = await services.reject(session, profile, admin, data.reason)
@@ -152,7 +156,7 @@ async def reject(
     response_model=DriverAdminRead,
 )
 async def suspend(
-    driver_id: uuid.UUID, data: ReasonRequest, admin: StaffUser, session: DBSession
+    driver_id: uuid.UUID, data: ReasonRequest, admin: Can("drivers.suspend"), session: DBSession
 ) -> DriverAdminRead:
     profile = await services.get_or_404(session, driver_id)
     profile = await services.suspend(session, profile, admin, data.reason)
@@ -166,7 +170,9 @@ async def suspend(
     dependencies=[audit("driver.reinstate", "driver", "driver_id")],
     response_model=DriverAdminRead,
 )
-async def reinstate(driver_id: uuid.UUID, admin: StaffUser, session: DBSession) -> DriverAdminRead:
+async def reinstate(
+    driver_id: uuid.UUID, admin: Can("drivers.suspend"), session: DBSession
+) -> DriverAdminRead:
     profile = await services.get_or_404(session, driver_id)
     profile = await services.reinstate(session, profile, admin)
     await services.notify(session, profile, "reinstated")
@@ -182,7 +188,7 @@ async def review_document(
     driver_id: uuid.UUID,
     document_id: uuid.UUID,
     data: DocumentReview,
-    admin: StaffUser,
+    admin: Can("drivers.review"),
     session: DBSession,
 ) -> DriverAdminRead:
     profile = await services.get_or_404(session, driver_id)

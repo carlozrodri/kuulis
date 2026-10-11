@@ -16,7 +16,9 @@
     "reports": "Reports",
     "finance": "Finance",
     "system": "System",
-    "audit": "Audit log"
+    "audit": "Audit log",
+    "team": "Team",
+    "roles": "Roles"
   },
   "auth": {
     "title": "Admin sign in",
@@ -118,7 +120,90 @@
   "roles": {
     "user": "User",
     "staff": "Staff",
-    "admin": "Administrator"
+    "admin": "Administrator",
+    "help": "What each team role can do. Changes apply the next time those people sign in.",
+    "adminNote": "Settings, fee schedules, team, roles and audit are admin-only.",
+    "permission": "Permission",
+    "members": "no one | 1 person | {n} people",
+    "save": "Save",
+    "saved": "Role {role} saved",
+    "new": "New role",
+    "label": "Role name",
+    "create": "Create role",
+    "groups": {
+      "users": "Users",
+      "reports": "Reports",
+      "drivers": "Drivers",
+      "rides": "Rides",
+      "promotions": "Promotions",
+      "rates": "Rates",
+      "notifications": "Notifications",
+      "wallet": "Balances and top-ups",
+      "subscriptions": "Subscriptions",
+      "finance": "Finance",
+      "system": "System"
+    },
+    "permissions": {
+      "users": {
+        "view": "View users and their data",
+        "suspend": "Suspend accounts up to 7 days",
+        "suspend_long": "Suspend longer than 7 days or indefinitely"
+      },
+      "reports": {
+        "manage": "Handle reports"
+      },
+      "drivers": {
+        "view": "View drivers and documents",
+        "review": "Approve or reject drivers and documents",
+        "suspend": "Suspend or reinstate drivers"
+      },
+      "rides": {
+        "view": "View rides",
+        "cancel": "Cancel rides"
+      },
+      "live": {
+        "view": "Live map"
+      },
+      "promotions": {
+        "view": "View promotions",
+        "manage": "Create and edit promotions"
+      },
+      "rates": {
+        "view": "View rates",
+        "manage": "Set and refresh rates"
+      },
+      "notifications": {
+        "send": "Send notifications"
+      },
+      "wallet": {
+        "view": "View balances",
+        "adjust": "Adjust balances"
+      },
+      "top_ups": {
+        "view": "View top-ups",
+        "manage": "Confirm, reject and assign top-ups"
+      },
+      "transfers": {
+        "view": "View transfers"
+      },
+      "subscriptions": {
+        "view": "View subscriptions and charges",
+        "manage": "Waive charges and run monthly billing"
+      },
+      "finance": {
+        "view": "View finance",
+        "export": "Export finance CSVs"
+      },
+      "dashboard": {
+        "view": "Dashboard"
+      },
+      "system": {
+        "view": "System status"
+      },
+      "config": {
+        "view": "View settings"
+      }
+    }
   },
   "notifications": {
     "audience": "Audience",
@@ -218,7 +303,11 @@
     "totp_challenge_expired": "Too much time or too many tries. Sign in again.",
     "admin_mfa_required": "Sign in to the panel with your verification code",
     "reauth_required": "Confirm the action with your code",
-    "session_not_found": "That session was already closed"
+    "session_not_found": "That session was already closed",
+    "invite_invalid": "This invitation is no longer valid. Ask for a new one.",
+    "token_used": "This link was already used.",
+    "staff_role_exists": "A role with that name already exists.",
+    "staff_role_not_found": "That role does not exist."
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -1397,6 +1486,14 @@
       },
       "wallet": {
         "adjust": "Adjusted a balance"
+      },
+      "role": {
+        "create": "Created a role",
+        "update": "Changed a role's permissions"
+      },
+      "staff": {
+        "invite": "Invited someone to the team",
+        "update": "Changed a team member"
       }
     },
     "entities": {
@@ -1415,7 +1512,44 @@
       "notification": "Notification",
       "finance": "Finance",
       "file": "File",
-      "audit": "Audit"
+      "audit": "Audit",
+      "staff_role": "Team role"
     }
+  },
+  "team": {
+    "help": "People with admin access. Each one sees and does only what their role allows; admins can do everything.",
+    "invite": "Invite",
+    "inviteHelp": "They get an email with a link (valid for 3 days) to create their password, then set up 2FA when signing in.",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "person": "Person",
+    "totp": "2FA",
+    "lastLogin": "Last sign-in",
+    "never": "Never",
+    "admin": "Admin",
+    "noRole": "No role",
+    "inactive": "Deactivated",
+    "invitePending": "Invitation pending",
+    "totpOn": "On",
+    "totpOff": "Not set up",
+    "resend": "Resend invitation",
+    "deactivate": "Deactivate",
+    "activate": "Reactivate",
+    "send": "Send invitation",
+    "saved": "Changes saved",
+    "invited": "Invitation sent to {email}"
+  },
+  "invite": {
+    "title": "Join the Kuulis team",
+    "help": "Create your account password. Then sign in to the admin and set up your authenticator (2FA).",
+    "password": "Password",
+    "passwordHint": "At least 8 characters",
+    "confirm": "Repeat the password",
+    "mismatch": "Passwords do not match",
+    "submit": "Create password",
+    "done": "Done, your password is set. You can sign in now.",
+    "goLogin": "Go to sign in",
+    "noToken": "The link is incomplete. Ask for a new invitation."
   }
 }

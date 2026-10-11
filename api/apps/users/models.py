@@ -49,6 +49,10 @@ class User(BaseModel):
     # carried out after the grace period by apps.users.tasks (personal data erased).
     deletion_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Admin permissions of a staff account (apps.staff); admins have every permission.
+    staff_role_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("staff_roles.id", ondelete="SET NULL")
+    )
 
     social_accounts: Mapped[list["SocialAccount"]] = relationship(
         back_populates="user", cascade="all, delete-orphan", lazy="raise"

@@ -2,6 +2,8 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { AppConfig, Page, PromotionPairAlert } from '~/types/api'
 
+definePageMeta({ permission: 'promotions.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const apiError = useApiError()

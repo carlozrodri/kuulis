@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Promotion } from '~/types/api'
 
-definePageMeta({ roles: ['admin'] })
+definePageMeta({ permission: 'promotions.manage' })
 
 const { t } = useI18n()
 const route = useRoute()

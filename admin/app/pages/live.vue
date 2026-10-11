@@ -2,6 +2,8 @@
 import type { AppConfig, OnlineDriver, Page, Ride, ServiceArea } from '~/types/api'
 import type { MapLine, MapMarker, MapRectangle } from '~/utils/geo'
 
+definePageMeta({ permission: 'live.view' })
+
 const { t, te, locale } = useI18n()
 const { request } = useApi()
 const apiError = useApiError()

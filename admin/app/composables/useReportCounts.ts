@@ -7,8 +7,10 @@ import type { ReportCounts, ReportPage } from '~/types/api'
 export function useReportCounts() {
   const counts = useState<ReportCounts | null>('report-counts', () => null)
   const { request } = useApi()
+  const auth = useAuth()
 
   async function refresh() {
+    if (!auth.can('reports.manage')) return
     try {
       const page = await request<ReportPage>('/admin/reports', { query: { status: 'open', limit: 1, offset: 0 } })
       counts.value = page.counts ?? { open: page.total, in_review: 0, urgent_open: 0 }

@@ -3,6 +3,8 @@ import type { TableColumn } from '@nuxt/ui'
 import type { AdminDriver, DriverStatus, Page } from '~/types/api'
 import { DRIVER_STATUSES } from '~/types/api'
 
+definePageMeta({ permission: 'drivers.view' })
+
 const { t, locale } = useI18n()
 const { request } = useApi()
 const route = useRoute()

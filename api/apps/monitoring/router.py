@@ -10,7 +10,7 @@ from apps.monitoring import checks
 from apps.monitoring.schemas import SystemHealth
 from apps.realtime.manager import manager
 from apps.rides import presence
-from apps.users.dependencies import DBSession, StaffUser
+from apps.users.dependencies import Can, DBSession
 from kuulis.core.exceptions import NotFoundError
 from kuulis.settings import settings
 
@@ -21,7 +21,7 @@ STATUS_VALUE = {"ok": 1, "warning": 1, "down": 0}
 
 
 @router.get("/health", response_model=SystemHealth)
-async def system_health(_: StaffUser, session: DBSession) -> SystemHealth:
+async def system_health(_: Can("system.view"), session: DBSession) -> SystemHealth:
     return await checks.collect(session)
 
 

@@ -15,6 +15,7 @@ async def public_config(session: DBSession) -> AppConfig:
 
 @router.get("/admin/config", response_model=AppConfig)
 async def admin_config(_: StaffUser, session: DBSession) -> AppConfig:
+    # Every staff page reads its defaults from here; config.view only shows the settings page.
     return await services.get_app_config(session)
 
 

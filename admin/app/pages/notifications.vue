@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Role } from '~/types/api'
 
+definePageMeta({ permission: 'notifications.send' })
+
 const { t } = useI18n()
 const { request } = useApi()
 const toast = useToast()

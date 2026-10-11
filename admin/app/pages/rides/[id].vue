@@ -3,6 +3,8 @@ import type { AdminRide, RideMessage, RideRating } from '~/types/api'
 import { RATE_SOURCES } from '~/types/api'
 import type { MapLine, MapMarker } from '~/utils/geo'
 
+definePageMeta({ permission: 'rides.view' })
+
 const { t, te, locale } = useI18n()
 const route = useRoute()
 const { request } = useApi()

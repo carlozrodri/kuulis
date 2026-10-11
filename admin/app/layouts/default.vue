@@ -29,25 +29,14 @@ onMounted(() => {
 onBeforeUnmount(() => clearInterval(countsTimer))
 watch(() => route.path, () => reportCounts.refresh())
 
-const links = computed<NavigationMenuItem[]>(() => [
-  { label: t('nav.dashboard'), icon: 'i-lucide-layout-dashboard', to: '/' },
-  { label: t('nav.users'), icon: 'i-lucide-users', to: '/users' },
-  { label: t('nav.drivers'), icon: 'i-lucide-bike', to: '/drivers' },
-  { label: t('nav.rides'), icon: 'i-lucide-route', to: '/rides' },
-  { label: t('nav.live'), icon: 'i-lucide-radar', to: '/live' },
-  { label: t('nav.reports'), icon: 'i-lucide-flag', to: '/reports', badge: reportsBadge.value },
-  { label: t('nav.rates'), icon: 'i-lucide-banknote', to: '/rates' },
-  { label: t('nav.promotions'), icon: 'i-lucide-ticket-percent', to: '/promotions' },
-  { label: t('nav.topUps'), icon: 'i-lucide-wallet', to: '/top-ups' },
-  { label: t('nav.transfers'), icon: 'i-lucide-arrow-left-right', to: '/transfers' },
-  { label: t('nav.subscriptions'), icon: 'i-lucide-calendar-check', to: '/subscriptions' },
-  { label: t('nav.finance'), icon: 'i-lucide-landmark', to: '/finance' },
-  { label: t('nav.system'), icon: 'i-lucide-activity', to: '/system' },
-  { label: t('nav.notifications'), icon: 'i-lucide-bell', to: '/notifications' },
-  ...(auth.isAdmin.value ? [{ label: t('nav.audit'), icon: 'i-lucide-scroll-text', to: '/audit' }] : []),
-  { label: t('nav.settings'), icon: 'i-lucide-settings', to: '/settings' },
-  { label: t('nav.profile'), icon: 'i-lucide-user-cog', to: '/profile' },
-])
+const links = computed<NavigationMenuItem[]>(() =>
+  NAV.filter(entry => navAllowed(entry, auth.isAdmin.value, auth.can)).map(entry => ({
+    label: t(`nav.${entry.key}`),
+    icon: entry.icon,
+    to: entry.to,
+    ...(entry.key === 'reports' ? { badge: reportsBadge.value } : {}),
+  })),
+)
 
 const localeItems = computed(() =>
   locales.value.map(l => ({ label: l.name ?? l.code, value: l.code })),

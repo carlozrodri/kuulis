@@ -8,6 +8,8 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 
+from apps.staff.models import StaffRole
+from apps.staff.permissions import ALL_PERMISSIONS
 from apps.users.models import Role
 from apps.users.schemas import UserCreate
 from kuulis.asgi import app
@@ -46,13 +48,34 @@ async def client() -> AsyncIterator[AsyncClient]:
         yield c
 
 
-async def _make_user(email: str, role: Role = Role.USER):
+# What plain staff could do before roles (doc 06): everything but the admin-only writes.
+LEGACY_STAFF = ALL_PERMISSIONS - {
+    "promotions.manage",
+    "rates.manage",
+    "top_ups.manage",
+    "wallet.adjust",
+    "subscriptions.manage",
+}
+
+
+async def make_staff_role(name: str, permissions) -> StaffRole:
+    async with SessionLocal() as session:
+        role = StaffRole(name=name, label=name.title(), permissions=sorted(permissions))
+        session.add(role)
+        await session.commit()
+        return role
+
+
+async def _make_user(email: str, role: Role = Role.USER, staff_role: StaffRole | None = None):
     from apps.users import services
 
+    if role == Role.STAFF and staff_role is None:
+        staff_role = await make_staff_role(f"legacy_{email.split('@')[0]}", LEGACY_STAFF)
     async with SessionLocal() as session:
         user = await services.create_user(
             session, UserCreate(email=email, password=PASSWORD), role=role, is_verified=True
         )
+        user.staff_role_id = staff_role.id if staff_role else None
         await session.commit()
         return user
 
