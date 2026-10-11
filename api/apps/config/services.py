@@ -12,7 +12,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.config.models import AppSetting
-from apps.config.schemas import AppConfig, AppConfigUpdate
+from apps.config.schemas import AppConfig, AppConfigUpdate, PublicSite
 from kuulis.core.cache import cache_delete, cached
 from kuulis.core.exceptions import AppError
 
@@ -97,3 +97,31 @@ async def _merge(session: AsyncSession, data: AppConfigUpdate) -> tuple[AppConfi
 
 async def invalidate_cache() -> None:
     await cache_delete(CACHE_KEY)
+
+
+async def public_site(session: AsyncSession) -> PublicSite:
+    """The public subset of the settings plus this month's fee tiers, for the website."""
+    from apps.subscriptions.services import schedule_for
+    from kuulis.core.calendar import local_now, month_start
+
+    config = await get_app_config(session)
+    schedule = await schedule_for(session, month_start(local_now()))
+    return PublicSite.model_validate(
+        {
+            "cities": list(dict.fromkeys(area.name for area in config.service_areas)),
+            "driver": {
+                "min_age": config.driver_min_age,
+                "vehicle_types": config.enabled_vehicle_types,
+                "vehicle_min_year": {
+                    t: y
+                    for t, y in config.vehicle_min_year.items()
+                    if t in config.enabled_vehicle_types
+                },
+                "documents": config.driver_required_documents,
+                "vehicle_photo_min_count": config.vehicle_photo_min_count,
+            },
+            "free_months": config.subscription_free_months,
+            "fee_tiers": [t.model_dump() for t in schedule.tiers],
+            "payment_methods": config.payment_methods,
+        }
+    )

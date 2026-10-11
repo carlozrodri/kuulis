@@ -1,11 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
 from fastapi.responses import JSONResponse
 
 from apps.approvals import services as approvals
 from apps.approvals.schemas import ApprovalHeld
 from apps.audit.services import audit, note, snapshot
 from apps.config import services
-from apps.config.schemas import AppConfig, AppConfigUpdate
+from apps.config.schemas import AppConfig, AppConfigUpdate, PublicSite
 from apps.users.dependencies import AdminUser, DBSession, StaffUser
 
 router = APIRouter(tags=["config"])
@@ -17,6 +17,13 @@ FARE_KEYS = {"fares", "fare_rounding"}
 @router.get("/config/public", response_model=AppConfig)
 async def public_config(session: DBSession) -> AppConfig:
     return await services.get_app_config(session)
+
+
+@router.get("/public/site", response_model=PublicSite)
+async def public_site(session: DBSession, response: Response) -> PublicSite:
+    """What the public website shows (no account needed); browsers and proxies may keep it 5 min."""
+    response.headers["Cache-Control"] = "public, max-age=300"
+    return await services.public_site(session)
 
 
 @router.get("/admin/config", response_model=AppConfig)

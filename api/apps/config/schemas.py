@@ -286,3 +286,26 @@ class AppConfigUpdate(BaseModel):
     @classmethod
     def check_increasing(cls, value: list[int] | None) -> list[int] | None:
         return value if value is None else _increasing(value)
+
+
+class PublicDriverRequirements(BaseModel):
+    min_age: int
+    vehicle_types: list[VehicleType]
+    vehicle_min_year: dict[VehicleType, int]
+    documents: list[DocumentKind]
+    vehicle_photo_min_count: int
+
+
+class PublicFeeTier(BaseModel):
+    above: Decimal
+    fee: Decimal
+
+
+class PublicSite(BaseModel):
+    """What the public website shows (doc 08): cities, driver requirements and the fee tiers."""
+
+    cities: list[str]
+    driver: PublicDriverRequirements
+    free_months: int
+    fee_tiers: list[PublicFeeTier]
+    payment_methods: list[PaymentMethod]

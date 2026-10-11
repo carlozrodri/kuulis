@@ -68,3 +68,28 @@ Un sitio público, rápido y bonito, que sea la casa de Kuulis fuera de la app: 
 ## Preguntas para Carlos
 1. ¿Movemos el admin a un subdominio (`admin.`) y dejamos el dominio principal para la web? Recomendado: sí.
 2. ¿Tienes logo final? Si no, se usa el logotipo tipográfico actual.
+
+## Decidido (2026-10-11)
+1. El admin pasa a `admin.<dominio>`; la web ocupa el dominio principal y la API sigue en `/api`.
+2. Sin logo final: se usa el logotipo tipográfico actual («kuulis» con el punto amarillo).
+3. Se entrega por partes: (1) la web con lo que ya existe; viaje compartido, ayuda, analítica y estado se
+   suman al implementar 11, 13, 19 y 03.
+
+## Cómo quedó
+### Parte 1 (2026-10-11)
+- App `web/`: Nuxt 4 con SSR, CSS propio (sin librería de componentes), Plus Jakarta Sans, colores Verde Ávila
+  con modo oscuro, español e inglés (cookie `kuulis_locale`, sin prefijo en la URL). Unos 85 KB de JavaScript
+  comprimido en total.
+- Páginas: **Inicio**, **Motorizados** (requisitos y tramos de la cuota leídos de la API), **Descargar** («muy
+  pronto» hasta que 09 publique el APK; aviso para iPhone), **Legal** (los textos de 07 con su versión),
+  **Verificar email** (pide un toque antes de usar el enlace, para que los antivirus del correo no lo gasten) y
+  **Cambiar contraseña**. Página 404 propia.
+- `robots.txt` (bloquea todo fuera de producción), `sitemap.xml`, Open Graph con imagen para WhatsApp,
+  cabeceras de seguridad y `noindex` en las páginas con token.
+- API: `GET /public/site` sin sesión y cacheado 5 min (ciudades, requisitos, tramos del mes, meses gratis,
+  métodos de pago). El documento proponía `GET /public/config`; ese nombre ya lo usa la app, así que se separó.
+  No hizo falta CORS: la web llama a la API en su mismo dominio.
+- `ADMIN_URL` (nuevo): los enlaces de invitación del equipo apuntan al admin. `FRONTEND_URL` queda para la web
+  (emails de verificación y cambio de contraseña).
+- CI: job `web` (lint, tipos, tests y build).
+- Despliegue: app `kuulis-web-<entorno>` en Coolify (ver `docs/deployment.md`).

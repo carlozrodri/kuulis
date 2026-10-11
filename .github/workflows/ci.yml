@@ -25,6 +25,7 @@ jobs:
       api: ${{ steps.filter.outputs.api }}
       admin: ${{ steps.filter.outputs.admin }}
       mobile: ${{ steps.filter.outputs.mobile }}
+      web: ${{ steps.filter.outputs.web }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -39,6 +40,9 @@ jobs:
               - '.github/workflows/ci.yml'
             mobile:
               - 'mobile/**'
+              - '.github/workflows/ci.yml'
+            web:
+              - 'web/**'
               - '.github/workflows/ci.yml'
 
   api:
@@ -125,6 +129,33 @@ jobs:
         continue-on-error: true
         run: pnpm audit --prod --audit-level high
 
+  web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - name: Dependency audit (informative)
+        continue-on-error: true
+        run: pnpm audit --prod --audit-level high
+
   mobile:
     needs: changes
     if: needs.changes.outputs.mobile == 'true' || github.event_name == 'workflow_dispatch'
@@ -165,7 +196,7 @@ jobs:
   # Single required check: fails if any job failed or was cancelled; skipped jobs (folder untouched) pass.
   ci:
     if: always()
-    needs: [changes, api, admin, mobile, secrets]
+    needs: [changes, api, admin, web, mobile, secrets]
     runs-on: ubuntu-latest
     steps:
       - name: All jobs passed or were skipped

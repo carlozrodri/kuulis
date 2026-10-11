@@ -63,6 +63,9 @@ construir. Las preguntas de cada documento están en su sección final.
   versionados (pendientes de abogado) con aceptación obligatoria; eliminación de cuenta que no deja datos
   personales en ninguna tabla, descarga de mis datos por email, limpieza diaria de datos viejos, aviso de
   ubicación del motorizado y página Privacidad en el admin.
+- **08** parte 1 hecha (2026-10-11): web pública `web/` (inicio, motorizados, descargar, legal, verificar email
+  y cambiar contraseña, Open Graph, sitemap) en el dominio principal; el admin pasa a `admin.<dominio>`. Faltan
+  viaje compartido (11), ayuda (13), analítica (19) y enlace de estado (03), que se suman con esos documentos.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay
@@ -91,7 +94,7 @@ como texto y botón de llamar al 911.
 - ~~`DELETE /users/me` solo desactiva la cuenta~~: resuelto en `da5bb1e` (borrado a los 30 días). Ver 07.
 - ~~No hay CI~~: resuelto en 01.
 - ~~OSRM y Photon usan los servidores públicos de demostración~~: resuelto en 02.
-- **Los enlaces de los emails** (`/verify-email`, `/reset-password`) apuntan a páginas que no existen. Ver 08.
+- ~~Los enlaces de los emails apuntan a páginas que no existen~~: resuelto en 08 (web pública).
 - **No se guarda el recorrido del viaje**: ante un reporte de seguridad no hay ruta real para revisar. Ver 11.
 - **No hay `expo-updates`**: sin tiendas, hoy no hay forma de que los usuarios reciban una versión nueva. Ver 09.
 - **Los documentos del motorizado no tienen fecha de vencimiento** (licencia, certificado médico). Ver 12.
