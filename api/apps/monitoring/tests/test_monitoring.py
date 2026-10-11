@@ -126,3 +126,11 @@ def test_log_lines_carry_request_ids():
         request_id_ctx.reset(tokens[0])
         log_fields_ctx.reset(tokens[1])
     assert (line["request_id"], line["ride_id"], line["user_id"]) == ("req-1", "r-1", "u-1")
+
+
+def test_reserved_email_domains_are_never_sent():
+    from kuulis.core.email import is_undeliverable
+
+    assert is_undeliverable("smoke-admin@example.com")
+    assert is_undeliverable("a@Sub.TEST") and is_undeliverable("a@x.invalid")
+    assert not is_undeliverable("carlos@gmail.com") and not is_undeliverable("a@myexample.com")

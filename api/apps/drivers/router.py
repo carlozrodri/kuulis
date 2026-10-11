@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
 
+from apps.audit.services import audit
 from apps.config.services import get_app_config
 from apps.drivers import services
 from apps.drivers.models import DocumentStatus, DriverStatus
@@ -110,20 +111,32 @@ async def list_drivers(
     )
 
 
-@admin_router.get("/{driver_id}", response_model=DriverAdminRead)
+@admin_router.get(
+    "/{driver_id}",
+    dependencies=[audit("driver.view", "driver", "driver_id")],  # shows the documents
+    response_model=DriverAdminRead,
+)
 async def get_driver(driver_id: uuid.UUID, _: StaffUser, session: DBSession) -> DriverAdminRead:
     profile = await services.get_or_404(session, driver_id)
     return services.to_admin_read(profile, await get_app_config(session))
 
 
-@admin_router.post("/{driver_id}/approve", response_model=DriverAdminRead)
+@admin_router.post(
+    "/{driver_id}/approve",
+    dependencies=[audit("driver.approve", "driver", "driver_id")],
+    response_model=DriverAdminRead,
+)
 async def approve(driver_id: uuid.UUID, admin: StaffUser, session: DBSession) -> DriverAdminRead:
     profile = await services.approve(session, await services.get_or_404(session, driver_id), admin)
     await services.notify(session, profile, "approved")
     return services.to_admin_read(profile, await get_app_config(session))
 
 
-@admin_router.post("/{driver_id}/reject", response_model=DriverAdminRead)
+@admin_router.post(
+    "/{driver_id}/reject",
+    dependencies=[audit("driver.reject", "driver", "driver_id")],
+    response_model=DriverAdminRead,
+)
 async def reject(
     driver_id: uuid.UUID, data: ReasonRequest, admin: StaffUser, session: DBSession
 ) -> DriverAdminRead:
@@ -133,7 +146,11 @@ async def reject(
     return services.to_admin_read(profile, await get_app_config(session))
 
 
-@admin_router.post("/{driver_id}/suspend", response_model=DriverAdminRead)
+@admin_router.post(
+    "/{driver_id}/suspend",
+    dependencies=[audit("driver.suspend", "driver", "driver_id")],
+    response_model=DriverAdminRead,
+)
 async def suspend(
     driver_id: uuid.UUID, data: ReasonRequest, admin: StaffUser, session: DBSession
 ) -> DriverAdminRead:
@@ -144,7 +161,11 @@ async def suspend(
     return services.to_admin_read(profile, await get_app_config(session))
 
 
-@admin_router.post("/{driver_id}/reinstate", response_model=DriverAdminRead)
+@admin_router.post(
+    "/{driver_id}/reinstate",
+    dependencies=[audit("driver.reinstate", "driver", "driver_id")],
+    response_model=DriverAdminRead,
+)
 async def reinstate(driver_id: uuid.UUID, admin: StaffUser, session: DBSession) -> DriverAdminRead:
     profile = await services.get_or_404(session, driver_id)
     profile = await services.reinstate(session, profile, admin)
@@ -152,7 +173,11 @@ async def reinstate(driver_id: uuid.UUID, admin: StaffUser, session: DBSession) 
     return services.to_admin_read(profile, await get_app_config(session))
 
 
-@admin_router.post("/{driver_id}/documents/{document_id}/review", response_model=DriverAdminRead)
+@admin_router.post(
+    "/{driver_id}/documents/{document_id}/review",
+    dependencies=[audit("driver.document_review", "driver", "driver_id")],
+    response_model=DriverAdminRead,
+)
 async def review_document(
     driver_id: uuid.UUID,
     document_id: uuid.UUID,

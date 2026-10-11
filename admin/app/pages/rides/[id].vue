@@ -678,6 +678,10 @@ async function confirmCancel() {
 
           <!-- Phase 1E: reports about this ride -->
           <ReportsList :ride-id="ride.id" />
+          <AuditHistoryCard
+            entity-type="ride"
+            :entity-id="ride.id"
+          />
         </div>
       </div>
 

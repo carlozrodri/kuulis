@@ -4,6 +4,7 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, Request, status
 
+from apps.audit.services import audit
 from apps.rides import events, presence, services, stats
 from apps.rides.models import Ride, RideStatus
 from apps.rides.schemas import (
@@ -258,7 +259,11 @@ async def admin_detail(ride_id: uuid.UUID, _: StaffUser, session: DBSession) -> 
     )
 
 
-@admin_router.post("/{ride_id}/cancel", response_model=RideAdminRead)
+@admin_router.post(
+    "/{ride_id}/cancel",
+    dependencies=[audit("ride.cancel", "ride", "ride_id")],
+    response_model=RideAdminRead,
+)
 async def admin_cancel(
     ride_id: uuid.UUID, data: AdminCancelRequest, admin: StaffUser, session: DBSession
 ) -> RideAdminRead:

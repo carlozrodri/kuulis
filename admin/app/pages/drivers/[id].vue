@@ -527,6 +527,11 @@ const failedThumbs = reactive(new Set<string>())
             </UCard>
           </div>
         </section>
+
+        <AuditHistoryCard
+          entity-type="driver"
+          :entity-id="driver.id"
+        />
       </div>
 
       <UModal

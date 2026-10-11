@@ -44,6 +44,7 @@ const links = computed<NavigationMenuItem[]>(() => [
   { label: t('nav.finance'), icon: 'i-lucide-landmark', to: '/finance' },
   { label: t('nav.system'), icon: 'i-lucide-activity', to: '/system' },
   { label: t('nav.notifications'), icon: 'i-lucide-bell', to: '/notifications' },
+  ...(auth.isAdmin.value ? [{ label: t('nav.audit'), icon: 'i-lucide-scroll-text', to: '/audit' }] : []),
   { label: t('nav.settings'), icon: 'i-lucide-settings', to: '/settings' },
   { label: t('nav.profile'), icon: 'i-lucide-user-cog', to: '/profile' },
 ])

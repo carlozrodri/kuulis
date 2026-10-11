@@ -2,6 +2,7 @@
 
 from collections.abc import AsyncIterator
 
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -30,7 +31,11 @@ SessionLocal = async_sessionmaker(engine, expire_on_commit=False, autoflush=Fals
 
 async def get_db() -> AsyncIterator[AsyncSession]:
     """Request-scoped session. Commits on success, rolls back on error."""
+    from apps.audit.services import stage as stage_audit  # app code; avoid a core->apps cycle
+
     async with SessionLocal() as session:
+        # The admin action and its audit row commit together.
+        event.listen(session.sync_session, "before_commit", stage_audit)
         try:
             yield session
             await session.commit()

@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 
 from fastapi import APIRouter, Request, status
 
+from apps.audit.services import audit
 from apps.auth import services, social, totp
 from apps.auth.schemas import (
     AdminAuthResponse,
@@ -86,7 +87,11 @@ async def admin_totp(request: Request, data: TotpVerify, session: DBSession) -> 
     )
 
 
-@router.post("/admin/reauth", status_code=status.HTTP_204_NO_CONTENT)
+@router.post(
+    "/admin/reauth",
+    dependencies=[audit("auth.reauth", "user")],
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 @limiter.limit("10/minute")
 async def admin_reauth(
     request: Request, data: ReauthRequest, user: StaffUser, session: DBSession

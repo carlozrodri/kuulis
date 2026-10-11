@@ -10,3 +10,8 @@ def set_log_field(name: str, value: object) -> None:
     fields = log_fields_ctx.get()
     if fields is not None and value is not None:
         fields[name] = str(value)
+
+
+# Admin action of the request waiting to be written to the audit log (apps.audit). A dict set by
+# the middleware so a dependency can open the entry and the DB session writes it with the commit.
+audit_ctx: ContextVar[dict | None] = ContextVar("audit", default=None)

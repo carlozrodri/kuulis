@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
+from apps.audit.services import audit
 from apps.rates import services
 from apps.rates.models import RateSource
 from apps.rates.schemas import (
@@ -34,7 +35,12 @@ async def history(
     return Page(items=items, total=total, limit=params.limit, offset=params.offset)
 
 
-@router.post("/admin/rates", response_model=ExchangeRateRead, status_code=201)
+@router.post(
+    "/admin/rates",
+    dependencies=[audit("rate.set_manual", "rate")],
+    response_model=ExchangeRateRead,
+    status_code=201,
+)
 async def set_manual(data: ManualRate, user: AdminUser, session: DBSession) -> ExchangeRateRead:
     rate = await services.set_manual(session, user, data.source, data.rate, data.note)
     await session.commit()
@@ -42,6 +48,10 @@ async def set_manual(data: ManualRate, user: AdminUser, session: DBSession) -> E
     return rate
 
 
-@router.post("/admin/rates/refresh", response_model=CurrentRates)
+@router.post(
+    "/admin/rates/refresh",
+    dependencies=[audit("rate.refresh", "rate")],
+    response_model=CurrentRates,
+)
 async def refresh(data: RefreshRequest, _: AdminUser, session: DBSession) -> CurrentRates:
     return await services.refresh(session, data.source)

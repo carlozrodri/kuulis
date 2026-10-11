@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 
+from apps.audit.services import audit
 from apps.subscriptions import services
 from apps.subscriptions.models import ChargeStatus
 from apps.subscriptions.schemas import (
@@ -109,7 +110,11 @@ async def charges(
     )
 
 
-@admin_router.post("/charges/{charge_id}/waive", response_model=ChargeRead)
+@admin_router.post(
+    "/charges/{charge_id}/waive",
+    dependencies=[audit("charge.waive", "charge", "charge_id")],
+    response_model=ChargeRead,
+)
 async def waive(
     charge_id: uuid.UUID, data: ReasonBody, admin: VerifiedAdminUser, session: DBSession
 ) -> ChargeRead:
@@ -119,7 +124,9 @@ async def waive(
     return services.charge_read(charge)
 
 
-@admin_router.post("/run", response_model=RunResultRead)
+@admin_router.post(
+    "/run", dependencies=[audit("subscription.run", "charge")], response_model=RunResultRead
+)
 async def run(data: RunRequest, _: AdminUser, session: DBSession) -> RunResultRead:
     result = await services.charge_month(session, data.month)
     return RunResultRead(**result.__dict__)
@@ -149,7 +156,12 @@ async def schedules(_: StaffUser, session: DBSession) -> list[ScheduleRead]:
     return result
 
 
-@admin_router.post("/schedules", response_model=ScheduleRead, status_code=201)
+@admin_router.post(
+    "/schedules",
+    dependencies=[audit("fee_schedule.create", "fee_schedule")],
+    response_model=ScheduleRead,
+    status_code=201,
+)
 async def create_schedule(
     data: ScheduleCreate, admin: AdminUser, session: DBSession
 ) -> ScheduleRead:
