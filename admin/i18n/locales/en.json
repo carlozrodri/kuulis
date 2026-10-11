@@ -1249,6 +1249,17 @@
     },
     "dashboardAlert": "There are {count} open system alerts",
     "dashboardAlertHelp": "A service or background loop has problems.",
-    "open": "View status"
+    "open": "View status",
+    "backups": {
+      "title": "Backups",
+      "notConfigured": "Off-site backups are not configured (worker BACKUP_* variables).",
+      "never": "Never",
+      "database": "Database (every 15 min)",
+      "ledger": "Ledger (daily)",
+      "files": "Files (daily)",
+      "restore": "Restore check (weekly)",
+      "restoreOk": "Passed",
+      "restoreFailed": "Failed"
+    }
   }
 }

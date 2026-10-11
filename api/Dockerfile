@@ -15,7 +15,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PATH="/app/.venv/bin:$PATH" \
     PORT=8000 \
     PROCESS_TYPE=api
-RUN apt-get update && apt-get install -y --no-install-recommends curl tini \
+# PostgreSQL 17 client tools (from the PGDG repository: pg_dump must match the server) and openssl
+# for the backups (apps/backups).
+RUN apt-get update && apt-get install -y --no-install-recommends curl tini openssl ca-certificates \
+        postgresql-common \
+    && /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y \
+    && apt-get install -y --no-install-recommends postgresql-client-17 \
+    && pg_dump --version | grep -q " 17\." \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system app && useradd --system --gid app --home /app app
 WORKDIR /app

@@ -19,6 +19,7 @@ TASK_MODULES = [
     "apps.rates.tasks",
     "apps.wallet.tasks",
     "apps.monitoring.tasks",
+    "apps.backups.tasks",
 ]
 
 if settings.APP_ENV == "test":

@@ -113,6 +113,20 @@ class BaseAppSettings(BaseSettings):
     # Bearer token for /api/metrics (Prometheus). Empty: the endpoint answers 404.
     METRICS_TOKEN: str = ""
 
+    # --- Backups (apps/backups) ---------------------------------------------------
+    # The worker dumps Postgres every BACKUP_EVERY_MINUTES, encrypted with BACKUP_PASSPHRASE
+    # (openssl aes-256-cbc, pbkdf2), to an S3-compatible bucket outside the homelab (Cloudflare R2),
+    # mirrors the uploaded files there and checks a restore every week.
+    BACKUP_ENABLED: bool = False
+    BACKUP_S3_ENDPOINT: str = ""
+    BACKUP_S3_BUCKET: str = ""
+    BACKUP_S3_ACCESS_KEY_ID: str = ""
+    BACKUP_S3_SECRET_ACCESS_KEY: str = ""
+    BACKUP_S3_REGION: str = "auto"
+    BACKUP_PASSPHRASE: str = ""
+    BACKUP_EVERY_MINUTES: int = 15
+    BACKUP_MIRROR_FILES: bool = True
+
     # --- Bootstrap --------------------------------------------------------------
     FIRST_SUPERUSER_EMAIL: str = ""
     FIRST_SUPERUSER_PASSWORD: str = ""
@@ -147,6 +161,16 @@ class BaseAppSettings(BaseSettings):
         return self.APP_ENV == "production"
 
     @computed_field  # type: ignore[prop-decorator]
+    @property
+    def backups_configured(self) -> bool:
+        return bool(
+            self.BACKUP_ENABLED
+            and self.BACKUP_S3_BUCKET
+            and self.BACKUP_S3_ACCESS_KEY_ID
+            and self.BACKUP_S3_SECRET_ACCESS_KEY
+            and self.BACKUP_PASSPHRASE
+        )
+
     @property
     def storage_enabled(self) -> bool:
         return bool(self.AWS_ACCESS_KEY_ID and self.AWS_SECRET_ACCESS_KEY and self.AWS_S3_BUCKET)

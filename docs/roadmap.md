@@ -62,6 +62,8 @@ Plan completo en `docs/produccion/README.md`; Carlos aprobó todas las recomenda
 - [x] 01 · CI y calidad: GitHub Actions, Dependabot, gitleaks, tests del admin, smoke E2E, cuentas de prueba.
 - [x] 02 · Infraestructura: OSRM y Photon propios, Redis persistente, Postgres ajustado, commit en `/health` y
       en el admin, listas de encendido y de despliegue (en QA; producción al encenderla).
+- [ ] 04 · Backups: código listo (dump cifrado cada 15 min a R2, libro contable, archivos, restauración
+      semanal); falta activar con el bucket de R2 y el simulacro.
 
 ## Fase 3 · Operación
 - [ ] Activar Sentry (API, admin, mobile).

@@ -30,6 +30,23 @@ const label = (group: 'serviceNames' | 'loopNames', name: string) => {
   return t(key) === key ? name : t(key)
 }
 
+const backupRows = computed(() => {
+  const b = health.value?.backups
+  if (!b?.configured) return []
+  const when = (value?: string | null) => (value ? formatDate(value, locale.value) : t('system.backups.never'))
+  return [
+    { label: t('system.backups.database'), value: when(b.last_backup_at), detail: b.last_backup_bytes ? `${formatNumber(b.last_backup_bytes / 1048576, locale.value, 1)} MB` : '', bad: Boolean(b.errors.database) },
+    { label: t('system.backups.ledger'), value: when(b.last_ledger_at), detail: '', bad: Boolean(b.errors.ledger) },
+    { label: t('system.backups.files'), value: when(b.last_files_mirror_at), detail: '', bad: Boolean(b.errors.files) },
+    {
+      label: t('system.backups.restore'),
+      value: when(b.last_restore_check_at),
+      detail: b.last_restore_ok === null || b.last_restore_ok === undefined ? '' : t(b.last_restore_ok ? 'system.backups.restoreOk' : 'system.backups.restoreFailed'),
+      bad: b.last_restore_ok === false,
+    },
+  ]
+})
+
 const numbers = computed(() => {
   const h = health.value
   if (!h) return []
@@ -200,6 +217,51 @@ const numbers = computed(() => {
             </ul>
           </UCard>
         </div>
+
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('system.backups.title') }}
+            </h2>
+          </template>
+          <p
+            v-if="!health.backups.configured"
+            class="text-sm text-(--ui-text-muted)"
+          >
+            {{ t('system.backups.notConfigured') }}
+          </p>
+          <dl
+            v-else
+            class="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4"
+          >
+            <div
+              v-for="row in backupRows"
+              :key="row.label"
+            >
+              <dt class="text-(--ui-text-muted)">
+                {{ row.label }}
+              </dt>
+              <dd :class="row.bad ? 'font-semibold text-(--ui-error)' : ''">
+                {{ row.value }}
+                <span
+                  v-if="row.detail"
+                  class="block text-xs text-(--ui-text-muted)"
+                >{{ row.detail }}</span>
+              </dd>
+            </div>
+          </dl>
+          <ul
+            v-if="Object.keys(health.backups.errors).length"
+            class="mt-3 space-y-1 text-xs text-(--ui-error)"
+          >
+            <li
+              v-for="(message, job) in health.backups.errors"
+              :key="job"
+            >
+              {{ job }}: {{ message }}
+            </li>
+          </ul>
+        </UCard>
 
         <div class="grid gap-6 lg:grid-cols-3">
           <UCard

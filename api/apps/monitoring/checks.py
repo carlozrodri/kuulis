@@ -11,9 +11,11 @@ from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.analytics.services import _real_rides
+from apps.backups import services as backup_services
 from apps.geo.clients import http
 from apps.monitoring import alerts, stats
 from apps.monitoring.schemas import (
+    BackupsHealth,
     LoopHealth,
     Queues,
     RidesHealth,
@@ -55,6 +57,8 @@ def expected_loops() -> dict[str, int]:
         loops["rates"] = 10 * 60  # checks every minute which source is due
     if binance.enabled():
         loops["binance"] = 10 * 60
+    if settings.backups_configured:
+        loops["backups"] = 10 * 60  # checks every minute what is due
     return loops
 
 
@@ -177,6 +181,24 @@ async def rides(session: AsyncSession) -> RidesHealth:
     )
 
 
+async def backups() -> BackupsHealth:
+    if not settings.backups_configured:
+        return BackupsHealth(configured=False)
+    try:
+        state = await backup_services.status()
+    except Exception:
+        state = {}
+    errors = {
+        key.removeprefix("last_").removesuffix("_error"): value
+        for key, value in state.items()
+        if key.endswith("_error") and value
+    }
+    fields = {
+        k: state.get(k) for k in BackupsHealth.model_fields if k not in ("configured", "errors")
+    }
+    return BackupsHealth(configured=True, errors=errors, **fields)
+
+
 def disk_used_percent() -> float | None:
     try:
         usage = shutil.disk_usage("/")
@@ -198,6 +220,7 @@ async def collect(session: AsyncSession) -> SystemHealth:
         rides=await rides(session),
         stale_rates=[n for n, v in current.model_dump().items() if v and v["stale"]],
         disk_used_percent=disk_used_percent(),
+        backups=await backups(),
         alerts=await alerts.open_alerts(),
     )
 
@@ -260,6 +283,16 @@ def problems(health: SystemHealth) -> list[Problem]:
         )
     if health.disk_used_percent is not None and health.disk_used_percent > DISK_LIMIT_PERCENT:
         found.append(Problem("disk", f"Disco al {health.disk_used_percent:.0f} %"))
+
+    backup = health.backups
+    if backup.configured:
+        late_after = timedelta(minutes=2 * settings.BACKUP_EVERY_MINUTES + 5)
+        if backup.last_backup_at is None or health.checked_at - backup.last_backup_at > late_after:
+            found.append(Problem("backup:stale", "No hay backup reciente de la base de datos"))
+        if backup.last_restore_ok is False:
+            found.append(Problem("backup:restore", "Falló la prueba de restauración del backup"))
+        for job, error in backup.errors.items():
+            found.append(Problem(f"backup:{job}", f"Falla el backup '{job}': {error[:120]}"))
 
     rides = health.rides
     if (
