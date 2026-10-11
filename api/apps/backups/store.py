@@ -76,7 +76,11 @@ class AppFiles:
         return _list(self.client, settings.AWS_S3_BUCKET, prefix)
 
     def get(self, key: str, path: Path) -> None:
-        self.client.download_file(settings.AWS_S3_BUCKET, key, str(path))
+        # GetObject, not download_file: the homelab S3 refuses the HeadObject that the latter does.
+        body = self.client.get_object(Bucket=settings.AWS_S3_BUCKET, Key=key)["Body"]
+        with path.open("wb") as file:
+            for chunk in body.iter_chunks(1024 * 1024):
+                file.write(chunk)
 
 
 @lru_cache
