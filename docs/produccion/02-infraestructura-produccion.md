@@ -1,6 +1,6 @@
 # 02 · Infraestructura de producción
 
-**Prioridad:** P0 · **Área:** Infra · **Depende de:** 01
+**Prioridad:** P0 · **Área:** Infra · **Depende de:** 01 · **Estado:** en curso (2026-10-11)
 
 ## Objetivo
 Dejar producción lista para encender: servicios propios para mapas, Redis y Postgres configurados para no
@@ -72,3 +72,21 @@ servidor de Carlos.
 2. ¿Cuánta RAM y disco libres hay en el servidor? OSRM de Venezuela necesita aprox. 2–4 GB y Photon 2–8 GB.
 3. ¿Se acepta un VPS de respaldo pagado (≈5–10 USD/mes) para contingencia? Recomendado: tenerlo preparado
    pero apagado.
+
+## Decidido (2026-10-11)
+1. Dominio: uno propio y corto antes de lanzar (pendiente de elegir y comprar; hasta entonces
+   `kuulis-prod.top8.uk`).
+2. Servidor: VM de Coolify con 8 núcleos, 10 GB de RAM y 100 GB de disco (uso actual ~20 % de RAM y <10 %
+   de CPU). Alcanza para OSRM y Photon propios.
+3. VPS de contingencia: preparado pero apagado.
+4. Protección de ramas: pendiente, la activa Carlos más adelante.
+
+## Cómo quedó
+- `infra/osrm` (OSRM 6, perfil car, MLD) e `infra/photon` (Photon 1.0.1): imágenes con Venezuela y la zona de
+  Valencia (QA) preparadas al construir. Photon medido: índice de 155 MB, ~370 MB de RAM, importación de 4 min.
+- `/api/health/live` y `/ready` muestran `env` y `commit`; `/ready` revisa OSRM y Photon y responde
+  `degraded` (sin 503) si se cae uno. Sentry usa el commit como `release`. Configuración del admin muestra el
+  commit de API y admin.
+- Migración que activa `pg_stat_statements` (sin bloquear el despliegue si no se puede).
+- `docs/deployment.md`: configuración de Redis (AOF, `noeviction`) y Postgres, límites de RAM, listas de
+  encendido y de cada despliegue, contingencia del homelab.
