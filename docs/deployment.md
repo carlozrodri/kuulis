@@ -15,7 +15,7 @@ existente de Carlos. No comparte nada con los proyectos NDS ni bidding-market.
 | API (`/api`) | `kuulis-api-qa` · `rayxgnveijwwq86tquloc3r8` | `kuulis-api-production` · `f14idkxf8c209b1hghrunmhb` |
 | Worker | `kuulis-worker-qa` · `i10vqipywxmdafk5sjaowzya` | `kuulis-worker-production` · `f3eiht6l1r439xxp3401u2ur` |
 | Admin (`admin.top8.uk` en QA) | `kuulis-admin-qa` · `m37iqum9dy4n0o5281n0tvu5` | `kuulis-admin-production` · `ru2e54bw4mn4igqvvdmkgrys` |
-| Web pública (`/`) | `kuulis-web-qa` (por crear) | `kuulis-web-production` (por crear) |
+| Web pública | `Kuulis web` · `p4lpainpky5a5tf5oe9ggthm` en `kuulis.top8.uk` (y `www.`) | por crear |
 | PostgreSQL 17 | `kuulis-postgres-qa` · `v12h71ber6ifhpgcugm6adth` | `kuulis-postgres-production` · `pvx2gkfbo18zcld9x55t0tgp` |
 | Redis 7.4 | `kuulis-redis-qa` · `miq3v8c99isk848ps719a7dn` | `kuulis-redis-production` · `mgtsa16kwmktv0jl55belww8` |
 | Backup Postgres | diario 03:00, 7 días | cada 6 h, 14 días |
@@ -54,14 +54,16 @@ Carlos crea en su NPM los proxy hosts `kuulis-qa.top8.uk` y `kuulis-prod.top8.uk
 funcionan (por ejemplo `testqa.top8.uk`), apuntando al Traefik de Coolify. Importante:
 - Activar **Websockets Support** (la app usa `wss://<host>/api/v1/ws`).
 - Reenviar el host original (NPM lo hace por defecto) para que Traefik enrute por dominio.
-- Traefik enruta `/api/*` a la API y todo lo demás a la web pública.
+- Traefik enruta `/api/*` a la API.
+- En QA el admin sigue en el dominio principal (`kuulis-qa.top8.uk`) y la web pública vive en
+  `kuulis.top8.uk`. Ese dominio también apunta a la API en `/api`, así la web la llama en su mismo origen.
 - El admin de QA vive en `admin.top8.uk` (un solo nivel, lo cubre el certificado `*.top8.uk`); el de
   producción está por decidir. La app API tiene también el dominio `https://admin.top8.uk/api`, así el admin
   sigue llamando a la API en su mismo origen, sin CORS.
 
 ### App web en Coolify
 Crear `kuulis-web-<entorno>` desde el UI: repositorio `carlozrodri/kuulis`, rama `qa` o `main`, build pack
-Dockerfile, `base_directory` `/web`, puerto 3000, `watch_paths` `web/**`, dominio `https://<dominio>`.
+Dockerfile, `base_directory` `/web`, puerto 3000, `watch_paths` `web/**`, dominio de la web.
 Variables: `NUXT_PUBLIC_APP_ENV` (`qa`/`production`), `NUXT_PUBLIC_SITE_URL` (`https://<dominio>`),
 `NUXT_API_INTERNAL` (`http://<contenedor de la API>:8000/api/v1`, opcional) y `NUXT_PUBLIC_SUPPORT_EMAIL`.
 
