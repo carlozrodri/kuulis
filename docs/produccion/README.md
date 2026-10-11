@@ -49,6 +49,8 @@ construir. Las preguntas de cada documento están en su sección final.
 
 ## Avance
 - **01** hecho (2026-10-11).
+- **02** hecho en QA (2026-10-11): OSRM y Photon propios, Redis con AOF, Postgres ajustado, commit en `/health`,
+  listas de encendido y de despliegue. Pendiente para producción: dominio propio y VPS de contingencia.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay
@@ -76,7 +78,7 @@ como texto y botón de llamar al 911.
   que 120/min por IP puede bloquear a usuarios legítimos. Ver 05.
 - ~~`DELETE /users/me` solo desactiva la cuenta~~: resuelto en `da5bb1e` (borrado a los 30 días). Ver 07.
 - ~~No hay CI~~: resuelto en 01.
-- **OSRM y Photon** usan los servidores públicos de demostración, que no son para producción. Ver 02.
+- ~~OSRM y Photon usan los servidores públicos de demostración~~: resuelto en 02.
 - **Los enlaces de los emails** (`/verify-email`, `/reset-password`) apuntan a páginas que no existen. Ver 08.
 - **No se guarda el recorrido del viaje**: ante un reporte de seguridad no hay ruta real para revisar. Ver 11.
 - **No hay `expo-updates`**: sin tiendas, hoy no hay forma de que los usuarios reciban una versión nueva. Ver 09.

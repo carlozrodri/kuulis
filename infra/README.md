@@ -1,8 +1,14 @@
 # Infraestructura propia
 
 Servicios que Kuulis aloja en Coolify en vez de usar servidores públicos. Cada carpeta es una app de
-Coolify (build pack Dockerfile, `base_directory` = la carpeta, sin dominio público: la API los llama por la
-red interna de Coolify con su uuid como hostname).
+Coolify (build pack Dockerfile, `base_directory` = la carpeta, sin dominio público). La API los llama por la red
+interna de Coolify con un **alias de red fijo** (Coolify → app → Advanced → Network aliases): `kuulis-osrm` y
+`kuulis-photon`. El uuid no sirve como hostname: el contenedor de una app cambia de nombre en cada despliegue.
+
+| Variable (API y worker) | Valor |
+| --- | --- |
+| `OSRM_URL` | `http://kuulis-osrm:5000` |
+| `PHOTON_URL` | `http://kuulis-photon:2322` |
 
 | Carpeta | Servicio | Puerto | Para qué | RAM en uso |
 | --- | --- | --- | --- | --- |

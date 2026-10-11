@@ -18,8 +18,8 @@ existente de Carlos. No comparte nada con los proyectos NDS ni bidding-market.
 | PostgreSQL 17 | `kuulis-postgres-qa` · `v12h71ber6ifhpgcugm6adth` | `kuulis-postgres-production` · `pvx2gkfbo18zcld9x55t0tgp` |
 | Redis 7.4 | `kuulis-redis-qa` · `miq3v8c99isk848ps719a7dn` | `kuulis-redis-production` · `mgtsa16kwmktv0jl55belww8` |
 | Backup Postgres | diario 03:00, 7 días | cada 6 h, 14 días |
-| OSRM (rutas) | `kuulis-osrm`, compartido (ver `infra/README.md`) | el mismo |
-| Photon (direcciones) | `kuulis-photon`, compartido | el mismo |
+| OSRM (rutas) | `kuulis-osrm` · `nqbbvoaqqvzkthxeq6vts7zc`, compartido (ver `infra/README.md`) | el mismo |
+| Photon (direcciones) | `kuulis-photon` · `owcfbizidzhgftvwksyxqkis`, compartido | el mismo |
 
 Cada app usa `base_directory` (`/api` o `/admin`), su `Dockerfile` y `watch_paths` (`api/**`, `admin/**`),
 así que solo se redepliega lo que cambió. Auto-deploy activado: hacer push a `qa` o `main` despliega.
@@ -116,7 +116,8 @@ porque Coolify hace rolling update y la versión vieja convive unos segundos con
 Orden a seguir; no saltar pasos.
 1. Postgres y Redis de producción con la configuración de arriba; iniciar ambos.
 2. Variables obligatorias de la API y el worker (tabla de arriba) con `APP_ENV=production`,
-   `OSRM_URL=http://<uuid de kuulis-osrm>:5000` y `PHOTON_URL=http://<uuid de kuulis-photon>:2322`.
+   `OSRM_URL=http://kuulis-osrm:5000` y `PHOTON_URL=http://kuulis-photon:2322` (alias de red, ver
+   `infra/README.md`).
 3. Iniciar API, worker y admin; reactivar el auto-deploy.
 4. `GET https://<dominio>/api/health/ready` → `status: ok`, base, Redis, OSRM y Photon en `true`, y el
    commit igual al último de `main`.
