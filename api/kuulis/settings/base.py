@@ -112,6 +112,8 @@ class BaseAppSettings(BaseSettings):
     ALERT_EMAILS: CSVList = []
     # Bearer token for /api/metrics (Prometheus). Empty: the endpoint answers 404.
     METRICS_TOKEN: str = ""
+    # Adds the raw X-Forwarded-For to each request log line, to check what the proxies send.
+    LOG_FORWARDED_FOR: bool = False
 
     # --- Backups (apps/backups) ---------------------------------------------------
     # The worker dumps Postgres every BACKUP_EVERY_MINUTES, encrypted with BACKUP_PASSPHRASE
