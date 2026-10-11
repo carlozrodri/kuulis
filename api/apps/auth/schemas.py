@@ -16,6 +16,8 @@ class RegisterRequest(BaseModel):
     password: str = Field(min_length=8, max_length=128)
     full_name: str = Field(default="", max_length=150)
     locale: Locale = "es"
+    # The sign-up form's "I accept the terms and privacy policy and I am over 18" (doc 07).
+    accept_legal: bool = False
 
 
 class TokenPair(BaseModel):

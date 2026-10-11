@@ -582,7 +582,9 @@
     "referral_driver_only": "Solo los motorizados pueden usar códigos de invitación.",
     "trusted_contact_incomplete": "Escribe el nombre y el teléfono de tu contacto.",
     "account_ride_active": "Termina tu viaje en curso antes de eliminar tu cuenta.",
-    "session_not_found": "Esa sesión ya estaba cerrada"
+    "session_not_found": "Esa sesión ya estaba cerrada",
+    "legal_acceptance_required": "Acepta los términos actualizados para continuar",
+    "legal_document_not_found": "Texto no encontrado"
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -1295,5 +1297,28 @@
     "total_other": "{{count}} viajes en total",
     "rating": "Tu calificación: {{rating}}",
     "recent": "Viajes recientes"
+  },
+  "legal": {
+    "title": "Legal",
+    "kinds": {
+      "terms": "Términos y condiciones",
+      "privacy": "Política de privacidad",
+      "community": "Normas de la comunidad",
+      "driver_terms": "Términos para motorizados",
+      "wallet": "Condiciones de la billetera"
+    },
+    "versionDate": "Versión {{version}} · {{date}}",
+    "acceptTitle": "Antes de empezar",
+    "acceptBody": "Lee y acepta los textos de Kuulis para usar la app.",
+    "updatedTitle": "Actualizamos nuestros términos",
+    "updatedBody": "Revisa los cambios y acéptalos para seguir pidiendo o haciendo viajes.",
+    "read": "Toca para leer",
+    "acceptCheck": "Leí y acepto estos textos",
+    "adultCheck": "Soy mayor de 18 años",
+    "accept": "Aceptar y continuar",
+    "required": "Acepta los términos y confirma que eres mayor de 18 años.",
+    "signUpPrefix": "Acepto los ",
+    "signUpAnd": " y la ",
+    "socialNote": "Si entras con Google o Apple te pediremos aceptar los términos al entrar."
   }
 }

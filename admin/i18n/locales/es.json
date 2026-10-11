@@ -19,7 +19,8 @@
     "audit": "Auditoría",
     "team": "Equipo",
     "roles": "Roles",
-    "approvals": "Aprobaciones"
+    "approvals": "Aprobaciones",
+    "legal": "Legal"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -311,7 +312,8 @@
     "staff_role_not_found": "Ese rol no existe.",
     "approval_not_found": "Solicitud no encontrada",
     "approval_closed": "La solicitud ya se decidió o venció",
-    "approval_own_request": "Otra persona tiene que aprobar tu solicitud"
+    "approval_own_request": "Otra persona tiene que aprobar tu solicitud",
+    "legal_document_not_found": "Texto legal no encontrado"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -1514,6 +1516,9 @@
         "request": "Pidió una aprobación",
         "approve": "Aprobó una solicitud",
         "reject": "Rechazó una solicitud"
+      },
+      "legal": {
+        "publish": "Publicó un texto legal"
       }
     },
     "entities": {
@@ -1534,7 +1539,8 @@
       "file": "Archivo",
       "audit": "Auditoría",
       "staff_role": "Rol del equipo",
-      "approval": "Aprobación"
+      "approval": "Aprobación",
+      "legal": "Legal"
     }
   },
   "team": {
@@ -1615,6 +1621,42 @@
       "notification": {
         "broadcast": "Notificación masiva"
       }
+    }
+  },
+  "legal": {
+    "help": "Textos legales que ven los usuarios en la app. Cada versión se publica en español e inglés. Si marcas que exige aceptar de nuevo, nadie puede pedir ni aceptar viajes hasta aceptarla. Los borradores actuales están pendientes de revisión de un abogado.",
+    "current": "Versión {version} · {date}",
+    "none": "Sin publicar",
+    "read": "Ver",
+    "publish": "Publicar versión nueva",
+    "history": "Versiones ({n})",
+    "reaccept": "Exige aceptar de nuevo",
+    "who": {
+      "terms": "Lo aceptan todos los usuarios.",
+      "privacy": "Lo aceptan todos los usuarios.",
+      "community": "Se enlaza desde los términos; no se acepta aparte.",
+      "driver_terms": "Lo aceptan los motorizados.",
+      "wallet": "Lo aceptan los motorizados."
+    },
+    "publishTitle": "Publicar {kind}",
+    "publishHelp": "Se publica como la versión siguiente en los dos idiomas. Las versiones anteriores quedan guardadas.",
+    "title_es": "Título (español)",
+    "title_en": "Título (inglés)",
+    "body_es": "Texto en Markdown (español)",
+    "body_en": "Texto en Markdown (inglés)",
+    "summary": "Qué cambió",
+    "summaryHelp": "Lo ven los usuarios en la pantalla «Actualizamos nuestros términos».",
+    "reacceptLabel": "Exige aceptar de nuevo",
+    "reacceptHelp": "Úsalo para cambios importantes. Los cambios menores (erratas, aclaraciones) no lo necesitan.",
+    "published": "Versión {version} publicada",
+    "acceptances": "Textos legales aceptados",
+    "noAcceptances": "Todavía no aceptó ningún texto.",
+    "kinds": {
+      "terms": "Términos y condiciones",
+      "privacy": "Política de privacidad",
+      "community": "Normas de la comunidad",
+      "driver_terms": "Términos para motorizados",
+      "wallet": "Condiciones de la billetera"
     }
   }
 }

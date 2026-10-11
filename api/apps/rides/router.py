@@ -5,6 +5,7 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Depends, Query, Request, status
 
 from apps.audit.services import audit
+from apps.legal.dependencies import LegalAccepted
 from apps.rides import events, presence, services, stats
 from apps.rides.models import Ride, RideStatus
 from apps.rides.schemas import (
@@ -55,7 +56,12 @@ async def quote(
     return await services.create_quote(session, user, data)
 
 
-@router.post("", response_model=RideRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=RideRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[LegalAccepted],
+)
 @limiter.limit("6/minute")
 async def create_ride(
     request: Request, data: RideCreate, user: CurrentUser, session: DBSession
@@ -114,7 +120,7 @@ async def cancel(
 # --- Driver ------------------------------------------------------------------------------------
 
 
-@router.post("/{ride_id}/accept", response_model=RideRead)
+@router.post("/{ride_id}/accept", response_model=RideRead, dependencies=[LegalAccepted])
 async def accept(ride_id: uuid.UUID, user: CurrentUser, session: DBSession) -> RideRead:
     ride = await services.accept(session, user, ride_id)
     return await _read(session, ride, user)
@@ -143,7 +149,7 @@ async def complete(ride_id: uuid.UUID, user: CurrentUser, session: DBSession) ->
     return await _read(session, ride, user)
 
 
-@driver_router.post("/online", response_model=DriverState)
+@driver_router.post("/online", response_model=DriverState, dependencies=[LegalAccepted])
 async def go_online(data: GoOnline, user: CurrentUser, session: DBSession) -> DriverState:
     return await services.go_online(session, user, data.lat, data.lng)
 

@@ -108,10 +108,13 @@ def register(base_url: str, stamp: str) -> tuple[Api, Api]:
                 "email": f"smoke+{who}-{stamp}@example.com",
                 "password": PASSWORD,
                 "full_name": f"Smoke {who.capitalize()}",
+                "accept_legal": True,
             },
         )
         api.token = body["access_token"]
         api.user_id = body["user"]["id"]
+        if who == "driver":  # drivers also accept their terms and the wallet conditions (doc 07)
+            api.call("POST", "/legal/accept", json={"kinds": ["driver_terms", "wallet"]})
         users.append(api)
     return users[0], users[1]
 

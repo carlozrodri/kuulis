@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import i18n from '@/i18n';
-import { api, setSessionExpiredHandler, tokens } from '@/lib/api';
+import { api, setLegalRequiredHandler, setSessionExpiredHandler, tokens } from '@/lib/api';
 import { googleSignOut } from '@/lib/social';
 import type { AuthResponse, User } from '@/lib/types';
 
@@ -10,7 +10,7 @@ type AuthContextValue = {
   user: User | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string, acceptLegal: boolean) => Promise<void>;
   /** Exchanges a Google / Apple id token for a Kuulis session (POST /auth/social/{provider}). */
   signInWithGoogle: (idToken: string) => Promise<void>;
   signInWithApple: (idToken: string, fullName: string | null) => Promise<void>;
@@ -40,6 +40,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   // Restore the session on app start.
   useEffect(() => {
     setSessionExpiredHandler(() => void clear());
+    // Shows the acceptance screen: the root navigator follows user.pending_legal.
+    setLegalRequiredHandler((kinds) => setUser((current) => (current ? { ...current, pending_legal: kinds } : current)));
     (async () => {
       try {
         const { refreshToken } = await tokens.load();
@@ -61,11 +63,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
           await api<AuthResponse>('/auth/login', { method: 'POST', body: { email, password }, auth: false }),
         );
       },
-      signUp: async (email, password, fullName) => {
+      signUp: async (email, password, fullName, acceptLegal) => {
         await applySession(
           await api<AuthResponse>('/auth/register', {
             method: 'POST',
-            body: { email, password, full_name: fullName, locale: i18n.language },
+            body: { email, password, full_name: fullName, locale: i18n.language, accept_legal: acceptLegal },
             auth: false,
           }),
         );

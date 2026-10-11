@@ -21,6 +21,8 @@ export interface User {
   trusted_contact_phone?: string | null;
   /** Phase 1E: the account suspension in force, null when there is none (older servers omit it). */
   suspension?: Suspension | null;
+  /** Doc 07: legal texts this user still has to accept (older servers omit it). */
+  pending_legal?: string[] | null;
 }
 
 export interface TokenPair {

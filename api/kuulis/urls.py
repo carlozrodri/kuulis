@@ -13,6 +13,7 @@ from apps.files.router import router as files_router
 from apps.geo.router import router as geo_router
 from apps.health.client_errors import router as client_errors_router
 from apps.health.router import router as health_router
+from apps.legal.router import router as legal_router
 from apps.moderation.router import admin_router as moderation_admin_router
 from apps.moderation.router import router as moderation_router
 from apps.monitoring.router import metrics_router
@@ -39,6 +40,7 @@ api_v1 = APIRouter()
 api_v1.include_router(auth_router)
 api_v1.include_router(places_router)
 api_v1.include_router(users_router)
+api_v1.include_router(legal_router)
 api_v1.include_router(referrals_router)
 api_v1.include_router(notifications_router)
 api_v1.include_router(files_router)

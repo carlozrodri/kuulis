@@ -297,7 +297,12 @@ async def user_reads(
 
 
 async def user_read(session: AsyncSession, user: User, *, staff_view: bool = False) -> UserRead:
-    return (await user_reads(session, [user], staff_view=staff_view))[0]
+    from apps.legal import services as legal
+
+    read = (await user_reads(session, [user], staff_view=staff_view))[0]
+    if not staff_view:
+        read.pending_legal = await legal.pending(session, user)
+    return read
 
 
 # --- Reports: users ----------------------------------------------------------------------------

@@ -23,6 +23,7 @@ export class ApiError extends Error {
 let accessToken: string | null = null;
 let refreshPromise: Promise<boolean> | null = null;
 let onSessionExpired: (() => void) | null = null;
+let onLegalRequired: ((kinds: string[]) => void) | null = null;
 let currentLocale = 'es';
 
 export const tokens = {
@@ -49,6 +50,11 @@ export const tokens = {
 
 export function setSessionExpiredHandler(handler: () => void) {
   onSessionExpired = handler;
+}
+
+/** Ride actions answer 409 legal_acceptance_required after new terms are published (doc 07). */
+export function setLegalRequiredHandler(handler: (kinds: string[]) => void) {
+  onLegalRequired = handler;
 }
 
 export function setApiLocale(locale: string) {
@@ -113,6 +119,7 @@ export async function api<T>(path: string, options: RequestOptions = {}, retried
   if (!response.ok) {
     const payload = await response.json().catch(() => null);
     const error = payload?.error;
+    if (error?.code === 'legal_acceptance_required') onLegalRequired?.(error.details?.kinds ?? []);
     throw new ApiError(
       response.status,
       error?.code ?? `http_${response.status}`,

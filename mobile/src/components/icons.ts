@@ -103,3 +103,4 @@ export { default as Ellipsis } from 'lucide-react-native/icons/ellipsis';
 export { default as UserPlus } from 'lucide-react-native/icons/user-plus';
 export { default as HeartHandshake } from 'lucide-react-native/icons/heart-handshake';
 export { default as Ticket } from 'lucide-react-native/icons/ticket';
+export { default as ScrollText } from 'lucide-react-native/icons/scroll-text';

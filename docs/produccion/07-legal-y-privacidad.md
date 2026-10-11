@@ -96,3 +96,32 @@ de Carlos al operar sin empresa registrada.
 1. ¿Tienes un abogado venezolano que revise los textos? Claude prepara el borrador.
 2. ¿Edad mínima del pasajero: 18? Recomendado: 18 (menores con un adulto, sin cuenta propia).
 3. ¿Plazo de 14 días antes de eliminar? Recomendado: sí.
+
+## Decidido (2026-10-11)
+1. Claude redacta los borradores; la revisión del abogado queda pendiente (`docs/pending.md`).
+2. Edad mínima del pasajero: 18 años.
+3. Espera antes de borrar la cuenta: **30 días**, como ya estaba implementado (en lugar de los 14 del borrador).
+4. Se entrega en dos partes: (1) textos legales versionados y su aceptación; (2) eliminación, descarga de
+   datos, retención y consentimientos.
+
+## Cómo quedó
+### Parte 1 (2026-10-11)
+- Borradores en español e inglés en `api/apps/legal/texts/`: términos y condiciones, política de privacidad,
+  normas de la comunidad, términos para motorizados y condiciones de la billetera. Cada uno avisa que está
+  pendiente de revisión legal y deja entre corchetes los datos que faltan. La migración los publica como
+  versión 1.
+- Tablas `legal_documents` (tipo, versión, idioma, título, texto en Markdown, qué cambió, si exige aceptar de
+  nuevo, fecha) y `legal_acceptances` (usuario, tipo, versión, fecha, IP y plataforma).
+- `GET /legal` y `GET /legal/{kind}?locale=` públicos; `POST /legal/accept`; `GET /users/me` trae
+  `pending_legal`. Pasajeros aceptan términos y privacidad; quien tiene ficha de motorizado también los términos
+  de motorizado y la billetera. El equipo (staff y admin) no acepta nada.
+- Pedir un viaje, aceptar un viaje y conectarse responden 409 `legal_acceptance_required` con
+  `details.kinds` mientras falte aceptar algo.
+- `POST /auth/register` acepta `accept_legal: true` y guarda la aceptación con IP y plataforma.
+- App: casillas obligatorias en el registro (acepto términos y privacidad, con enlaces; soy mayor de 18),
+  pantalla bloqueante «Antes de empezar» / «Actualizamos nuestros términos» (también tras entrar con Google o
+  Apple), lector de textos dentro de la app y sección **Legal** en el perfil.
+- Admin: página **Legal** (solo admin) con la versión vigente de cada texto, su historial, lectura en los dos
+  idiomas y publicación de una versión nueva (con «qué cambió» y si exige aceptar de nuevo; queda en la
+  auditoría como `legal.publish`). La ficha de cada usuario muestra qué versiones aceptó, cuándo y desde dónde.
+- Las licencias de código abierto y la web pública (08) quedan para cuando se haga el doc 08.
