@@ -70,7 +70,7 @@ Un sitio público, rápido y bonito, que sea la casa de Kuulis fuera de la app: 
 2. ¿Tienes logo final? Si no, se usa el logotipo tipográfico actual.
 
 ## Decidido (2026-10-11)
-1. El admin pasa a `admin.<dominio>`; la web ocupa el dominio principal y la API sigue en `/api`.
+1. El admin pasa a su propio subdominio (`admin.top8.uk` en QA, por pedido de Carlos); la web ocupa el dominio principal y la API sigue en `/api`.
 2. Sin logo final: se usa el logotipo tipográfico actual («kuulis» con el punto amarillo).
 3. Se entrega por partes: (1) la web con lo que ya existe; viaje compartido, ayuda, analítica y estado se
    suman al implementar 11, 13, 19 y 03.
