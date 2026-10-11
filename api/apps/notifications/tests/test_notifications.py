@@ -1,3 +1,6 @@
+from conftest import set_config
+
+
 async def test_register_device_is_idempotent(client, user_headers):
     payload = {"push_token": "ExponentPushToken[abc123xyz]", "platform": "ios"}
     first = await client.post("/api/v1/notifications/devices", json=payload, headers=user_headers)
@@ -25,6 +28,7 @@ async def test_staff_sends_notification_to_user(client, staff_headers, user_head
 
 
 async def test_broadcast_reaches_all_active_users(client, staff_headers, user_headers):
+    await set_config(approval_broadcasts=False)
     response = await client.post(
         "/api/v1/notifications/send", json={"title": "Aviso"}, headers=staff_headers
     )

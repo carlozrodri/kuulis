@@ -2,12 +2,16 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from apps.approvals import services as approvals
+from apps.approvals.schemas import ApprovalHeld
 from apps.audit.services import audit, note, snapshot
 from apps.config.services import get_app_config
 from apps.subscriptions import services as subscriptions
 from apps.subscriptions.schemas import ChargeRead
+from apps.users import services as users
 from apps.users.dependencies import Can, CurrentUser, DBSession
 from apps.users.models import User
 from apps.wallet import services
@@ -245,13 +249,27 @@ async def admin_entries(
     dependencies=[audit("wallet.adjust", "wallet", "user_id")],
     response_model=WalletEntryRead,
     status_code=201,
+    responses={202: {"model": ApprovalHeld, "description": "Waiting for a second approval"}},
 )
 async def adjust(
     user_id: uuid.UUID,
     data: Adjustment,
     admin: Can("wallet.adjust", verified=True),
     session: DBSession,
-) -> WalletEntryRead:
+) -> WalletEntryRead | JSONResponse:
+    if await approvals.required(session, "wallet.adjust", amount=data.amount):
+        await services.require_driver(session, user_id)
+        target = await users.get_or_404(session, user_id)
+        return await approvals.hold(
+            session,
+            admin,
+            "wallet.adjust",
+            entity_type="wallet",
+            entity_id=user_id,
+            summary=f"{data.amount:+.2f} USD · {target.full_name or target.email}",
+            payload={"user_id": str(user_id), "amount": str(data.amount), "reason": data.reason},
+            reason=data.reason,
+        )
     before = await services.get_balance(session, user_id)
     entry = await services.adjust(session, admin, user_id, data.amount, data.reason)
     note(

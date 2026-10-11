@@ -1,6 +1,7 @@
 from apps.config import services
 from apps.config.models import AppSetting
 from apps.config.schemas import AppConfig
+from conftest import set_config
 from kuulis.core.cache import cache_get
 from kuulis.core.db import SessionLocal
 
@@ -43,6 +44,9 @@ DEFAULTS = {
     "transfer_monthly_limit": "50.00",
     "subscription_free_months": 3,
     "subscription_grace_days": 7,
+    "approval_adjust_limit": "20.00",
+    "approval_fares": True,
+    "approval_broadcasts": True,
 }
 
 
@@ -106,6 +110,7 @@ async def test_admin_config_validation(client, admin_headers):
 
 
 async def test_admin_updates_ride_config(client, admin_headers):
+    await set_config(approval_fares=False)
     response = await client.patch(
         "/api/v1/admin/config",
         json={

@@ -18,7 +18,8 @@
     "system": "System",
     "audit": "Audit log",
     "team": "Team",
-    "roles": "Roles"
+    "roles": "Roles",
+    "approvals": "Approvals"
   },
   "auth": {
     "title": "Admin sign in",
@@ -307,7 +308,10 @@
     "invite_invalid": "This invitation is no longer valid. Ask for a new one.",
     "token_used": "This link was already used.",
     "staff_role_exists": "A role with that name already exists.",
-    "staff_role_not_found": "That role does not exist."
+    "staff_role_not_found": "That role does not exist.",
+    "approval_not_found": "Request not found",
+    "approval_closed": "The request was already decided or expired",
+    "approval_own_request": "Someone else has to approve your request"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -437,7 +441,8 @@
       "accountName": "The account name is required (at most {max} characters).",
       "transferLimit": "Transfer limit: between 0 and {max} USDT.",
       "freeMonths": "Free months: whole number between {min} and {max}.",
-      "graceDays": "Grace days: whole number between {min} and {max}."
+      "graceDays": "Grace days: whole number between {min} and {max}.",
+      "approvalLimit": "Four-eyes limit: between 0 and {max} USD."
     },
     "fares": {
       "title": "Fares",
@@ -524,6 +529,16 @@
       "graceDays": "Grace days",
       "graceDaysHelp": "Days to pay after the charge before being blocked.",
       "tiersHint": "Fee tiers are edited in"
+    },
+    "approvals": {
+      "title": "Four-eyes approval",
+      "help": "Actions one person proposes and another approves in Approvals. While there is only one admin, nobody can approve fares and fee schedules: turn it off here if needed.",
+      "adjustLimit": "Balance adjustments above (USD)",
+      "adjustLimitHelp": "Adjustments above this amount, credit or debit, wait for approval. 0 turns it off.",
+      "fares": "Fares and subscription fee schedules",
+      "faresHelp": "Fare or rounding changes in Settings and new fee schedules. Only another admin can approve them.",
+      "broadcasts": "Mass notifications",
+      "broadcastsHelp": "Notifications to everyone or a whole role. Single-user ones go out right away."
     }
   },
   "paymentMethods": {
@@ -1494,6 +1509,11 @@
       "staff": {
         "invite": "Invited someone to the team",
         "update": "Changed a team member"
+      },
+      "approval": {
+        "request": "Asked for an approval",
+        "approve": "Approved a request",
+        "reject": "Rejected a request"
       }
     },
     "entities": {
@@ -1513,7 +1533,8 @@
       "finance": "Finance",
       "file": "File",
       "audit": "Audit",
-      "staff_role": "Team role"
+      "staff_role": "Team role",
+      "approval": "Approval"
     }
   },
   "team": {
@@ -1551,5 +1572,49 @@
     "done": "Done, your password is set. You can sign in now.",
     "goLogin": "Go to sign in",
     "noToken": "The link is incomplete. Ask for a new invitation."
+  },
+  "approvals": {
+    "help": "High-impact changes waiting for a second person: large balance adjustments, fares and fee schedules, and mass notifications. Whoever asks for a change cannot approve it. Requests expire after 48 hours.",
+    "all": "All",
+    "empty": "No requests.",
+    "date": "Date",
+    "request": "Request",
+    "requester": "Requested by",
+    "state": "Status",
+    "reason": "Reason",
+    "detail": "Show data",
+    "expires": "Expires {date}",
+    "waitingOther": "Waiting for someone else",
+    "open": "Open",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveTitle": "Approve request",
+    "rejectTitle": "Reject request",
+    "approveHint": "The change is applied now, on behalf of {email}.",
+    "note": "Comment (optional)",
+    "rejectNote": "Reason for rejecting",
+    "approved": "Request approved and applied",
+    "rejected": "Request rejected",
+    "held": "Sent for approval: someone else has to approve it",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "actions": {
+      "wallet": {
+        "adjust": "Balance adjustment"
+      },
+      "fee_schedule": {
+        "create": "New subscription fee schedule"
+      },
+      "config": {
+        "update": "Fare change"
+      },
+      "notification": {
+        "broadcast": "Mass notification"
+      }
+    }
   }
 }

@@ -23,6 +23,7 @@ export const NAV: NavEntry[] = [
   { key: 'finance', icon: 'i-lucide-landmark', to: '/finance', permission: 'finance.view' },
   { key: 'system', icon: 'i-lucide-activity', to: '/system', permission: 'system.view' },
   { key: 'notifications', icon: 'i-lucide-bell', to: '/notifications', permission: 'notifications.send' },
+  { key: 'approvals', icon: 'i-lucide-stamp', to: '/approvals' },
   { key: 'team', icon: 'i-lucide-users-round', to: '/team', adminOnly: true },
   { key: 'roles', icon: 'i-lucide-shield-check', to: '/roles', adminOnly: true },
   { key: 'audit', icon: 'i-lucide-scroll-text', to: '/audit', adminOnly: true },

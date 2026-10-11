@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AppConfig, DocumentKind, VehicleType } from '~/types/api'
+import type { AppConfig, ApprovalHeld, DocumentKind, VehicleType } from '~/types/api'
 import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/types/api'
 import type { MapRectangle } from '~/utils/geo'
 import type { SettingsForm } from '~/utils/settings'
@@ -11,6 +11,7 @@ const { request } = useApi()
 const auth = useAuth()
 const toast = useToast()
 const apiError = useApiError()
+const approvals = useApprovalCount()
 
 const { data: config, status, error } = await useAsyncData('app-config', () => request<AppConfig>('/admin/config'))
 
@@ -64,7 +65,14 @@ async function save() {
   saving.value = true
   try {
     // Only the keys that changed: never overwrite settings this screen did not touch.
-    config.value = await request<AppConfig>('/admin/config', { method: 'PATCH', body: changes.value })
+    const result = await request<AppConfig | ApprovalHeld>('/admin/config', { method: 'PATCH', body: changes.value })
+    if (isHeld(result)) {
+      // Nothing changed yet: show the saved values again until someone approves.
+      reset()
+      await approvals.notifyHeld(result)
+      return
+    }
+    config.value = result
     toast.add({ title: t('common.saved'), color: 'success' })
   }
   catch (err) {
@@ -807,6 +815,45 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
                 >{{ t('nav.subscriptions') }}</NuxtLink>
               </p>
             </div>
+          </div>
+        </UCard>
+
+        <!-- Doc 06: four-eyes approvals -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.approvals.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.approvals.help') }}
+            </p>
+          </template>
+          <div class="space-y-4">
+            <UFormField
+              :label="t('settings.approvals.adjustLimit')"
+              :help="t('settings.approvals.adjustLimitHelp')"
+            >
+              <UInputNumber
+                v-model="form.approval_adjust_limit"
+                :min="0"
+                :max="APPROVAL_LIMIT_MAX"
+                :step="5"
+                :format-options="moneyFormat"
+                :disabled="readOnly"
+              />
+            </UFormField>
+            <USwitch
+              v-model="form.approval_fares"
+              :label="t('settings.approvals.fares')"
+              :description="t('settings.approvals.faresHelp')"
+              :disabled="readOnly"
+            />
+            <USwitch
+              v-model="form.approval_broadcasts"
+              :label="t('settings.approvals.broadcasts')"
+              :description="t('settings.approvals.broadcastsHelp')"
+              :disabled="readOnly"
+            />
           </div>
         </UCard>
 
