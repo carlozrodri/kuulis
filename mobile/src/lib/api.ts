@@ -1,13 +1,17 @@
 import { Platform } from 'react-native';
 
+import { APP_VERSION_HEADERS } from './appVersion';
 import { config } from './config';
 import { secureStorage } from './storage';
 import type { TokenPair } from './types';
 
 const ACCESS_KEY = 'kuulis.access_token';
 const REFRESH_KEY = 'kuulis.refresh_token';
-/** Lets the API label this device in the session list (Perfil → Sesiones activas). */
-const CLIENT_HEADERS = { 'X-Client-Platform': Platform.OS };
+/**
+ * X-Client-Platform lets the API label this device in the session list (Perfil → Sesiones activas); the
+ * X-App-* headers say which build is talking (doc 09: builds in use, mandatory updates).
+ */
+const CLIENT_HEADERS = { 'X-Client-Platform': Platform.OS, ...APP_VERSION_HEADERS };
 
 export class ApiError extends Error {
   constructor(
@@ -24,6 +28,7 @@ let accessToken: string | null = null;
 let refreshPromise: Promise<boolean> | null = null;
 let onSessionExpired: (() => void) | null = null;
 let onLegalRequired: ((kinds: string[]) => void) | null = null;
+let onUpdateRequired: ((minimumBuild: number) => void) | null = null;
 let currentLocale = 'es';
 
 export const tokens = {
@@ -55,6 +60,11 @@ export function setSessionExpiredHandler(handler: () => void) {
 /** Ride actions answer 409 legal_acceptance_required after new terms are published (doc 07). */
 export function setLegalRequiredHandler(handler: (kinds: string[]) => void) {
   onLegalRequired = handler;
+}
+
+/** Ride actions answer 426 app_update_required when this build is below the newest mandatory release (doc 09). */
+export function setUpdateRequiredHandler(handler: (minimumBuild: number) => void) {
+  onUpdateRequired = handler;
 }
 
 export function setApiLocale(locale: string) {
@@ -120,6 +130,7 @@ export async function api<T>(path: string, options: RequestOptions = {}, retried
     const payload = await response.json().catch(() => null);
     const error = payload?.error;
     if (error?.code === 'legal_acceptance_required') onLegalRequired?.(error.details?.kinds ?? []);
+    if (error?.code === 'app_update_required') onUpdateRequired?.(Number(error.details?.minimum_build) || 0);
     throw new ApiError(
       response.status,
       error?.code ?? `http_${response.status}`,

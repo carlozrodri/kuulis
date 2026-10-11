@@ -1,12 +1,13 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Header, Query, status
 
 from apps.audit.services import audit, note, snapshot
 from apps.auth import services as auth
 from apps.auth import totp
 from apps.moderation import services as moderation
+from apps.releases import services as releases
 from apps.rides import presence
 from apps.staff.services import permissions_of
 from apps.users import services
@@ -30,12 +31,20 @@ from apps.users.schemas import (
 )
 from kuulis.core.exceptions import PermissionDeniedError
 from kuulis.core.pagination import Page, PageParams, page_params
+from kuulis.core.redis import redis_client
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/me", response_model=UserRead)
-async def read_me(user: CurrentUser, session: DBSession) -> UserRead:
+async def read_me(
+    user: CurrentUser,
+    session: DBSession,
+    x_app_platform: Annotated[str | None, Header()] = None,
+    x_app_build: Annotated[str | None, Header()] = None,
+) -> UserRead:
+    # The apps load the profile on start: a cheap place to count which builds are in use (doc 09).
+    await releases.record_usage(redis_client, x_app_platform, x_app_build, user.id)
     read = await moderation.user_read(session, user)
     if user.can_access_admin:
         read.permissions = sorted(await permissions_of(session, user))

@@ -66,6 +66,9 @@ construir. Las preguntas de cada documento están en su sección final.
 - **08** parte 1 hecha (2026-10-11): web pública `web/` (inicio, motorizados, descargar, legal, verificar email
   y cambiar contraseña, Open Graph, sitemap) en el dominio principal; el admin pasa a `admin.<dominio>`. Faltan
   viaje compartido (11), ayuda (13), analítica (19) y enlace de estado (03), que se suman con esos documentos.
+- **09** parte 1 hecha (2026-10-11): versiones del APK publicadas desde el admin, aviso y actualización dentro
+  de la app, versión mínima obligatoria (426 en acciones de viaje) y página Descargar con el APK real. Faltan
+  las OTA con servidor propio (parte 2) y la PWA para iPhone (parte 3).
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay
@@ -96,7 +99,7 @@ como texto y botón de llamar al 911.
 - ~~OSRM y Photon usan los servidores públicos de demostración~~: resuelto en 02.
 - ~~Los enlaces de los emails apuntan a páginas que no existen~~: resuelto en 08 (web pública).
 - **No se guarda el recorrido del viaje**: ante un reporte de seguridad no hay ruta real para revisar. Ver 11.
-- **No hay `expo-updates`**: sin tiendas, hoy no hay forma de que los usuarios reciban una versión nueva. Ver 09.
+- ~~Sin tiendas no hay forma de que los usuarios reciban una versión nueva~~: la app ya se actualiza sola con APKs (09 parte 1); las OTA vienen en la parte 2.
 - **Los documentos del motorizado no tienen fecha de vencimiento** (licencia, certificado médico). Ver 12.
 - **Los reportes no tienen conversación**: el usuario solo recibe la resolución final. Ver 13.
 - **Acciones del admin sin auditoría** y solo dos roles (`staff`, `admin`). Ver 06.

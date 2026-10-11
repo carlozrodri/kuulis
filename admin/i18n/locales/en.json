@@ -21,7 +21,8 @@
     "roles": "Roles",
     "approvals": "Approvals",
     "legal": "Legal",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "versions": "Versions"
   },
   "auth": {
     "title": "Admin sign in",
@@ -144,7 +145,8 @@
       "wallet": "Balances and top-ups",
       "subscriptions": "Subscriptions",
       "finance": "Finance",
-      "system": "System"
+      "system": "System",
+      "releases": "App versions"
     },
     "permissions": {
       "users": {
@@ -205,6 +207,10 @@
       },
       "config": {
         "view": "View settings"
+      },
+      "releases": {
+        "view": "See app versions",
+        "manage": "Publish, withdraw and mark versions mandatory"
       }
     }
   },
@@ -314,7 +320,11 @@
     "approval_not_found": "Request not found",
     "approval_closed": "The request was already decided or expired",
     "approval_own_request": "Someone else has to approve your request",
-    "legal_document_not_found": "Legal text not found"
+    "legal_document_not_found": "Legal text not found",
+    "build_not_found": "That build is no longer in storage",
+    "release_exists": "That build is already published in that channel",
+    "storage_unavailable": "File storage is not answering; try again in a moment.",
+    "storage_disabled": "File storage is not configured in this environment."
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -1521,6 +1531,10 @@
       },
       "legal": {
         "publish": "Published a legal text"
+      },
+      "app_release": {
+        "publish": "Published an app version",
+        "update": "Changed an app version"
       }
     },
     "entities": {
@@ -1542,7 +1556,8 @@
       "audit": "Audit",
       "staff_role": "Team role",
       "approval": "Approval",
-      "legal": "Legal"
+      "legal": "Legal",
+      "app_release": "App version"
     }
   },
   "team": {
@@ -1686,5 +1701,67 @@
     "userErased": "Account deleted on {date}: its personal data is already erased.",
     "userScheduled": "Deletion scheduled for {date}",
     "userScheduledHelp": "Asked for on {date}. Signing in to the app before then restores the account."
+  },
+  "versions": {
+    "help": "Versions of the Android app (APK) offered to users. The app and the website offer the newest version of their channel that is not withdrawn. Withdrawing a version offers the previous one again; marking it mandatory stops older builds from requesting or accepting rides until they update.",
+    "releases": "Published versions",
+    "builds": "Available builds",
+    "buildsHelp": "APKs the compiler uploaded for this environment, newest first.",
+    "usage": "Usage per build",
+    "usageHelp": "Distinct people who used each build in the last 7 days.",
+    "allChannels": "All channels",
+    "channel": "Channel",
+    "channels": {
+      "qa": "QA",
+      "beta": "Beta",
+      "production": "Production"
+    },
+    "version": "Version",
+    "build": "Build {build}",
+    "buildCol": "Build",
+    "published": "Published",
+    "by": "by {email}",
+    "size": "Size",
+    "state": "State",
+    "notes": "Notes",
+    "mandatory": "Mandatory",
+    "optional": "Optional",
+    "active": "Active",
+    "current": "Offered now",
+    "withdrawn": "Withdrawn {date}",
+    "download": "Download APK",
+    "markMandatory": "Mark mandatory",
+    "unmarkMandatory": "Make optional",
+    "withdraw": "Withdraw",
+    "restore": "Restore",
+    "editNotes": "Edit notes",
+    "builtAt": "Built {date}",
+    "commit": "Commit {commit}",
+    "publishedIn": "Published in",
+    "notPublished": "Not published",
+    "copy": "Copy SHA-256",
+    "copied": "SHA-256 copied",
+    "publish": "Publish",
+    "publishTitle": "Publish {version} ({build})",
+    "publishHelp": "The app and the website will offer this build to whoever uses the chosen channel.",
+    "channelHelp": "QA: testing team. Beta: invited testers. Production: every user.",
+    "notesHelp": "What changed. Users see it when updating.",
+    "mandatoryLabel": "Mandatory",
+    "mandatoryHelp": "People on an older build of this channel will not be able to request or accept rides until they update. Use it only for critical fixes or incompatible changes.",
+    "publishedToast": "Version {version} published in {channel}",
+    "updated": "Version updated",
+    "users": "Users (7 days)",
+    "latestIn": "Newest in {channel}",
+    "confirmMandatoryTitle": "Mark {version} ({build}) as mandatory",
+    "confirmMandatory": "People on an older build in the {channel} channel will not be able to request or accept rides until they update to this version.",
+    "confirmOptionalTitle": "Make {version} ({build}) optional",
+    "confirmOptional": "Older builds can be used again, unless another mandatory version blocks them.",
+    "confirmWithdrawTitle": "Withdraw {version} ({build})",
+    "confirmWithdraw": "It stops being offered in the {channel} channel: the previous version is offered again. People who already installed it keep it. If it was mandatory, it stops blocking older builds.",
+    "confirmRestoreTitle": "Restore {version} ({build})",
+    "confirmRestore": "It is offered again in the {channel} channel (if it is the newest build) and, if mandatory, blocks older builds again.",
+    "notesTitle": "Notes for {version} ({build})",
+    "platform": "Platform",
+    "actions": "Actions"
   }
 }

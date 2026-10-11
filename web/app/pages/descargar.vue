@@ -1,5 +1,18 @@
 <script setup lang="ts">
-const { t } = useI18n()
+import type { VersionCheck } from '~/utils/types'
+
+const { t, locale } = useI18n()
+const { request } = useApi()
+const { public: { apiBase } } = useRuntimeConfig()
+
+// The newest APK published for this environment (doc 09); "coming soon" until there is one.
+const { data: check } = await useAsyncData('app-version', () =>
+  request<VersionCheck>('/app/version').catch(() => null),
+)
+const release = computed(() => check.value?.latest ?? null)
+const sizeMb = computed(() => (release.value ? (release.value.size / 1_000_000).toFixed(1) : ''))
+// Redirects to a short-lived link to the file in storage.
+const downloadUrl = `${apiBase}/app/download`
 
 useSeoMeta({
   title: () => t('download.metaTitle'),
@@ -23,7 +36,37 @@ const isIphone = /iPhone|iPad|iPod/i.test(agent)
         {{ t('download.lead') }}
       </p>
 
-      <div class="card soon">
+      <div
+        v-if="release"
+        class="card release"
+      >
+        <a
+          class="btn btn-accent"
+          :href="downloadUrl"
+          rel="nofollow"
+        >{{ t('download.button') }}</a>
+        <p class="meta">
+          {{ t('download.meta', { version: release.version, build: release.build, size: sizeMb, date: formatDay(release.created_at, locale) }) }}
+        </p>
+        <p
+          v-if="release.notes"
+          class="muted"
+        >
+          {{ release.notes }}
+        </p>
+        <details class="fingerprint">
+          <summary>{{ t('download.fingerprint') }}</summary>
+          <p class="muted small">
+            {{ t('download.fingerprintHelp') }}
+          </p>
+          <code>{{ release.sha256 }}</code>
+        </details>
+      </div>
+
+      <div
+        v-else
+        class="card soon"
+      >
         <h2>{{ t('download.soon.title') }}</h2>
         <p class="muted">
           {{ t('download.soon.body') }}
@@ -62,6 +105,29 @@ const isIphone = /iPhone|iPad|iPod/i.test(agent)
 .lead {
   font-size: 1.2rem;
   color: var(--muted);
+}
+
+.release {
+  margin-bottom: 16px;
+}
+
+.meta {
+  margin: 12px 0 4px;
+  font-weight: 600;
+}
+
+.fingerprint summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.fingerprint code {
+  display: block;
+  word-break: break-all;
+  font-size: 0.85rem;
+  padding: 8px;
+  background: var(--surface-alt);
+  border-radius: 8px;
 }
 
 .soon {

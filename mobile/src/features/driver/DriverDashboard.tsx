@@ -11,6 +11,7 @@ import { showToast } from '@/components/Toast';
 import { Button, Card, IconTile, Notice, Sheet, Skeleton, StatusPill, Txt } from '@/components/ui';
 import { SuspendedPanel } from '@/features/account/SuspendedPanel';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
+import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { useWalletFormat } from '@/features/wallet/format';
 import { EarningsCard, goToTopUp } from '@/features/wallet/SubscriptionCard';
 import { getFreshPosition, requestLocationPermission, useUserLocation } from '@/hooks/useLocation';
@@ -200,6 +201,8 @@ export function DriverDashboard() {
           ) : null}
 
           {fee === 'pending' && summary && !blocked ? <PendingFeeNotice summary={summary} /> : null}
+
+          <UpdateBanner />
 
           {permission !== 'granted' && !(blocked && !online) && !suspended ? <LocationPrompt variant="driver" /> : null}
 

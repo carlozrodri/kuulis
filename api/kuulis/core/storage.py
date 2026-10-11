@@ -138,3 +138,19 @@ def delete_objects(keys: list[str]) -> bool:
     except Exception:
         logger.warning("Could not delete %s storage objects", len(keys), exc_info=True)
         return False
+
+
+def list_objects(prefix: str, limit: int = 200) -> list[dict[str, Any]]:
+    """Objects under ``prefix`` (``Key``, ``Size``, ``LastModified``), newest first."""
+    response = get_s3_client().list_objects_v2(
+        Bucket=settings.AWS_S3_BUCKET, Prefix=prefix, MaxKeys=1000
+    )
+    items = response.get("Contents", [])
+    items.sort(key=lambda o: o["LastModified"], reverse=True)
+    return items[:limit]
+
+
+def get_object_bytes(key: str, max_bytes: int = 64 * 1024) -> bytes:
+    """A small object read on the server (e.g. a build's metadata file)."""
+    body = get_s3_client().get_object(Bucket=settings.AWS_S3_BUCKET, Key=key)["Body"]
+    return body.read(max_bytes)

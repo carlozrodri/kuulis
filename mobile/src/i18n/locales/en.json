@@ -587,7 +587,8 @@
     "legal_document_not_found": "Text not found",
     "account_open_reports": "There are open reports about your account. Support must close them before it can be deleted.",
     "account_fee_pending": "Pay your pending fee before deleting your account.",
-    "export_too_soon": "You can download your data once a day."
+    "export_too_soon": "You can download your data once a day.",
+    "app_update_required": "You need to update Kuulis to do this"
   },
   "map": {
     "recenter": "Recenter map"
@@ -1351,5 +1352,55 @@
       "body": "While you are online, Kuulis uses your location to offer you nearby rides and show the passenger where you are coming from, even with the app minimized or the screen off. You will see a fixed notice while it happens. When you go offline we stop using it.",
       "accept": "Got it, go online"
     }
+  },
+  "update": {
+    "button": "Update",
+    "downloading": "Downloading… {{percent}}%",
+    "verifying": "Checking the file…",
+    "installing": "Opening the installer…",
+    "banner": {
+      "title": "New version available",
+      "body": "Kuulis {{version}} is ready ({{size}} MB).",
+      "requiredTitle": "Update required",
+      "requiredBody": "Finish your ride, then install Kuulis {{version}} to keep requesting or accepting rides.",
+      "dismiss": "Not now"
+    },
+    "required": {
+      "title": "You need to update",
+      "body": "This version of Kuulis can no longer request or accept rides. Install the new one to continue; your account, balance and history stay the same.",
+      "version": "Version {{version}} ({{build}}) · {{size}} MB",
+      "checking": "Looking for the new version…",
+      "current": "You have version {{version}} ({{build}})."
+    },
+    "unknownSources": {
+      "title": "Allow the update to install",
+      "body": "If Android did not let you install it, go to Settings → Install unknown apps → Kuulis, turn on “Allow from this source” and tap Update again.",
+      "hint": "When the download finishes, Android will ask you to confirm the install. If it is blocked, allow it in Settings → Install unknown apps → Kuulis.",
+      "open": "Open settings"
+    },
+    "error": {
+      "no_release": "We could not find the new version. Try again in a few minutes.",
+      "download": "We could not download the update. Check your connection and try again.",
+      "checksum": "The downloaded file does not match the published version, so we deleted it. Try again.",
+      "installer": "We could not open the Android installer."
+    }
+  },
+  "about": {
+    "section": "Kuulis",
+    "title": "About Kuulis",
+    "rowHint": "Version {{version}} · check for updates",
+    "version": "Version",
+    "build": "Build",
+    "channel": "Channel",
+    "channels": {
+      "qa": "Testing (QA)",
+      "beta": "Beta",
+      "production": "Production"
+    },
+    "check": "Check for updates",
+    "upToDate": "You have the latest version.",
+    "available": "Kuulis {{version}} available",
+    "availableBody": "{{size}} MB download.",
+    "unsupported": "This copy of Kuulis is not updated from here (development build, web or iPhone)."
   }
 }

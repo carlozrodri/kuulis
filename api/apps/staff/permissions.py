@@ -15,6 +15,7 @@ PERMISSIONS: dict[str, tuple[str, ...]] = {
     "subscriptions": ("subscriptions.view", "subscriptions.manage"),
     "finance": ("finance.view", "finance.export"),
     "system": ("dashboard.view", "system.view", "config.view"),
+    "releases": ("releases.view", "releases.manage"),
 }
 ALL_PERMISSIONS: frozenset[str] = frozenset(p for group in PERMISSIONS.values() for p in group)
 

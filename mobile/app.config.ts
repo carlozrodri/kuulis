@@ -74,6 +74,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       monochromeImage: './assets/android-icon-monochrome.png',
     },
     predictiveBackGestureEnabled: false,
+    // The APK is distributed outside the stores (doc 09): the app downloads updates and opens the system
+    // installer. `permissions` only adds to what plugins and libraries already declare (nothing is dropped).
+    permissions: ['android.permission.REQUEST_INSTALL_PACKAGES'],
   },
   web: {
     bundler: 'metro',

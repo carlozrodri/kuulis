@@ -21,7 +21,8 @@
     "roles": "Roles",
     "approvals": "Aprobaciones",
     "legal": "Legal",
-    "privacy": "Privacidad"
+    "privacy": "Privacidad",
+    "versions": "Versiones"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -144,7 +145,8 @@
       "wallet": "Saldos y recargas",
       "subscriptions": "Suscripciones",
       "finance": "Finanzas",
-      "system": "Sistema"
+      "system": "Sistema",
+      "releases": "Versiones de la app"
     },
     "permissions": {
       "users": {
@@ -205,6 +207,10 @@
       },
       "config": {
         "view": "Ver la configuración"
+      },
+      "releases": {
+        "view": "Ver versiones de la app",
+        "manage": "Publicar, retirar y marcar versiones obligatorias"
       }
     }
   },
@@ -314,7 +320,11 @@
     "approval_not_found": "Solicitud no encontrada",
     "approval_closed": "La solicitud ya se decidió o venció",
     "approval_own_request": "Otra persona tiene que aprobar tu solicitud",
-    "legal_document_not_found": "Texto legal no encontrado"
+    "legal_document_not_found": "Texto legal no encontrado",
+    "build_not_found": "Esa compilación ya no está en el almacenamiento",
+    "release_exists": "Esa compilación ya está publicada en ese canal",
+    "storage_unavailable": "El almacenamiento de archivos no responde; prueba de nuevo en un momento.",
+    "storage_disabled": "El almacenamiento de archivos no está configurado en este entorno."
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -1521,6 +1531,10 @@
       },
       "legal": {
         "publish": "Publicó un texto legal"
+      },
+      "app_release": {
+        "publish": "Publicó una versión de la app",
+        "update": "Cambió una versión de la app"
       }
     },
     "entities": {
@@ -1542,7 +1556,8 @@
       "audit": "Auditoría",
       "staff_role": "Rol del equipo",
       "approval": "Aprobación",
-      "legal": "Legal"
+      "legal": "Legal",
+      "app_release": "Versión de la app"
     }
   },
   "team": {
@@ -1686,5 +1701,67 @@
     "userErased": "Cuenta eliminada el {date}: sus datos personales ya se borraron.",
     "userScheduled": "Eliminación programada para el {date}",
     "userScheduledHelp": "La pidió el {date}. Si entra a la app antes, la cuenta se recupera."
+  },
+  "versions": {
+    "help": "Versiones de la app Android (APK) que se ofrecen a los usuarios. La app y la web ofrecen la versión más nueva no retirada de su canal. Retirar una versión vuelve a ofrecer la anterior; marcarla obligatoria impide pedir o aceptar viajes desde compilaciones más viejas hasta actualizar.",
+    "releases": "Versiones publicadas",
+    "builds": "Compilaciones disponibles",
+    "buildsHelp": "APK que subió el compilador para este entorno, de la más nueva a la más vieja.",
+    "usage": "Uso por compilación",
+    "usageHelp": "Personas distintas que usaron cada compilación en los últimos 7 días.",
+    "allChannels": "Todos los canales",
+    "channel": "Canal",
+    "channels": {
+      "qa": "QA",
+      "beta": "Beta",
+      "production": "Producción"
+    },
+    "version": "Versión",
+    "build": "Compilación {build}",
+    "buildCol": "Compilación",
+    "published": "Publicada",
+    "by": "por {email}",
+    "size": "Tamaño",
+    "state": "Estado",
+    "notes": "Notas",
+    "mandatory": "Obligatoria",
+    "optional": "Opcional",
+    "active": "Activa",
+    "current": "Se ofrece ahora",
+    "withdrawn": "Retirada {date}",
+    "download": "Descargar APK",
+    "markMandatory": "Marcar obligatoria",
+    "unmarkMandatory": "Quitar obligatoria",
+    "withdraw": "Retirar",
+    "restore": "Restaurar",
+    "editNotes": "Editar notas",
+    "builtAt": "Compilada {date}",
+    "commit": "Commit {commit}",
+    "publishedIn": "Publicada en",
+    "notPublished": "Sin publicar",
+    "copy": "Copiar SHA-256",
+    "copied": "SHA-256 copiado",
+    "publish": "Publicar",
+    "publishTitle": "Publicar {version} ({build})",
+    "publishHelp": "La app y la web ofrecerán esta compilación a quienes usen el canal elegido.",
+    "channelHelp": "QA: equipo de pruebas. Beta: probadores invitados. Producción: todos los usuarios.",
+    "notesHelp": "Qué cambió. Lo ven los usuarios al actualizar.",
+    "mandatoryLabel": "Obligatoria",
+    "mandatoryHelp": "Quienes tengan una compilación más vieja de este canal no podrán pedir ni aceptar viajes hasta actualizar. Úsalo solo para arreglos críticos o cambios incompatibles.",
+    "publishedToast": "Versión {version} publicada en {channel}",
+    "updated": "Versión actualizada",
+    "users": "Usuarios (7 días)",
+    "latestIn": "Más nueva en {channel}",
+    "confirmMandatoryTitle": "Marcar {version} ({build}) como obligatoria",
+    "confirmMandatory": "Quienes tengan una compilación más vieja en el canal {channel} no podrán pedir ni aceptar viajes hasta actualizar a esta versión.",
+    "confirmOptionalTitle": "Quitar obligatoria a {version} ({build})",
+    "confirmOptional": "Las compilaciones más viejas podrán volver a usarse, salvo que otra versión obligatoria lo impida.",
+    "confirmWithdrawTitle": "Retirar {version} ({build})",
+    "confirmWithdraw": "Deja de ofrecerse en el canal {channel}: se vuelve a ofrecer la versión anterior. Quienes ya la instalaron la conservan. Si era obligatoria, deja de bloquear las compilaciones más viejas.",
+    "confirmRestoreTitle": "Restaurar {version} ({build})",
+    "confirmRestore": "Se vuelve a ofrecer en el canal {channel} (si es la compilación más nueva) y, si es obligatoria, vuelve a bloquear las compilaciones más viejas.",
+    "notesTitle": "Notas de {version} ({build})",
+    "platform": "Plataforma",
+    "actions": "Acciones"
   }
 }

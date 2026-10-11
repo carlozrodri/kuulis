@@ -8,6 +8,7 @@ import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { Button, Card, IconTile, ListRow, Notice, Txt, Wordmark } from '@/components/ui';
 import { SuspendedPanel } from '@/features/account/SuspendedPanel';
+import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
 import { rideDraft, setDraftPlace } from '@/features/ride/store';
 import { useCurrentPickup } from '@/features/ride/useCurrentPickup';
@@ -120,6 +121,8 @@ export function PassengerHome() {
           </View>
         </Pressable>
       )}
+
+      <UpdateBanner />
 
       {permission !== 'granted' && !suspension ? <LocationPrompt /> : null}
 
