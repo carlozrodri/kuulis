@@ -1,0 +1,78 @@
+# Camino a producción
+
+Análisis del 2026-10-11 sobre la rama `qa` (fases 1A a 1E hechas: cuentas, motorizados, viajes, tasas,
+promociones, billetera, suscripción, reportes, suspensiones, finanzas y métricas). Aquí está lo que **falta**
+para operar Kuulis en producción con al menos **5000 usuarios activos**, sin contar la publicación en App
+Store ni Google Play (fuera de alcance por ahora).
+
+Cada documento es autocontenido: objetivo, estado actual, alcance, app móvil (pasajero y motorizado), admin,
+API y datos, criterios de aceptación y dependencias. Se implementan **uno a uno, en el orden de la tabla**.
+Convención de siempre: lo que dijo Carlos es **Decidido**; el resto es **Supuesto** y se valida antes de
+construir. Las preguntas de cada documento están en su sección final.
+
+## Prioridades
+- **P0**: bloquea el lanzamiento en Caracas. No se abre al público sin esto.
+- **P1**: necesario en las primeras semanas con usuarios reales (o antes si hay tiempo).
+- **P2**: crecimiento y eficiencia; cuando la operación esté estable.
+- **P3**: opcional, a evaluar con datos.
+
+## Orden de ejecución
+
+| # | Documento | Prioridad | Área | Depende de |
+| --- | --- | --- | --- | --- |
+| 01 | [CI y calidad del código](01-ci-y-calidad.md) | P0 | Infra | — |
+| 02 | [Infraestructura de producción](02-infraestructura-produccion.md) | P0 | Infra | 01 |
+| 03 | [Observabilidad y alertas](03-observabilidad-y-alertas.md) | P0 | Infra · Admin | 02 |
+| 04 | [Backups y recuperación](04-backups-y-recuperacion.md) | P0 | Infra | 02 |
+| 05 | [Seguridad de la plataforma](05-seguridad-plataforma.md) | P0 | API · Admin · Mobile | 01 |
+| 06 | [Auditoría y permisos del admin](06-auditoria-y-permisos-admin.md) | P0 | API · Admin | 05 |
+| 07 | [Legal y privacidad](07-legal-y-privacidad.md) | P0 | API · Mobile · Admin | 08 (en paralelo) |
+| 08 | [Web pública](08-web-publica.md) | P0 | Web | 02 |
+| 09 | [Distribución y actualizaciones sin tiendas](09-distribucion-y-actualizaciones.md) | P0 | Mobile · Infra | 08 |
+| 10 | [Control remoto de la app](10-control-remoto-de-la-app.md) | P0 | API · Mobile · Admin | 09 |
+| 11 | [Seguridad en el viaje](11-seguridad-en-el-viaje.md) | P0 | Mobile · API · Admin | 08 |
+| 12 | [Verificación continua de motorizados](12-verificacion-continua-motorizados.md) | P0 | Mobile · API · Admin | 06 |
+| 13 | [Soporte y centro de ayuda](13-soporte-y-ayuda.md) | P0 | Mobile · API · Admin | 06 |
+| 14 | [Notificaciones completas](14-notificaciones.md) | P1 | Mobile · API · Admin | 10 |
+| 15 | [Reglas de cancelación y calidad del servicio](15-cancelaciones-y-calidad.md) | P1 | API · Mobile · Admin | — |
+| 16 | [Antifraude](16-antifraude.md) | P1 | API · Mobile · Admin | 11, 15 |
+| 17 | [Pagos y suscripción: endurecimiento](17-pagos-y-suscripcion.md) | P1 | API · Mobile · Admin | 03, 06 |
+| 18 | [Escalabilidad y pruebas de carga](18-escalabilidad-y-carga.md) | P1 | Infra · API | 02, 03 |
+| 19 | [Analítica de producto](19-analitica-de-producto.md) | P1 | API · Mobile · Admin | 07 |
+| 20 | [Calidad de la app móvil](20-calidad-app-movil.md) | P1 | Mobile | 01 |
+| 21 | [Zonas y demanda](21-zonas-y-demanda.md) | P2 | API · Mobile · Admin | 18, 19 |
+| 22 | [Referidos](22-referidos.md) | P2 | API · Mobile · Admin | 16, 17 |
+| 23 | [Mejoras para el pasajero](23-mejoras-pasajero.md) | P2 | Mobile · API | — |
+| 24 | [Admin: herramientas de operación (CRM)](24-admin-crm.md) | P2 | Admin · API | 06, 13 |
+| 25 | [Moderación de contenido](25-moderacion-de-contenido.md) | P2 | API · Admin | 13 |
+| 26 | [Llamadas dentro de la app](26-llamadas-voip.md) | P3 | Mobile · API · Infra | 02 |
+
+## Etapas sugeridas
+1. **Bases (01–06):** que nada se rompa sin que lo sepamos y que se pueda recuperar. Sin pantallas nuevas
+   para el usuario.
+2. **Abrir al público (07–13):** lo mínimo legal, cómo se instala y actualiza la app sin tiendas, y la
+   confianza (seguridad en el viaje, verificación, soporte). Al terminar esta etapa se puede lanzar en Caracas.
+3. **Primeras semanas (14–20):** calidad del servicio, fraude, pagos robustos, carga real y medición.
+4. **Crecimiento (21–26):** cuando haya datos.
+
+## Lo que ya existe y no se repite aquí
+Auth con Google/Apple y JWT con rotación, modo pasajero/motorizado, onboarding y aprobación de motorizados,
+cotización y despacho con ofertas de 15 s, viaje en vivo por WebSocket, chat y calificación obligatoria,
+ubicación en segundo plano (Android), tasas BCV/Binance, promociones con alertas de abuso, billetera con
+recargas Binance Pay conciliadas, transferencias con límite, cuota mensual por tramos, reportes con bandeja,
+suspensiones, finanzas con CSV, métricas, portada operativa, reporte de crashes a los logs, compartir el viaje
+como texto y botón de llamar al 911.
+
+## Hallazgos del análisis que conviene saber ya
+- **Rate limit por IP** con la primera IP de `X-Forwarded-For` (`api/kuulis/core/rate_limit.py`): el cliente
+  puede falsificarla, y en Venezuela las operadoras móviles usan CGNAT (muchos usuarios con la misma IP), así
+  que 120/min por IP puede bloquear a usuarios legítimos. Ver 05.
+- **`DELETE /users/me` solo desactiva** la cuenta (`is_active = false`); no borra ni anonimiza datos. Ver 07.
+- **No hay CI**: Coolify despliega en cada push aunque los tests fallen. Ver 01.
+- **OSRM y Photon** usan los servidores públicos de demostración, que no son para producción. Ver 02.
+- **Los enlaces de los emails** (`/verify-email`, `/reset-password`) apuntan a páginas que no existen. Ver 08.
+- **No se guarda el recorrido del viaje**: ante un reporte de seguridad no hay ruta real para revisar. Ver 11.
+- **No hay `expo-updates`**: sin tiendas, hoy no hay forma de que los usuarios reciban una versión nueva. Ver 09.
+- **Los documentos del motorizado no tienen fecha de vencimiento** (licencia, certificado médico). Ver 12.
+- **Los reportes no tienen conversación**: el usuario solo recibe la resolución final. Ver 13.
+- **Acciones del admin sin auditoría** y solo dos roles (`staff`, `admin`). Ver 06.
