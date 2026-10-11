@@ -57,6 +57,10 @@ funcionando en QA antes de pasar a la siguiente.
 - [ ] Iconos, splash, nombre final y bundle ids definitivos.
 - [ ] Deep links para verificar email y resetear contraseña dentro de la app.
 
+## Camino a producción (desde 2026-10-11)
+Plan completo en `docs/produccion/README.md`; Carlos aprobó todas las recomendaciones. Se hace en orden.
+- [x] 01 · CI y calidad: GitHub Actions, Dependabot, gitleaks, tests del admin, smoke E2E, cuentas de prueba.
+
 ## Fase 3 · Operación
 - [ ] Activar Sentry (API, admin, mobile).
 - [ ] Prueba de carga y ajuste de workers/pool.

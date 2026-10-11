@@ -24,9 +24,27 @@ así que solo se redepliega lo que cambió. Auto-deploy activado: hacer push a `
 
 ## Flujo de trabajo
 1. Rama `feature/<algo>` desde `qa`.
-2. PR hacia `qa` → merge → Coolify despliega QA.
-3. Validar en `https://kuulis-qa.top8.uk`.
-4. PR de `qa` a `main` → merge → Coolify despliega producción.
+2. PR hacia `qa`. GitHub Actions (`.github/workflows/ci.yml`) corre lint, tipos, tests, migraciones y
+   escaneo de secretos de las apps que cambiaron; el check `ci` debe estar en verde para fusionar.
+3. Merge → Coolify despliega QA.
+4. Smoke E2E contra QA (ver abajo) y validación en `https://kuulis-qa.top8.uk`.
+5. PR de `qa` a `main` → mismo CI → merge → Coolify despliega producción.
+
+### Protección de ramas (GitHub → Settings → Branches)
+En `qa` y `main`: exigir PR antes de fusionar y el check obligatorio **`ci`** en verde. En `main`, además,
+solo PRs que vienen de `qa`. Así Coolify (que despliega en cada push) solo recibe código que pasó CI.
+
+### Smoke E2E
+`scripts/smoke_e2e.py` recorre el flujo completo contra un entorno: registra pasajero y motorizado,
+sube documentos, aprueba, conecta, cotiza, pide, acepta, llega, inicia, completa y califica. Marca ambas
+cuentas como **cuentas de prueba** (no cuentan en métricas ni en la portada) y las cierra al final. Necesita el
+worker encendido y una cuenta con rol `admin`:
+
+```
+SMOKE_ADMIN_EMAIL=... SMOKE_ADMIN_PASSWORD=... uv run scripts/smoke_e2e.py --base-url https://kuulis-qa.top8.uk
+```
+
+Tarda unos segundos y termina con código 0 si todo pasó. No usarlo contra producción sin motivo.
 
 ## Dominios (Nginx Proxy Manager)
 Carlos crea en su NPM los proxy hosts `kuulis-qa.top8.uk` y `kuulis-prod.top8.uk` igual que los que ya

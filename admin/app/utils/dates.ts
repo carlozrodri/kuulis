@@ -6,7 +6,10 @@ import type { Day } from '~/types/api'
 const DAY = /^\d{4}-\d{2}-\d{2}$/
 
 export function isDay(value: string | null | undefined): value is Day {
-  return !!value && DAY.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`))
+  if (!value || !DAY.test(value)) return false
+  // Date.parse rolls impossible days over ("2026-02-30" → March 2), so check the day survives a round trip.
+  const date = new Date(`${value}T00:00:00Z`)
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
 }
 
 /** Today in Caracas. */

@@ -3,7 +3,18 @@
 ## Git
 - Ramas: `main` (prod), `qa` (QA), `feature/<tema>`, `fix/<tema>`.
 - Commits en imperativo y en inglés, pequeños y con un solo propósito.
-- Nunca subir secretos: `.env*` está ignorado; las variables viven en Coolify.
+- Nunca subir secretos: `.env*` está ignorado; las variables viven en Coolify. CI los busca con gitleaks
+  (`.gitleaks.toml` lista lo que es público a propósito, como el `google-services.json`).
+- Todo entra a `qa` y `main` por PR con el check `ci` en verde (ver `deployment.md`).
+- Dependabot abre PRs semanales agrupados; se revisan en lote, no se fusionan solos. Expo y React Native se
+  actualizan con `npx expo install --fix`, no con Dependabot.
+
+## Tests
+- API: `cd api && uv run ruff check . && uv run ruff format --check . && uv run pytest` (Postgres y Redis
+  locales). Toda migración nueva debe pasar `alembic upgrade head` y `alembic check`.
+- Admin: `pnpm lint && pnpm typecheck && pnpm test` (vitest en `admin/tests/`, sin auto-imports de Nuxt:
+  importar explícitamente).
+- Mobile: `npm run lint && npm run typecheck && npm test`.
 
 ## API
 - Una carpeta por dominio en `api/apps/`. Routers finos, lógica en `services.py`.

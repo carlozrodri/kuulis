@@ -109,7 +109,9 @@
     "allAccounts": "All accounts",
     "suspendedOnly": "Suspended",
     "notSuspended": "Not suspended",
-    "suspensionFilter": "Suspension"
+    "suspensionFilter": "Suspension",
+    "testAccount": "Test account",
+    "testAccountHint": "Left out of metrics and the overview."
   },
   "roles": {
     "user": "User",

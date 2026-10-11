@@ -47,6 +47,13 @@ construir. Las preguntas de cada documento están en su sección final.
 | 25 | [Moderación de contenido](25-moderacion-de-contenido.md) | P2 | API · Admin | 13 |
 | 26 | [Llamadas dentro de la app](26-llamadas-voip.md) | P3 | Mobile · API · Infra | 02 |
 
+## Avance
+- **01** hecho (2026-10-11).
+- Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
+  invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
+  eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay
+  que partir de eso y no rehacerlo.
+
 ## Etapas sugeridas
 1. **Bases (01–06):** que nada se rompa sin que lo sepamos y que se pueda recuperar. Sin pantallas nuevas
    para el usuario.
@@ -67,8 +74,8 @@ como texto y botón de llamar al 911.
 - **Rate limit por IP** con la primera IP de `X-Forwarded-For` (`api/kuulis/core/rate_limit.py`): el cliente
   puede falsificarla, y en Venezuela las operadoras móviles usan CGNAT (muchos usuarios con la misma IP), así
   que 120/min por IP puede bloquear a usuarios legítimos. Ver 05.
-- **`DELETE /users/me` solo desactiva** la cuenta (`is_active = false`); no borra ni anonimiza datos. Ver 07.
-- **No hay CI**: Coolify despliega en cada push aunque los tests fallen. Ver 01.
+- ~~`DELETE /users/me` solo desactiva la cuenta~~: resuelto en `da5bb1e` (borrado a los 30 días). Ver 07.
+- ~~No hay CI~~: resuelto en 01.
 - **OSRM y Photon** usan los servidores públicos de demostración, que no son para producción. Ver 02.
 - **Los enlaces de los emails** (`/verify-email`, `/reset-password`) apuntan a páginas que no existen. Ver 08.
 - **No se guarda el recorrido del viaje**: ante un reporte de seguridad no hay ruta real para revisar. Ver 11.

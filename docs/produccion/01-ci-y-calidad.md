@@ -1,6 +1,6 @@
 # 01 · CI y calidad del código
 
-**Prioridad:** P0 · **Área:** Infra · **Depende de:** nada
+**Prioridad:** P0 · **Área:** Infra · **Depende de:** nada · **Estado:** hecho (2026-10-11)
 
 ## Objetivo
 Que ningún cambio llegue a QA o a producción si rompe los tests, el lint o el tipado, y que exista una prueba
@@ -58,6 +58,18 @@ Sin cambios visibles.
 ## Dependencias
 Ninguna. Carlos activa la protección de ramas en GitHub (requiere permisos de dueño del repo).
 
-## Preguntas para Carlos
-1. ¿Se protege `main` para que solo entre por PR desde `qa`? Recomendado: sí.
-2. ¿Los PRs de Dependabot se fusionan solos si CI pasa (solo parches)? Recomendado: no, se revisan en lote.
+## Decidido (2026-10-11)
+1. `main` protegida: solo entra por PR desde `qa`. La protección la activa Carlos en GitHub (ver
+   `docs/deployment.md`).
+2. Los PRs de Dependabot no se fusionan solos: se revisan en lote.
+
+## Cómo quedó
+- `.github/workflows/ci.yml`: jobs `api` (ruff, formato, migraciones con `alembic check`, pytest con Postgres 17
+  y Redis), `admin` (lint, typecheck, vitest, build), `mobile` (lint, typecheck, jest), `secrets` (gitleaks) y
+  `ci`, el único check obligatorio. Cada app corre solo si cambió su carpeta. Auditorías de dependencias y
+  `expo-doctor` informan sin bloquear.
+- `.github/dependabot.yml`, `.gitleaks.toml`.
+- `admin/vitest.config.ts` y `admin/tests/` (paridad de traducciones, fechas, formato y polilíneas). Arreglado
+  `isDay`, que aceptaba fechas imposibles como `2026-02-30`.
+- `users.is_test_account`: lo marca un admin desde la ficha del usuario; métricas y portada lo excluyen.
+- `scripts/smoke_e2e.py`, probado de punta a punta contra una API local con worker.

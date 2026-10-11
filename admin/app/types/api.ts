@@ -9,6 +9,7 @@ export interface User {
   avatar_key: string | null
   is_active: boolean
   is_verified: boolean
+  is_test_account?: boolean
   created_at: string
   last_login_at: string | null
 }
