@@ -14,14 +14,15 @@ existente de Carlos. No comparte nada con los proyectos NDS ni bidding-market.
 | Dominio | `kuulis-qa.top8.uk` | `kuulis-prod.top8.uk` |
 | API (`/api`) | `kuulis-api-qa` · `rayxgnveijwwq86tquloc3r8` | `kuulis-api-production` · `f14idkxf8c209b1hghrunmhb` |
 | Worker | `kuulis-worker-qa` · `i10vqipywxmdafk5sjaowzya` | `kuulis-worker-production` · `f3eiht6l1r439xxp3401u2ur` |
-| Admin (`/`) | `kuulis-admin-qa` · `m37iqum9dy4n0o5281n0tvu5` | `kuulis-admin-production` · `ru2e54bw4mn4igqvvdmkgrys` |
+| Admin (`admin.<dominio>`) | `kuulis-admin-qa` · `m37iqum9dy4n0o5281n0tvu5` | `kuulis-admin-production` · `ru2e54bw4mn4igqvvdmkgrys` |
+| Web pública (`/`) | `kuulis-web-qa` (por crear) | `kuulis-web-production` (por crear) |
 | PostgreSQL 17 | `kuulis-postgres-qa` · `v12h71ber6ifhpgcugm6adth` | `kuulis-postgres-production` · `pvx2gkfbo18zcld9x55t0tgp` |
 | Redis 7.4 | `kuulis-redis-qa` · `miq3v8c99isk848ps719a7dn` | `kuulis-redis-production` · `mgtsa16kwmktv0jl55belww8` |
 | Backup Postgres | diario 03:00, 7 días | cada 6 h, 14 días |
 | OSRM (rutas) | `kuulis-osrm` · `nqbbvoaqqvzkthxeq6vts7zc`, compartido (ver `infra/README.md`) | el mismo |
 | Photon (direcciones) | `kuulis-photon` · `owcfbizidzhgftvwksyxqkis`, compartido | el mismo |
 
-Cada app usa `base_directory` (`/api` o `/admin`), su `Dockerfile` y `watch_paths` (`api/**`, `admin/**`),
+Cada app usa `base_directory` (`/api`, `/admin` o `/web`), su `Dockerfile` y `watch_paths` (`api/**`, `admin/**`, `web/**`),
 así que solo se redepliega lo que cambió. Auto-deploy activado: hacer push a `qa` o `main` despliega.
 
 ## Flujo de trabajo
@@ -53,7 +54,16 @@ Carlos crea en su NPM los proxy hosts `kuulis-qa.top8.uk` y `kuulis-prod.top8.uk
 funcionan (por ejemplo `testqa.top8.uk`), apuntando al Traefik de Coolify. Importante:
 - Activar **Websockets Support** (la app usa `wss://<host>/api/v1/ws`).
 - Reenviar el host original (NPM lo hace por defecto) para que Traefik enrute por dominio.
-- Traefik enruta `/api/*` a la API y todo lo demás al admin.
+- Traefik enruta `/api/*` a la API y todo lo demás a la web pública.
+- El admin vive en `admin.kuulis-qa.top8.uk` / `admin.kuulis-prod.top8.uk` (proxy host propio en NPM, igual
+  que el principal). La app API tiene también el dominio `https://admin.<dominio>/api`, así el admin sigue
+  llamando a la API en su mismo origen, sin CORS.
+
+### App web en Coolify
+Crear `kuulis-web-<entorno>` desde el UI: repositorio `carlozrodri/kuulis`, rama `qa` o `main`, build pack
+Dockerfile, `base_directory` `/web`, puerto 3000, `watch_paths` `web/**`, dominio `https://<dominio>`.
+Variables: `NUXT_PUBLIC_APP_ENV` (`qa`/`production`), `NUXT_PUBLIC_SITE_URL` (`https://<dominio>`),
+`NUXT_API_INTERNAL` (`http://<contenedor de la API>:8000/api/v1`, opcional) y `NUXT_PUBLIC_SUPPORT_EMAIL`.
 
 ## Variables de entorno
 Están puestas en Coolify (no en el repo). Lista completa en `api/.env.example` y `admin/.env.example`.
@@ -78,6 +88,7 @@ Están puestas en Coolify (no en el repo). Lista completa en `api/.env.example` 
 | `ADMIN_TOTP_REQUIRED` | opcional | | `true` por defecto: el equipo entra al admin con 2FA (ver Acceso del equipo) |
 | `FORWARDED_ALLOW_IPS` | opcional | | redes de los proxies en las que se confía para `X-Forwarded-For` (por defecto las privadas; ver Límites de uso) |
 | `NUXT_PUBLIC_APP_ENV`, `NUXT_PUBLIC_API_BASE` | | | solo admin |
+| `FRONTEND_URL`, `ADMIN_URL` | opcional | opcional | web pública (enlaces de los emails) y admin (invitaciones); por defecto los dominios de cada entorno |
 
 La contraseña del primer admin está en la variable `FIRST_SUPERUSER_PASSWORD` de la app API de cada entorno
 en Coolify. Conviene cambiarla desde el panel (Mi perfil) tras el primer login.

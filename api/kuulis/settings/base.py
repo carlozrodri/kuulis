@@ -74,7 +74,10 @@ class BaseAppSettings(BaseSettings):
     RESEND_API_KEY: str = ""
     EMAIL_FROM: str = "Kuulis <no-reply@email.top8.uk>"
     EMAIL_ENABLED: bool = False
+    # Public website (doc 08): the email links (verify email, reset password) open there.
     FRONTEND_URL: str = "http://localhost:3000"
+    # Admin panel, when it lives on its own host (admin.<domain>); empty means FRONTEND_URL.
+    ADMIN_URL: str = ""
 
     # --- Push notifications (Expo) ---------------------------------------------
     EXPO_PUSH_URL: str = "https://exp.host/--/api/v2/push/send"
@@ -180,3 +183,7 @@ class BaseAppSettings(BaseSettings):
     @property
     def storage_enabled(self) -> bool:
         return bool(self.AWS_ACCESS_KEY_ID and self.AWS_SECRET_ACCESS_KEY and self.AWS_S3_BUCKET)
+
+    @property
+    def admin_url(self) -> str:
+        return (self.ADMIN_URL or self.FRONTEND_URL).rstrip("/")

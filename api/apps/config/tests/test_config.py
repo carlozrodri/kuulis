@@ -166,3 +166,17 @@ async def test_legacy_single_service_area_is_migrated(client):
         await session.commit()
     body = (await client.get("/api/v1/config/public")).json()
     assert body["service_areas"] == [{"name": "Caracas", **legacy}]
+
+
+async def test_public_site_for_the_website(client):
+    response = await client.get("/api/v1/public/site")
+    assert response.status_code == 200, response.text
+    assert response.headers["cache-control"] == "public, max-age=300"
+    site = response.json()
+    assert site["cities"] == ["Caracas"]
+    assert site["driver"]["min_age"] == 21
+    assert site["driver"]["vehicle_types"] == ["moto"]
+    assert site["driver"]["vehicle_min_year"] == {"moto": 2013}  # cars are not enabled
+    assert site["free_months"] == 3
+    assert site["fee_tiers"][0] == {"above": "0.00", "fee": "0.00"}
+    assert "topup_binance_pay_id" not in site

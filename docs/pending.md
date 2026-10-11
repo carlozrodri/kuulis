@@ -25,8 +25,7 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
 - [ ] Plazos de conservación de la auditoría y el libro contable (supuesto: 5 años) a validar con el abogado.
 
 ## API
-- [ ] Páginas web para `verify-email` y `reset-password` (los enlaces de los emails apuntan a
-      `FRONTEND_URL/verify-email?token=` y `/reset-password?token=`; hoy esas rutas no existen en el admin).
+- [x] Páginas web para `verify-email` y `reset-password`: las sirve la web pública (`web/`, doc 08).
       Alternativa: deep links a la app móvil.
 - [ ] Plantillas HTML de email con diseño.
 - [ ] Scheduler de Taskiq desplegado cuando haya tareas periódicas (hoy no hay ninguna).

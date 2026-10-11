@@ -10,6 +10,7 @@ class ProductionSettings(BaseAppSettings):
     STORAGE_PREFIX: str = "production"
     PUBLIC_URL: str = "https://kuulis-prod.top8.uk"
     FRONTEND_URL: str = "https://kuulis-prod.top8.uk"
+    ADMIN_URL: str = "https://admin.kuulis-prod.top8.uk"
     CORS_ORIGINS: CSVList = ["https://kuulis-prod.top8.uk"]
     EMAIL_ENABLED: bool = True
     DB_POOL_SIZE: int = 10

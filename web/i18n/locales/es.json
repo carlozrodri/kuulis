@@ -1,0 +1,226 @@
+{
+  "nav": {
+    "label": "Principal",
+    "skip": "Saltar al contenido",
+    "drivers": "Motorizados",
+    "download": "Descargar",
+    "legal": "Legal",
+    "language": "Change language to English",
+    "menu": "Menú",
+    "getApp": "Descargar la app"
+  },
+  "footer": {
+    "tagline": "Viajes en moto en Venezuela. Sin comisión por viaje.",
+    "made": "Hecho en Venezuela"
+  },
+  "common": {
+    "wait": "Un momento…",
+    "networkError": "No pudimos conectar con Kuulis. Revisa tu conexión e intenta de nuevo."
+  },
+  "fees": {
+    "earned": "Si ganas en el mes",
+    "pay": "Pagas",
+    "range": "{from} a {to}",
+    "over": "Más de {from}",
+    "nothing": "Nada"
+  },
+  "home": {
+    "metaTitle": "Kuulis · Viajes en moto, sin comisión por viaje",
+    "metaDescription": "Pide un motorizado en minutos y paga directo, como acuerden. Los motorizados no pagan comisión por viaje: solo una cuota mensual pequeña los meses que trabajan.",
+    "pill": "Motorizados: {months} meses gratis al empezar",
+    "title": "Tu moto en minutos. Sin comisión por viaje.",
+    "lead": "Pide un motorizado cerca de ti, ve el precio antes de salir y págale directo, como acuerden.",
+    "download": "Descargar para Android",
+    "drive": "Quiero manejar",
+    "card": {
+      "driver": "Luis está en camino",
+      "bike": "Yamaha YBR · Negra",
+      "fare": "Precio del viaje"
+    },
+    "riders": {
+      "eyebrow": "Para pasajeros",
+      "title": "Rápido, claro y sin sorpresas",
+      "price": {
+        "title": "Precio antes de salir",
+        "body": "La app calcula el precio por distancia y tiempo. Lo ves antes de pedir y no cambia en el camino."
+      },
+      "pay": {
+        "title": "Pagas como quieras",
+        "body": "Efectivo en dólares o bolívares, pago móvil, Zelle o Binance: lo acuerdas con el motorizado y le pagas directo."
+      },
+      "safe": {
+        "title": "Viajas acompañado",
+        "body": "Ves el nombre, la foto, la moto y la placa del motorizado, y puedes compartir tu viaje con alguien de confianza."
+      }
+    },
+    "drivers": {
+      "eyebrow": "Para motorizados",
+      "title": "Lo que cobras es tuyo",
+      "body": "Kuulis no se queda con nada de tus viajes. Solo pagas una cuota mensual pequeña, según lo que ganaste, y solo los meses en que trabajas. Los primeros {months} meses son gratis.",
+      "cta": "Ver requisitos",
+      "tableTitle": "Cuota mensual",
+      "tableNote": "Si no tienes viajes en un mes, no pagas nada. Los primeros {months} meses son gratis."
+    },
+    "how": {
+      "eyebrow": "Cómo funciona",
+      "title": "Tres pasos y vas en camino",
+      "step1": {
+        "title": "Pide tu viaje",
+        "body": "Elige a dónde vas y mira el precio."
+      },
+      "step2": {
+        "title": "Un motorizado acepta",
+        "body": "Te mostramos quién es, su moto y cuánto tarda en llegar."
+      },
+      "step3": {
+        "title": "Llegas y pagas",
+        "body": "Le pagas directo al motorizado, con el método que acordaron."
+      }
+    },
+    "cities": "Disponible en:",
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "items": [
+        {
+          "q": "¿Kuulis cobra comisión por cada viaje?",
+          "a": "No. El pasajero le paga el viaje completo al motorizado. El motorizado paga una cuota mensual según lo que ganó, y nada los meses en que no trabajó."
+        },
+        {
+          "q": "¿Cómo pago el viaje?",
+          "a": "Directo al motorizado: efectivo, pago móvil, Zelle o Binance, como acuerden. El precio lo calcula la app y es el mismo para los dos."
+        },
+        {
+          "q": "¿Por qué no está en la Play Store?",
+          "a": "Por ahora la app se instala desde esta web. En la página Descargar te explicamos cómo hacerlo de forma segura."
+        },
+        {
+          "q": "¿Tengo iPhone, puedo usar Kuulis?",
+          "a": "Estamos preparando la versión para iPhone. Mientras tanto, la app para Android es la única disponible."
+        },
+        {
+          "q": "¿Qué necesito para ser motorizado?",
+          "a": "Ser mayor de edad, tener tu moto con sus papeles y subir tus documentos desde la app. Revisamos tu solicitud y te avisamos."
+        }
+      ]
+    },
+    "final": {
+      "title": "Empieza a moverte con Kuulis",
+      "body": "Descarga la app, crea tu cuenta y pide tu primer viaje."
+    }
+  },
+  "drivers": {
+    "metaTitle": "Maneja con Kuulis · Sin comisión por viaje",
+    "metaDescription": "Gana con tu moto sin dar comisión por cada viaje. Requisitos, cuota mensual y cómo registrarte.",
+    "eyebrow": "Motorizados",
+    "title": "Gana con tu moto, sin comisión por viaje",
+    "lead": "Tú pones el tiempo y la moto; Kuulis te trae los viajes. Lo que te pagan los pasajeros es tuyo. Los primeros {months} meses son gratis.",
+    "cta": "Descargar la app",
+    "why": {
+      "commission": {
+        "title": "Cero comisión",
+        "body": "No descontamos nada de tus viajes. El pasajero te paga directo, como acuerden."
+      },
+      "free": {
+        "title": "{months} meses gratis",
+        "body": "Empiezas sin pagar nada. Después, una cuota pequeña solo los meses en que trabajas."
+      },
+      "direct": {
+        "title": "Tú decides cuándo",
+        "body": "Te conectas cuando quieres y recibes viajes cerca de ti."
+      }
+    },
+    "requirements": {
+      "title": "Requisitos",
+      "age": "Tener {age} años o más",
+      "year": "Moto del año {year} o más nueva",
+      "phone": "Un teléfono Android con datos y GPS"
+    },
+    "documents": {
+      "id_card": "Cédula de identidad",
+      "rif": "RIF vigente",
+      "drivers_license": "Licencia de conducir",
+      "medical_certificate": "Certificado médico",
+      "vehicle_registration": "Carnet de circulación de la moto",
+      "selfie": "Una foto tuya (selfie)",
+      "vehicle_photo": "{n} fotos de tu moto"
+    },
+    "fees": {
+      "title": "Cuota mensual",
+      "body": "Se calcula con lo que ganaste en el mes y se paga desde tu billetera Kuulis. Los primeros {months} meses son gratis."
+    },
+    "steps": {
+      "title": "Cómo registrarte",
+      "step1": "Descarga la app y crea tu cuenta.",
+      "step2": "En Perfil, cambia a modo motorizado y completa tu solicitud.",
+      "step3": "Sube tus documentos y las fotos de tu moto.",
+      "step4": "Revisamos tu solicitud y te avisamos cuando puedas conectarte."
+    }
+  },
+  "download": {
+    "metaTitle": "Descargar Kuulis para Android",
+    "metaDescription": "Instala la app de Kuulis en tu teléfono Android.",
+    "eyebrow": "Descargar",
+    "title": "Kuulis para Android",
+    "lead": "La app se instala desde esta página, sin pasar por la tienda.",
+    "soon": {
+      "title": "Muy pronto",
+      "body": "Estamos terminando la primera versión pública. Cuando esté lista, aquí vas a encontrar el archivo para instalarla, con su versión y su huella de seguridad."
+    },
+    "iphone": {
+      "title": "¿Tienes iPhone?",
+      "body": "La versión para iPhone viene después. Te avisaremos aquí cuando esté disponible."
+    },
+    "android": {
+      "title": "Cómo instalarla",
+      "step1": "Toca el botón de descarga y abre el archivo cuando termine.",
+      "step2": "Si Android te lo pide, permite instalar apps desde tu navegador.",
+      "step3": "Toca Instalar y espera unos segundos.",
+      "step4": "Abre Kuulis y crea tu cuenta.",
+      "safety": "Descarga Kuulis solo desde esta página. Nunca te pediremos tu contraseña por WhatsApp ni por teléfono."
+    }
+  },
+  "legal": {
+    "metaTitle": "Legal · Kuulis",
+    "metaDescription": "Términos y condiciones, política de privacidad y normas de la comunidad de Kuulis.",
+    "title": "Legal",
+    "lead": "Los textos que aceptas al usar Kuulis. Cuando cambian, te lo avisamos en la app.",
+    "version": "Versión {version} · {date}",
+    "kinds": {
+      "terms": "Términos y condiciones",
+      "privacy": "Política de privacidad",
+      "community": "Normas de la comunidad",
+      "driver_terms": "Términos para motorizados",
+      "wallet": "Condiciones de la billetera"
+    }
+  },
+  "verify": {
+    "title": "Confirma tu correo",
+    "body": "Toca el botón para confirmar que este correo es tuyo.",
+    "button": "Confirmar mi correo",
+    "doneTitle": "¡Correo confirmado!",
+    "doneBody": "Listo. Ya puedes volver a la app de Kuulis.",
+    "invalidTitle": "Este enlace ya no sirve",
+    "invalidBody": "Puede que ya lo hayas usado o que haya vencido. Pide uno nuevo desde la app, en Perfil."
+  },
+  "reset": {
+    "title": "Crea una contraseña nueva",
+    "body": "Escribe la contraseña que vas a usar para entrar a Kuulis.",
+    "password": "Contraseña nueva",
+    "repeat": "Repite la contraseña",
+    "hint": "Al menos 8 caracteres.",
+    "tooShort": "Debe tener al menos 8 caracteres.",
+    "mismatch": "Las contraseñas no coinciden.",
+    "button": "Guardar contraseña",
+    "doneTitle": "Contraseña cambiada",
+    "doneBody": "Ya puedes entrar a la app con tu contraseña nueva. Por seguridad, cerramos tus otras sesiones.",
+    "invalidTitle": "Este enlace ya no sirve",
+    "invalidBody": "Puede que ya lo hayas usado o que haya vencido. En la app, toca «Olvidé mi contraseña» para recibir uno nuevo."
+  },
+  "error": {
+    "title": "Algo salió mal",
+    "body": "Intenta de nuevo en un momento.",
+    "notFound": "No encontramos esta página",
+    "notFoundBody": "Puede que el enlace esté mal escrito o que la página ya no exista.",
+    "home": "Ir al inicio"
+  }
+}

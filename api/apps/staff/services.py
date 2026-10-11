@@ -153,7 +153,7 @@ async def invite(session: AsyncSession, data: StaffInvite) -> User:
     user.staff_role_id = data.staff_role_id
     await session.flush()
     token, _, _ = create_token(str(user.id), "staff_invite", INVITE_TTL)
-    link = f"{settings.FRONTEND_URL}/accept-invite?token={token}"
+    link = f"{settings.admin_url}/accept-invite?token={token}"
     await send_templated_email.kiq(user.email, "invite", user.locale, user.full_name, link)
     return user
 

@@ -1,0 +1,226 @@
+{
+  "nav": {
+    "label": "Main",
+    "skip": "Skip to content",
+    "drivers": "Drivers",
+    "download": "Download",
+    "legal": "Legal",
+    "language": "Cambiar el idioma a español",
+    "menu": "Menu",
+    "getApp": "Get the app"
+  },
+  "footer": {
+    "tagline": "Motorbike rides in Venezuela. No commission per ride.",
+    "made": "Made in Venezuela"
+  },
+  "common": {
+    "wait": "One moment…",
+    "networkError": "We could not reach Kuulis. Check your connection and try again."
+  },
+  "fees": {
+    "earned": "If you earn in the month",
+    "pay": "You pay",
+    "range": "{from} to {to}",
+    "over": "Over {from}",
+    "nothing": "Nothing"
+  },
+  "home": {
+    "metaTitle": "Kuulis · Motorbike rides, no commission per ride",
+    "metaDescription": "Get a motorbike ride in minutes and pay the driver directly, however you agree. Drivers pay no commission per ride, just a small monthly fee in the months they work.",
+    "pill": "Drivers: {months} months free to start",
+    "title": "Your ride in minutes. No commission per ride.",
+    "lead": "Request a motorbike near you, see the price before you go and pay the driver directly, however you agree.",
+    "download": "Download for Android",
+    "drive": "I want to drive",
+    "card": {
+      "driver": "Luis is on the way",
+      "bike": "Yamaha YBR · Black",
+      "fare": "Ride price"
+    },
+    "riders": {
+      "eyebrow": "For riders",
+      "title": "Fast, clear and no surprises",
+      "price": {
+        "title": "Price before you go",
+        "body": "The app prices the ride by distance and time. You see it before you request and it does not change on the way."
+      },
+      "pay": {
+        "title": "Pay your way",
+        "body": "Cash in dollars or bolívares, pago móvil, Zelle or Binance: agree with the driver and pay them directly."
+      },
+      "safe": {
+        "title": "Never alone",
+        "body": "You see the driver's name, photo, bike and plate, and you can share your ride with someone you trust."
+      }
+    },
+    "drivers": {
+      "eyebrow": "For drivers",
+      "title": "What you earn is yours",
+      "body": "Kuulis takes nothing from your rides. You only pay a small monthly fee based on what you earned, and only in the months you work. The first {months} months are free.",
+      "cta": "See requirements",
+      "tableTitle": "Monthly fee",
+      "tableNote": "No rides in a month, nothing to pay. The first {months} months are free."
+    },
+    "how": {
+      "eyebrow": "How it works",
+      "title": "Three steps and you are on your way",
+      "step1": {
+        "title": "Request a ride",
+        "body": "Choose where you are going and see the price."
+      },
+      "step2": {
+        "title": "A driver accepts",
+        "body": "We show you who they are, their bike and how long until they arrive."
+      },
+      "step3": {
+        "title": "Arrive and pay",
+        "body": "Pay the driver directly, with the method you agreed."
+      }
+    },
+    "cities": "Available in:",
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "q": "Does Kuulis take a commission on each ride?",
+          "a": "No. The rider pays the full ride to the driver. The driver pays a monthly fee based on what they earned, and nothing in months they did not work."
+        },
+        {
+          "q": "How do I pay for the ride?",
+          "a": "Directly to the driver: cash, pago móvil, Zelle or Binance, however you agree. The app sets the price and it is the same for both of you."
+        },
+        {
+          "q": "Why is it not on the Play Store?",
+          "a": "For now the app is installed from this website. The Download page explains how to do it safely."
+        },
+        {
+          "q": "I have an iPhone, can I use Kuulis?",
+          "a": "We are working on the iPhone version. Until then, the Android app is the only one available."
+        },
+        {
+          "q": "What do I need to drive?",
+          "a": "Be of age, have your bike with its papers and upload your documents in the app. We review your application and let you know."
+        }
+      ]
+    },
+    "final": {
+      "title": "Start moving with Kuulis",
+      "body": "Download the app, create your account and request your first ride."
+    }
+  },
+  "drivers": {
+    "metaTitle": "Drive with Kuulis · No commission per ride",
+    "metaDescription": "Earn with your motorbike without giving a commission on each ride. Requirements, monthly fee and how to sign up.",
+    "eyebrow": "Drivers",
+    "title": "Earn with your bike, no commission per ride",
+    "lead": "You bring the time and the bike; Kuulis brings the rides. What riders pay you is yours. The first {months} months are free.",
+    "cta": "Download the app",
+    "why": {
+      "commission": {
+        "title": "Zero commission",
+        "body": "We take nothing from your rides. The rider pays you directly, however you agree."
+      },
+      "free": {
+        "title": "{months} months free",
+        "body": "Start without paying anything. Then a small fee only in the months you work."
+      },
+      "direct": {
+        "title": "You decide when",
+        "body": "Go online whenever you want and get rides near you."
+      }
+    },
+    "requirements": {
+      "title": "Requirements",
+      "age": "Be {age} or older",
+      "year": "A {year} or newer motorbike",
+      "phone": "An Android phone with data and GPS"
+    },
+    "documents": {
+      "id_card": "National ID card",
+      "rif": "Valid RIF",
+      "drivers_license": "Driver's license",
+      "medical_certificate": "Medical certificate",
+      "vehicle_registration": "Bike registration card",
+      "selfie": "A photo of you (selfie)",
+      "vehicle_photo": "{n} photos of your bike"
+    },
+    "fees": {
+      "title": "Monthly fee",
+      "body": "Based on what you earned in the month and paid from your Kuulis wallet. The first {months} months are free."
+    },
+    "steps": {
+      "title": "How to sign up",
+      "step1": "Download the app and create your account.",
+      "step2": "In Profile, switch to driver mode and fill in your application.",
+      "step3": "Upload your documents and the photos of your bike.",
+      "step4": "We review your application and let you know when you can go online."
+    }
+  },
+  "download": {
+    "metaTitle": "Download Kuulis for Android",
+    "metaDescription": "Install the Kuulis app on your Android phone.",
+    "eyebrow": "Download",
+    "title": "Kuulis for Android",
+    "lead": "The app is installed from this page, without going through the store.",
+    "soon": {
+      "title": "Coming soon",
+      "body": "We are finishing the first public version. When it is ready, you will find the file to install it here, with its version and its security fingerprint."
+    },
+    "iphone": {
+      "title": "Have an iPhone?",
+      "body": "The iPhone version comes later. We will announce it here when it is available."
+    },
+    "android": {
+      "title": "How to install it",
+      "step1": "Tap the download button and open the file when it finishes.",
+      "step2": "If Android asks, allow installing apps from your browser.",
+      "step3": "Tap Install and wait a few seconds.",
+      "step4": "Open Kuulis and create your account.",
+      "safety": "Download Kuulis only from this page. We will never ask for your password over WhatsApp or the phone."
+    }
+  },
+  "legal": {
+    "metaTitle": "Legal · Kuulis",
+    "metaDescription": "Kuulis terms and conditions, privacy policy and community guidelines.",
+    "title": "Legal",
+    "lead": "The texts you accept when you use Kuulis. When they change, we tell you in the app.",
+    "version": "Version {version} · {date}",
+    "kinds": {
+      "terms": "Terms and conditions",
+      "privacy": "Privacy policy",
+      "community": "Community guidelines",
+      "driver_terms": "Driver terms",
+      "wallet": "Wallet conditions"
+    }
+  },
+  "verify": {
+    "title": "Confirm your email",
+    "body": "Tap the button to confirm this email is yours.",
+    "button": "Confirm my email",
+    "doneTitle": "Email confirmed!",
+    "doneBody": "All set. You can go back to the Kuulis app.",
+    "invalidTitle": "This link no longer works",
+    "invalidBody": "You may have used it already or it expired. Ask for a new one in the app, in Profile."
+  },
+  "reset": {
+    "title": "Create a new password",
+    "body": "Type the password you will use to sign in to Kuulis.",
+    "password": "New password",
+    "repeat": "Repeat the password",
+    "hint": "At least 8 characters.",
+    "tooShort": "It must have at least 8 characters.",
+    "mismatch": "The passwords do not match.",
+    "button": "Save password",
+    "doneTitle": "Password changed",
+    "doneBody": "You can sign in to the app with your new password. For safety, we signed out your other sessions.",
+    "invalidTitle": "This link no longer works",
+    "invalidBody": "You may have used it already or it expired. In the app, tap “Forgot password” to get a new one."
+  },
+  "error": {
+    "title": "Something went wrong",
+    "body": "Try again in a moment.",
+    "notFound": "We could not find this page",
+    "notFoundBody": "The link may be mistyped or the page no longer exists.",
+    "home": "Go home"
+  }
+}
