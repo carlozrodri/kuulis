@@ -30,6 +30,11 @@ class ClientError(BaseModel):
     route: str | None = Field(default=None, max_length=300)
 
 
+def _quoted(text: str) -> str:
+    """Indents every line so a report can't forge log lines of its own."""
+    return "\n".join(f"    | {line}" for line in text.replace("\r", "").splitlines())
+
+
 def _user_id(credentials: HTTPAuthorizationCredentials | None) -> str | None:
     if credentials is None:
         return None
@@ -53,6 +58,6 @@ async def report_client_error(
         data.app_version,
         data.route,
         _user_id(credentials),
-        data.message,
-        data.stack or "",
+        _quoted(data.message),
+        _quoted(data.stack or ""),
     )

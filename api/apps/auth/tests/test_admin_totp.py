@@ -178,3 +178,23 @@ async def test_sessions_are_listed_and_closed_one_by_one(client):
     assert rotated.status_code == 200
     after = (await client.get("/api/v1/auth/sessions", headers=phone_headers)).json()
     assert [s["id"] for s in after] == [current["id"]]  # same session after the refresh
+
+
+async def test_code_guessing_is_capped_per_account(client, totp_required):
+    from apps.users.models import Role
+
+    await _make_user("admin@example.com", Role.ADMIN)
+    _, secret, _ = await _enroll(client)
+    # New challenges don't give fresh attempts: after 10 wrong codes the account waits.
+    for _ in range(totp.MAX_CODE_FAILURES // totp.MAX_ATTEMPTS):
+        step = (await client.post("/api/v1/auth/admin/login", json=ADMIN)).json()
+        for _ in range(totp.MAX_ATTEMPTS):
+            await client.post(
+                "/api/v1/auth/admin/totp", json={"challenge": step["challenge"], "code": "000000"}
+            )
+    step = (await client.post("/api/v1/auth/admin/login", json=ADMIN)).json()
+    locked = await client.post(
+        "/api/v1/auth/admin/totp", json={"challenge": step["challenge"], "code": _code(secret, 1)}
+    )
+    assert locked.status_code == 429
+    assert locked.json()["error"]["code"] == "login_locked"

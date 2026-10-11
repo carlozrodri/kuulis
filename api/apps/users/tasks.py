@@ -3,6 +3,7 @@ grace period ended, see ``services.erase_due``), started with each worker proces
 
 import asyncio
 import contextlib
+import html
 import logging
 
 from taskiq import TaskiqEvents, TaskiqState
@@ -57,7 +58,9 @@ TEMPLATES = {
 @broker.task(task_name="users.send_templated_email", retry_on_error=True, max_retries=3)
 async def send_templated_email(to: str, template: str, locale: str, name: str, link: str) -> bool:
     subject, body = TEMPLATES[template].get(locale, TEMPLATES[template]["es"])
-    return await send_email(to, subject, body.format(name=name or to, link=link))
+    # The name is user input and the email is HTML: escape it so nobody can inject links.
+    safe = body.format(name=html.escape(name or to), link=html.escape(link, quote=True))
+    return await send_email(to, subject, safe)
 
 
 async def erase_loop() -> None:

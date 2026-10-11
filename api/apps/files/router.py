@@ -37,11 +37,22 @@ async def presign_upload(
     )
 
 
+# Folders whose second level is the owner's id: <prefix>/<folder>/<user id>/...
+OWNED_FOLDERS = ("avatars", "uploads", "drivers")
+
+
+def _owns(user_id: object, key: str) -> bool:
+    return ".." not in key and any(
+        key.startswith(storage.folder_prefix(f"{folder}/{user_id}")) for folder in OWNED_FOLDERS
+    )
+
+
 @router.get("/download", response_model=DownloadResponse)
 async def presign_download(user: CurrentUser, key: str = Query(max_length=512)) -> DownloadResponse:
-    owner_segment = f"/{user.id}/"
-    if owner_segment not in key and not has_admin_session(user):
+    if _owns(user.id, key):
+        ttl = settings.STORAGE_PRESIGN_TTL_SECONDS
+    elif has_admin_session(user):
+        ttl = settings.PRIVATE_FILE_URL_SECONDS  # someone else's file: short-lived link
+    else:
         raise PermissionDeniedError()
-    return DownloadResponse(
-        url=storage.presigned_download(key), expires_in=settings.STORAGE_PRESIGN_TTL_SECONDS
-    )
+    return DownloadResponse(url=storage.presigned_download(key, ttl), expires_in=ttl)

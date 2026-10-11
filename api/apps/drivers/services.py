@@ -37,6 +37,7 @@ from apps.drivers.schemas import (
     VehicleWrite,
     compact_upper,
 )
+from apps.files import metadata
 from apps.files.schemas import UploadResponse
 from apps.notifications import services as notifications
 from apps.notifications import tasks as notification_tasks
@@ -218,7 +219,7 @@ def to_read(profile: DriverProfile, config: AppConfig) -> DriverProfileRead:
 
 def _download_url(key: str) -> str | None:
     try:
-        return storage.presigned_download(key)
+        return storage.presigned_download(key, settings.PRIVATE_FILE_URL_SECONDS)
     except ServiceUnavailableError:
         return None  # Storage not configured (local development).
 
@@ -365,6 +366,8 @@ async def register_document(
         )
     )
     await _flush_unique(session, "Document already registered", "document_already_registered")
+    if content_type in metadata.FORMATS:
+        await metadata.schedule(data.key)
     return await reload(session, profile)
 
 

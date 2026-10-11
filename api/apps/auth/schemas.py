@@ -30,7 +30,7 @@ class AuthResponse(TokenPair):
 
 
 class RefreshRequest(BaseModel):
-    refresh_token: str
+    refresh_token: str = Field(max_length=2048)
 
 
 class PasswordResetRequest(BaseModel):
@@ -38,12 +38,12 @@ class PasswordResetRequest(BaseModel):
 
 
 class PasswordResetConfirm(BaseModel):
-    token: str
+    token: str = Field(max_length=2048)
     new_password: str = Field(min_length=8, max_length=128)
 
 
 class TokenRequest(BaseModel):
-    token: str
+    token: str = Field(max_length=2048)
 
 
 class GoogleLoginRequest(BaseModel):

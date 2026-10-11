@@ -20,6 +20,7 @@ TASK_MODULES = [
     "apps.wallet.tasks",
     "apps.monitoring.tasks",
     "apps.backups.tasks",
+    "apps.files.metadata",
 ]
 
 if settings.APP_ENV == "test":

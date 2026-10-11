@@ -998,6 +998,7 @@
     "autoBody": "We detect your payment because it comes from your Binance Pay ID ({{payerId}}). Always pay from that account. If it doesn't show up within 15 minutes, tell us with \"I've paid\".",
     "manualTitle": "Manual confirmation",
     "manualBody": "An admin reviews every payment, usually within a few hours. Tell us with \"I've paid\" and the order ID so we can find it fast.",
+    "firstBody": "An admin confirms your first payment from this Pay ID to check the account is yours. Tell us with \"I've paid\". After that, your top-ups are credited on their own.",
     "yourId": "Your Binance Pay ID",
     "yourIdA11y": "Your Binance Pay ID: {{id}}",
     "changeId": "Change",

@@ -43,8 +43,10 @@ class Wallet(BaseModel):
     balance: Mapped[Decimal] = mapped_column(
         Numeric(12, 2), default=Decimal("0"), server_default=text("0")
     )
-    # The driver's Binance Pay ID: payments from it are credited automatically.
+    # The driver's Binance Pay ID. Anyone can type any id, so payments from it are credited
+    # automatically only once staff matched a first payment from it to this driver (verified).
     binance_pay_id: Mapped[str | None] = mapped_column(String(20), unique=True)
+    binance_pay_id_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class WalletEntry(BaseModel):

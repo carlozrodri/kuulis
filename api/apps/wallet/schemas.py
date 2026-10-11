@@ -43,6 +43,8 @@ class WalletRead(BaseModel):
     balance: MoneyStr
     currency: Literal["USDT"] = "USDT"
     binance_pay_id: str | None = None
+    # False until staff match a first payment from it; until then top-ups are credited by hand.
+    binance_pay_id_verified: bool = False
     transfer: TransferLimit | None = None
 
 

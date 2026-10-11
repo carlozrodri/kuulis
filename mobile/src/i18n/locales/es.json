@@ -998,6 +998,7 @@
     "autoBody": "Detectamos tu pago porque sale de tu Binance Pay ID ({{payerId}}). Paga siempre desde esa cuenta. Si en 15 minutos no aparece, avísanos con «Ya pagué».",
     "manualTitle": "Confirmación manual",
     "manualBody": "Un administrador revisa cada pago, normalmente en pocas horas. Avísanos con «Ya pagué» y el ID de la orden para ubicarlo rápido.",
+    "firstBody": "Tu primer pago desde este Pay ID lo confirma un administrador, para comprobar que la cuenta es tuya. Avísanos con «Ya pagué». Después, tus recargas se acreditan solas.",
     "yourId": "Tu Binance Pay ID",
     "yourIdA11y": "Tu Binance Pay ID: {{id}}",
     "changeId": "Cambiar",

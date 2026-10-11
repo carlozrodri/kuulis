@@ -1,3 +1,6 @@
+from conftest import _login
+
+
 async def test_me_requires_auth(client):
     response = await client.get("/api/v1/users/me")
     assert response.status_code == 401
@@ -47,12 +50,16 @@ async def test_full_name_is_trimmed(client, user_headers):
 
 
 async def test_change_password(client, user_headers):
+    other_device = await _login(client, "user@example.com")
     response = await client.post(
         "/api/v1/users/me/password",
         json={"current_password": "Sup3r-secret!", "new_password": "N3w-password!"},
         headers=user_headers,
     )
     assert response.status_code == 204
+    # This device stays signed in; the others have to sign in again.
+    assert (await client.get("/api/v1/users/me", headers=user_headers)).status_code == 200
+    assert (await client.get("/api/v1/users/me", headers=other_device)).status_code == 401
 
 
 async def test_regular_user_cannot_list_users(client, user_headers):

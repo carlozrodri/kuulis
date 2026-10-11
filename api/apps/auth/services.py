@@ -165,6 +165,13 @@ async def revoke_all(user_id: str) -> None:
     await redis_client.delete(_user_sessions_key(user_id))
 
 
+async def revoke_others(user_id: str, keep_sid: str | None) -> None:
+    """Closes every session but ``keep_sid`` (after a password change, for instance)."""
+    sids = [s for s in await redis_client.smembers(_user_sessions_key(user_id)) if s != keep_sid]
+    if sids:
+        await _close_sessions(user_id, sids)
+
+
 async def session_is_open(sid: str) -> bool:
     return bool(await redis_client.exists(_session_key(sid)))
 

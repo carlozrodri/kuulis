@@ -189,7 +189,8 @@ async def set_binance_pay_id(session: AsyncSession, user: User, pay_id: str) -> 
     )
     if taken:
         raise BinancePayIdTakenError()
-    wallet.binance_pay_id = pay_id
+    if wallet.binance_pay_id != pay_id:
+        wallet.binance_pay_id, wallet.binance_pay_id_verified_at = pay_id, None
     try:
         await session.flush()
     except IntegrityError as exc:
@@ -228,10 +229,11 @@ async def find_recipient(session: AsyncSession, query: str) -> User:
     query = query.strip()
     phone = "".join(ch for ch in query if ch.isdigit() or ch == "+")
     conditions = [func.lower(User.email) == query.lower()]
-    if len(phone) >= 7:
-        # Accept 04121234567, 4121234567 and +584121234567 for the same phone.
-        digits = phone.lstrip("+").removeprefix("58").lstrip("0")
-        conditions.append(func.right(DriverProfile.phone, len(digits)) == digits)
+    # Accept 04121234567, 4121234567 and +584121234567 for the same phone; only a whole number
+    # (10 digits without the 0) matches, so short or empty suffixes can't list drivers.
+    digits = phone.lstrip("+").removeprefix("58").lstrip("0")
+    if len(digits) == 10:
+        conditions.append(func.right(DriverProfile.phone, 10) == digits)
     user = await session.scalar(
         select(User)
         .join(DriverProfile, DriverProfile.user_id == User.id)
@@ -418,6 +420,12 @@ async def assign_top_up(
         raise TopUpInvalidStatusError(details={"status": top_up.status.value})
     await require_driver(session, user_id)
     await _close_oldest_request(session, user_id)
+    if top_up.payer_binance_id:
+        # Staff matched a payment from the Pay ID the driver registered: it really is theirs,
+        # so the next payments from it are credited on their own.
+        wallet = await lock_wallet(session, user_id)
+        if wallet.binance_pay_id == top_up.payer_binance_id:
+            wallet.binance_pay_id_verified_at = datetime.now(UTC)
     return await _complete(session, top_up, user_id, top_up.amount, admin)
 
 
@@ -451,7 +459,10 @@ async def record_payment(
     owner = None
     if payer_binance_id:
         owner = await session.scalar(
-            select(Wallet.user_id).where(Wallet.binance_pay_id == payer_binance_id)
+            select(Wallet.user_id).where(
+                Wallet.binance_pay_id == payer_binance_id,
+                Wallet.binance_pay_id_verified_at.is_not(None),
+            )
         )
     top_up = TopUp(
         user_id=None,

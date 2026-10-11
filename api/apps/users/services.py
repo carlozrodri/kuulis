@@ -6,6 +6,7 @@ from datetime import UTC, date, datetime, timedelta
 from sqlalchemy import ColumnElement, delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.files import metadata
 from apps.users import passwords
 from apps.users.models import Role, SocialAccount, User
 from apps.users.schemas import UserAdminCreate, UserAdminUpdate, UserCreate, UserUpdateMe
@@ -91,6 +92,8 @@ async def update_me(user: User, data: UserUpdateMe) -> User:
         if key is not None and not storage.key_in_folder(key, f"avatars/{user.id}"):
             raise AppError("Invalid avatar key", code="invalid_avatar_key")
         changes["avatar_key"] = key
+        if key is not None and key != user.avatar_key:
+            await metadata.schedule(key)
     for field in ("trusted_contact_name", "trusted_contact_phone"):
         if field in changes:
             changes[field] = (changes[field] or "").strip() or None
