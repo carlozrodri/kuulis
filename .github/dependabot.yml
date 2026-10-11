@@ -1,0 +1,28 @@
+# Weekly grouped updates, reviewed in batch (not merged automatically).
+version: 2
+updates:
+  - package-ecosystem: uv
+    directory: /api
+    schedule: { interval: weekly, day: monday }
+    groups:
+      api: { patterns: ['*'], update-types: [minor, patch] }
+  - package-ecosystem: npm
+    directory: /admin
+    schedule: { interval: weekly, day: monday }
+    groups:
+      admin: { patterns: ['*'], update-types: [minor, patch] }
+  - package-ecosystem: npm
+    directory: /mobile
+    schedule: { interval: weekly, day: monday }
+    # Expo pins compatible versions per SDK: upgrade those with `npx expo install --fix`, not Dependabot.
+    ignore:
+      - dependency-name: 'expo*'
+      - dependency-name: 'react-native*'
+      - dependency-name: 'react'
+      - dependency-name: 'react-dom'
+      - dependency-name: '@expo/*'
+    groups:
+      mobile: { patterns: ['*'], update-types: [minor, patch] }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }

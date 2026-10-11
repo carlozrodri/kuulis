@@ -218,3 +218,30 @@ async def test_overview(client, staff_headers, passenger):
     assert body["gmv_today"] == "9.00" and body["rides_in_progress"] == 1
     assert body["online_drivers"] == 0 and body["open_reports"] == 0
     assert isinstance(body["stale_rates"], list)
+
+
+async def test_test_accounts_left_out(client, staff_headers, admin_headers, passenger):
+    luis, _ = await _seed(client, passenger)
+    # Marking the driver Luis as a test account drops his 3 rides (2 completed, 1 cancelled).
+    response = await client.patch(
+        f"{API}/users/{luis.user.id}", json={"is_test_account": True}, headers=admin_headers
+    )
+    assert response.status_code == 200 and response.json()["is_test_account"] is True
+    totals = (await client.get(f"{API}/admin/metrics", headers=staff_headers)).json()["totals"]
+    assert totals["rides_requested"] == 3 and totals["rides_completed"] == 1
+    assert totals["rides_cancelled_driver"] == 0 and totals["gmv"] == "4.00"
+    overview = (await client.get(f"{API}/admin/overview", headers=staff_headers)).json()
+    assert overview["rides_today"] == 3 and overview["completed_today"] == 1
+
+    # A test passenger hides every ride they asked for, and is not a new passenger.
+    before = totals["new_passengers"]
+    await client.patch(
+        f"{API}/users/{passenger.user.id}", json={"is_test_account": True}, headers=admin_headers
+    )
+    totals = (await client.get(f"{API}/admin/metrics", headers=staff_headers)).json()["totals"]
+    assert totals["rides_requested"] == 0 and totals["new_passengers"] == before - 1
+    # Only admins can flag accounts.
+    flagged = await client.patch(
+        f"{API}/users/{passenger.user.id}", json={"is_test_account": False}, headers=staff_headers
+    )
+    assert flagged.status_code == 403

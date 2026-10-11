@@ -33,6 +33,8 @@ class User(BaseModel):
     avatar_key: Mapped[str | None] = mapped_column(String(512))
     is_active: Mapped[bool] = mapped_column(default=True)
     is_verified: Mapped[bool] = mapped_column(default=False)
+    # Accounts made by scripts or the team to test (smoke E2E): left out of metrics.
+    is_test_account: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # Rating received as a passenger (as a driver it lives on ``driver_profiles``).
     rating_sum: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))

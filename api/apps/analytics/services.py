@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import Select, and_, distinct, extract, func, select
+from sqlalchemy import Select, and_, distinct, extract, func, not_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.analytics.schemas import (
@@ -303,6 +303,15 @@ def _in_area(area: ServiceArea | None) -> list[Any]:
     ]
 
 
+def _real_rides() -> list[Any]:
+    """Leaves out rides where either side is a test account (smoke E2E, team tests)."""
+    test_users = select(User.id).where(User.is_test_account)
+    return [
+        not_(Ride.passenger_id.in_(test_users)),
+        or_(Ride.driver_id.is_(None), not_(Ride.driver_id.in_(test_users))),
+    ]
+
+
 def _seconds(value: Any) -> int | None:
     return round(value) if value is not None else None
 
@@ -315,7 +324,7 @@ async def metrics(
     session: AsyncSession, first: date, last: date, area: ServiceArea | None
 ) -> Metrics:
     start, end = days_bounds(first, last)
-    where = [Ride.requested_at >= start, Ride.requested_at < end, *_in_area(area)]
+    where = [Ride.requested_at >= start, Ride.requested_at < end, *_in_area(area), *_real_rides()]
     done = Ride.status == RideStatus.COMPLETED
 
     def count(condition: Any) -> Any:
@@ -358,13 +367,18 @@ async def metrics(
     )
 
     new_passengers = await session.scalar(
-        select(func.count(User.id)).where(User.created_at >= start, User.created_at < end)
+        select(func.count(User.id)).where(
+            User.created_at >= start, User.created_at < end, not_(User.is_test_account)
+        )
     )
     new_drivers = await session.scalar(
-        select(func.count(DriverProfile.id)).where(
+        select(func.count(DriverProfile.id))
+        .join(User, User.id == DriverProfile.user_id)
+        .where(
             DriverProfile.approved_at >= start,
             DriverProfile.approved_at < end,
             DriverProfile.status != DriverStatus.REJECTED,
+            not_(User.is_test_account),
         )
     )
     ratings = dict(
@@ -509,7 +523,7 @@ async def overview(session: AsyncSession) -> Overview:
                 func.count(Ride.id),
                 func.count(Ride.id).filter(Ride.status == RideStatus.COMPLETED),
                 func.sum(Ride.fare).filter(Ride.status == RideStatus.COMPLETED),
-            ).where(Ride.requested_at >= start, Ride.requested_at < end)
+            ).where(Ride.requested_at >= start, Ride.requested_at < end, *_real_rides())
         )
     ).one()
     in_progress = await session.scalar(

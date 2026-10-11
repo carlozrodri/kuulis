@@ -37,6 +37,7 @@ class UserRead(BaseModel):
     avatar_url: str | None = None
     is_active: bool
     is_verified: bool
+    is_test_account: bool = False
     created_at: datetime
     last_login_at: datetime | None
     # Rating received as a passenger.
@@ -80,6 +81,7 @@ class UserAdminUpdate(BaseModel):
     role: Role | None = None
     is_active: bool | None = None
     is_verified: bool | None = None
+    is_test_account: bool | None = None
     locale: Locale | None = None
 
 

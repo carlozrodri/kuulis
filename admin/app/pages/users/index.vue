@@ -115,6 +115,15 @@ const columns = computed<TableColumn<AdminUser>[]>(() => [
             {{ row.original.is_active ? t('users.active') : t('users.inactive') }}
           </UBadge>
           <UBadge
+            v-if="row.original.is_test_account"
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-flask-conical"
+            class="ml-1"
+          >
+            {{ t('users.testAccount') }}
+          </UBadge>
+          <UBadge
             v-if="isSuspensionInForce(row.original.suspension)"
             color="error"
             variant="solid"

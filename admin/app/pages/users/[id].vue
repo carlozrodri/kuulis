@@ -11,11 +11,12 @@ const apiError = useApiError()
 const id = computed(() => route.params.id as string)
 const { data: user, refresh } = await useAsyncData(`user-${id.value}`, () => request<AdminUser>(`/users/${id.value}`))
 
-const form = reactive<{ full_name: string, role: Role, is_active: boolean, is_verified: boolean }>({
+const form = reactive<{ full_name: string, role: Role, is_active: boolean, is_verified: boolean, is_test_account: boolean }>({
   full_name: '',
   role: 'user',
   is_active: true,
   is_verified: false,
+  is_test_account: false,
 })
 watchEffect(() => {
   if (user.value) {
@@ -24,6 +25,7 @@ watchEffect(() => {
       role: user.value.role,
       is_active: user.value.is_active,
       is_verified: user.value.is_verified,
+      is_test_account: user.value.is_test_account ?? false,
     })
   }
 })
@@ -128,6 +130,12 @@ async function save() {
             <USwitch
               v-model="form.is_verified"
               :label="t('users.verified')"
+              :disabled="!auth.isAdmin.value"
+            />
+            <USwitch
+              v-model="form.is_test_account"
+              :label="t('users.testAccount')"
+              :description="t('users.testAccountHint')"
               :disabled="!auth.isAdmin.value"
             />
             <UButton

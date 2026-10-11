@@ -1,0 +1,10 @@
+# Secret scanning config for CI (see .github/workflows/ci.yml).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Values that are public by design"
+paths = [
+  # Firebase client config: its API key ships inside every APK and is restricted to the app's package.
+  '''mobile/google-services(\.[a-z]+)?\.json''',
+]
