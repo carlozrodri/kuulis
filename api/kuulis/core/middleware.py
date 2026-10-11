@@ -31,6 +31,8 @@ class RequestContextMiddleware:
         token = request_id_ctx.set(request_id)
         path = scope.get("path", "")
         fields: dict[str, str] = {}
+        if client := scope.get("client"):
+            fields["ip"] = client[0]  # resolved by uvicorn from the trusted proxies
         if ride := RIDE_PATH.search(path):
             fields["ride_id"] = ride.group(1)
         fields_token = log_fields_ctx.set(fields)
@@ -56,6 +58,18 @@ class RequestContextMiddleware:
             request_id_ctx.reset(token)
 
 
+# JSON only: nothing to load, embed or frame. The Swagger page (local/QA) loads its own assets.
+API_CSP = b"default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+SECURITY_HEADERS = [
+    (b"x-content-type-options", b"nosniff"),
+    (b"x-frame-options", b"DENY"),
+    (b"referrer-policy", b"strict-origin-when-cross-origin"),
+    (b"permissions-policy", b"camera=(), microphone=(), geolocation=(), payment=()"),
+    (b"strict-transport-security", b"max-age=31536000"),
+    (b"cross-origin-opener-policy", b"same-origin"),
+]
+
+
 class SecurityHeadersMiddleware:
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
@@ -64,17 +78,14 @@ class SecurityHeadersMiddleware:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
+        docs = scope.get("path", "").endswith(("/docs", "/docs/oauth2-redirect"))
 
         async def send_wrapper(message: Message) -> None:
             if message["type"] == "http.response.start":
                 message.setdefault("headers", [])
-                message["headers"].extend(
-                    [
-                        (b"x-content-type-options", b"nosniff"),
-                        (b"x-frame-options", b"DENY"),
-                        (b"referrer-policy", b"strict-origin-when-cross-origin"),
-                    ]
-                )
+                message["headers"].extend(SECURITY_HEADERS)
+                if not docs:
+                    message["headers"].append((b"content-security-policy", API_CSP))
             await send(message)
 
         await self.app(scope, receive, send_wrapper)

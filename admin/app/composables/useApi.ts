@@ -77,7 +77,9 @@ export function useApiError() {
   return (error: unknown): string => {
     const body = (error as { data?: ApiErrorBody }).data
     const code = body?.error?.code
-    if (code && te(`errors.${code}`)) return t(`errors.${code}`)
+    const details = body?.error?.details
+    const values = details && typeof details === 'object' && !Array.isArray(details) ? details as Record<string, unknown> : {}
+    if (code && te(`errors.${code}`)) return t(`errors.${code}`, values)
     return body?.error?.message ?? t('errors.generic')
   }
 }

@@ -83,6 +83,30 @@ revisión de seguridad documentada.
 ## Dependencias
 01 (los tests de autorización corren en CI). Se coordina con 06 (las acciones sensibles se auditan).
 
+## Decidido (2026-10-11)
+1. 2FA obligatorio para todo el equipo del admin.
+2. El token de Expo del bloqueo 8: Carlos lo rota (no se puede hacer desde aquí); queda en el inventario de
+   secretos.
+3. Se entrega en tres partes: (1) límites, bloqueo de login, contraseñas, cabeceras y WebSocket; (2) 2FA del
+   admin y sesiones visibles; (3) documentos privados, inventario de secretos y revisión de seguridad.
+
+## Cómo quedó
+### Parte 1 (2026-10-11)
+- IP real: uvicorn confía en `X-Forwarded-For` solo desde redes privadas (`FORWARDED_ALLOW_IPS`), así que
+  una IP inventada no cambia el contador. La IP sale en cada línea del log.
+- Límite por usuario con sesión y por IP sin sesión; límites propios para cotizar, pedir viaje, chat,
+  reportes, subir archivos y transferencias (`docs/deployment.md` → Límites de uso). El 429 usa el mismo
+  formato de error (`rate_limited`, `retry_after`).
+- Bloqueo progresivo del login por correo (1, 5, 15 min) con aviso por email; también para correos que no
+  existen, para no revelar cuáles están registrados.
+- Contraseñas: lista local de 46 000 contraseñas comunes de 8 o más caracteres (NCSC top 100 000 y algunas
+  locales); `password_too_common` en registro, cambio, restablecer y altas del admin.
+- Cabeceras: HSTS, `Permissions-Policy`, `Cross-Origin-Opener-Policy` y CSP en la API (`default-src 'none'`)
+  y en el admin (solo su origen; los iconos van en el paquete, sin pedirlos a iconify).
+- WebSocket: mensajes de hasta 4 KB, 10 por segundo, y la conexión se cierra (4001) si el token vence sin
+  renovarse. La app renueva el token al recibir `auth.expiring`.
+- App y admin traducen `login_locked` (con los minutos), `password_too_common` y `rate_limited`.
+
 ## Preguntas para Carlos
 1. ¿2FA obligatorio para todo el equipo del admin? Recomendado: sí.
 2. ¿Rotaste ya el token de Expo del bloqueo 8?

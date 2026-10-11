@@ -15,7 +15,7 @@ import { DRIVER_QUERY_KEY, isDriverNotification } from '@/hooks/useDriver';
 import { refreshReports } from '@/hooks/useReports';
 import { rideKeys } from '@/hooks/useRides';
 import { isSubscriptionNotification, isWalletNotification, refreshSubscription, refreshWallet } from '@/hooks/useWallet';
-import { tokens } from '@/lib/api';
+import { refreshTokens, tokens } from '@/lib/api';
 import { config } from '@/lib/config';
 import { isAccountNotification, isReportNotification } from '@/lib/reports';
 import { useAuth } from '@/providers/AuthProvider';
@@ -32,6 +32,9 @@ type RealtimeContextValue = {
   /** Increments every time the socket becomes ready again after a drop (use it to re-sync state). */
   generation: number;
 };
+
+/** Close code the server uses when the access token expired without being renewed. */
+const TOKEN_EXPIRED_CLOSE = 4001;
 
 const RealtimeContext = createContext<RealtimeContextValue | null>(null);
 
@@ -88,6 +91,14 @@ export function RealtimeProvider({ enabled, children }: PropsWithChildren<{ enab
             if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' }));
           }, 25_000);
         }
+        // The socket lives as long as the access token: refresh it and re-authenticate in place.
+        if (message.event === 'auth.expiring') {
+          void refreshTokens()
+            .then((ok) => {
+              if (ok && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'auth', token: tokens.access }));
+            })
+            .catch(() => undefined);
+        }
         if (message.event === 'notification') {
           void queryClient.invalidateQueries({ queryKey: ['notifications'] });
           if (isDriverNotification(message.data)) void queryClient.invalidateQueries({ queryKey: DRIVER_QUERY_KEY });
@@ -108,12 +119,21 @@ export function RealtimeProvider({ enabled, children }: PropsWithChildren<{ enab
           }
         });
       };
-      ws.onclose = () => {
+      ws.onclose = (event) => {
         clearInterval(pingTimer);
         readyRef.current = false;
         if (socketRef.current === ws) socketRef.current = null;
         setStatus('closed');
         if (stopped || paused) return;
+        if (event.code === TOKEN_EXPIRED_CLOSE) {
+          // Expired before we could renew it (e.g. no network for a minute): refresh, then reconnect.
+          void refreshTokens()
+            .catch(() => false)
+            .then(() => {
+              if (!stopped && !paused) connect();
+            });
+          return;
+        }
         attempts += 1;
         timer = setTimeout(connect, Math.min(30_000, 1000 * 2 ** attempts));
       };

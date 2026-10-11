@@ -51,7 +51,7 @@ export function setApiLocale(locale: string) {
   currentLocale = locale;
 }
 
-async function refreshTokens(): Promise<boolean> {
+export async function refreshTokens(): Promise<boolean> {
   // One refresh at a time; concurrent 401s wait for the same promise.
   refreshPromise ??= (async () => {
     const refreshToken = await tokens.refreshToken();

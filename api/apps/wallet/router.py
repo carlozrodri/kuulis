@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel
 
 from apps.config.services import get_app_config
@@ -31,6 +31,7 @@ from apps.wallet.schemas import (
 )
 from kuulis.core.exceptions import NotFoundError
 from kuulis.core.pagination import Page, PageParams, page_params
+from kuulis.core.rate_limit import limiter
 from kuulis.settings import settings
 
 router = APIRouter(prefix="/wallet", tags=["wallet"])
@@ -123,7 +124,10 @@ async def recipient(
 
 
 @router.post("/me/transfers", response_model=WalletEntryRead, status_code=201)
-async def transfer(data: TransferCreate, user: CurrentUser, session: DBSession) -> WalletEntryRead:
+@limiter.limit("10/hour")
+async def transfer(
+    request: Request, data: TransferCreate, user: CurrentUser, session: DBSession
+) -> WalletEntryRead:
     config = await get_app_config(session)
     entry = await services.transfer(session, user, data.to_user_id, data.amount, data.note, config)
     await session.commit()

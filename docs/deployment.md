@@ -75,6 +75,7 @@ Están puestas en Coolify (no en el repo). Lista completa en `api/.env.example` 
 | `ALERT_EMAILS` | ✓ | ✓ | resumen diario 08:00 (y alertas si no hay Telegram), separados por coma |
 | `METRICS_TOKEN` | ✓ | | token de `/api/metrics` (sin él, 404) |
 | `BACKUP_ENABLED`, `BACKUP_S3_*`, `BACKUP_PASSPHRASE` | | ✓ | backups a Cloudflare R2 (ver Backups) |
+| `FORWARDED_ALLOW_IPS` | opcional | | redes de los proxies en las que se confía para `X-Forwarded-For` (por defecto las privadas; ver Límites de uso) |
 | `NUXT_PUBLIC_APP_ENV`, `NUXT_PUBLIC_API_BASE` | | | solo admin |
 
 La contraseña del primer admin está en la variable `FIRST_SUPERUSER_PASSWORD` de la app API de cada entorno
@@ -102,6 +103,20 @@ Se pone en Coolify (base de datos → Configuration), igual en QA y producción.
 | Postgres / Redis | 1,5 GB / 768 MB | por entorno |
 | OSRM / Photon | 1,5 GB / 1 GB | compartidos |
 | Compilador de APK | 6 GB | solo mientras compila; no compilar a la vez que OSRM o Photon |
+
+## Límites de uso
+- La IP del cliente la resuelve uvicorn desde `X-Forwarded-For` confiando solo en las redes privadas (NPM y
+  Traefik): toma la última dirección que no es de un proxy, así que una IP inventada por el cliente no cuenta.
+  Cada línea del log de peticiones trae `ip`; si alguna vez sale una IP privada para todos, el proxy está
+  borrando la cabecera y hay que revisar NPM o Traefik.
+- Con sesión: límite por usuario (120/min general). Sin sesión: por IP (120/min general, 20/min en login,
+  registro y restablecer contraseña).
+- Límites propios: cotizar 30/min, pedir viaje 6/min, mensajes del chat 30/min, reportes 10/h, subir archivos
+  30/h, transferencias 10/h, correo de restablecer contraseña 1/min por dirección.
+- Login con contraseña: tras 5 fallos seguidos con el mismo correo, bloqueo de 1, 5 y 15 min (los siguientes
+  en 24 h) y un correo al dueño en el primero. Respuesta `429 login_locked` con `retry_after`.
+- WebSocket: mensajes de hasta 4 KB y 10 por segundo; la conexión dura lo que el token de acceso (la app lo
+  renueva al recibir `auth.expiring`).
 
 ## Migraciones
 La API ejecuta `alembic upgrade head` al arrancar (`RUN_MIGRATIONS=true`). Para crear una:

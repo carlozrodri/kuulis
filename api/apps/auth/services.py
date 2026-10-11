@@ -6,6 +6,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.auth import lockout
 from apps.auth.schemas import TokenPair
 from apps.auth.social import SocialIdentity
 from apps.users import services as users
@@ -52,6 +53,18 @@ async def issue_tokens(user: User) -> TokenPair:
         refresh_token=refresh,
         expires_in=settings.ACCESS_TOKEN_TTL_MINUTES * 60,
     )
+
+
+async def password_login(session: AsyncSession, email: str, password: str) -> User:
+    await lockout.ensure_not_locked(email)
+    try:
+        user = await users.authenticate(session, email, password)
+    except AuthenticationError as error:
+        if error.code == "invalid_credentials":
+            await lockout.record_failure(email, await users.get_by_email(session, email))
+        raise
+    await lockout.record_success(email)
+    return user
 
 
 async def rotate_refresh_token(session: AsyncSession, refresh_token: str) -> tuple[User, TokenPair]:
@@ -112,6 +125,10 @@ async def verify_email(session: AsyncSession, token: str) -> User:
 
 
 async def request_password_reset(session: AsyncSession, email: str) -> None:
+    # One email per address per minute, whatever IP asks (the route limit is per IP).
+    throttle = f"{_PREFIX}:reset:{users.normalize_email(email)}"
+    if not await redis_client.set(throttle, "1", nx=True, ex=60):
+        return
     user = await users.get_by_email(session, email)
     if user is None or not user.is_active:
         return  # Never reveal whether an email exists.

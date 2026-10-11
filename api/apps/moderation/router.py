@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 
 from apps.moderation import services
 from apps.moderation.models import (
@@ -34,6 +34,7 @@ from apps.rides.schemas import RideAdminRead
 from apps.users.dependencies import CurrentUser, DBSession, StaffUser
 from apps.users.models import User
 from kuulis.core.pagination import Page, PageParams, page_params
+from kuulis.core.rate_limit import limiter
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 admin_router = APIRouter(prefix="/admin", tags=["reports"])
@@ -45,7 +46,10 @@ Params = Annotated[PageParams, Depends(page_params)]
 
 
 @router.post("", response_model=ReportRead, status_code=status.HTTP_201_CREATED)
-async def create(data: ReportCreate, user: CurrentUser, session: DBSession) -> ReportRead:
+@limiter.limit("10/hour")
+async def create(
+    request: Request, data: ReportCreate, user: CurrentUser, session: DBSession
+) -> ReportRead:
     report = await services.create_report(
         session, user, data.category, data.description, data.ride_id
     )
