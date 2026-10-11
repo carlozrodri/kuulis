@@ -328,6 +328,16 @@
       "redeem": "Usar código",
       "redeemed": "¡Listo! Tu código quedó registrado",
       "referredBy": "Te invitó {{name}}. Gracias por sumarte."
+    },
+    "sessions": {
+      "title": "Sesiones activas",
+      "rowHint": "Dispositivos con tu cuenta abierta",
+      "subtitle": "Si no reconoces un dispositivo, ciérralo y cambia tu contraseña.",
+      "thisDevice": "Este dispositivo",
+      "lastUsed": "Último uso: {{time}}",
+      "close": "Cerrar",
+      "closed": "Sesión cerrada",
+      "unknownDevice": "Dispositivo desconocido"
     }
   },
   "driver": {
@@ -571,7 +581,8 @@
     "referral_closed": "Los códigos solo se pueden usar antes de tu primer viaje.",
     "referral_driver_only": "Solo los motorizados pueden usar códigos de invitación.",
     "trusted_contact_incomplete": "Escribe el nombre y el teléfono de tu contacto.",
-    "account_ride_active": "Termina tu viaje en curso antes de eliminar tu cuenta."
+    "account_ride_active": "Termina tu viaje en curso antes de eliminar tu cuenta.",
+    "session_not_found": "Esa sesión ya estaba cerrada"
   },
   "map": {
     "recenter": "Centrar el mapa"

@@ -1,18 +1,20 @@
 """JWT access tokens + rotating refresh tokens stored in Redis (revocable)."""
 
 import uuid
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.requests import Request
 
 from apps.auth import lockout
-from apps.auth.schemas import TokenPair
+from apps.auth.schemas import SessionRead, TokenPair
 from apps.auth.social import SocialIdentity
 from apps.users import services as users
 from apps.users.models import SocialAccount, User
 from apps.users.tasks import send_templated_email
-from kuulis.core.exceptions import AuthenticationError
+from kuulis.core.exceptions import AuthenticationError, NotFoundError
 from kuulis.core.redis import redis_client
 from kuulis.core.security import create_token, decode_token
 from kuulis.settings import settings
@@ -28,25 +30,71 @@ def _user_sessions_key(user_id: str) -> str:
     return f"{_PREFIX}:sessions:{user_id}"
 
 
+def _session_key(sid: str) -> str:
+    return f"{_PREFIX}:session:{sid}"
+
+
 def _used_token_key(jti: str) -> str:
     return f"{_PREFIX}:used:{jti}"
 
 
-async def issue_tokens(user: User) -> TokenPair:
+@dataclass(frozen=True)
+class ClientInfo:
+    """Where a session was opened from, shown in the session list."""
+
+    ip: str = ""
+    user_agent: str = ""
+    platform: str = ""  # X-Client-Platform sent by our apps: android, ios, admin
+
+    @classmethod
+    def from_request(cls, request: Request | None) -> "ClientInfo":
+        if request is None:
+            return cls()
+        return cls(
+            ip=request.client.host if request.client else "",
+            user_agent=request.headers.get("user-agent", "")[:300],
+            platform=request.headers.get("x-client-platform", "")[:20],
+        )
+
+
+async def issue_tokens(
+    user: User,
+    request: Request | None = None,
+    *,
+    mfa: bool = False,
+    sid: str | None = None,
+) -> TokenPair:
+    """Opens a session (or continues ``sid`` on a refresh). ``mfa`` marks sessions that passed
+    the admin's second factor: only those reach the staff endpoints."""
     user_id = str(user.id)
+    sid = sid or uuid.uuid4().hex
+    claims: dict = {"role": user.role.value, "sid": sid}
+    if mfa:
+        claims["mfa"] = True
     access, _, _ = create_token(
-        user_id,
-        "access",
-        timedelta(minutes=settings.ACCESS_TOKEN_TTL_MINUTES),
-        extra={"role": user.role.value},
+        user_id, "access", timedelta(minutes=settings.ACCESS_TOKEN_TTL_MINUTES), extra=claims
     )
     refresh_ttl = timedelta(days=settings.REFRESH_TOKEN_TTL_DAYS)
-    refresh, jti, _ = create_token(user_id, "refresh", refresh_ttl)
+    refresh, jti, _ = create_token(user_id, "refresh", refresh_ttl, extra={"sid": sid})
     seconds = int(refresh_ttl.total_seconds())
+    client = ClientInfo.from_request(request)
+    now = datetime.now(UTC).isoformat()
     async with redis_client.pipeline(transaction=True) as pipe:
         pipe.set(_refresh_key(jti), user_id, ex=seconds)
-        pipe.sadd(_user_sessions_key(user_id), jti)
+        pipe.sadd(_user_sessions_key(user_id), sid)
         pipe.expire(_user_sessions_key(user_id), seconds)
+        pipe.hsetnx(_session_key(sid), "created_at", now)
+        pipe.hset(
+            _session_key(sid),
+            mapping={
+                "user_id": user_id,
+                "jti": jti,
+                "last_used_at": now,
+                "mfa": "1" if mfa else "0",
+                **{k: v for k, v in asdict(client).items() if v},
+            },
+        )
+        pipe.expire(_session_key(sid), seconds)
         await pipe.execute()
     return TokenPair(
         access_token=access,
@@ -67,20 +115,38 @@ async def password_login(session: AsyncSession, email: str, password: str) -> Us
     return user
 
 
-async def rotate_refresh_token(session: AsyncSession, refresh_token: str) -> tuple[User, TokenPair]:
+async def rotate_refresh_token(
+    session: AsyncSession, refresh_token: str, request: Request | None = None
+) -> tuple[User, TokenPair]:
     payload = decode_token(refresh_token, "refresh")
-    jti, user_id = payload["jti"], payload["sub"]
+    jti, user_id, sid = payload["jti"], payload["sub"], payload.get("sid")
     # GETDEL makes the token single use even with concurrent requests.
     stored = await redis_client.getdel(_refresh_key(jti))
     if stored != user_id:
+        if sid and not await redis_client.exists(_session_key(sid)):
+            # The session was closed (from the session list): only this device is out.
+            raise AuthenticationError("Session closed", code="token_revoked")
         # Reuse of a rotated token: revoke every session of that user.
         await revoke_all(user_id)
         raise AuthenticationError("Refresh token revoked", code="token_revoked")
-    await redis_client.srem(_user_sessions_key(user_id), jti)
     user = await users.get_by_id(session, uuid.UUID(user_id))
     if user is None or not user.is_active:
         raise AuthenticationError("User not found or inactive", code="user_inactive")
-    return user, await issue_tokens(user)
+    mfa = bool(sid) and await redis_client.hget(_session_key(sid), "mfa") == "1"
+    if not sid:  # token from before sessions had ids
+        await redis_client.srem(_user_sessions_key(user_id), jti)
+    return user, await issue_tokens(user, request, mfa=mfa, sid=sid)
+
+
+async def _close_sessions(user_id: str, sids: list[str]) -> None:
+    jtis = [await redis_client.hget(_session_key(sid), "jti") for sid in sids]
+    keys = [_refresh_key(j) for j in jtis if j] + [_session_key(sid) for sid in sids]
+    # Members from before sessions had ids are refresh token ids themselves.
+    keys += [_refresh_key(sid) for sid in sids]
+    async with redis_client.pipeline(transaction=True) as pipe:
+        pipe.delete(*keys)
+        pipe.srem(_user_sessions_key(user_id), *sids)
+        await pipe.execute()
 
 
 async def revoke(refresh_token: str) -> None:
@@ -89,13 +155,77 @@ async def revoke(refresh_token: str) -> None:
     except AuthenticationError:
         return
     await redis_client.delete(_refresh_key(payload["jti"]))
-    await redis_client.srem(_user_sessions_key(payload["sub"]), payload["jti"])
+    await _close_sessions(payload["sub"], [payload.get("sid") or payload["jti"]])
 
 
 async def revoke_all(user_id: str) -> None:
-    jtis = await redis_client.smembers(_user_sessions_key(user_id))
-    keys = [_refresh_key(j) for j in jtis] + [_user_sessions_key(user_id)]
-    await redis_client.delete(*keys)
+    sids = list(await redis_client.smembers(_user_sessions_key(user_id)))
+    if sids:
+        await _close_sessions(user_id, sids)
+    await redis_client.delete(_user_sessions_key(user_id))
+
+
+async def session_is_open(sid: str) -> bool:
+    return bool(await redis_client.exists(_session_key(sid)))
+
+
+async def list_sessions(user_id: str, current_sid: str | None) -> list[SessionRead]:
+    found = []
+    for sid in await redis_client.smembers(_user_sessions_key(user_id)):
+        data = await redis_client.hgetall(_session_key(sid))
+        if not data:
+            continue  # legacy member or expired session
+        found.append(
+            SessionRead(
+                id=sid,
+                current=sid == current_sid,
+                platform=data.get("platform") or None,
+                device=describe_device(data.get("user_agent", ""), data.get("platform", "")),
+                ip=data.get("ip") or None,
+                created_at=datetime.fromisoformat(data["created_at"]),
+                last_used_at=datetime.fromisoformat(data["last_used_at"]),
+                admin=data.get("mfa") == "1",
+            )
+        )
+    return sorted(found, key=lambda s: s.last_used_at, reverse=True)
+
+
+async def close_session(user_id: str, sid: str) -> None:
+    if not await redis_client.sismember(_user_sessions_key(user_id), sid):
+        raise NotFoundError("Session not found", code="session_not_found")
+    await _close_sessions(user_id, [sid])
+
+
+def describe_device(user_agent: str, platform: str = "") -> str | None:
+    """A short label from the User-Agent (and our apps' platform header): "Kuulis · Android",
+    "Chrome · Windows"."""
+    if not user_agent:
+        return None
+    ua = user_agent.lower()
+    system = next((name for key, name in _SYSTEMS if key in ua), None) or _PLATFORMS.get(platform)
+    browser = next((name for key, name in _BROWSERS if key in ua), None)
+    app = "Kuulis" if ua.startswith(("kuulis", "okhttp", "expo")) or "cfnetwork" in ua else None
+    parts = [p for p in (app or browser, system) if p]
+    return " · ".join(parts) or user_agent[:60]
+
+
+_SYSTEMS = (
+    ("android", "Android"),
+    ("iphone", "iPhone"),
+    ("ipad", "iPad"),
+    ("cfnetwork", "iOS"),
+    ("windows", "Windows"),
+    ("mac os", "macOS"),
+    ("linux", "Linux"),
+)
+_PLATFORMS = {"android": "Android", "ios": "iOS"}
+_BROWSERS = (
+    ("edg/", "Edge"),
+    ("opr/", "Opera"),
+    ("chrome/", "Chrome"),
+    ("firefox/", "Firefox"),
+    ("safari/", "Safari"),
+)
 
 
 async def _consume_one_time_token(token: str, token_type) -> dict:

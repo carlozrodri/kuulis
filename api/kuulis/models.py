@@ -3,6 +3,7 @@
 Add new apps here, like INSTALLED_APPS in Django.
 """
 
+from apps.auth.models import UserTotp  # noqa: F401
 from apps.config.models import AppSetting  # noqa: F401
 from apps.drivers.models import DriverDocument, DriverProfile, Vehicle  # noqa: F401
 from apps.moderation.models import Report, ReportNote, Suspension  # noqa: F401

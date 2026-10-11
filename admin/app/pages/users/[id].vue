@@ -33,6 +33,22 @@ watchEffect(() => {
 const saving = ref(false)
 const roleItems = computed(() => (['user', 'staff', 'admin'] as Role[]).map(r => ({ label: t(`roles.${r}`), value: r })))
 
+const resetting = ref(false)
+async function resetTotp() {
+  if (!confirm(t('totp.resetConfirm'))) return
+  resetting.value = true
+  try {
+    await request(`/users/${id.value}/totp/reset`, { method: 'POST' })
+    toast.add({ title: t('totp.resetDone'), color: 'success' })
+  }
+  catch (error) {
+    toast.add({ title: apiError(error), color: 'error' })
+  }
+  finally {
+    resetting.value = false
+  }
+}
+
 async function save() {
   saving.value = true
   try {
@@ -151,6 +167,28 @@ async function save() {
               {{ t('users.readOnly') }}
             </p>
           </form>
+        </UCard>
+
+        <!-- Doc 05: lost authenticator of a team member -->
+        <UCard v-if="auth.isAdmin.value && user.role !== 'user'">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="font-semibold">
+                {{ t('totp.resetTitle') }}
+              </h2>
+              <p class="text-sm text-(--ui-text-muted)">
+                {{ t('totp.resetHelp') }}
+              </p>
+            </div>
+            <UButton
+              color="error"
+              variant="outline"
+              icon="i-lucide-key-round"
+              :loading="resetting"
+              :label="t('totp.reset')"
+              @click="resetTotp"
+            />
+          </div>
         </UCard>
 
         <!-- Phase 1E: account suspension (moderation) and reports -->

@@ -212,7 +212,12 @@
     "report_not_found": "Reporte no encontrado",
     "ride_without_driver": "Ese viaje no tuvo motorizado asignado",
     "suspension_until_invalid": "La fecha de fin de la suspensión debe ser futura",
-    "too_many_open_reports": "Esta persona ya tiene 5 reportes abiertos"
+    "too_many_open_reports": "Esta persona ya tiene 5 reportes abiertos",
+    "totp_invalid": "Código incorrecto",
+    "totp_challenge_expired": "Pasó demasiado tiempo o hubo muchos intentos. Entra de nuevo.",
+    "admin_mfa_required": "Entra al panel con tu código de verificación",
+    "reauth_required": "Confirma la acción con tu código",
+    "session_not_found": "Esa sesión ya estaba cerrada"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -1264,5 +1269,35 @@
       "restoreOk": "Correcta",
       "restoreFailed": "Falló"
     }
+  },
+  "totp": {
+    "title": "Verificación en dos pasos",
+    "setupHelp": "Escanea el código con Google Authenticator, Aegis o similar y escribe el código de 6 dígitos que muestra.",
+    "manualKey": "¿No puedes escanear? Escribe esta clave:",
+    "codeHelp": "Escribe el código de 6 dígitos de tu app de autenticación (o un código de recuperación).",
+    "code": "Código",
+    "codePlaceholder": "123456",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "recoveryTitle": "Códigos de recuperación",
+    "recoveryHelp": "Guárdalos en un lugar seguro. Cada uno sirve una sola vez para entrar si pierdes el teléfono. No se vuelven a mostrar.",
+    "copy": "Copiar códigos",
+    "copied": "Copiados",
+    "continue": "Ya los guardé, continuar",
+    "reauthTitle": "Confirma con tu código",
+    "reauthHelp": "Esta acción es sensible. Escribe el código de tu app de autenticación.",
+    "resetTitle": "Verificación en dos pasos",
+    "resetHelp": "Si perdió el teléfono, reinícialo: configurará uno nuevo en su próximo acceso y se cierran sus sesiones.",
+    "reset": "Reiniciar 2FA",
+    "resetConfirm": "¿Reiniciar la verificación en dos pasos de esta cuenta? Se cerrarán sus sesiones.",
+    "resetDone": "Listo: configurará su autenticador al volver a entrar",
+    "qrAlt": "Código QR para tu app de autenticación"
+  },
+  "sessions": {
+    "title": "Sesiones activas",
+    "current": "Este dispositivo",
+    "lastUsed": "Último uso {time}",
+    "close": "Cerrar",
+    "unknownDevice": "Dispositivo desconocido"
   }
 }

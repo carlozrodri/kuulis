@@ -328,6 +328,16 @@
       "redeem": "Use code",
       "redeemed": "Done! Your code is registered",
       "referredBy": "{{name}} invited you. Thanks for joining."
+    },
+    "sessions": {
+      "title": "Active sessions",
+      "rowHint": "Devices signed in to your account",
+      "subtitle": "If you don't recognize a device, sign it out and change your password.",
+      "thisDevice": "This device",
+      "lastUsed": "Last used: {{time}}",
+      "close": "Sign out",
+      "closed": "Session closed",
+      "unknownDevice": "Unknown device"
     }
   },
   "driver": {
@@ -571,7 +581,8 @@
     "referral_closed": "Codes can only be used before your first ride.",
     "referral_driver_only": "Only drivers can use invite codes.",
     "trusted_contact_incomplete": "Enter your contact's name and phone number.",
-    "account_ride_active": "Finish your current ride before deleting your account."
+    "account_ride_active": "Finish your current ride before deleting your account.",
+    "session_not_found": "That session was already closed"
   },
   "map": {
     "recenter": "Recenter map"

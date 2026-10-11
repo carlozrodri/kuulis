@@ -19,6 +19,7 @@ import {
   Moon,
   MonitorSmartphone,
   Pencil,
+  Smartphone,
   Sparkles,
   Star,
   Sun,
@@ -249,6 +250,14 @@ export function ProfileScreen() {
                 }
                 divider
                 onPress={() => router.push('/profile/contact')}
+              />
+              <ListRow
+                icon={Smartphone}
+                iconTone="neutral"
+                title={t('profile.sessions.title')}
+                subtitle={t('profile.sessions.rowHint')}
+                divider
+                onPress={() => router.push('/profile/sessions')}
               />
               <ListRow
                 icon={MonitorSmartphone}

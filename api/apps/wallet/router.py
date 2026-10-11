@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from apps.config.services import get_app_config
 from apps.subscriptions import services as subscriptions
 from apps.subscriptions.schemas import ChargeRead
-from apps.users.dependencies import AdminUser, CurrentUser, DBSession, StaffUser
+from apps.users.dependencies import AdminUser, CurrentUser, DBSession, StaffUser, VerifiedAdminUser
 from apps.users.models import User
 from apps.wallet import services
 from apps.wallet.models import TopUp, TopUpStatus
@@ -219,7 +219,7 @@ async def admin_entries(
 
 @admin_router.post("/wallets/{user_id}/adjust", response_model=WalletEntryRead, status_code=201)
 async def adjust(
-    user_id: uuid.UUID, data: Adjustment, admin: AdminUser, session: DBSession
+    user_id: uuid.UUID, data: Adjustment, admin: VerifiedAdminUser, session: DBSession
 ) -> WalletEntryRead:
     entry = await services.adjust(session, admin, user_id, data.amount, data.reason)
     await session.commit()

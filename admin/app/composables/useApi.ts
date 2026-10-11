@@ -1,5 +1,6 @@
 import type { FetchOptions } from 'ofetch'
 import type { ApiErrorBody } from '~/types/api'
+import { CLIENT_HEADERS } from '~/composables/useAuth'
 
 /** $fetch wrapper: base URL, bearer token, one transparent retry after refreshing on 401. */
 export function useApi() {
@@ -15,6 +16,7 @@ export function useApi() {
         ...options,
         headers: {
           'Accept-Language': $i18n.locale.value,
+          ...CLIENT_HEADERS,
           ...(auth.accessToken.value ? { Authorization: `Bearer ${auth.accessToken.value}` } : {}),
           ...(options.headers as Record<string, string> | undefined),
         },
@@ -31,6 +33,16 @@ export function useApi() {
       if (status === 401) {
         auth.clearSession()
         await navigateTo('/login')
+      }
+      const code = (error as { data?: ApiErrorBody }).data?.error?.code
+      // A session from before the second factor existed: sign in again (with the code).
+      if (status === 403 && code === 'admin_mfa_required') {
+        auth.clearSession()
+        await navigateTo('/login')
+      }
+      // Sensitive action: ask for a fresh authenticator code, then try once more.
+      if (status === 403 && code === 'reauth_required' && (await useReauth().ask())) {
+        return await call()
       }
       throw error
     }

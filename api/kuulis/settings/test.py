@@ -12,6 +12,7 @@ class TestSettings(BaseAppSettings):
     REDIS_URL: RedisDsn = RedisDsn("redis://localhost:6379/15")
     LOG_JSON: bool = False
     RATE_LIMIT_ENABLED: bool = False
+    ADMIN_TOTP_REQUIRED: bool = False  # tests that need it turn it on
     EMAIL_ENABLED: bool = False
     PUSH_ENABLED: bool = False
     STORAGE_PREFIX: str = "test"
