@@ -96,10 +96,10 @@ chat ni los logs. Revisado el 2026-10-11 comparando huellas, sin leer valores.
 | `BACKUP_S3_*` (R2) | worker | por entorno | 2026-10-11 (alta en QA) | token de R2 con permiso solo de escritura y lectura en su bucket |
 | `BACKUP_PASSPHRASE` | worker + gestor de contraseñas de Carlos | por entorno | 2026-10-11 | **guardar la anterior**: los backups viejos solo se abren con ella |
 | `FIRST_SUPERUSER_PASSWORD` | API | distinta | alta | cambiar la contraseña desde Mi perfil; la variable solo sirve para el primer arranque |
-| `BINANCE_API_KEY` / `BINANCE_API_SECRET` | API y worker (solo QA por ahora) | — | alta | clave de solo lectura con IP fija si Binance lo permite |
+| `BINANCE_API_KEY` / `BINANCE_API_SECRET` | API y worker (solo QA por ahora) | — | alta | de solo lectura (confirmado por Carlos el 2026-10-11) |
 | `METRICS_TOKEN` | API | por entorno | aún sin poner | cambiarlo aquí y en el scraper |
-| `ALERT_TELEGRAM_BOT_TOKEN` | API y worker | el mismo bot | aún sin poner | `/revoke` en BotFather |
-| `SENTRY_DSN` | API y worker | por entorno | aún sin poner | nuevo DSN en GlitchTip |
+| `ALERT_TELEGRAM_BOT_TOKEN` | API y worker | el mismo bot | 2026-10-11 (alta en QA) | `/revoke` en BotFather |
+| `SENTRY_DSN` | API y worker | por entorno | pendiente (GlitchTip listo el 2026-10-11) | nuevo DSN en GlitchTip |
 | Token de Expo (EAS) | cuenta de Expo de Carlos, `EXPO_ACCESS_TOKEN` | — | **pendiente**: se pegó en un chat; Carlos lo rota | revocarlo en expo.dev y crear otro |
 
 Reglas: un secreto por entorno (QA nunca debe abrir datos de producción), rotar al salir alguien del
@@ -184,7 +184,15 @@ porque Coolify hace rolling update y la versión vieja convive unos segundos con
 - Admin → **Sistema** muestra todo eso en vivo; la portada avisa si hay alertas abiertas.
 - `GET /api/metrics` (Prometheus) con `Authorization: Bearer <METRICS_TOKEN>`.
 - Los logs JSON llevan `request_id`, `user_id` y `ride_id` cuando aplican.
-- Monitor externo (fuera del homelab): UptimeRobot sobre `/api/health/ready`.
+- Monitor externo (fuera del homelab): UptimeRobot sobre `/api/health/live` de QA (puesto por Carlos el
+  2026-10-11).
+- Telegram: bot `@Kuulis_bot`; el token está en API y worker de QA. El chat de alertas es el último chat privado
+  que le escribió al bot (o `ALERT_TELEGRAM_CHAT_ID`).
+- Errores: GlitchTip propio en `https://glitchtip.top8.uk` (servicio `GlitchTip` · `ltics19o8wipo8ri1sxrkpog`,
+  servidor `localhost`, entorno QA). Su dominio en Coolify lleva el puerto del contenedor
+  (`https://glitchtip.top8.uk:8000`); sin el puerto Traefik responde 502. El DSN del proyecto va en `SENTRY_DSN`.
+- Prueba automática completa (`scripts/smoke_e2e.py`): la cuenta `SMOKE_ADMIN_*` (marcada como de prueba) tiene
+  su correo, contraseña y clave 2FA guardados como variables de la API de QA en Coolify; no se usan en la app.
 
 ## Encender producción (lista)
 Orden a seguir; no saltar pasos.

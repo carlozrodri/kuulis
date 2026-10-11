@@ -3,6 +3,9 @@
 Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blockers.md`.
 
 ## Infra
+- [ ] Una clave de S3 por entorno, limitada a su prefijo (hoy QA y producción comparten la misma; hallazgo M3
+      de `produccion/revision-seguridad.md`). Carlos lo deja para más adelante (2026-10-11).
+- [ ] Rotar el token de Expo que se pegó en un chat (Carlos lo deja para más adelante, 2026-10-11).
 - [ ] Protección de ramas `qa` y `main` en GitHub (Carlos, cuando quiera; ver `deployment.md`). Hasta
       entonces, no fusionar con el check `ci` en rojo.
 - [ ] Preparar el VPS de contingencia (apagado) y el dominio de marca antes de lanzar (ver
