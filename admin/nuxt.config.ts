@@ -33,6 +33,24 @@ export default defineNuxtConfig({
         'X-Frame-Options': 'DENY',
         'X-Content-Type-Options': 'nosniff',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+        'Strict-Transport-Security': 'max-age=31536000',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        // Scripts only from this origin ('unsafe-inline' for the small bootstrap scripts Nuxt and
+        // the color mode inline in the SPA shell). Images also from https: (map tiles and the
+        // short-lived S3 links of driver documents). The API is same-origin (/api).
+        'Content-Security-Policy': [
+          'default-src \'self\'',
+          'script-src \'self\' \'unsafe-inline\'',
+          'style-src \'self\' \'unsafe-inline\'',
+          'img-src \'self\' data: blob: https:',
+          'font-src \'self\' data:',
+          'connect-src \'self\'',
+          'object-src \'none\'',
+          'base-uri \'self\'',
+          'form-action \'self\'',
+          'frame-ancestors \'none\'',
+        ].join('; '),
       },
     },
   },
@@ -56,5 +74,12 @@ export default defineNuxtConfig({
       { code: 'en', language: 'en-US', name: 'English', file: 'en.json' },
     ],
     detectBrowserLanguage: { useCookie: true, cookieKey: 'kuulis_locale', fallbackLocale: 'es' },
+  },
+
+  // Every icon ships in the bundle (scanned from the source): no requests to api.iconify.design,
+  // which the CSP's connect-src would block anyway.
+  icon: {
+    clientBundle: { scan: true, sizeLimitKb: 512 },
+    fallbackToApi: false,
   },
 })

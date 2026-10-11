@@ -151,6 +151,9 @@
   },
   "errors": {
     "generic": "Something went wrong, please try again",
+    "login_locked": "Too many attempts. Try again in {minutes} min.",
+    "password_too_common": "That password is too common, choose another one",
+    "rate_limited": "Too many requests, wait a moment",
     "invalid_credentials": "Wrong email or password",
     "admin_required": "Your account cannot access the admin panel",
     "account_disabled": "Account disabled",

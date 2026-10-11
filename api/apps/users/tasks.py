@@ -37,6 +37,20 @@ TEMPLATES = {
             "Hi {name}, reset your password here: <a href='{link}'>{link}</a>",
         ),
     },
+    "login_locked": {
+        "es": (
+            "Intentos fallidos de entrar a tu cuenta",
+            "Hola {name}, hubo varios intentos fallidos de entrar a tu cuenta de Kuulis y la "
+            "bloqueamos unos minutos. Si no fuiste tú, cambia tu contraseña desde la app "
+            "(Olvidé mi contraseña).",
+        ),
+        "en": (
+            "Failed sign-in attempts on your account",
+            "Hi {name}, there were several failed attempts to sign in to your Kuulis account, so "
+            "we locked it for a few minutes. If it was not you, change your password in the app "
+            "(Forgot password).",
+        ),
+    },
 }
 
 

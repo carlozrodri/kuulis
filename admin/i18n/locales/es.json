@@ -151,6 +151,9 @@
   },
   "errors": {
     "generic": "Algo salió mal, inténtalo de nuevo",
+    "login_locked": "Demasiados intentos. Intenta de nuevo en {minutes} min.",
+    "password_too_common": "Esa contraseña es demasiado común, elige otra",
+    "rate_limited": "Demasiadas solicitudes, espera un momento",
     "invalid_credentials": "Correo o contraseña incorrectos",
     "admin_required": "Tu cuenta no tiene acceso al panel",
     "account_disabled": "Cuenta desactivada",

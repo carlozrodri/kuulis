@@ -14,6 +14,7 @@ from apps.auth.schemas import (
     TokenRequest,
 )
 from apps.moderation import services as moderation
+from apps.users import passwords
 from apps.users import services as users
 from apps.users.dependencies import CurrentUser, DBSession
 from apps.users.schemas import UserCreate, UserRead
@@ -27,6 +28,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
 @limiter.limit(settings.RATE_LIMIT_AUTH)
 async def register(request: Request, data: RegisterRequest, session: DBSession) -> AuthResponse:
+    passwords.ensure_allowed(data.password)
     user = await users.create_user(session, UserCreate(**data.model_dump()))
     await session.commit()
     await services.send_verification_email(user)
@@ -37,7 +39,7 @@ async def register(request: Request, data: RegisterRequest, session: DBSession) 
 @router.post("/login", response_model=AuthResponse)
 @limiter.limit(settings.RATE_LIMIT_AUTH)
 async def login(request: Request, data: LoginRequest, session: DBSession) -> AuthResponse:
-    user = await users.authenticate(session, data.email, data.password)
+    user = await services.password_login(session, data.email, data.password)
     tokens = await services.issue_tokens(user)
     return AuthResponse(**tokens.model_dump(), user=await moderation.user_read(session, user))
 
@@ -46,7 +48,7 @@ async def login(request: Request, data: LoginRequest, session: DBSession) -> Aut
 @limiter.limit(settings.RATE_LIMIT_AUTH)
 async def admin_login(request: Request, data: LoginRequest, session: DBSession) -> AuthResponse:
     """Same as /login but only staff/admin roles can obtain tokens (used by the admin panel)."""
-    user = await users.authenticate(session, data.email, data.password)
+    user = await services.password_login(session, data.email, data.password)
     if not user.can_access_admin:
         raise PermissionDeniedError("Admin access required", code="admin_required")
     tokens = await services.issue_tokens(user)

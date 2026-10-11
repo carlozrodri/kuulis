@@ -6,6 +6,7 @@ from datetime import UTC, date, datetime, timedelta
 from sqlalchemy import ColumnElement, delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.users import passwords
 from apps.users.models import Role, SocialAccount, User
 from apps.users.schemas import UserAdminCreate, UserAdminUpdate, UserCreate, UserUpdateMe
 from kuulis.core import storage
@@ -58,6 +59,7 @@ async def create_user(
 
 
 async def admin_create_user(session: AsyncSession, data: UserAdminCreate) -> User:
+    passwords.ensure_allowed(data.password)
     return await create_user(session, data, role=data.role, is_verified=data.is_verified)
 
 
@@ -106,10 +108,12 @@ async def change_password(user: User, current: str, new: str) -> None:
     valid, _ = verify_password(current, user.hashed_password or "")
     if not valid:
         raise AuthenticationError("Current password is incorrect", code="invalid_credentials")
+    passwords.ensure_allowed(new)
     user.hashed_password = hash_password(new)
 
 
 async def set_password(user: User, new: str) -> None:
+    passwords.ensure_allowed(new)
     user.hashed_password = hash_password(new)
 
 

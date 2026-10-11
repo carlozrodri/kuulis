@@ -2,7 +2,7 @@ import uuid
 from datetime import date
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 
 from apps.rides import events, presence, services, stats
 from apps.rides.models import Ride, RideStatus
@@ -31,6 +31,7 @@ from apps.rides.state import RideNotFoundError
 from apps.users.dependencies import CurrentUser, DBSession, StaffUser
 from apps.users.models import User
 from kuulis.core.pagination import Page, PageParams, page_params
+from kuulis.core.rate_limit import limiter
 
 router = APIRouter(prefix="/rides", tags=["rides"])
 driver_router = APIRouter(prefix="/drivers/me", tags=["rides"])
@@ -46,12 +47,18 @@ async def _read(session: DBSession, ride, user: User) -> RideRead:
 
 
 @router.post("/quote", response_model=Quote)
-async def quote(data: QuoteRequest, user: CurrentUser, session: DBSession) -> Quote:
+@limiter.limit("30/minute")
+async def quote(
+    request: Request, data: QuoteRequest, user: CurrentUser, session: DBSession
+) -> Quote:
     return await services.create_quote(session, user, data)
 
 
 @router.post("", response_model=RideRead, status_code=status.HTTP_201_CREATED)
-async def create_ride(data: RideCreate, user: CurrentUser, session: DBSession) -> RideRead:
+@limiter.limit("6/minute")
+async def create_ride(
+    request: Request, data: RideCreate, user: CurrentUser, session: DBSession
+) -> RideRead:
     ride = await services.create_ride(session, user, data)
     return await _read(session, ride, user)
 
@@ -173,8 +180,9 @@ async def list_messages(
 
 
 @router.post("/{ride_id}/messages", response_model=MessageRead, status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute")
 async def post_message(
-    ride_id: uuid.UUID, data: MessageCreate, user: CurrentUser, session: DBSession
+    request: Request, ride_id: uuid.UUID, data: MessageCreate, user: CurrentUser, session: DBSession
 ) -> MessageRead:
     return MessageRead.model_validate(await services.post_message(session, user, ride_id, data))
 

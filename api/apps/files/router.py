@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 
 from apps.files.schemas import DownloadResponse, UploadRequest, UploadResponse
 from apps.users.dependencies import CurrentUser
 from kuulis.core import storage
 from kuulis.core.exceptions import AppError, PermissionDeniedError
+from kuulis.core.rate_limit import limiter
 from kuulis.settings import settings
 
 router = APIRouter(prefix="/files", tags=["files"])
@@ -18,7 +19,10 @@ ALLOWED_TYPES = {
 
 
 @router.post("/presign-upload", response_model=UploadResponse)
-async def presign_upload(data: UploadRequest, user: CurrentUser) -> UploadResponse:
+@limiter.limit("30/hour")
+async def presign_upload(
+    request: Request, data: UploadRequest, user: CurrentUser
+) -> UploadResponse:
     """Returns a presigned URL; the client uploads straight to S3 (the API never proxies bytes)."""
     if data.content_type not in ALLOWED_TYPES:
         raise AppError("File type not allowed", code="file_type_not_allowed")

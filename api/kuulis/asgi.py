@@ -7,7 +7,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIASGIMiddleware
 
@@ -23,7 +22,7 @@ from kuulis.core.middleware import (
     RestoreApiPrefixMiddleware,
     SecurityHeadersMiddleware,
 )
-from kuulis.core.rate_limit import limiter
+from kuulis.core.rate_limit import limiter, rate_limited_handler
 from kuulis.core.redis import redis_client
 from kuulis.core.sentry import init_sentry
 from kuulis.settings import settings
@@ -63,7 +62,7 @@ def create_app() -> FastAPI:
     )
 
     app.state.limiter = limiter
-    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    app.add_exception_handler(RateLimitExceeded, rate_limited_handler)
     register_exception_handlers(app)
 
     # Middleware order: last added runs first.

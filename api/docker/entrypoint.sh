@@ -17,7 +17,7 @@ case "${PROCESS_TYPE:-api}" in
       --keep-alive 5 \
       --max-requests 10000 \
       --max-requests-jitter 1000 \
-      --forwarded-allow-ips "*" \
+      --forwarded-allow-ips "${FORWARDED_ALLOW_IPS:-127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}" \
       --access-logfile -
     ;;
   worker)
