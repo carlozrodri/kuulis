@@ -1018,3 +1018,30 @@ export interface ApprovalHeld {
   status: 'pending_approval'
   approval: ApprovalRead
 }
+
+// ---- Legal texts (doc 07) ----
+
+export const LEGAL_KINDS = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as const
+export type LegalKind = typeof LEGAL_KINDS[number]
+
+export interface LegalVersion {
+  kind: LegalKind
+  version: number
+  locale: 'es' | 'en'
+  title: string
+  summary: string
+  requires_reacceptance: boolean
+  published_at: string
+}
+
+export interface LegalDocument extends LegalVersion {
+  body_md: string
+}
+
+export interface LegalAcceptance {
+  kind: LegalKind
+  version: number
+  ip: string | null
+  platform: string | null
+  created_at: string
+}

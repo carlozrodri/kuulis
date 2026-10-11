@@ -39,6 +39,8 @@ export type TxtProps = PropsWithChildren<{
   numberOfLines?: number;
   tabular?: boolean;
   accessibilityRole?: ComponentProps<typeof Text>['accessibilityRole'];
+  /** Inline links inside a paragraph. */
+  onPress?: () => void;
 }>;
 
 export function Txt({ variant = 'body', color = 'text', align, style, tabular, children, ...rest }: TxtProps) {

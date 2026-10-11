@@ -582,7 +582,9 @@
     "referral_driver_only": "Only drivers can use invite codes.",
     "trusted_contact_incomplete": "Enter your contact's name and phone number.",
     "account_ride_active": "Finish your current ride before deleting your account.",
-    "session_not_found": "That session was already closed"
+    "session_not_found": "That session was already closed",
+    "legal_acceptance_required": "Accept the updated terms to continue",
+    "legal_document_not_found": "Text not found"
   },
   "map": {
     "recenter": "Recenter map"
@@ -1295,5 +1297,28 @@
     "total_other": "{{count}} rides in total",
     "rating": "Your rating: {{rating}}",
     "recent": "Recent rides"
+  },
+  "legal": {
+    "title": "Legal",
+    "kinds": {
+      "terms": "Terms and conditions",
+      "privacy": "Privacy policy",
+      "community": "Community guidelines",
+      "driver_terms": "Driver terms",
+      "wallet": "Wallet conditions"
+    },
+    "versionDate": "Version {{version}} · {{date}}",
+    "acceptTitle": "Before you start",
+    "acceptBody": "Read and accept the Kuulis texts to use the app.",
+    "updatedTitle": "We updated our terms",
+    "updatedBody": "Review the changes and accept them to keep requesting or making rides.",
+    "read": "Tap to read",
+    "acceptCheck": "I have read and accept these texts",
+    "adultCheck": "I am over 18",
+    "accept": "Accept and continue",
+    "required": "Accept the terms and confirm you are over 18.",
+    "signUpPrefix": "I accept the ",
+    "signUpAnd": " and the ",
+    "socialNote": "If you sign in with Google or Apple we will ask you to accept the terms when you sign in."
   }
 }

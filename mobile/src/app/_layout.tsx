@@ -44,6 +44,7 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
   }, [pathname]);
 
   const ready = fontsReady && !isLoading && !modeLoading;
+  const pendingLegal = !!user?.pending_legal?.length;
 
   useEffect(() => {
     void SystemUI.setBackgroundColorAsync(theme.background).catch(() => undefined);
@@ -60,12 +61,18 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
       <Stack.Protected guard={!user}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
-      <Stack.Protected guard={!!user && !mode}>
+      {/* New or updated terms (doc 07): nothing else opens until they are accepted. */}
+      <Stack.Protected guard={!!user && pendingLegal}>
+        <Stack.Screen name="accept-terms" />
+      </Stack.Protected>
+      <Stack.Protected guard={!!user && !pendingLegal && !mode}>
         <Stack.Screen name="welcome" />
       </Stack.Protected>
-      <Stack.Protected guard={!!user && !!mode}>
+      <Stack.Protected guard={!!user && !pendingLegal && !!mode}>
         <Stack.Screen name="(app)" />
       </Stack.Protected>
+      {/* Legal texts open from the sign-up form, the acceptance screen and Profile. */}
+      <Stack.Screen name="legal/[kind]" options={{ animation: 'slide_from_right' }} />
     </Stack>
   );
 }

@@ -202,6 +202,10 @@ async function save() {
           @changed="refresh"
         />
         <ReportsList :user-id="user.id" />
+        <LegalAcceptancesCard
+          v-if="user.role === 'user'"
+          :user-id="user.id"
+        />
         <AuditHistoryCard
           entity-type="user"
           :entity-id="user.id"

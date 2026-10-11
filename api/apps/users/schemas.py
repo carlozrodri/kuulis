@@ -48,6 +48,8 @@ class UserRead(BaseModel):
     suspension: SuspensionRead | None = None
     # Admin panel accounts only (/users/me): what their role lets them do (apps.staff).
     permissions: list[str] | None = None
+    # Legal texts (doc 07) this user still has to accept; only on their own account.
+    pending_legal: list[str] | None = None
 
 
 class UserCreate(BaseModel):

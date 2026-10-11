@@ -19,7 +19,8 @@
     "audit": "Audit log",
     "team": "Team",
     "roles": "Roles",
-    "approvals": "Approvals"
+    "approvals": "Approvals",
+    "legal": "Legal"
   },
   "auth": {
     "title": "Admin sign in",
@@ -311,7 +312,8 @@
     "staff_role_not_found": "That role does not exist.",
     "approval_not_found": "Request not found",
     "approval_closed": "The request was already decided or expired",
-    "approval_own_request": "Someone else has to approve your request"
+    "approval_own_request": "Someone else has to approve your request",
+    "legal_document_not_found": "Legal text not found"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -1514,6 +1516,9 @@
         "request": "Asked for an approval",
         "approve": "Approved a request",
         "reject": "Rejected a request"
+      },
+      "legal": {
+        "publish": "Published a legal text"
       }
     },
     "entities": {
@@ -1534,7 +1539,8 @@
       "file": "File",
       "audit": "Audit",
       "staff_role": "Team role",
-      "approval": "Approval"
+      "approval": "Approval",
+      "legal": "Legal"
     }
   },
   "team": {
@@ -1615,6 +1621,42 @@
       "notification": {
         "broadcast": "Mass notification"
       }
+    }
+  },
+  "legal": {
+    "help": "Legal texts users see in the app. Each version is published in Spanish and English. If it requires accepting again, nobody can request or accept rides until they accept it. The current drafts are pending a lawyer's review.",
+    "current": "Version {version} · {date}",
+    "none": "Not published",
+    "read": "View",
+    "publish": "Publish new version",
+    "history": "Versions ({n})",
+    "reaccept": "Requires accepting again",
+    "who": {
+      "terms": "Accepted by every user.",
+      "privacy": "Accepted by every user.",
+      "community": "Linked from the terms; not accepted separately.",
+      "driver_terms": "Accepted by drivers.",
+      "wallet": "Accepted by drivers."
+    },
+    "publishTitle": "Publish {kind}",
+    "publishHelp": "Published as the next version in both languages. Earlier versions are kept.",
+    "title_es": "Title (Spanish)",
+    "title_en": "Title (English)",
+    "body_es": "Markdown text (Spanish)",
+    "body_en": "Markdown text (English)",
+    "summary": "What changed",
+    "summaryHelp": "Users see it on the \"We updated our terms\" screen.",
+    "reacceptLabel": "Requires accepting again",
+    "reacceptHelp": "Use it for important changes. Minor changes (typos, clarifications) do not need it.",
+    "published": "Version {version} published",
+    "acceptances": "Accepted legal texts",
+    "noAcceptances": "Has not accepted any text yet.",
+    "kinds": {
+      "terms": "Terms and conditions",
+      "privacy": "Privacy policy",
+      "community": "Community guidelines",
+      "driver_terms": "Driver terms",
+      "wallet": "Wallet conditions"
     }
   }
 }

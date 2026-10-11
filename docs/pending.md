@@ -16,6 +16,11 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
       medido (ver `deployment.md` → Backups).
 - [ ] Prueba de carga (k6/Locust) contra QA: objetivo 50 req/s y 500 WebSockets sin errores.
 
+## Legal
+- [ ] Revisión de los textos legales por un abogado venezolano antes del lanzamiento, y completar los datos
+  entre corchetes (responsable, RIF, domicilio, correo de contacto, tribunales, seguro). Se publican como versión
+  nueva desde el admin → Legal (doc 07).
+
 ## API
 - [ ] Páginas web para `verify-email` y `reset-password` (los enlaces de los emails apuntan a
       `FRONTEND_URL/verify-email?token=` y `/reset-password?token=`; hoy esas rutas no existen en el admin).

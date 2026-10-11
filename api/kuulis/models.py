@@ -8,6 +8,7 @@ from apps.audit.models import AuditLog  # noqa: F401
 from apps.auth.models import UserTotp  # noqa: F401
 from apps.config.models import AppSetting  # noqa: F401
 from apps.drivers.models import DriverDocument, DriverProfile, Vehicle  # noqa: F401
+from apps.legal.models import LegalAcceptance, LegalDocument  # noqa: F401
 from apps.moderation.models import Report, ReportNote, Suspension  # noqa: F401
 from apps.notifications.models import Device, Notification  # noqa: F401
 from apps.places.models import SavedPlace  # noqa: F401

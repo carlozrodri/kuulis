@@ -21,6 +21,7 @@ from apps.auth.schemas import (
     TokenRequest,
     TotpVerify,
 )
+from apps.legal import services as legal
 from apps.moderation import services as moderation
 from apps.users import passwords
 from apps.users import services as users
@@ -37,7 +38,9 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @limiter.limit(settings.RATE_LIMIT_AUTH)
 async def register(request: Request, data: RegisterRequest, session: DBSession) -> AuthResponse:
     passwords.ensure_allowed(data.password)
-    user = await users.create_user(session, UserCreate(**data.model_dump()))
+    user = await users.create_user(session, UserCreate(**data.model_dump(exclude={"accept_legal"})))
+    if data.accept_legal:
+        await legal.accept(session, user, list(legal.FOR_EVERYONE), request)
     await session.commit()
     await services.send_verification_email(user)
     tokens = await services.issue_tokens(user, request)

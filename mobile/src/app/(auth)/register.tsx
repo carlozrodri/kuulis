@@ -7,11 +7,15 @@ import { AuthScaffold } from '@/components/AuthScaffold';
 import { ChevronLeft, Lock, Mail, User } from '@/components/icons';
 import { SocialButtons } from '@/components/SocialButtons';
 import { Button, ErrorText, Field, IconButton, Txt } from '@/components/ui';
+import { CheckRow } from '@/features/legal/CheckRow';
 import { apiErrorMessage, apiFieldErrors } from '@/i18n';
+import type { LegalKind } from '@/lib/legal';
 import { isEmail, isPassword } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
 
-type Errors = { full_name?: string; email?: string; password?: string };
+type Errors = { full_name?: string; email?: string; password?: string; legal?: string };
+
+const openLegal = (kind: LegalKind) => router.push({ pathname: '/legal/[kind]', params: { kind } });
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
@@ -23,19 +27,22 @@ export default function RegisterScreen() {
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [socialBusy, setSocialBusy] = useState(false);
+  const [accepted, setAccepted] = useState(false);
+  const [adult, setAdult] = useState(false);
 
   async function submit() {
     const fieldErrors: Errors = {
       full_name: fullName.trim() ? undefined : t('validation.required'),
       email: isEmail(email) ? undefined : t('validation.email'),
       password: isPassword(password) ? undefined : t('validation.password'),
+      legal: accepted && adult ? undefined : t('legal.required'),
     };
     setErrors(fieldErrors);
     if (Object.values(fieldErrors).some(Boolean)) return;
     setLoading(true);
     setError(undefined);
     try {
-      await signUp(email.trim(), password, fullName.trim());
+      await signUp(email.trim(), password, fullName.trim(), true);
     } catch (e) {
       setErrors(apiFieldErrors(e));
       setError(apiErrorMessage(e));
@@ -101,10 +108,23 @@ export default function RegisterScreen() {
         returnKeyType="go"
         onSubmitEditing={submit}
       />
-      <ErrorText>{error}</ErrorText>
+      <CheckRow checked={accepted} onChange={setAccepted}>
+        {t('legal.signUpPrefix')}
+        <Txt variant="caption" color="primary" onPress={() => openLegal('terms')}>
+          {t('legal.kinds.terms')}
+        </Txt>
+        {t('legal.signUpAnd')}
+        <Txt variant="caption" color="primary" onPress={() => openLegal('privacy')}>
+          {t('legal.kinds.privacy')}
+        </Txt>
+      </CheckRow>
+      <CheckRow checked={adult} onChange={setAdult}>
+        {t('legal.adultCheck')}
+      </CheckRow>
+      <ErrorText>{errors.legal ?? error}</ErrorText>
       <Button title={t('auth.register')} onPress={submit} loading={loading} disabled={socialBusy} />
       <Txt variant="caption" color="muted" align="center" style={{ marginTop: 12 }}>
-        {t('auth.terms')}
+        {t('legal.socialNote')}
       </Txt>
     </AuthScaffold>
   );

@@ -24,6 +24,7 @@ import {
   Star,
   Sun,
   UserX,
+  ScrollText,
 } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { Button, Card, IconTile, ListRow, Sheet, TAB_BAR_SPACE, Txt, Wordmark } from '@/components/ui';
@@ -32,6 +33,7 @@ import { useDriverStats, usePassengerStats } from '@/hooks/useRides';
 import { apiErrorMessage, SUPPORTED_LOCALES, type Locale } from '@/i18n';
 import { api } from '@/lib/api';
 import { config as appConfig } from '@/lib/config';
+import { DRIVER_KINDS, type LegalKind } from '@/lib/legal';
 import { formatKm, missingProfileSteps, PROFILE_STEPS_TOTAL, type ProfileStep, ratingValue } from '@/lib/profile';
 import { formatFare } from '@/lib/ride';
 import { useStore } from '@/lib/store';
@@ -69,6 +71,7 @@ export function ProfileScreen() {
   );
 
   const driver = useDriverProfile(mode === 'driver');
+  const legalKinds: LegalKind[] = ['terms', 'privacy', 'community', ...(mode === 'driver' ? DRIVER_KINDS : [])];
   const approvedDriver = mode === 'driver' && (driver.data?.status === 'approved' || driver.data?.status === 'suspended');
   const driverStats = useDriverStats(approvedDriver);
   const passengerStats = usePassengerStats(!approvedDriver);
@@ -274,6 +277,21 @@ export function ProfileScreen() {
                 subtitle={t('profile.deactivate.hint')}
                 onPress={() => setConfirm('deactivate')}
               />
+            </Card>
+          </Section>
+
+          <Section title={t('legal.title')}>
+            <Card style={{ paddingVertical: space.xxs }}>
+              {legalKinds.map((kind, index) => (
+                <ListRow
+                  key={kind}
+                  icon={ScrollText}
+                  iconTone="neutral"
+                  title={t(`legal.kinds.${kind}`)}
+                  divider={index < legalKinds.length - 1}
+                  onPress={() => router.push({ pathname: '/legal/[kind]', params: { kind } })}
+                />
+              ))}
             </Card>
           </Section>
 
