@@ -29,6 +29,29 @@ export interface AuthResponse {
   user: User
 }
 
+export interface AdminAuthResponse extends AuthResponse {
+  /** Only right after setting up the authenticator: shown once. */
+  recovery_codes?: string[] | null
+}
+
+/** Password accepted: the second factor comes next (``totp_setup`` when there is no authenticator yet). */
+export interface AdminLoginStep {
+  status: 'totp_required' | 'totp_setup'
+  challenge: string
+  setup: { secret: string, otpauth_uri: string, qr_data_uri: string } | null
+}
+
+export interface SessionInfo {
+  id: string
+  current: boolean
+  device: string | null
+  platform: string | null
+  ip: string | null
+  created_at: string
+  last_used_at: string
+  admin: boolean
+}
+
 export interface UserStats {
   total: number
   active: number

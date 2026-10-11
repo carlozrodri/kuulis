@@ -112,6 +112,8 @@ class BaseAppSettings(BaseSettings):
     ALERT_EMAILS: CSVList = []
     # Bearer token for /api/metrics (Prometheus). Empty: the endpoint answers 404.
     METRICS_TOKEN: str = ""
+    # Staff and admins need the second factor (apps/auth/totp.py) to use the admin endpoints.
+    ADMIN_TOTP_REQUIRED: bool = True
     # Adds the raw X-Forwarded-For to each request log line, to check what the proxies send.
     LOG_FORWARDED_FOR: bool = False
 

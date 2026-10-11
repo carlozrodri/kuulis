@@ -75,6 +75,7 @@ Están puestas en Coolify (no en el repo). Lista completa en `api/.env.example` 
 | `ALERT_EMAILS` | ✓ | ✓ | resumen diario 08:00 (y alertas si no hay Telegram), separados por coma |
 | `METRICS_TOKEN` | ✓ | | token de `/api/metrics` (sin él, 404) |
 | `BACKUP_ENABLED`, `BACKUP_S3_*`, `BACKUP_PASSPHRASE` | | ✓ | backups a Cloudflare R2 (ver Backups) |
+| `ADMIN_TOTP_REQUIRED` | opcional | | `true` por defecto: el equipo entra al admin con 2FA (ver Acceso del equipo) |
 | `FORWARDED_ALLOW_IPS` | opcional | | redes de los proxies en las que se confía para `X-Forwarded-For` (por defecto las privadas; ver Límites de uso) |
 | `NUXT_PUBLIC_APP_ENV`, `NUXT_PUBLIC_API_BASE` | | | solo admin |
 
@@ -103,6 +104,20 @@ Se pone en Coolify (base de datos → Configuration), igual en QA y producción.
 | Postgres / Redis | 1,5 GB / 768 MB | por entorno |
 | OSRM / Photon | 1,5 GB / 1 GB | compartidos |
 | Compilador de APK | 6 GB | solo mientras compila; no compilar a la vez que OSRM o Photon |
+
+## Acceso del equipo (2FA)
+- Todo staff y admin entra al panel con contraseña y un código de su app de autenticación (Google
+  Authenticator, Aegis). La primera vez el panel muestra un QR para configurarla y 10 códigos de recuperación
+  de un solo uso.
+- Las sesiones abiertas desde la app móvil con una cuenta de staff no tienen permisos de admin.
+- Cambiar roles, crear usuarios, ajustar saldos y reiniciar el 2FA de alguien piden un código nuevo (vale
+  10 min en esa sesión).
+- Si alguien pierde el teléfono y sus códigos: un admin entra a su ficha → "Reiniciar 2FA"; lo configura de
+  nuevo al entrar. Si el único admin pierde ambos, se borra su fila en `user_totp` desde la base.
+- Las claves de 2FA se guardan cifradas con una clave derivada de `SECRET_KEY`: si se rota `SECRET_KEY`,
+  todo el equipo configura su autenticador de nuevo (borrar las filas de `user_totp`).
+- Cada usuario ve y cierra sus sesiones (app: Perfil → Sesiones activas; admin: Mi perfil). Cerrar una
+  sesión corta también su token de acceso al instante.
 
 ## Límites de uso
 - La IP del cliente la resuelve uvicorn desde `X-Forwarded-For` confiando solo en las redes privadas (NPM y

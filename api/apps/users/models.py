@@ -54,6 +54,10 @@ class User(BaseModel):
         back_populates="user", cascade="all, delete-orphan", lazy="raise"
     )
 
+    # Set per request from the access token (apps/users/dependencies.py), never stored.
+    auth_sid = None  # str | None (not annotated: not a column)
+    auth_mfa = False
+
     @property
     def can_access_admin(self) -> bool:
         return self.role in ADMIN_PANEL_ROLES

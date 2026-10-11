@@ -1,9 +1,13 @@
+import { Platform } from 'react-native';
+
 import { config } from './config';
 import { secureStorage } from './storage';
 import type { TokenPair } from './types';
 
 const ACCESS_KEY = 'kuulis.access_token';
 const REFRESH_KEY = 'kuulis.refresh_token';
+/** Lets the API label this device in the session list (Perfil → Sesiones activas). */
+const CLIENT_HEADERS = { 'X-Client-Platform': Platform.OS };
 
 export class ApiError extends Error {
   constructor(
@@ -58,7 +62,7 @@ export async function refreshTokens(): Promise<boolean> {
     if (!refreshToken) return false;
     const response = await fetch(`${config.apiUrl}/auth/refresh`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...CLIENT_HEADERS },
       body: JSON.stringify({ refresh_token: refreshToken }),
     });
     if (!response.ok) {
@@ -94,6 +98,7 @@ export async function api<T>(path: string, options: RequestOptions = {}, retried
     headers: {
       Accept: 'application/json',
       'Accept-Language': currentLocale,
+      ...CLIENT_HEADERS,
       ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
       ...(auth && accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...(headers as Record<string, string> | undefined),

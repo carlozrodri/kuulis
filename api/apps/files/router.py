@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query, Request
 
 from apps.files.schemas import DownloadResponse, UploadRequest, UploadResponse
-from apps.users.dependencies import CurrentUser
+from apps.users.dependencies import CurrentUser, has_admin_session
 from kuulis.core import storage
 from kuulis.core.exceptions import AppError, PermissionDeniedError
 from kuulis.core.rate_limit import limiter
@@ -40,7 +40,7 @@ async def presign_upload(
 @router.get("/download", response_model=DownloadResponse)
 async def presign_download(user: CurrentUser, key: str = Query(max_length=512)) -> DownloadResponse:
     owner_segment = f"/{user.id}/"
-    if owner_segment not in key and not user.can_access_admin:
+    if owner_segment not in key and not has_admin_session(user):
         raise PermissionDeniedError()
     return DownloadResponse(
         url=storage.presigned_download(key), expires_in=settings.STORAGE_PRESIGN_TTL_SECONDS

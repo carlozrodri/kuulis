@@ -107,5 +107,6 @@ const localeItems = computed(() =>
     </UDashboardSidebar>
 
     <slot />
+    <ReauthModal />
   </UDashboardGroup>
 </template>

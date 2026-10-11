@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["httpx>=0.27"]
+# dependencies = ["httpx>=0.27", "pyotp>=2.9"]
 # ///
 """End-to-end smoke test against a deployed environment (QA by default).
 
@@ -12,10 +12,13 @@ fails.
 
 Needs a running worker (it sends the ride offer). Run after every deploy to QA:
 
-    SMOKE_ADMIN_EMAIL=... SMOKE_ADMIN_PASSWORD=... uv run scripts/smoke_e2e.py
+    SMOKE_ADMIN_EMAIL=... SMOKE_ADMIN_PASSWORD=... SMOKE_ADMIN_TOTP_SECRET=... \
+        uv run scripts/smoke_e2e.py
     uv run scripts/smoke_e2e.py --base-url https://kuulis-qa.top8.uk
 
-The admin must have the `admin` role (flagging test accounts is admin-only). Exit code 0 means every
+The admin must have the `admin` role (flagging test accounts is admin-only) and its 2FA set up:
+SMOKE_ADMIN_TOTP_SECRET is the key shown under the QR when setting it up (a dedicated smoke
+account is best). Exit code 0 means every
 step passed. Never point it at production without a reason: it creates real rows there.
 """
 
@@ -30,6 +33,7 @@ from datetime import date
 from typing import Any
 
 import httpx
+import pyotp
 
 # A spot inside the Caracas service area; the driver waits right at the pickup so the dispatcher
 # offers the ride to them before any real driver nearby.
@@ -260,6 +264,15 @@ def main() -> int:
     print(f"Smoke test against {args.base_url}", flush=True)
     admin = Api(args.base_url)
     login = admin.call("POST", "/auth/admin/login", json={"email": email, "password": password})
+    if "challenge" in login:  # second factor (docs/deployment.md, "Acceso del equipo")
+        secret = os.environ.get("SMOKE_ADMIN_TOTP_SECRET")
+        if not secret or login["status"] != "totp_required":
+            print("Set SMOKE_ADMIN_TOTP_SECRET (the admin's 2FA key).", file=sys.stderr)
+            return 2
+        code = pyotp.TOTP(secret).now()
+        login = admin.call(
+            "POST", "/auth/admin/totp", json={"challenge": login["challenge"], "code": code}
+        )
     admin.token = login["access_token"]
     stamp = time.strftime("%Y%m%d%H%M%S")
     passenger = driver = None

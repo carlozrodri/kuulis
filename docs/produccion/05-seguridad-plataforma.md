@@ -106,6 +106,21 @@ revisión de seguridad documentada.
 - WebSocket: mensajes de hasta 4 KB, 10 por segundo, y la conexión se cierra (4001) si el token vence sin
   renovarse. La app renueva el token al recibir `auth.expiring`.
 - App y admin traducen `login_locked` (con los minutos), `password_too_common` y `rate_limited`.
+- Pendiente de Carlos: que Traefik confíe en NPM (`192.168.0.148`), porque hoy reemplaza la cabecera y la API
+  ve a todos los anónimos con la IP de NPM (`docs/deployment.md` → Límites de uso).
+
+### Parte 2 (2026-10-11)
+- 2FA (TOTP) obligatorio para staff y admin: QR la primera vez, 10 códigos de recuperación de un solo uso,
+  un código no se acepta dos veces y el reto se anula tras 5 intentos. Tabla `user_totp` con la clave cifrada.
+- Los tokens del admin llevan la marca de 2FA de la sesión; un staff que entra desde la app no tiene permisos
+  de admin (`admin_mfa_required`).
+- Código nuevo para cambiar roles, crear usuarios, ajustar saldos y reiniciar el 2FA de otro
+  (`reauth_required`; el admin lo pide en una ventana y reintenta). No existe una vista de documentos en
+  bloque, así que no hubo que protegerla.
+- Un admin reinicia el 2FA de un miembro del equipo desde su ficha.
+- Sesiones con id: la app (Perfil → Sesiones activas) y el admin (Mi perfil) muestran dispositivo, IP y
+  último uso, con cierre por sesión. Cerrar una sesión invalida su token de acceso al instante y no se
+  confunde con un robo de token (no cierra las demás).
 
 ## Preguntas para Carlos
 1. ¿2FA obligatorio para todo el equipo del admin? Recomendado: sí.

@@ -212,7 +212,12 @@
     "report_not_found": "Report not found",
     "ride_without_driver": "That ride never had a driver assigned",
     "suspension_until_invalid": "The suspension end must be in the future",
-    "too_many_open_reports": "This person already has 5 open reports"
+    "too_many_open_reports": "This person already has 5 open reports",
+    "totp_invalid": "Wrong code",
+    "totp_challenge_expired": "Too much time or too many tries. Sign in again.",
+    "admin_mfa_required": "Sign in to the panel with your verification code",
+    "reauth_required": "Confirm the action with your code",
+    "session_not_found": "That session was already closed"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -1264,5 +1269,35 @@
       "restoreOk": "Passed",
       "restoreFailed": "Failed"
     }
+  },
+  "totp": {
+    "title": "Two-step verification",
+    "setupHelp": "Scan the code with Google Authenticator, Aegis or similar and type the 6-digit code it shows.",
+    "manualKey": "Can't scan? Type this key:",
+    "codeHelp": "Type the 6-digit code from your authenticator app (or a recovery code).",
+    "code": "Code",
+    "codePlaceholder": "123456",
+    "confirm": "Confirm",
+    "back": "Back",
+    "recoveryTitle": "Recovery codes",
+    "recoveryHelp": "Keep them somewhere safe. Each one signs you in once if you lose your phone. They are not shown again.",
+    "copy": "Copy codes",
+    "copied": "Copied",
+    "continue": "I saved them, continue",
+    "reauthTitle": "Confirm with your code",
+    "reauthHelp": "This is a sensitive action. Type the code from your authenticator app.",
+    "resetTitle": "Two-step verification",
+    "resetHelp": "If they lost their phone, reset it: they set up a new one at their next sign-in and their sessions end.",
+    "reset": "Reset 2FA",
+    "resetConfirm": "Reset two-step verification for this account? Their sessions will end.",
+    "resetDone": "Done: they will set up their authenticator when they sign in again",
+    "qrAlt": "QR code for your authenticator app"
+  },
+  "sessions": {
+    "title": "Active sessions",
+    "current": "This device",
+    "lastUsed": "Last used {time}",
+    "close": "Sign out",
+    "unknownDevice": "Unknown device"
   }
 }

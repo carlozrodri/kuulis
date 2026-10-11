@@ -4,10 +4,18 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 
 from apps.auth import services as auth
+from apps.auth import totp
 from apps.moderation import services as moderation
 from apps.rides import presence
 from apps.users import services
-from apps.users.dependencies import AdminUser, CurrentUser, DBSession, StaffUser
+from apps.users.dependencies import (
+    AdminUser,
+    CurrentUser,
+    DBSession,
+    StaffUser,
+    VerifiedAdminUser,
+    ensure_recently_verified,
+)
 from apps.users.models import Role
 from apps.users.schemas import (
     ChangePassword,
@@ -84,7 +92,7 @@ async def user_stats(_: StaffUser, session: DBSession) -> UserStats:
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
-async def create_user(data: UserAdminCreate, _: AdminUser, session: DBSession) -> UserRead:
+async def create_user(data: UserAdminCreate, _: VerifiedAdminUser, session: DBSession) -> UserRead:
     return UserRead.model_validate(await services.admin_create_user(session, data))
 
 
@@ -100,7 +108,16 @@ async def update_user(
     user_id: uuid.UUID, data: UserAdminUpdate, admin: AdminUser, session: DBSession
 ) -> UserRead:
     user = await services.get_or_404(session, user_id)
+    if data.role is not None and data.role != user.role:
+        await ensure_recently_verified(admin)
     if user.id == admin.id and (data.role not in (None, Role.ADMIN) or data.is_active is False):
         raise PermissionDeniedError("You cannot demote or disable yourself", code="self_demotion")
     updated = await services.admin_update_user(user, data)
     return await moderation.user_read(session, updated, staff_view=True)
+
+
+@router.post("/{user_id}/totp/reset", status_code=status.HTTP_204_NO_CONTENT)
+async def reset_totp(user_id: uuid.UUID, _: VerifiedAdminUser, session: DBSession) -> None:
+    """Removes a staff member's authenticator (lost phone); they set it up at their next sign-in."""
+    await totp.reset(session, await services.get_or_404(session, user_id))
+    await session.commit()
