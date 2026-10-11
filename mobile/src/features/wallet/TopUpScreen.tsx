@@ -75,6 +75,8 @@ export function TopUpScreen() {
   const loading = wallet.isPending || info.isPending;
   const error = wallet.error ?? info.error;
   const payerId = wallet.data?.binance_pay_id ?? null;
+  // A new Pay ID is checked by staff on its first payment; after that top-ups are automatic.
+  const verified = wallet.data?.binance_pay_id_verified !== false;
   const current: Step = !payerId || editingId ? "binance" : step;
 
   if (loading || error || !wallet.data || !info.data) {
@@ -139,6 +141,7 @@ export function TopUpScreen() {
     <PayStep
       info={info.data}
       payerId={payerId ?? ""}
+      verified={verified}
       onChangeId={() => setEditingId(true)}
       onNotify={() => setStep("notify")}
     />
@@ -265,17 +268,20 @@ function BinanceIdStep({
 function PayStep({
   info,
   payerId,
+  verified,
   onChangeId,
   onNotify,
 }: {
   info: TopUpInfo;
   payerId: string;
+  verified: boolean;
   onChangeId: () => void;
   onNotify: () => void;
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
   const available = !!info.pay_id;
+  const automatic = info.automatic && verified;
   const min = formatAmount(info.min_amount);
 
   return (
@@ -336,19 +342,21 @@ function PayStep({
             name: info.account_name,
           }),
           t("topUp.step3", { min, payerId }),
-          info.automatic ? t("topUp.step4Auto") : t("topUp.step4Manual"),
+          automatic ? t("topUp.step4Auto") : t("topUp.step4Manual"),
         ]}
       />
 
       <Notice
-        tone={info.automatic ? "success" : "info"}
-        icon={info.automatic ? Zap : ShieldCheck}
-        title={info.automatic ? t("topUp.autoTitle") : t("topUp.manualTitle")}
+        tone={automatic ? "success" : "info"}
+        icon={automatic ? Zap : ShieldCheck}
+        title={automatic ? t("topUp.autoTitle") : t("topUp.manualTitle")}
         style={{ marginTop: space.lg }}
       >
-        {info.automatic
+        {automatic
           ? t("topUp.autoBody", { payerId })
-          : t("topUp.manualBody")}
+          : info.automatic
+            ? t("topUp.firstBody")
+            : t("topUp.manualBody")}
       </Notice>
 
       <Pressable

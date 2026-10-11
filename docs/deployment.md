@@ -82,6 +82,29 @@ Están puestas en Coolify (no en el repo). Lista completa en `api/.env.example` 
 La contraseña del primer admin está en la variable `FIRST_SUPERUSER_PASSWORD` de la app API de cada entorno
 en Coolify. Conviene cambiarla desde el panel (Mi perfil) tras el primer login.
 
+### Inventario de secretos
+Solo nombres y dónde viven; los valores están en Coolify (o en la cuenta del servicio) y nunca en el repo, el
+chat ni los logs. Revisado el 2026-10-11 comparando huellas, sin leer valores.
+
+| Secreto | Dónde | QA y prod | Última rotación | Al rotarlo |
+| --- | --- | --- | --- | --- |
+| `SECRET_KEY` | API y worker | distinta (verificado) | alta del entorno (2026-10) | cierra todas las sesiones y anula el 2FA guardado: en la misma ventana, `DELETE FROM user_totp;` y el equipo vuelve a dar de alta su app |
+| `DATABASE_URL` (clave de Postgres) | API y worker | distinta | alta | cambiarla en la base y en ambas apps a la vez |
+| `REDIS_URL` | API y worker | distinta | alta | igual que la anterior |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | API y worker | **la misma** | alta | ver hallazgo M3 en `docs/produccion/revision-seguridad.md`: una clave por entorno limitada a su prefijo |
+| `RESEND_API_KEY` | API y worker | la misma | alta | crear la nueva en Resend, cambiarla y borrar la vieja |
+| `BACKUP_S3_*` (R2) | worker | por entorno | 2026-10-11 (alta en QA) | token de R2 con permiso solo de escritura y lectura en su bucket |
+| `BACKUP_PASSPHRASE` | worker + gestor de contraseñas de Carlos | por entorno | 2026-10-11 | **guardar la anterior**: los backups viejos solo se abren con ella |
+| `FIRST_SUPERUSER_PASSWORD` | API | distinta | alta | cambiar la contraseña desde Mi perfil; la variable solo sirve para el primer arranque |
+| `BINANCE_API_KEY` / `BINANCE_API_SECRET` | API y worker (solo QA por ahora) | — | alta | clave de solo lectura con IP fija si Binance lo permite |
+| `METRICS_TOKEN` | API | por entorno | aún sin poner | cambiarlo aquí y en el scraper |
+| `ALERT_TELEGRAM_BOT_TOKEN` | API y worker | el mismo bot | aún sin poner | `/revoke` en BotFather |
+| `SENTRY_DSN` | API y worker | por entorno | aún sin poner | nuevo DSN en GlitchTip |
+| Token de Expo (EAS) | cuenta de Expo de Carlos, `EXPO_ACCESS_TOKEN` | — | **pendiente**: se pegó en un chat; Carlos lo rota | revocarlo en expo.dev y crear otro |
+
+Reglas: un secreto por entorno (QA nunca debe abrir datos de producción), rotar al salir alguien del
+equipo o ante cualquier sospecha, y anotar aquí la fecha de cada rotación.
+
 ### Configuración de Redis y Postgres
 Se pone en Coolify (base de datos → Configuration), igual en QA y producción. Requiere reiniciar la base.
 - **Redis** (`redis.conf` personalizado): `appendonly yes`, `appendfsync everysec`, `save 900 1`,
@@ -124,6 +147,10 @@ Se pone en Coolify (base de datos → Configuration), igual en QA y producción.
   Traefik): toma la última dirección que no es de un proxy, así que una IP inventada por el cliente no cuenta.
   Cada línea del log de peticiones trae `ip`; si alguna vez sale una IP privada para todos, el proxy está
   borrando la cabecera y hay que revisar NPM o Traefik.
+- Traefik de Coolify (servidor `localhost`) confía en NPM: su configuración lleva
+  `--entrypoints.http.forwardedHeaders.trustedIPs=192.168.0.148/32` y lo mismo para `https` (puesto el
+  2026-10-11; si se regenera la configuración del proxy en Coolify hay que volver a ponerlo). Sin eso Traefik
+  reemplaza la cabecera y la API ve a todos los anónimos con la IP de NPM.
 - Con sesión: límite por usuario (120/min general). Sin sesión: por IP (120/min general, 20/min en login,
   registro y restablecer contraseña).
 - Límites propios: cotizar 30/min, pedir viaje 6/min, mensajes del chat 30/min, reportes 10/h, subir archivos
@@ -132,6 +159,8 @@ Se pone en Coolify (base de datos → Configuration), igual en QA y producción.
   en 24 h) y un correo al dueño en el primero. Respuesta `429 login_locked` con `retry_after`.
 - WebSocket: mensajes de hasta 4 KB y 10 por segundo; la conexión dura lo que el token de acceso (la app lo
   renueva al recibir `auth.expiring`).
+- Código del 2FA: además de 5 intentos por reto, 10 códigos errados por cuenta en 15 min la bloquean hasta que
+  pase la ventana (`429 login_locked`), aunque se pida un reto nuevo.
 
 ## Migraciones
 La API ejecuta `alembic upgrade head` al arrancar (`RUN_MIGRATIONS=true`). Para crear una:

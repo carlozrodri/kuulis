@@ -18,7 +18,13 @@ from apps.subscriptions.schemas import (
     SubscriptionSummary,
     UserBrief,
 )
-from apps.users.dependencies import AdminUser, CurrentUser, DBSession, StaffUser
+from apps.users.dependencies import (
+    AdminUser,
+    CurrentUser,
+    DBSession,
+    StaffUser,
+    VerifiedAdminUser,
+)
 from apps.users.models import User
 from apps.wallet.schemas import ReasonBody
 from kuulis.core.calendar import local_now, month_start, parse_month
@@ -105,7 +111,7 @@ async def charges(
 
 @admin_router.post("/charges/{charge_id}/waive", response_model=ChargeRead)
 async def waive(
-    charge_id: uuid.UUID, data: ReasonBody, admin: AdminUser, session: DBSession
+    charge_id: uuid.UUID, data: ReasonBody, admin: VerifiedAdminUser, session: DBSession
 ) -> ChargeRead:
     charge = await services.waive(session, admin, charge_id, data.reason)
     await session.commit()

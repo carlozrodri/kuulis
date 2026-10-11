@@ -52,7 +52,10 @@ construir. Las preguntas de cada documento están en su sección final.
 - **02** hecho en QA (2026-10-11): OSRM y Photon propios, Redis con AOF, Postgres ajustado, commit en `/health`,
   listas de encendido y de despliegue. Pendiente para producción: dominio propio y VPS de contingencia.
 - **04** hecho en código (2026-10-11): backups cifrados a R2 cada 15 min, libro contable, copia de archivos y
-  prueba de restauración semanal. Falta el bucket de R2 para activarlo en QA.
+  prueba de restauración semanal. Activo en QA desde el 2026-10-11.
+- **03** hecho en código (2026-10-11); faltan el bot de Telegram, GlitchTip y UptimeRobot de parte de Carlos.
+- **05** hecho (2026-10-11): límites de uso con la IP real, bloqueo de login, 2FA del equipo, sesiones visibles,
+  fotos sin EXIF y revisión de seguridad sin hallazgos altos (`revision-seguridad.md`).
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

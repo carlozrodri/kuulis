@@ -91,11 +91,11 @@ def presigned_upload(key: str, content_type: str) -> str:
     )
 
 
-def presigned_download(key: str) -> str:
+def presigned_download(key: str, expires_in: int | None = None) -> str:
     return get_s3_client().generate_presigned_url(
         "get_object",
         Params={"Bucket": settings.AWS_S3_BUCKET, "Key": key},
-        ExpiresIn=settings.STORAGE_PRESIGN_TTL_SECONDS,
+        ExpiresIn=expires_in or settings.STORAGE_PRESIGN_TTL_SECONDS,
     )
 
 

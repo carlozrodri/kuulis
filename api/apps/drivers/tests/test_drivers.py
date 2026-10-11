@@ -36,7 +36,9 @@ REQUIRED = [
 def fake_storage(monkeypatch):
     """Presign returns fake URLs and every key "exists" in S3 as a JPEG."""
     monkeypatch.setattr(storage, "presigned_upload", lambda key, ct: f"https://s3.test/{key}")
-    monkeypatch.setattr(storage, "presigned_download", lambda key: f"https://s3.test/get/{key}")
+    monkeypatch.setattr(
+        storage, "presigned_download", lambda key, expires_in=None: f"https://s3.test/get/{key}"
+    )
     monkeypatch.setattr(
         storage, "head_object", lambda key: {"ContentType": "image/jpeg", "ContentLength": 1000}
     )

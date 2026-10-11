@@ -371,6 +371,8 @@ export interface Wallet {
   currency: string;
   // Phase 1D (optional: older servers do not send them).
   binance_pay_id?: string | null;
+  // False until staff match a first payment from the Pay ID (then top-ups are automatic).
+  binance_pay_id_verified?: boolean;
   transfer?: TransferAllowance | null;
 }
 

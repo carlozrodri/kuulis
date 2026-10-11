@@ -45,6 +45,7 @@ async def update_me(data: UserUpdateMe, user: CurrentUser, session: DBSession) -
 @router.post("/me/password", status_code=status.HTTP_204_NO_CONTENT)
 async def change_password(data: ChangePassword, user: CurrentUser) -> None:
     await services.change_password(user, data.current_password, data.new_password)
+    await auth.revoke_others(str(user.id), user.auth_sid)  # other devices sign in again
 
 
 @router.delete("/me", response_model=DeletionScheduled)

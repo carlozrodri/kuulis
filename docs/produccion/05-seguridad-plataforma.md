@@ -122,6 +122,20 @@ revisión de seguridad documentada.
   último uso, con cierre por sesión. Cerrar una sesión invalida su token de acceso al instante y no se
   confunde con un robo de token (no cierra las demás).
 
+### Parte 3 (2026-10-11)
+- Fotos: al registrar un documento del motorizado o un avatar, el worker baja la imagen, la endereza y la
+  vuelve a guardar sin EXIF (ubicación, teléfono, fecha). PDF y HEIC se quedan como están.
+- Archivos ajenos: solo el dueño o el equipo con sesión de admin; el equipo recibe enlaces de 5 minutos.
+- Tests de autorización por objeto: otro usuario u otro motorizado no puede leer ni tocar viajes, chat,
+  calificaciones, reportes, lugares guardados, notificaciones ni sesiones ajenas.
+- Secretos: inventario en `docs/deployment.md`; `SECRET_KEY` distinta en QA y producción (comparado por huella,
+  sin leer valores).
+- Revisión de seguridad (OWASP ASVS nivel 1) en `revision-seguridad.md`: sin hallazgos altos; se corrigieron
+  dos de los tres medios y casi todos los bajos (correos con HTML inyectado, Pay ID de Binance sin verificar, 2FA para
+  confirmar recargas, intentos de 2FA por cuenta, búsqueda de destinatarios, sesiones al cambiar contraseña,
+  logs de errores de la app y largos máximos). Queda abierto separar la clave del S3 de QA y producción.
+- Traefik ya confía en NPM y la API ve la IP real de cada cliente (verificado en los logs de QA).
+
 ## Preguntas para Carlos
 1. ¿2FA obligatorio para todo el equipo del admin? Recomendado: sí.
 2. ¿Rotaste ya el token de Expo del bloqueo 8?

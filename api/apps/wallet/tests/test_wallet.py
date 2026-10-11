@@ -117,53 +117,62 @@ async def test_binance_payments_match_or_wait(client, admin_headers, monkeypatch
     )
     await client.post(f"{API}/wallet/me/top-ups", json={"amount": "5"}, headers=luis.headers)
 
+    def payment(tx: str, amount: str, payer: int | None = None, currency: str = "USDT") -> dict:
+        item = {"transactionId": tx, "transactionTime": 1, "amount": amount, "currency": currency}
+        if payer is not None:
+            item["payerInfo"] = {"name": "Luis", "binanceId": payer}
+        return item
+
     items = [
-        {
-            "transactionId": "T1",
-            "transactionTime": 1,
-            "amount": "5.00",
-            "currency": "USDT",
-            "payerInfo": {"name": "Luis", "binanceId": 111222333},
-        },
-        {
-            "transactionId": "T2",
-            "transactionTime": 2,
-            "amount": "7",
-            "currency": "USDT",
-            "payerInfo": {"name": "Desconocido", "binanceId": 999},
-        },
-        {"transactionId": "T3", "transactionTime": 3, "amount": "-3", "currency": "USDT"},
-        {"transactionId": "T4", "transactionTime": 4, "amount": "8", "currency": "BTC"},
+        payment("T1", "5.00", 111222333),  # Luis's Pay ID, not verified yet: waits for staff
+        payment("T2", "7", 999),
+        payment("T3", "-3"),
+        payment("T4", "8", currency="BTC"),
     ]
 
     async def fake_fetch(start, end):
         return items
 
+    async def reconcile():
+        await binance.redis_client.delete(binance.LOCK_KEY)
+        async with SessionLocal() as session:
+            return await binance.reconcile(session)
+
     monkeypatch.setattr(binance, "fetch_transactions", fake_fetch)
-    async with SessionLocal() as session:
-        assert await binance.reconcile(session) == 2
-    await binance.redis_client.delete(binance.LOCK_KEY)
-    async with SessionLocal() as session:  # the same payments again: ignored
-        assert await binance.reconcile(session) == 0
+    assert await reconcile() == 2
+    assert await reconcile() == 0  # the same payments again: ignored
     async with SessionLocal() as session:  # lock still held: not this worker's turn
         assert await binance.reconcile(session) is None
 
-    assert (await client.get(f"{API}/wallet/me", headers=luis.headers)).json()["balance"] == "5.00"
+    wallet = (await client.get(f"{API}/wallet/me", headers=luis.headers)).json()
+    assert wallet["balance"] == "0.00" and wallet["binance_pay_id_verified"] is False
     async with SessionLocal() as session:
         rows = list(await session.scalars(select(TopUp).order_by(TopUp.created_at)))
     assert [r.status for r in rows] == [
-        TopUpStatus.COMPLETED,  # the driver's notice, settled by T1
-        TopUpStatus.COMPLETED,  # T1
+        TopUpStatus.PENDING,  # the driver's notice
+        TopUpStatus.UNMATCHED,  # T1
         TopUpStatus.UNMATCHED,  # T2
     ]
-    unmatched = rows[2]
-    assigned = await client.post(
-        f"{API}/admin/top-ups/{unmatched.id}/assign",
-        json={"user_id": luis.id},
-        headers=admin_headers,
+    for unmatched in rows[1:]:
+        assigned = await client.post(
+            f"{API}/admin/top-ups/{unmatched.id}/assign",
+            json={"user_id": luis.id},
+            headers=admin_headers,
+        )
+        assert assigned.status_code == 200, assigned.text
+    wallet = (await client.get(f"{API}/wallet/me", headers=luis.headers)).json()
+    assert wallet["balance"] == "12.00" and wallet["binance_pay_id_verified"] is True
+
+    # Verified by staff matching T1: the next payment from it is credited on its own.
+    items.append(payment("T5", "3", 111222333))
+    assert await reconcile() == 1
+    assert (await client.get(f"{API}/wallet/me", headers=luis.headers)).json()["balance"] == "15.00"
+
+    # Changing the Pay ID needs a new check.
+    changed = await client.put(
+        f"{API}/wallet/me/binance", json={"binance_pay_id": "444555666"}, headers=luis.headers
     )
-    assert assigned.status_code == 200, assigned.text
-    assert (await client.get(f"{API}/wallet/me", headers=luis.headers)).json()["balance"] == "12.00"
+    assert changed.json()["binance_pay_id_verified"] is False
 
 
 @pytest.mark.parametrize(
@@ -177,6 +186,16 @@ async def test_recipient_lookup(client, query):
     )
     assert response.status_code == 200, response.text
     assert response.json()["name"] == "Luis G."
+
+
+@pytest.mark.parametrize("query", ["+0000000", "5800000000", "1234567", "4567"])
+async def test_recipient_lookup_needs_a_whole_phone(client, query):
+    await make_driver(client, "luis@example.com", "Luis Gómez")
+    ana = await make_driver(client, "ana2@example.com", "Ana Ruiz")
+    response = await client.get(
+        f"{API}/wallet/recipients", params={"q": query}, headers=ana.headers
+    )
+    assert response.status_code == 404
 
 
 async def test_transfers(client, admin_headers, staff_headers):

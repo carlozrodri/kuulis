@@ -54,6 +54,7 @@ async def _wallet_read(session: DBSession, user: User) -> WalletRead:
     return WalletRead(
         balance=wallet.balance if wallet else services.ZERO,
         binance_pay_id=wallet.binance_pay_id if wallet else None,
+        binance_pay_id_verified=bool(wallet and wallet.binance_pay_id_verified_at),
         transfer=await services.transfer_limit(session, user.id, config),
     )
 
@@ -159,7 +160,7 @@ async def _top_up_response(session: DBSession, top_up: TopUp) -> TopUpAdminRead:
 
 @admin_router.post("/top-ups/{top_up_id}/confirm", response_model=TopUpAdminRead)
 async def confirm(
-    top_up_id: uuid.UUID, data: TopUpConfirm, admin: AdminUser, session: DBSession
+    top_up_id: uuid.UUID, data: TopUpConfirm, admin: VerifiedAdminUser, session: DBSession
 ) -> TopUpAdminRead:
     top_up = await services.confirm_top_up(session, admin, top_up_id, data.amount, data.reference)
     return await _top_up_response(session, top_up)
@@ -175,7 +176,7 @@ async def reject(
 
 @admin_router.post("/top-ups/{top_up_id}/assign", response_model=TopUpAdminRead)
 async def assign(
-    top_up_id: uuid.UUID, data: TopUpAssign, admin: AdminUser, session: DBSession
+    top_up_id: uuid.UUID, data: TopUpAssign, admin: VerifiedAdminUser, session: DBSession
 ) -> TopUpAdminRead:
     top_up = await services.assign_top_up(session, admin, top_up_id, data.user_id)
     return await _top_up_response(session, top_up)

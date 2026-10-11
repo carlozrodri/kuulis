@@ -28,6 +28,7 @@ dependencies = [
     "tzdata>=2024.1",
     "pyotp>=2.10.0",
     "segno>=1.6.6",
+    "pillow>=12.3.0",
 ]
 
 [dependency-groups]

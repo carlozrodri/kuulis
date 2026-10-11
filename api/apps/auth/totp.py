@@ -18,6 +18,7 @@ import segno
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.auth.lockout import LoginLockedError
 from apps.auth.models import UserTotp
 from apps.auth.schemas import AdminLoginStep, TotpSetup
 from apps.users import services as users
@@ -31,6 +32,8 @@ CHALLENGE_SECONDS = 5 * 60
 MAX_ATTEMPTS = 5
 REAUTH_SECONDS = 10 * 60
 RECOVERY_CODES = 10
+MAX_CODE_FAILURES = 10  # per account, across challenges and re-auths
+CODE_FAILURE_WINDOW = 15 * 60
 _PREFIX = f"{settings.APP_ENV}:auth:totp"
 
 
@@ -40,6 +43,10 @@ def _challenge_key(challenge: str) -> str:
 
 def _reauth_key(sid: str) -> str:
     return f"{_PREFIX}:reauth:{sid}"
+
+
+def _failures_key(user_id: uuid.UUID) -> str:
+    return f"{_PREFIX}:fails:{user_id}"
 
 
 def _issuer() -> str:
@@ -83,6 +90,11 @@ async def get(session: AsyncSession, user_id: uuid.UUID) -> UserTotp | None:
 
 async def check_code(session: AsyncSession, user: User, code: str) -> None:
     """A code from the app or an unused recovery code; raises ``totp_invalid``."""
+    failures_key = _failures_key(user.id)
+    if int(await redis_client.get(failures_key) or 0) >= MAX_CODE_FAILURES:
+        # New challenges don't reset this: guessing is capped per account, not per challenge.
+        wait = max(await redis_client.ttl(failures_key), 1)
+        raise LoginLockedError(details={"retry_after": wait, "minutes": -(-wait // 60)})
     totp = await get(session, user.id)
     if totp is None or totp.confirmed_at is None:
         raise AppError("Second factor not set up", code="totp_invalid")
@@ -94,6 +106,10 @@ async def check_code(session: AsyncSession, user: User, code: str) -> None:
     if hashed in totp.recovery_codes:
         totp.recovery_codes = [c for c in totp.recovery_codes if c != hashed]
         return
+    async with redis_client.pipeline(transaction=True) as pipe:
+        pipe.incr(failures_key)
+        pipe.expire(failures_key, CODE_FAILURE_WINDOW, nx=True)
+        await pipe.execute()
     raise AppError("Invalid code", code="totp_invalid")
 
 
