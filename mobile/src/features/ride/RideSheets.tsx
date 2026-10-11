@@ -3,10 +3,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, Share } from 'react-native';
 
-import { CircleHelp, CircleX, Flag, PhoneCall, Share2 } from '@/components/icons';
+import { CircleHelp, CircleX, Flag, HeartHandshake, MessageCircle, PhoneCall, Share2 } from '@/components/icons';
 import { Sheet } from '@/components/ui';
+import { whatsappUrl } from '@/lib/profile';
 import { CANCEL_REASONS, formatPlate, shortAddress } from '@/lib/ride';
 import type { Ride } from '@/lib/types';
+import { useAuth } from '@/providers/AuthProvider';
 
 /** Re-renders every `interval` ms (clocks, ETAs). */
 export function useNow(interval = 1000) {
@@ -47,9 +49,11 @@ export function CancelSheet({
   );
 }
 
-export function shareRide(ride: Ride, t: (key: string, options?: Record<string, unknown>) => string) {
+type Translate = (key: string, options?: Record<string, unknown>) => string;
+
+function shareMessage(ride: Ride, t: Translate) {
   const vehicle = ride.driver?.vehicle;
-  const message = t('ride.shareMessage', {
+  return t('ride.shareMessage', {
     driver: ride.driver?.first_name ?? '',
     vehicle: vehicle ? `${vehicle.brand} ${vehicle.model} ${vehicle.color}`.trim() : '',
     plate: formatPlate(vehicle?.plate),
@@ -57,12 +61,30 @@ export function shareRide(ride: Ride, t: (key: string, options?: Record<string, 
     dropoff: shortAddress(ride.dropoff.address),
     maps: `https://maps.google.com/?q=${ride.dropoff.lat},${ride.dropoff.lng}`,
   });
-  return Share.share({ message }).catch(() => undefined);
+}
+
+/** Any app (system share sheet). */
+export function shareRide(ride: Ride, t: Translate) {
+  return Share.share({ message: shareMessage(ride, t) }).catch(() => undefined);
+}
+
+/**
+ * WhatsApp: straight to the trusted contact's chat, or WhatsApp's own chat picker without one.
+ * wa.me opens the app when installed (no native query scheme needed); otherwise the share sheet.
+ */
+export async function shareRideWhatsApp(ride: Ride, t: Translate, phone?: string | null) {
+  try {
+    await Linking.openURL(whatsappUrl(shareMessage(ride, t), phone));
+  } catch {
+    await shareRide(ride, t);
+  }
 }
 
 /** Safety tools: call emergencies, report a problem, share the trip. */
 export function SafetySheet({ visible, ride, onClose }: { visible: boolean; ride: Ride; onClose: () => void }) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const contact = user?.trusted_contact_phone ? { name: user.trusted_contact_name ?? '', phone: user.trusted_contact_phone } : null;
   return (
     <Sheet
       visible={visible}
@@ -82,6 +104,25 @@ export function SafetySheet({ visible, ride, onClose }: { visible: boolean; ride
           hint: t('safety.reportHint'),
           icon: Flag,
           onPress: () => router.push({ pathname: '/report', params: { ride_id: ride.id } }),
+        },
+        contact
+          ? {
+              label: t('safety.sendContact', { name: contact.name }),
+              hint: t('safety.sendContactHint'),
+              icon: HeartHandshake,
+              onPress: () => void shareRideWhatsApp(ride, t, contact.phone),
+            }
+          : {
+              label: t('safety.addContact'),
+              hint: t('safety.addContactHint'),
+              icon: HeartHandshake,
+              onPress: () => router.push('/profile/contact'),
+            },
+        {
+          label: t('safety.whatsapp'),
+          hint: t('safety.whatsappHint'),
+          icon: MessageCircle,
+          onPress: () => void shareRideWhatsApp(ride, t),
         },
         {
           label: t('safety.share'),

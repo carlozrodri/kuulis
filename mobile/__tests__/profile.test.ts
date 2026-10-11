@@ -1,6 +1,16 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { firstName, formatKm, initials, memberSince, missingProfileSteps, ratingValue } from '@/lib/profile';
+import {
+  firstName,
+  formatInviteCode,
+  formatKm,
+  initials,
+  memberSince,
+  missingProfileSteps,
+  normalizeInviteCode,
+  ratingValue,
+  whatsappUrl,
+} from '@/lib/profile';
 
 describe('profile helpers', () => {
   it('builds initials from the name, then the email', () => {
@@ -40,5 +50,18 @@ describe('profile helpers', () => {
     expect(missingProfileSteps(null)).toEqual([]);
     expect(missingProfileSteps({ avatar_key: null, full_name: 'Ana', is_verified: false })).toEqual(['photo', 'name', 'email']);
     expect(missingProfileSteps({ avatar_key: 'k', full_name: 'Ana Pérez', is_verified: true })).toEqual([]);
+  });
+});
+
+describe('sharing and invites', () => {
+  it('builds WhatsApp links', () => {
+    expect(whatsappUrl('Hola y adiós', '+58 414-123.45.67')).toBe('https://wa.me/584141234567?text=Hola%20y%20adi%C3%B3s');
+    expect(whatsappUrl('Hi')).toBe('https://wa.me/?text=Hi');
+  });
+
+  it('normalizes and formats invite codes', () => {
+    expect(normalizeInviteCode(' ab3-k7q ')).toBe('AB3K7Q');
+    expect(formatInviteCode('ab3k7q')).toBe('AB3 K7Q');
+    expect(formatInviteCode(null)).toBe('');
   });
 });

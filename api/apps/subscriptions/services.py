@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -268,6 +268,16 @@ async def charge_month(session: AsyncSession, month: date) -> RunResult:
             continue
         total, free = await month_earnings(session, profile, month, config)
         fee = fee_for(schedule.tiers, total)
+        # A free month earned by inviting a driver covers the first month with a fee.
+        referral = fee > 0 and (
+            await session.scalar(
+                update(DriverProfile)
+                .where(DriverProfile.id == profile.id, DriverProfile.free_months_credit > 0)
+                .values(free_months_credit=DriverProfile.free_months_credit - 1)
+                .returning(DriverProfile.id)
+            )
+            is not None
+        )
         now = utcnow()
         stmt = (
             insert(Charge)
@@ -277,11 +287,17 @@ async def charge_month(session: AsyncSession, month: date) -> RunResult:
                 month=month,
                 earnings=total,
                 fee=fee,
-                status=ChargeStatus.WAIVED if fee <= 0 else ChargeStatus.PENDING,
+                status=ChargeStatus.WAIVED if fee <= 0 or referral else ChargeStatus.PENDING,
                 free_period=free,
                 schedule_id=schedule.id,
                 due_at=now + timedelta(days=config.subscription_grace_days),
-                waived_reason=("free_period" if free else "below_minimum") if fee <= 0 else None,
+                waived_reason=(
+                    "referral"
+                    if referral
+                    else ("free_period" if free else "below_minimum")
+                    if fee <= 0
+                    else None
+                ),
             )
             .on_conflict_do_nothing(index_elements=[Charge.user_id, Charge.month])
             .returning(Charge.id)
@@ -295,6 +311,8 @@ async def charge_month(session: AsyncSession, month: date) -> RunResult:
         assert charge is not None
         if charge.status == ChargeStatus.WAIVED:
             result.waived += 1
+            if charge.waived_reason == "referral":
+                await _notify(session, charge, "fee_referral")
         elif await _pay(session, charge):
             result.paid += 1
             await _notify(session, charge, "fee_paid")

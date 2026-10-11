@@ -43,6 +43,8 @@ export default function AppLayout() {
           <Stack.Screen name="reports/[id]" />
           <Stack.Screen name="profile/edit" />
           <Stack.Screen name="profile/password" />
+          <Stack.Screen name="profile/place" options={{ animation: 'slide_from_bottom' }} />
+          <Stack.Screen name="profile/contact" />
         </Stack>
         <RideSync />
         <RideNavigator />

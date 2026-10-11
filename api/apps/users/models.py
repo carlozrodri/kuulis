@@ -38,6 +38,15 @@ class User(BaseModel):
     rating_sum: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     rating_count: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     rating_avg: Mapped[Decimal | None] = mapped_column(Numeric(3, 2))
+    # Driver invite code (apps.referrals), created when an approved driver first asks for it.
+    referral_code: Mapped[str | None] = mapped_column(String(12), unique=True)
+    # Someone the user trusts, to share rides with over WhatsApp (phone in E.164).
+    trusted_contact_name: Mapped[str | None] = mapped_column(String(80))
+    trusted_contact_phone: Mapped[str | None] = mapped_column(String(20))
+    # Account deletion: requested by the user (account inactive, restorable by signing in) and
+    # carried out after the grace period by apps.users.tasks (personal data erased).
+    deletion_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     social_accounts: Mapped[list["SocialAccount"]] = relationship(
         back_populates="user", cascade="all, delete-orphan", lazy="raise"

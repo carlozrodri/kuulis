@@ -58,6 +58,16 @@ TEMPLATES: dict[str, dict[str, tuple[str, str]]] = {
             "Your {fee} USDT fee is overdue. Top up your wallet to go online again.",
         ),
     },
+    "fee_referral": {
+        "es": (
+            "Tu cuota de {month} es gratis",
+            "Usaste un mes gratis por invitar a un motorizado. No pagas {fee} USDT.",
+        ),
+        "en": (
+            "Your {month} fee is free",
+            "You used a free month earned by inviting a driver. You don't pay {fee} USDT.",
+        ),
+    },
     "fee_waived": {
         "es": ("Cuota condonada", "Kuulis condonó tu cuota de {month}."),
         "en": ("Fee waived", "Kuulis waived your {month} fee."),

@@ -3,12 +3,15 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
 
+from apps.auth import services as auth
 from apps.moderation import services as moderation
+from apps.rides import presence
 from apps.users import services
 from apps.users.dependencies import AdminUser, CurrentUser, DBSession, StaffUser
 from apps.users.models import Role
 from apps.users.schemas import (
     ChangePassword,
+    DeletionScheduled,
     UserAdminCreate,
     UserAdminUpdate,
     UserRead,
@@ -36,9 +39,14 @@ async def change_password(data: ChangePassword, user: CurrentUser) -> None:
     await services.change_password(user, data.current_password, data.new_password)
 
 
-@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
-async def deactivate_me(user: CurrentUser) -> None:
-    user.is_active = False
+@router.delete("/me", response_model=DeletionScheduled)
+async def delete_me(user: CurrentUser, session: DBSession) -> DeletionScheduled:
+    """Deactivates the account now and erases the personal data after the grace period; signing
+    in before then restores it. Every session is closed."""
+    erase_at = await services.request_deletion(session, user)
+    await auth.revoke_all(str(user.id))
+    await presence.go_offline(user.id)
+    return DeletionScheduled(erase_at=erase_at)
 
 
 # --- Admin panel endpoints (staff / admin roles) -----------------------------------------------

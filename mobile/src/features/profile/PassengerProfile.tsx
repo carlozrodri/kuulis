@@ -6,20 +6,19 @@ import { View } from 'react-native';
 import { History, MapPinned } from '@/components/icons';
 import { Card, ListRow, Skeleton, Txt } from '@/components/ui';
 import { PaymentChips } from '@/features/ride/components';
-import { loadSavedPayment, rideDraft, setDraftPayment, setDraftPlace } from '@/features/ride/store';
+import { loadSavedPayment, rideDraft, setDraftPayment } from '@/features/ride/store';
+import { useSavedPlaces } from '@/hooks/useAccount';
 import { useAppConfig } from '@/hooks/useDriver';
 import { DEFAULT_PAYMENT_METHODS, shortAddress } from '@/lib/ride';
 import { useStore } from '@/lib/store';
-import type { FrequentPlace, PassengerStats } from '@/lib/types';
+import type { PassengerStats } from '@/lib/types';
 import { radius, space } from '@/theme';
 
 import { Section } from './components';
+import { rideTo, SavedPlacesCard } from './SavedPlaces';
 
-/** Frequent destination: straight to the price (pickup = where the passenger is), or search if unknown. */
-function rideTo(place: FrequentPlace) {
-  setDraftPlace('dropoff', { lat: place.lat, lng: place.lng, address: place.address });
-  router.push(rideDraft.get().pickup ? '/ride/quote' : '/ride/search');
-}
+/** Within ~150 m: a frequent place that is already saved is not listed twice. */
+const near = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => Math.abs(a.lat - b.lat) < 0.0015 && Math.abs(a.lng - b.lng) < 0.0015;
 
 export function PassengerProfile({ stats, loading }: { stats: PassengerStats | null | undefined; loading: boolean }) {
   const { t } = useTranslation();
@@ -31,10 +30,15 @@ export function PassengerProfile({ stats, loading }: { stats: PassengerStats | n
     void loadSavedPayment();
   }, []);
 
-  const places = stats?.frequent_places ?? [];
+  const saved = useSavedPlaces().data ?? [];
+  const places = (stats?.frequent_places ?? []).filter((place) => !saved.some((s) => near(s, place)));
 
   return (
     <>
+      <Section title={t('profile.saved.title')}>
+        <SavedPlacesCard />
+      </Section>
+
       <Section title={t('profile.places.title')}>
         <Card style={{ paddingVertical: space.xxs }}>
           {loading && !stats ? (

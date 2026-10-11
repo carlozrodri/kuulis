@@ -1,17 +1,18 @@
 """Business logic for users. Routers stay thin; everything reusable lives here."""
 
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 
-from sqlalchemy import ColumnElement, func, or_, select
+from sqlalchemy import ColumnElement, delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.users.models import Role, User
+from apps.users.models import Role, SocialAccount, User
 from apps.users.schemas import UserAdminCreate, UserAdminUpdate, UserCreate, UserUpdateMe
 from kuulis.core import storage
 from kuulis.core.exceptions import AppError, AuthenticationError, ConflictError, NotFoundError
 from kuulis.core.pagination import PageParams, paginate
 from kuulis.core.security import hash_password, verify_password
+from kuulis.settings import settings
 
 
 def normalize_email(email: str) -> str:
@@ -69,6 +70,7 @@ async def authenticate(session: AsyncSession, email: str, password: str) -> User
     valid, new_hash = verify_password(password, user.hashed_password)
     if not valid:
         raise AuthenticationError("Invalid email or password", code="invalid_credentials")
+    restore_if_pending_deletion(user)
     if not user.is_active:
         raise AuthenticationError("Account disabled", code="account_disabled")
     if new_hash:
@@ -87,6 +89,14 @@ async def update_me(user: User, data: UserUpdateMe) -> User:
         if key is not None and not storage.key_in_folder(key, f"avatars/{user.id}"):
             raise AppError("Invalid avatar key", code="invalid_avatar_key")
         changes["avatar_key"] = key
+    for field in ("trusted_contact_name", "trusted_contact_phone"):
+        if field in changes:
+            changes[field] = (changes[field] or "").strip() or None
+    if "trusted_contact_name" in changes or "trusted_contact_phone" in changes:
+        name = changes.get("trusted_contact_name", user.trusted_contact_name)
+        phone = changes.get("trusted_contact_phone", user.trusted_contact_phone)
+        if (name is None) != (phone is None):
+            raise AppError("Name and phone go together", code="trusted_contact_incomplete")
     for field, value in changes.items():
         setattr(user, field, value)
     return user
@@ -140,3 +150,112 @@ async def stats(session: AsyncSession) -> dict:
     rows = await session.execute(select(User.role, func.count(User.id)).group_by(User.role))
     by_role = {role.value: 0 for role in Role} | {str(r.value): c for r, c in rows.all()}
     return {"total": total, "active": active, "verified": verified, "by_role": by_role}
+
+
+# --- Account deletion --------------------------------------------------------------------------
+
+
+class ActiveRideError(ConflictError):
+    code = "account_ride_active"
+    message = "Finish your ride before deleting your account"
+
+
+def erase_at(user: User) -> datetime:
+    assert user.deletion_requested_at is not None
+    return user.deletion_requested_at + timedelta(days=settings.ACCOUNT_DELETION_GRACE_DAYS)
+
+
+def restore_if_pending_deletion(user: User) -> bool:
+    """Signing in during the grace period cancels the deletion (the password or social login
+    already proved it is the owner)."""
+    if (
+        user.is_active
+        or user.deletion_requested_at is None
+        or user.deleted_at is not None
+        or erase_at(user) <= datetime.now(UTC)
+    ):
+        return False
+    user.is_active = True
+    user.deletion_requested_at = None
+    return True
+
+
+async def request_deletion(session: AsyncSession, user: User) -> datetime:
+    from apps.rides.models import ACTIVE_STATUSES, Ride
+
+    busy = await session.scalar(
+        select(Ride.id)
+        .where(
+            or_(Ride.passenger_id == user.id, Ride.driver_id == user.id),
+            Ride.status.in_(ACTIVE_STATUSES),
+        )
+        .limit(1)
+    )
+    if busy is not None:
+        raise ActiveRideError()
+    user.is_active = False
+    user.deletion_requested_at = datetime.now(UTC)
+    await session.flush()
+    return erase_at(user)
+
+
+async def erase_due(session: AsyncSession, now: datetime | None = None, limit: int = 50) -> int:
+    """Erases the personal data of accounts whose grace period ended. Rides, payments, fees and
+    reports stay (accounting and safety records) but no longer point to a person."""
+    from apps.drivers.models import DriverDocument, DriverProfile, Vehicle
+    from apps.notifications.models import Device, Notification
+    from apps.places.models import SavedPlace
+
+    now = now or datetime.now(UTC)
+    cutoff = now - timedelta(days=settings.ACCOUNT_DELETION_GRACE_DAYS)
+    users = list(
+        await session.scalars(
+            select(User)
+            .where(
+                User.is_active.is_(False),
+                User.deleted_at.is_(None),
+                User.deletion_requested_at.is_not(None),
+                User.deletion_requested_at <= cutoff,
+            )
+            .limit(limit)
+            .with_for_update(skip_locked=True)
+        )
+    )
+    for user in users:
+        tag = user.id.hex
+        keys = [user.avatar_key] if user.avatar_key else []
+        profile = await session.scalar(
+            select(DriverProfile).where(DriverProfile.user_id == user.id)
+        )
+        if profile is not None:
+            keys += list(
+                await session.scalars(
+                    select(DriverDocument.key).where(DriverDocument.driver_id == profile.id)
+                )
+            )
+            await session.execute(
+                delete(DriverDocument).where(DriverDocument.driver_id == profile.id)
+            )
+            await session.execute(
+                update(Vehicle)
+                .where(Vehicle.driver_id == profile.id)
+                .values(plate=f"X{tag[:11]}", color="")
+            )
+            profile.national_id = f"DEL{tag[:17]}"
+            profile.rif = ""
+            profile.phone = ""
+            profile.birth_date = date(1900, 1, 1)
+        for model in (SocialAccount, Device, Notification, SavedPlace):
+            await session.execute(delete(model).where(model.user_id == user.id))
+        user.email = f"deleted-{tag}@deleted.invalid"
+        user.full_name = ""
+        user.hashed_password = None
+        user.avatar_key = None
+        user.referral_code = None
+        user.trusted_contact_name = None
+        user.trusted_contact_phone = None
+        user.deleted_at = now
+        await session.commit()
+        # After the commit: a storage hiccup leaves orphan files, never a half-erased account.
+        storage.delete_objects(keys)
+    return len(users)

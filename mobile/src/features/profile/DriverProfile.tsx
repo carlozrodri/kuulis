@@ -16,6 +16,7 @@ import { pendingTotal, subscriptionState } from '@/lib/wallet';
 import { radius, space, useTheme } from '@/theme';
 
 import { Meter, Section } from './components';
+import { InviteCard, RedeemSection } from './ReferralCard';
 
 const isActiveDriver = (driver: Driver | null | undefined) =>
   driver?.status === 'approved' || driver?.status === 'suspended';
@@ -40,7 +41,14 @@ export function DriverProfile({
       </View>
     );
   }
-  if (!isActiveDriver(driver)) return <ApplicationCard driver={driver ?? null} />;
+  if (!isActiveDriver(driver)) {
+    return (
+      <>
+        <ApplicationCard driver={driver ?? null} />
+        {driver ? <RedeemSection /> : null}
+      </>
+    );
+  }
 
   return (
     <>
@@ -77,6 +85,11 @@ export function DriverProfile({
           />
         </Card>
       </Section>
+
+      <Section title={t('profile.invite.section')}>
+        <InviteCard />
+      </Section>
+      <RedeemSection />
     </>
   );
 }

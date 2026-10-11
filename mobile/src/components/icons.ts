@@ -98,3 +98,8 @@ export { default as Moon } from 'lucide-react-native/icons/moon';
 export { default as History } from 'lucide-react-native/icons/clock-arrow-up';
 export { default as MonitorSmartphone } from 'lucide-react-native/icons/monitor-smartphone';
 export { default as TrendingUp } from 'lucide-react-native/icons/trending-up';
+export { default as Briefcase } from 'lucide-react-native/icons/briefcase';
+export { default as Ellipsis } from 'lucide-react-native/icons/ellipsis';
+export { default as UserPlus } from 'lucide-react-native/icons/user-plus';
+export { default as HeartHandshake } from 'lucide-react-native/icons/heart-handshake';
+export { default as Ticket } from 'lucide-react-native/icons/ticket';

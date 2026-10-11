@@ -15,6 +15,9 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
 - [ ] Plantillas HTML de email con diseño.
 - [ ] Scheduler de Taskiq desplegado cuando haya tareas periódicas (hoy no hay ninguna).
 - [ ] Limpieza periódica de notificaciones antiguas y dispositivos inactivos.
+- [ ] Mostrar en el admin las invitaciones entre motorizados y los meses gratis ganados.
+- [ ] Revisar en el admin las cuentas en proceso de borrado (`deletion_requested_at`); el worker
+      borra los datos personales a los 30 días (`ACCOUNT_DELETION_GRACE_DAYS`).
 
 ## Admin
 - [ ] Crear usuarios desde el panel (el endpoint `POST /users` ya existe).
@@ -23,3 +26,5 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
 ## Mobile
 - [ ] Manejo de toque en notificación push (navegar a la pantalla correspondiente).
 - [ ] Tests de componentes.
+- [ ] Enlace de invitación con el código ya puesto cuando la app esté en las tiendas (hoy el mensaje
+      de WhatsApp lleva solo el código).

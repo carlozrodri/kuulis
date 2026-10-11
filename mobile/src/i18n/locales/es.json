@@ -214,11 +214,12 @@
       "confirm": "Sí, cerrar todas"
     },
     "deactivate": {
-      "title": "Desactivar mi cuenta",
-      "hint": "Ya no podrás entrar ni pedir viajes",
-      "confirmTitle": "¿Desactivar tu cuenta?",
-      "confirmBody": "Cerramos tu sesión y tu cuenta deja de funcionar. Para recuperarla tendrás que escribirle a soporte.",
-      "confirm": "Sí, desactivar mi cuenta"
+      "title": "Eliminar mi cuenta",
+      "hint": "Borramos tus datos personales en 30 días",
+      "confirmTitle": "¿Eliminar tu cuenta?",
+      "confirmBody": "Cerramos tu sesión y en 30 días borramos tus datos personales para siempre. Si vuelves a entrar antes, recuperas tu cuenta.",
+      "confirm": "Sí, eliminar mi cuenta",
+      "done": "Tu cuenta se eliminará en 30 días"
     },
     "driver": {
       "vehicle": "Tu moto",
@@ -267,6 +268,66 @@
         "rejected_other": "{{count}} rechazados",
         "help": "Escríbele a soporte"
       }
+    },
+    "saved": {
+      "title": "Tus lugares",
+      "home": "Casa",
+      "work": "Trabajo",
+      "add_home": "Agregar casa",
+      "add_homeHint": "Pide tu moto a casa con un toque",
+      "add_work": "Agregar trabajo",
+      "add_workHint": "Tu ruta de todos los días, más rápida",
+      "addOther": "Agregar otro lugar",
+      "editOther": "Cambiar lugar",
+      "set_home": "Dirección de tu casa",
+      "set_work": "Dirección de tu trabajo",
+      "label": "Nombre",
+      "labelPlaceholder": "Gimnasio, casa de mamá…",
+      "address": "Dirección",
+      "searchPlaceholder": "Busca la dirección",
+      "useCurrent": "Usar mi ubicación actual",
+      "useCurrentHint": "Guarda el lugar donde estás ahora",
+      "savedToast": "Guardamos {{name}}",
+      "options": "Opciones de {{name}}",
+      "change": "Cambiar dirección",
+      "remove": "Quitar lugar"
+    },
+    "contact": {
+      "title": "Contacto de confianza",
+      "subtitle": "Alguien a quien enviarle tu viaje por WhatsApp con un toque.",
+      "name": "Nombre",
+      "namePlaceholder": "Ej. María Pérez",
+      "phone": "Teléfono con WhatsApp",
+      "phoneHint": "Número venezolano o con código de país",
+      "phoneInvalid": "Revisa el número, parece incompleto",
+      "how": "Durante un viaje, el botón Compartir le envía a esta persona los datos del motorizado, la placa y tu destino.",
+      "saved": "Contacto de confianza guardado",
+      "remove": "Quitar contacto",
+      "removed": "Quitamos tu contacto de confianza",
+      "rowHint": "Comparte tus viajes por WhatsApp",
+      "current": "{{name}} recibe tus viajes"
+    },
+    "invite": {
+      "section": "Invita y gana",
+      "title": "Invita a otro motorizado",
+      "body": "Cuando haga su primer viaje, te regalamos un mes de suscripción.",
+      "yourCode": "Tu código",
+      "copy": "Copiar código",
+      "copied": "Código copiado",
+      "whatsapp": "Invitar por WhatsApp",
+      "message": "¡Gana con tu moto en Kuulis! Sin comisión por viaje. Descarga la app, regístrate como motorizado y usa mi código {{code}}.",
+      "invited_one": "{{count}} invitado",
+      "invited_other": "{{count}} invitados",
+      "rewarded_one": "{{count}} ya viajó",
+      "rewarded_other": "{{count}} ya viajaron",
+      "freeMonths_one": "{{count}} mes gratis",
+      "freeMonths_other": "{{count}} meses gratis",
+      "redeemTitle": "¿Te invitó alguien?",
+      "redeemBody": "Escribe el código de quien te invitó antes de tu primer viaje. Esa persona gana un mes gratis.",
+      "codeLabel": "Código de invitación",
+      "redeem": "Usar código",
+      "redeemed": "¡Listo! Tu código quedó registrado",
+      "referredBy": "Te invitó {{name}}. Gracias por sumarte."
     }
   },
   "driver": {
@@ -498,7 +559,16 @@
     "too_many_open_reports": "Tienes 5 reportes abiertos. Espera a que el equipo responda alguno para enviar otro.",
     "not_ride_participant": "Solo puedes reportar viajes en los que estuviste.",
     "ride_without_driver": "Este viaje no tuvo motorizado asignado, así que no se puede reportar.",
-    "report_not_found": "No encontramos este reporte."
+    "report_not_found": "No encontramos este reporte.",
+    "place_not_found": "Ese lugar ya no existe.",
+    "too_many_places": "Llegaste al máximo de lugares guardados. Quita uno para agregar otro.",
+    "referral_code_invalid": "Ese código no existe. Revisa que esté bien escrito.",
+    "referral_own_code": "No puedes usar tu propio código.",
+    "referral_already_used": "Ya usaste un código de invitación.",
+    "referral_closed": "Los códigos solo se pueden usar antes de tu primer viaje.",
+    "referral_driver_only": "Solo los motorizados pueden usar códigos de invitación.",
+    "trusted_contact_incomplete": "Escribe el nombre y el teléfono de tu contacto.",
+    "account_ride_active": "Termina tu viaje en curso antes de eliminar tu cuenta."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -661,7 +731,8 @@
       "title": "Kuulis canceló este viaje",
       "body": "Nuestro equipo de soporte canceló el viaje. Si lo necesitas, puedes pedir otra moto ahora mismo."
     },
-    "reportProblem": "Reportar un problema"
+    "reportProblem": "Reportar un problema",
+    "shareWith": "Enviar a {{name}}"
   },
   "cancel": {
     "title": "¿Por qué cancelas?",
@@ -687,7 +758,13 @@
     "share": "Compartir mi viaje",
     "shareHint": "Envía los datos del motorizado y tu destino a alguien de confianza",
     "report": "Reportar un problema",
-    "reportHint": "Cuéntale al equipo de Kuulis qué pasó"
+    "reportHint": "Cuéntale al equipo de Kuulis qué pasó",
+    "sendContact": "Enviar a {{name}}",
+    "sendContactHint": "Le llega tu viaje por WhatsApp",
+    "addContact": "Agregar contacto de confianza",
+    "addContactHint": "Para enviarle tus viajes con un toque",
+    "whatsapp": "Enviar por WhatsApp",
+    "whatsappHint": "Elige a quién enviárselo"
   },
   "chat": {
     "title": "Chat",

@@ -85,6 +85,8 @@ class DriverProfile(BaseModel):
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     suspended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     first_trip_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Free months of subscription earned by inviting drivers (apps.referrals), not used yet.
+    free_months_credit: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     # Rating received as a driver (see apps/rides). ``rating_avg`` = sum / count, 2 decimals.
     rating_sum: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     rating_count: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))

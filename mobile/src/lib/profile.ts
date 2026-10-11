@@ -45,3 +45,18 @@ export function missingProfileSteps(user: Pick<User, 'avatar_key' | 'full_name' 
 }
 
 export const PROFILE_STEPS_TOTAL = 3;
+
+/** wa.me link: to one number (E.164, "+" optional) or, without a phone, WhatsApp's chat picker. */
+export function whatsappUrl(text: string, phone?: string | null): string {
+  const digits = (phone ?? '').replace(/\D/g, '');
+  return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
+}
+
+/** Invite codes are typed by hand: "ab3-k7q" -> "AB3K7Q". */
+export const normalizeInviteCode = (code: string) => code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+/** "AB3K7Q" -> "AB3 K7Q" so it is easy to read aloud. */
+export function formatInviteCode(code: string | null | undefined): string {
+  const clean = normalizeInviteCode(code ?? '');
+  return clean.length === 6 ? `${clean.slice(0, 3)} ${clean.slice(3)}` : clean;
+}

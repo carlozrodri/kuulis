@@ -16,6 +16,9 @@ export interface User {
   /** Rating received as a passenger (older servers omit it). */
   rating_avg?: number | null;
   rating_count?: number;
+  /** Someone to share rides with over WhatsApp (phone in E.164). */
+  trusted_contact_name?: string | null;
+  trusted_contact_phone?: string | null;
   /** Phase 1E: the account suspension in force, null when there is none (older servers omit it). */
   suspension?: Suspension | null;
 }
@@ -580,4 +583,28 @@ export interface PassengerStats {
   spent: string;
   /** Most visited destinations, most rides first. */
   frequent_places: FrequentPlace[];
+}
+
+/** GET /users/me/places: home and work (one each) and other saved places. */
+export type PlaceKind = "home" | "work" | "other";
+
+export interface SavedPlace extends Place {
+  id: string;
+  kind: PlaceKind;
+  /** Custom name for "other" places ("Gym"); empty for home and work. */
+  label: string;
+  updated_at: string;
+}
+
+/** GET /referrals/me: the driver's invite code and what it has earned. */
+export interface ReferralSummary {
+  /** Null until the user is an approved driver. */
+  code: string | null;
+  invited: number;
+  rewarded: number;
+  /** Free months of subscription earned and not used yet. */
+  free_months: number;
+  referred_by: string | null;
+  /** A driver before their first trip can still enter someone's code. */
+  can_redeem: boolean;
 }

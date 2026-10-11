@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Bike,
   Camera,
+  HeartHandshake,
   LifeBuoy,
   LockKeyhole,
   LogOut,
@@ -148,6 +149,7 @@ export function ProfileScreen() {
       showToast(apiErrorMessage(e), 'danger');
       return;
     }
+    showToast(t('profile.deactivate.done'), 'info');
     await signOut();
   }
 
@@ -236,6 +238,18 @@ export function ProfileScreen() {
 
           <Section title={t('profile.security')}>
             <Card style={{ paddingVertical: space.xxs }}>
+              <ListRow
+                icon={HeartHandshake}
+                iconTone="accent"
+                title={t('profile.contact.title')}
+                subtitle={
+                  user?.trusted_contact_name
+                    ? t('profile.contact.current', { name: user.trusted_contact_name })
+                    : t('profile.contact.rowHint')
+                }
+                divider
+                onPress={() => router.push('/profile/contact')}
+              />
               <ListRow
                 icon={MonitorSmartphone}
                 iconTone="neutral"

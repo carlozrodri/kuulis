@@ -214,11 +214,12 @@
       "confirm": "Yes, sign out everywhere"
     },
     "deactivate": {
-      "title": "Deactivate my account",
-      "hint": "You won't be able to sign in or request rides",
-      "confirmTitle": "Deactivate your account?",
-      "confirmBody": "We sign you out and your account stops working. To get it back you'll have to contact support.",
-      "confirm": "Yes, deactivate my account"
+      "title": "Delete my account",
+      "hint": "We erase your personal data in 30 days",
+      "confirmTitle": "Delete your account?",
+      "confirmBody": "We sign you out and erase your personal data for good in 30 days. Sign in before then to get your account back.",
+      "confirm": "Yes, delete my account",
+      "done": "Your account will be deleted in 30 days"
     },
     "driver": {
       "vehicle": "Your moto",
@@ -267,6 +268,66 @@
         "rejected_other": "{{count}} rejected",
         "help": "Contact support"
       }
+    },
+    "saved": {
+      "title": "Your places",
+      "home": "Home",
+      "work": "Work",
+      "add_home": "Add home",
+      "add_homeHint": "Get a ride home in one tap",
+      "add_work": "Add work",
+      "add_workHint": "Your daily route, faster",
+      "addOther": "Add another place",
+      "editOther": "Change place",
+      "set_home": "Your home address",
+      "set_work": "Your work address",
+      "label": "Name",
+      "labelPlaceholder": "Gym, mom's place…",
+      "address": "Address",
+      "searchPlaceholder": "Search the address",
+      "useCurrent": "Use my current location",
+      "useCurrentHint": "Save the place where you are now",
+      "savedToast": "{{name}} saved",
+      "options": "{{name}} options",
+      "change": "Change address",
+      "remove": "Remove place"
+    },
+    "contact": {
+      "title": "Trusted contact",
+      "subtitle": "Someone you can send your ride to on WhatsApp in one tap.",
+      "name": "Name",
+      "namePlaceholder": "e.g. María Pérez",
+      "phone": "WhatsApp phone number",
+      "phoneHint": "Venezuelan number or with country code",
+      "phoneInvalid": "Check the number, it looks incomplete",
+      "how": "During a ride, the Share button sends this person the driver's details, the plate and your destination.",
+      "saved": "Trusted contact saved",
+      "remove": "Remove contact",
+      "removed": "Trusted contact removed",
+      "rowHint": "Share your rides on WhatsApp",
+      "current": "{{name}} gets your rides"
+    },
+    "invite": {
+      "section": "Invite and earn",
+      "title": "Invite another driver",
+      "body": "When they finish their first ride, you get a free month of subscription.",
+      "yourCode": "Your code",
+      "copy": "Copy code",
+      "copied": "Code copied",
+      "whatsapp": "Invite on WhatsApp",
+      "message": "Earn with your motorbike on Kuulis! No per-ride commission. Get the app, sign up as a driver and use my code {{code}}.",
+      "invited_one": "{{count}} invited",
+      "invited_other": "{{count}} invited",
+      "rewarded_one": "{{count}} has ridden",
+      "rewarded_other": "{{count}} have ridden",
+      "freeMonths_one": "{{count}} free month",
+      "freeMonths_other": "{{count}} free months",
+      "redeemTitle": "Did someone invite you?",
+      "redeemBody": "Enter the code of whoever invited you before your first ride. They get a free month.",
+      "codeLabel": "Invite code",
+      "redeem": "Use code",
+      "redeemed": "Done! Your code is registered",
+      "referredBy": "{{name}} invited you. Thanks for joining."
     }
   },
   "driver": {
@@ -498,7 +559,16 @@
     "too_many_open_reports": "You have 5 open reports. Wait for the team to answer one before sending another.",
     "not_ride_participant": "You can only report rides you were part of.",
     "ride_without_driver": "This ride never had a driver assigned, so it can't be reported.",
-    "report_not_found": "We couldn't find this report."
+    "report_not_found": "We couldn't find this report.",
+    "place_not_found": "That place no longer exists.",
+    "too_many_places": "You've reached the limit of saved places. Remove one to add another.",
+    "referral_code_invalid": "That code doesn't exist. Check it's spelled right.",
+    "referral_own_code": "You can't use your own code.",
+    "referral_already_used": "You've already used an invite code.",
+    "referral_closed": "Codes can only be used before your first ride.",
+    "referral_driver_only": "Only drivers can use invite codes.",
+    "trusted_contact_incomplete": "Enter your contact's name and phone number.",
+    "account_ride_active": "Finish your current ride before deleting your account."
   },
   "map": {
     "recenter": "Recenter map"
@@ -661,7 +731,8 @@
       "title": "Kuulis cancelled this ride",
       "body": "Our support team cancelled the ride. If you still need it, you can request another moto right now."
     },
-    "reportProblem": "Report a problem"
+    "reportProblem": "Report a problem",
+    "shareWith": "Send to {{name}}"
   },
   "cancel": {
     "title": "Why are you cancelling?",
@@ -687,7 +758,13 @@
     "share": "Share my ride",
     "shareHint": "Send the driver's details and your destination to someone you trust",
     "report": "Report a problem",
-    "reportHint": "Tell the Kuulis team what happened"
+    "reportHint": "Tell the Kuulis team what happened",
+    "sendContact": "Send to {{name}}",
+    "sendContactHint": "They get your ride on WhatsApp",
+    "addContact": "Add a trusted contact",
+    "addContactHint": "To send them your rides in one tap",
+    "whatsapp": "Send on WhatsApp",
+    "whatsappHint": "Choose who to send it to"
   },
   "chat": {
     "title": "Chat",

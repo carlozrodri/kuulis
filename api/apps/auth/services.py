@@ -174,6 +174,7 @@ async def social_login(
                 email=identity.email,
             )
         )
+    users.restore_if_pending_deletion(user)
     if not user.is_active:
         raise AuthenticationError("Account disabled", code="user_inactive")
     if full_name and not user.full_name:

@@ -6,12 +6,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ArrowUpDown, ChevronLeft, LocateFixed, MapPin, MapPinned, SearchX, X } from '@/components/icons';
 import { IconButton, ListRow, Txt } from '@/components/ui';
+import { PLACE_ICONS } from '@/features/profile/PlacePickerScreen';
+import { usePlaceName } from '@/features/profile/SavedPlaces';
+import { useSavedPlaces } from '@/hooks/useAccount';
 import { useUserLocation } from '@/hooks/useLocation';
 import { useGeoSearch } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { placeFromGeo, shortAddress } from '@/lib/ride';
 import { useStore } from '@/lib/store';
-import type { GeoResult } from '@/lib/types';
+import type { Place } from '@/lib/types';
 import { elevation, fonts, radius, space, useTheme } from '@/theme';
 
 import { type DraftField, rideDraft, setDraftPlace } from './store';
@@ -42,13 +45,16 @@ export function SearchScreen() {
   const search = useGeoSearch(debounced, near ? { lat: near.lat, lng: near.lng } : null);
   const searching = query.trim().length >= 3;
   const results = searching ? (search.data ?? []) : [];
+  const saved = useSavedPlaces().data ?? [];
+  const placeName = usePlaceName();
+  const shortcuts = searching ? [] : saved;
 
   const proceed = (nextDraft = rideDraft.get()) => {
     if (nextDraft.pickup && nextDraft.dropoff) router.replace('/ride/quote');
   };
 
-  const choose = (result: GeoResult) => {
-    setDraftPlace(field, placeFromGeo(result));
+  const choose = (place: Place) => {
+    setDraftPlace(field, { lat: place.lat, lng: place.lng, address: place.address });
     setTexts((prev) => ({ ...prev, [field]: '' }));
     const next = rideDraft.get();
     if (field === 'pickup' && !next.dropoff) {
@@ -150,8 +156,20 @@ export function SearchScreen() {
               subtitle={field === 'pickup' ? t('search.pinPickupHint') : t('search.pinDropoffHint')}
               onPress={() => router.push({ pathname: '/ride/pin', params: { field } })}
               chevron={false}
-              divider={results.length > 0}
+              divider={results.length > 0 || shortcuts.length > 0}
             />
+            {shortcuts.map((place, index) => (
+              <ListRow
+                key={place.id}
+                icon={PLACE_ICONS[place.kind]}
+                iconTone={place.kind === 'other' ? 'primary' : 'accent'}
+                title={placeName(place)}
+                subtitle={shortAddress(place.address)}
+                onPress={() => choose(place)}
+                chevron={false}
+                divider={index < shortcuts.length - 1}
+              />
+            ))}
           </View>
         }
         ListEmptyComponent={
@@ -174,7 +192,7 @@ export function SearchScreen() {
             iconTone="neutral"
             title={item.name || shortAddress(item.address)}
             subtitle={item.address}
-            onPress={() => choose(item)}
+            onPress={() => choose(placeFromGeo(item))}
             chevron={false}
             divider={index < results.length - 1}
           />

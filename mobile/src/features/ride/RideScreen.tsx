@@ -24,12 +24,14 @@ import {
   formatFare,
   secondsSince,
 } from '@/lib/ride';
+import { firstName } from '@/lib/profile';
 import { useStore } from '@/lib/store';
 import type { Ride } from '@/lib/types';
+import { useAuth } from '@/providers/AuthProvider';
 import { radius, space, useTheme } from '@/theme';
 
 import { Avatar, PAYMENT_ICONS, PlaceRows, PlateBadge, PulsingRings, RatingBadge, RoundAction } from './components';
-import { CancelSheet, SafetySheet, shareRide, useNow } from './RideSheets';
+import { CancelSheet, SafetySheet, shareRideWhatsApp, useNow } from './RideSheets';
 import { chatUnread, routedRides } from './store';
 
 const goHome = () => router.dismissTo('/');
@@ -189,6 +191,7 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
   const unread = useStore(chatUnread)[ride.id] ?? 0;
   const cancel = useCancelFlow(ride);
   const [safety, setSafety] = useState(false);
+  const { user } = useAuth();
   const driver = ride.driver;
   const vehicle = driver?.vehicle;
   const name = driver?.first_name ?? t('ride.yourDriver');
@@ -246,7 +249,11 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
           badge={unread}
           onPress={() => router.push({ pathname: '/ride/chat', params: { id: ride.id } })}
         />
-        <RoundAction icon={Share2} label={t('ride.share')} onPress={() => void shareRide(ride, t)} />
+        <RoundAction
+          icon={Share2}
+          label={user?.trusted_contact_name ? t('ride.shareWith', { name: firstName(user.trusted_contact_name) }) : t('ride.share')}
+          onPress={() => void shareRideWhatsApp(ride, t, user?.trusted_contact_phone)}
+        />
         <RoundAction icon={ShieldCheck} label={t('ride.safety')} onPress={() => setSafety(true)} />
       </View>
 

@@ -110,3 +110,24 @@ def download_url_or_none(key: str | None) -> str | None:
     except Exception:
         logger.warning("Could not sign download URL", exc_info=True)
         return None
+
+
+def delete_objects(keys: list[str]) -> bool:
+    """Best-effort delete (account erasure). False when storage is off or answered an error."""
+    keys = [k for k in keys if k]
+    if not keys:
+        return True
+    try:
+        client = get_s3_client()
+        for start in range(0, len(keys), 1000):
+            chunk = keys[start : start + 1000]
+            client.delete_objects(
+                Bucket=settings.AWS_S3_BUCKET,
+                Delete={"Objects": [{"Key": k} for k in chunk], "Quiet": True},
+            )
+        return True
+    except ServiceUnavailableError:
+        return False
+    except Exception:
+        logger.warning("Could not delete %s storage objects", len(keys), exc_info=True)
+        return False

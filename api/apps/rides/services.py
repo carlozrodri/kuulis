@@ -22,6 +22,7 @@ from apps.moderation import services as moderation
 from apps.promotions import services as promotions
 from apps.promotions.schemas import PromotionBrief
 from apps.rates import services as rates
+from apps.referrals import services as referrals
 from apps.rides import dispatch, events, presence, pricing
 from apps.rides.models import (
     ACTIVE_STATUSES,
@@ -436,21 +437,27 @@ async def driver_step(
     now = utcnow()
     setattr(ride, field, now)
     credited = False
+    inviter = None
     if target == RideStatus.COMPLETED:
-        await session.execute(
+        first_trip = await session.scalar(
             update(DriverProfile)
             .where(
                 DriverProfile.user_id == user.id,
                 DriverProfile.first_trip_completed_at.is_(None),
             )
             .values(first_trip_completed_at=now)
+            .returning(DriverProfile.id)
         )
+        if first_trip is not None:
+            inviter = await referrals.reward_first_trip(session, user.id)
         credited = await _credit_promotion(session, ride)
     await session.commit()
     if target == RideStatus.COMPLETED:
         await presence.clear_active_ride(user.id, ride.id)
         if credited:
             await events.notify_promo_credit(session, ride)
+        if inviter is not None:
+            await referrals.notify_rewarded(session, inviter, user)
     await events.emit_updated(session, ride)
     if push_event:
         await events.push_to(

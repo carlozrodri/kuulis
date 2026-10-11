@@ -62,6 +62,8 @@ class BaseAppSettings(BaseSettings):
     AWS_S3_REGION: str = "us-east-1"
     STORAGE_PREFIX: str = "local"
     STORAGE_PRESIGN_TTL_SECONDS: int = 900
+    # Days between "delete my account" and erasing the personal data (signing in cancels it).
+    ACCOUNT_DELETION_GRACE_DAYS: int = 30
     STORAGE_MAX_UPLOAD_MB: int = 20
 
     # --- Email (Resend) ---------------------------------------------------------
