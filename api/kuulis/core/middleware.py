@@ -9,6 +9,7 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from apps.monitoring import stats
 from kuulis.core.request_context import log_fields_ctx, request_id_ctx
+from kuulis.settings import settings
 
 logger = logging.getLogger("kuulis.request")
 RIDE_PATH = re.compile(r"/rides/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})")
@@ -33,6 +34,8 @@ class RequestContextMiddleware:
         fields: dict[str, str] = {}
         if client := scope.get("client"):
             fields["ip"] = client[0]  # resolved by uvicorn from the trusted proxies
+        if settings.LOG_FORWARDED_FOR:  # diagnosing the proxy chain (docs/deployment.md)
+            fields["forwarded_for"] = headers.get(b"x-forwarded-for", b"").decode("latin1")
         if ride := RIDE_PATH.search(path):
             fields["ride_id"] = ride.group(1)
         fields_token = log_fields_ctx.set(fields)
