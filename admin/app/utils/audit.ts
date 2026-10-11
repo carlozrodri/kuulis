@@ -20,6 +20,7 @@ export const AUDIT_ENTITY_TYPES = [
   'audit',
   'approval',
   'legal',
+  'app_release',
 ] as const
 
 /** Admin page of the audited record, when it has one. */
@@ -37,6 +38,7 @@ export function auditEntityLink(entry: Pick<AuditEntry, 'entity_type' | 'entity_
     case 'staff_role': return '/roles'
     case 'approval': return '/approvals'
     case 'legal': return '/legal'
+    case 'app_release': return '/versions'
     default: return null
   }
 }

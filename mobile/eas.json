@@ -19,7 +19,8 @@
       },
       "android": {
         "buildType": "apk"
-      }
+      },
+      "autoIncrement": true
     },
     "qa-dev": {
       "developmentClient": true,
@@ -36,6 +37,9 @@
       "autoIncrement": true,
       "env": {
         "APP_ENV": "production"
+      },
+      "android": {
+        "buildType": "apk"
       }
     }
   },

@@ -162,6 +162,10 @@
     "eyebrow": "Descargar",
     "title": "Kuulis para Android",
     "lead": "La app se instala desde esta página, sin pasar por la tienda.",
+    "button": "Descargar Kuulis (APK)",
+    "meta": "Versión {version} ({build}) · {size} MB · {date}",
+    "fingerprint": "Huella de seguridad (SHA-256)",
+    "fingerprintHelp": "Si quieres comprobar que el archivo es el nuestro, su huella SHA-256 debe ser exactamente esta.",
     "soon": {
       "title": "Muy pronto",
       "body": "Estamos terminando la primera versión pública. Cuando esté lista, aquí vas a encontrar el archivo para instalarla, con su versión y su huella de seguridad."

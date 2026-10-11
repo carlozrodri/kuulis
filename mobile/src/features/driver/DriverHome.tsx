@@ -27,6 +27,7 @@ import {
   toneColors,
   Txt,
 } from '@/components/ui';
+import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { useAppConfig, useDriverProfile } from '@/hooks/useDriver';
 import { apiErrorMessage } from '@/i18n';
 import { documentChecklist, nextDriverStep, requirementChecklist } from '@/lib/driver';
@@ -90,6 +91,8 @@ function DriverIntro({ profile, refresh }: { profile: DriverProfile | null; refr
         </Txt>
         <Txt color="muted">{t('driver.intro.subtitle')}</Txt>
       </View>
+
+      <UpdateBanner style={{ marginTop: space.lg }} />
 
       {started ? (
         <Card elevated style={{ marginTop: space.lg, gap: space.sm }}>
@@ -225,6 +228,8 @@ function DriverStatus({
           <StatusPill label={t('driver.status.submittedAt', { date: date(profile.submitted_at) })} tone="warning" dot />
         </View>
       ) : null}
+
+      <UpdateBanner style={{ marginTop: space.lg }} />
 
       <Txt variant="overline" color="muted" style={{ marginTop: space.xl, marginBottom: space.xs }}>
         {t('driver.intro.documents')}

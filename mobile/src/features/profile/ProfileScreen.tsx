@@ -12,6 +12,7 @@ import {
   Camera,
   Download,
   HeartHandshake,
+  Info,
   LifeBuoy,
   LockKeyhole,
   LogOut,
@@ -290,6 +291,18 @@ export function ProfileScreen() {
                   onPress={() => router.push({ pathname: '/legal/[kind]', params: { kind } })}
                 />
               ))}
+            </Card>
+          </Section>
+
+          <Section title={t('about.section')}>
+            <Card style={{ paddingVertical: space.xxs }}>
+              <ListRow
+                icon={Info}
+                iconTone="neutral"
+                title={t('about.title')}
+                subtitle={t('about.rowHint', { version: Application.nativeApplicationVersion ?? 'dev' })}
+                onPress={() => router.push('/profile/about')}
+              />
             </Card>
           </Section>
 

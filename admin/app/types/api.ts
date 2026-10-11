@@ -1070,3 +1070,51 @@ export interface AdminDataExport {
   completed_at: string | null
   expires_at: string | null
 }
+
+// ---- APK releases (doc 09) ----
+
+export const RELEASE_CHANNELS = ['qa', 'beta', 'production'] as const
+export type ReleaseChannel = typeof RELEASE_CHANNELS[number]
+
+export interface AdminRelease {
+  id: string
+  platform: string
+  channel: ReleaseChannel
+  version: string
+  build: number
+  /** Bytes. */
+  size: number
+  sha256: string
+  md5: string
+  notes: string | null
+  is_mandatory: boolean
+  /** When it was published. */
+  created_at: string
+  /** Withdrawn (rolled back): the previous release is offered again. */
+  withdrawn_at: string | null
+  file_key: string
+  published_by_email: string | null
+  download_url: string | null
+}
+
+/** An APK the compiler uploaded, publishable from the admin. */
+export interface AppBuild {
+  key: string
+  file_name: string
+  version: string
+  build: number
+  size: number
+  sha256: string
+  md5: string
+  profile: string | null
+  commit: string | null
+  built_at: string | null
+  published_channels: ReleaseChannel[]
+}
+
+/** Distinct users per build over the last 7 days. */
+export interface BuildUsage {
+  platform: string
+  build: number
+  users: number
+}

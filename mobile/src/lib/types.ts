@@ -625,3 +625,25 @@ export interface ReferralSummary {
   /** A driver before their first trip can still enter someone's code. */
   can_redeem: boolean;
 }
+
+/** An APK published for a channel (doc 09). `download_url` is a presigned link valid about an hour. */
+export interface AppRelease {
+  version: string;
+  build: number;
+  /** Bytes. */
+  size: number;
+  sha256: string;
+  md5: string;
+  notes: string | null;
+  is_mandatory: boolean;
+  created_at: string;
+  download_url: string | null;
+}
+
+/** GET /app/version: the newest APK for this channel and whether this build must update. */
+export interface AppVersionCheck {
+  latest: AppRelease | null;
+  minimum_build: number;
+  update_available: boolean;
+  update_required: boolean;
+}

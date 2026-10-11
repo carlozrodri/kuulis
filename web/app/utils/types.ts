@@ -37,3 +37,17 @@ export interface LegalSummary {
 export interface LegalDocument extends LegalSummary {
   body_md: string
 }
+
+/** GET /app/version: the newest APK published for this environment's channel (doc 09). */
+export interface AppRelease {
+  version: string
+  build: number
+  size: number
+  sha256: string
+  notes: string | null
+  created_at: string
+}
+
+export interface VersionCheck {
+  latest: AppRelease | null
+}

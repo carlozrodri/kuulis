@@ -587,7 +587,8 @@
     "legal_document_not_found": "Texto no encontrado",
     "account_open_reports": "Hay reportes abiertos sobre tu cuenta. Soporte debe cerrarlos antes de eliminarla.",
     "account_fee_pending": "Paga tu cuota pendiente antes de eliminar tu cuenta.",
-    "export_too_soon": "Puedes descargar tus datos una vez al día."
+    "export_too_soon": "Puedes descargar tus datos una vez al día.",
+    "app_update_required": "Necesitas actualizar Kuulis para hacer esto"
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -1351,5 +1352,55 @@
       "body": "Mientras estés conectado, Kuulis usa tu ubicación para ofrecerte viajes cercanos y mostrarle al pasajero dónde vienes, incluso con la app minimizada o la pantalla apagada. Verás un aviso fijo mientras ocurre. Al desconectarte dejamos de usarla.",
       "accept": "Entendido, conectarme"
     }
+  },
+  "update": {
+    "button": "Actualizar",
+    "downloading": "Descargando… {{percent}} %",
+    "verifying": "Verificando el archivo…",
+    "installing": "Abriendo el instalador…",
+    "banner": {
+      "title": "Nueva versión disponible",
+      "body": "Kuulis {{version}} ya está lista ({{size}} MB).",
+      "requiredTitle": "Actualización obligatoria",
+      "requiredBody": "Termina tu viaje y luego instala Kuulis {{version}} para seguir pidiendo o aceptando viajes.",
+      "dismiss": "Ahora no"
+    },
+    "required": {
+      "title": "Necesitas actualizar",
+      "body": "Esta versión de Kuulis ya no puede pedir ni aceptar viajes. Instala la nueva para seguir; tu cuenta, saldo e historial se quedan igual.",
+      "version": "Versión {{version}} ({{build}}) · {{size}} MB",
+      "checking": "Buscando la nueva versión…",
+      "current": "Tienes la versión {{version}} ({{build}})."
+    },
+    "unknownSources": {
+      "title": "Permite instalar la actualización",
+      "body": "Si Android no te dejó instalarla, ve a Ajustes → Instalar apps desconocidas → Kuulis, activa «Permitir de esta fuente» y vuelve a tocar Actualizar.",
+      "hint": "Al terminar la descarga, Android te pedirá confirmar la instalación. Si lo bloquea, permítelo en Ajustes → Instalar apps desconocidas → Kuulis.",
+      "open": "Abrir ajustes"
+    },
+    "error": {
+      "no_release": "No encontramos la nueva versión. Inténtalo de nuevo en unos minutos.",
+      "download": "No pudimos descargar la actualización. Revisa tu conexión e inténtalo de nuevo.",
+      "checksum": "El archivo descargado no coincide con la versión publicada y lo borramos. Inténtalo de nuevo.",
+      "installer": "No pudimos abrir el instalador de Android."
+    }
+  },
+  "about": {
+    "section": "Kuulis",
+    "title": "Acerca de Kuulis",
+    "rowHint": "Versión {{version}} · buscar actualizaciones",
+    "version": "Versión",
+    "build": "Compilación",
+    "channel": "Canal",
+    "channels": {
+      "qa": "Pruebas (QA)",
+      "beta": "Beta",
+      "production": "Producción"
+    },
+    "check": "Buscar actualizaciones",
+    "upToDate": "Tienes la última versión.",
+    "available": "Kuulis {{version}} disponible",
+    "availableBody": "Descarga de {{size}} MB.",
+    "unsupported": "Esta copia de Kuulis no se actualiza desde aquí (versión de desarrollo, web o iPhone)."
   }
 }

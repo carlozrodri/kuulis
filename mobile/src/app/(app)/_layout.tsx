@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { ConnectionBanner } from '@/components/ConnectionBanner';
 import { ToastHost } from '@/components/Toast';
 import { DriverController, RideNavigator, RideSync } from '@/features/ride/RideController';
+import { UpdateGate } from '@/features/update/UpdateGate';
 import { RealtimeProvider } from '@/hooks/useRealtime';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
@@ -47,10 +48,13 @@ export default function AppLayout() {
           <Stack.Screen name="profile/contact" />
           <Stack.Screen name="profile/data" />
           <Stack.Screen name="profile/delete" />
+          <Stack.Screen name="profile/about" />
         </Stack>
         <RideSync />
         <RideNavigator />
         {mode === 'driver' ? <DriverController /> : null}
+        {/* Mandatory APK update (doc 09): covers everything above, except during a ride. */}
+        <UpdateGate />
         <ConnectionBanner />
         <ToastHost />
       </View>

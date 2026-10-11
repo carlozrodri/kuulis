@@ -317,6 +317,25 @@ App de Coolify en QA que compila el APK en nuestro servidor, sin la cola de EAS 
 - Volumen persistente en `/cache` (caché de Gradle y npm): acelera las siguientes compilaciones y evita
   recompilar el mismo código si el contenedor se reinicia.
 - Necesita unos 6 GB de RAM libres mientras compila; la imagen ocupa ~10 GB.
+- Junto a cada APK sube `<nombre>.json` con versión, build (`versionCode`), tamaño, SHA-256 y MD5. El perfil
+  `qa` sube el build en cada compilación (`autoIncrement`, numerado por EAS).
+
+## Publicar una versión del APK (doc 09)
+1. El compilador deja el APK en `builds/<entorno>/` (ver arriba).
+2. En el admin, **Versiones → Compilaciones disponibles → Publicar**: canal, notas y si es **obligatoria**.
+   Desde ese momento las apps del canal ven «Hay una versión nueva» y la página Descargar de la web ofrece
+   ese APK.
+3. Obligatoria = versión mínima: las builds anteriores no pueden pedir ni aceptar viajes ni conectarse
+   (426 `app_update_required`) hasta actualizar. Usarla solo cuando una versión vieja ya no funciona bien.
+4. Para revertir, **Retirar** la versión: vuelve a ofrecerse la anterior (y deja de bloquear si era
+   obligatoria). Ojo: Android no deja instalar una build menor encima de una mayor, así que quien ya
+   actualizó se queda con la retirada hasta que salga una nueva.
+
+## Firma de producción (pendiente de Carlos)
+El perfil `production` de `eas.json` genera un APK firmado con el keystore de producción que guarda EAS.
+Antes de la primera compilación de producción: crearlo (`eas credentials -p android`, perfil production),
+descargar una copia y guardarla con sus contraseñas en el gestor de contraseñas de Carlos. Si se pierde, los
+teléfonos no aceptan actualizaciones y todos tendrían que desinstalar e instalar de nuevo.
 
 ## Build de desarrollo (Android)
 Perfil `qa-dev` de `eas.json`: APK de desarrollo (`uk.top8.kuulis.qa`) que carga el JS desde

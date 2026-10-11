@@ -162,6 +162,10 @@
     "eyebrow": "Download",
     "title": "Kuulis for Android",
     "lead": "The app is installed from this page, without going through the store.",
+    "button": "Download Kuulis (APK)",
+    "meta": "Version {version} ({build}) · {size} MB · {date}",
+    "fingerprint": "Security fingerprint (SHA-256)",
+    "fingerprintHelp": "To check that the file is ours, its SHA-256 fingerprint must be exactly this one.",
     "soon": {
       "title": "Coming soon",
       "body": "We are finishing the first public version. When it is ready, you will find the file to install it here, with its version and its security fingerprint."

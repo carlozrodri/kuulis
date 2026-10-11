@@ -27,6 +27,7 @@ export const NAV: NavEntry[] = [
   { key: 'team', icon: 'i-lucide-users-round', to: '/team', adminOnly: true },
   { key: 'roles', icon: 'i-lucide-shield-check', to: '/roles', adminOnly: true },
   { key: 'privacy', icon: 'i-lucide-user-x', to: '/privacy', permission: 'users.view' },
+  { key: 'versions', icon: 'i-lucide-smartphone', to: '/versions', permission: 'releases.view' },
   { key: 'legal', icon: 'i-lucide-scale', to: '/legal', adminOnly: true },
   { key: 'audit', icon: 'i-lucide-scroll-text', to: '/audit', adminOnly: true },
   { key: 'settings', icon: 'i-lucide-settings', to: '/settings', permission: 'config.view' },

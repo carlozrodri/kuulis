@@ -33,7 +33,7 @@ build() {
     return 1
   fi
   status "Built ${NAME} ($(du -h "/out/${NAME}" | cut -f1)), uploading to S3"
-  python3 /src/builder/upload.py "/out/${NAME}" "builds/${APP_ENV}/${NAME}" "builds/${APP_ENV}/kuulis-${APP_ENV}-${PROFILE}-latest.apk" \
+  python3 /src/builder/upload.py "/out/${NAME}" "builds/${APP_ENV}/${NAME}" "builds/${APP_ENV}/kuulis-${APP_ENV}-${PROFILE}-latest.apk" "$PROFILE" \
     | tee -a "$STATUS_DIR/index.html" || { status "Upload failed"; return 1; }
   echo "builds/${APP_ENV}/${NAME}" > "$MARK"
   rm -rf /work "/out/${NAME}"

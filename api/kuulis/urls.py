@@ -25,6 +25,7 @@ from apps.promotions.router import admin_router as promotions_admin_router
 from apps.rates.router import router as rates_router
 from apps.realtime.router import router as realtime_router
 from apps.referrals.router import router as referrals_router
+from apps.releases.router import router as releases_router
 from apps.rides.router import admin_drivers_router as rides_admin_drivers_router
 from apps.rides.router import admin_router as rides_admin_router
 from apps.rides.router import driver_router as rides_driver_router
@@ -43,6 +44,7 @@ api_v1.include_router(places_router)
 api_v1.include_router(users_router)
 api_v1.include_router(legal_router)
 api_v1.include_router(privacy_router)
+api_v1.include_router(releases_router)
 api_v1.include_router(referrals_router)
 api_v1.include_router(notifications_router)
 api_v1.include_router(files_router)
