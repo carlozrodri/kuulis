@@ -11,6 +11,7 @@ from apps.users import services
 from apps.users.models import Role, User
 from kuulis.core.db import get_db
 from kuulis.core.exceptions import AuthenticationError, PermissionDeniedError
+from kuulis.core.request_context import set_log_field
 from kuulis.core.security import decode_token
 
 bearer = HTTPBearer(auto_error=False)
@@ -36,7 +37,9 @@ async def get_current_user(
 ) -> User:
     if credentials is None:
         raise AuthenticationError()
-    return await user_from_token(session, credentials.credentials)
+    user = await user_from_token(session, credentials.credentials)
+    set_log_field("user_id", user.id)
+    return user
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]

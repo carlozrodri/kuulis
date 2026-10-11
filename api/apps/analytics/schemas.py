@@ -128,3 +128,4 @@ class Overview(BaseModel):
     urgent_reports: int
     overdue_drivers: int
     stale_rates: list[str]
+    open_alerts: int = 0  # monitoring alerts not resolved yet (see /admin/system/health)

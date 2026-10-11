@@ -4,6 +4,7 @@ charges the month that just ended, and it sends due-soon / overdue reminders."""
 import asyncio
 import logging
 
+from apps.monitoring import stats
 from apps.subscriptions import services
 from kuulis.core.calendar import add_months, format_month, local_now, month_start
 from kuulis.core.db import SessionLocal
@@ -38,6 +39,7 @@ async def loop() -> None:
     while True:
         try:
             await run_once()
+            await stats.beat("subscriptions")
         except asyncio.CancelledError:
             raise
         except Exception:

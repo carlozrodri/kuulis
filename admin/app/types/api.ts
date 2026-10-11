@@ -884,4 +884,23 @@ export interface Overview {
   urgent_reports: number
   overdue_drivers: number
   stale_rates: RateSource[]
+  open_alerts?: number
+}
+
+// ---- Monitoring (GET /admin/system/health) ----------------------------------------------------
+
+export type HealthStatus = 'ok' | 'warning' | 'down' | 'off'
+
+export interface SystemHealth {
+  env: string
+  commit: string | null
+  checked_at: string
+  services: { name: 'database' | 'redis' | 'osrm' | 'photon', status: HealthStatus, latency_ms: number | null }[]
+  loops: { name: string, status: HealthStatus, last_beat_at: string | null, max_age_seconds: number }[]
+  queues: { taskiq_pending: number | null, dispatch_due: number, dispatch_overdue: number }
+  traffic: { requests_5m: number, errors_5m: number, error_rate_5m: number, avg_ms_5m: number }
+  rides: { searching: number, requested_last_hour: number, no_drivers_last_hour: number }
+  stale_rates: RateSource[]
+  disk_used_percent: number | null
+  alerts: { key: string, message: string, since: string }[]
 }

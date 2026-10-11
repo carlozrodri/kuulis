@@ -212,6 +212,15 @@ const userCards = computed(() => [
     </template>
     <template #body>
       <UAlert
+        v-if="overview?.open_alerts"
+        color="error"
+        variant="subtle"
+        icon="i-lucide-activity"
+        :title="t('system.dashboardAlert', { count: overview.open_alerts })"
+        :description="t('system.dashboardAlertHelp')"
+        :actions="[{ label: t('system.open'), to: '/system', color: 'error', variant: 'outline' }]"
+      />
+      <UAlert
         v-if="staleRates.length"
         color="warning"
         variant="subtle"
