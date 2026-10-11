@@ -937,3 +937,19 @@ export interface SystemHealth {
   }
   alerts: { key: string, message: string, since: string }[]
 }
+
+export interface AuditEntry {
+  id: string
+  actor_id: string | null
+  actor_email: string
+  action: string
+  entity_type: string
+  entity_id: string | null
+  before: Record<string, unknown> | null
+  after: Record<string, unknown> | null
+  reason: string | null
+  ip: string | null
+  user_agent: string | null
+  request_id: string | null
+  created_at: string
+}

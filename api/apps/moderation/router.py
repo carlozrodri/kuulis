@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Request, status
 
+from apps.audit.services import audit, note, snapshot
 from apps.moderation import services
 from apps.moderation.models import (
     Report,
@@ -206,7 +207,11 @@ async def admin_report(report_id: uuid.UUID, _: StaffUser, session: DBSession) -
     return await _detail(session, await services.get_report(session, report_id))
 
 
-@admin_router.patch("/reports/{report_id}", response_model=ReportAdminDetail)
+@admin_router.patch(
+    "/reports/{report_id}",
+    dependencies=[audit("report.update", "report", "report_id")],
+    response_model=ReportAdminDetail,
+)
 async def admin_update(
     report_id: uuid.UUID, data: ReportUpdate, admin: StaffUser, session: DBSession
 ) -> ReportAdminDetail:
@@ -226,7 +231,10 @@ async def admin_update(
 
 
 @admin_router.post(
-    "/reports/{report_id}/notes", response_model=ReportNoteRead, status_code=status.HTTP_201_CREATED
+    "/reports/{report_id}/notes",
+    dependencies=[audit("report.note", "report", "report_id")],
+    response_model=ReportNoteRead,
+    status_code=status.HTTP_201_CREATED,
 )
 async def admin_note(
     report_id: uuid.UUID, data: NoteCreate, admin: StaffUser, session: DBSession
@@ -244,7 +252,11 @@ async def admin_note(
     )
 
 
-@admin_router.post("/reports/{report_id}/resolve", response_model=ReportAdminDetail)
+@admin_router.post(
+    "/reports/{report_id}/resolve",
+    dependencies=[audit("report.resolve", "report", "report_id")],
+    response_model=ReportAdminDetail,
+)
 async def admin_resolve(
     report_id: uuid.UUID, data: ReportResolve, admin: StaffUser, session: DBSession
 ) -> ReportAdminDetail:
@@ -255,7 +267,11 @@ async def admin_resolve(
     return await _detail(session, report)
 
 
-@admin_router.post("/reports/{report_id}/reopen", response_model=ReportAdminDetail)
+@admin_router.post(
+    "/reports/{report_id}/reopen",
+    dependencies=[audit("report.reopen", "report", "report_id")],
+    response_model=ReportAdminDetail,
+)
 async def admin_reopen(
     report_id: uuid.UUID, admin: StaffUser, session: DBSession
 ) -> ReportAdminDetail:
@@ -269,7 +285,11 @@ async def admin_reopen(
 # --- Admin: suspensions ------------------------------------------------------------------------
 
 
-@admin_router.post("/users/{user_id}/suspend", response_model=SuspensionRead)
+@admin_router.post(
+    "/users/{user_id}/suspend",
+    dependencies=[audit("user.suspend", "user", "user_id")],
+    response_model=SuspensionRead,
+)
 async def suspend(
     user_id: uuid.UUID, data: SuspendRequest, admin: StaffUser, session: DBSession
 ) -> SuspensionRead:
@@ -278,10 +298,15 @@ async def suspend(
     )
     await session.commit()
     await session.refresh(suspension)
+    note(after=snapshot(suspension, ("id", "until", "report_id")))
     return services.suspension_read(suspension, {admin.id: admin})
 
 
-@admin_router.post("/users/{user_id}/unsuspend", status_code=status.HTTP_204_NO_CONTENT)
+@admin_router.post(
+    "/users/{user_id}/unsuspend",
+    dependencies=[audit("user.unsuspend", "user", "user_id")],
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def unsuspend(user_id: uuid.UUID, admin: StaffUser, session: DBSession) -> None:
     await services.unsuspend(session, admin, user_id)
     await session.commit()

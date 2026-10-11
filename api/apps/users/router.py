@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
 
+from apps.audit.services import audit, note, snapshot
 from apps.auth import services as auth
 from apps.auth import totp
 from apps.moderation import services as moderation
@@ -92,19 +93,32 @@ async def user_stats(_: StaffUser, session: DBSession) -> UserStats:
     return UserStats(**await services.stats(session))
 
 
-@router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    dependencies=[audit("user.create", "user")],
+    response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_user(data: UserAdminCreate, _: VerifiedAdminUser, session: DBSession) -> UserRead:
-    return UserRead.model_validate(await services.admin_create_user(session, data))
+    user = await services.admin_create_user(session, data)
+    note(entity_id=user.id)
+    return UserRead.model_validate(user)
 
 
-@router.get("/{user_id}", response_model=UserRead)
+@router.get(
+    "/{user_id}",
+    dependencies=[audit("user.view", "user", "user_id")],  # full personal data
+    response_model=UserRead,
+)
 async def get_user(user_id: uuid.UUID, _: StaffUser, session: DBSession) -> UserRead:
     return await moderation.user_read(
         session, await services.get_or_404(session, user_id), staff_view=True
     )
 
 
-@router.patch("/{user_id}", response_model=UserRead)
+@router.patch(
+    "/{user_id}", dependencies=[audit("user.update", "user", "user_id")], response_model=UserRead
+)
 async def update_user(
     user_id: uuid.UUID, data: UserAdminUpdate, admin: AdminUser, session: DBSession
 ) -> UserRead:
@@ -113,11 +127,18 @@ async def update_user(
         await ensure_recently_verified(admin)
     if user.id == admin.id and (data.role not in (None, Role.ADMIN) or data.is_active is False):
         raise PermissionDeniedError("You cannot demote or disable yourself", code="self_demotion")
+    changed = data.model_dump(exclude_unset=True).keys()
+    before = snapshot(user, changed)
     updated = await services.admin_update_user(user, data)
+    note(before=before, after=snapshot(updated, changed))
     return await moderation.user_read(session, updated, staff_view=True)
 
 
-@router.post("/{user_id}/totp/reset", status_code=status.HTTP_204_NO_CONTENT)
+@router.post(
+    "/{user_id}/totp/reset",
+    dependencies=[audit("user.totp_reset", "user", "user_id")],
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def reset_totp(user_id: uuid.UUID, _: VerifiedAdminUser, session: DBSession) -> None:
     """Removes a staff member's authenticator (lost phone); they set it up at their next sign-in."""
     await totp.reset(session, await services.get_or_404(session, user_id))

@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Query, Request
 
+from apps.audit.services import begin as audit_begin
 from apps.files.schemas import DownloadResponse, UploadRequest, UploadResponse
-from apps.users.dependencies import CurrentUser, has_admin_session
+from apps.users.dependencies import CurrentUser, DBSession, has_admin_session
 from kuulis.core import storage
 from kuulis.core.exceptions import AppError, PermissionDeniedError
 from kuulis.core.rate_limit import limiter
@@ -48,11 +49,15 @@ def _owns(user_id: object, key: str) -> bool:
 
 
 @router.get("/download", response_model=DownloadResponse)
-async def presign_download(user: CurrentUser, key: str = Query(max_length=512)) -> DownloadResponse:
+async def presign_download(
+    request: Request, user: CurrentUser, session: DBSession, key: str = Query(max_length=512)
+) -> DownloadResponse:
     if _owns(user.id, key):
         ttl = settings.STORAGE_PRESIGN_TTL_SECONDS
     elif has_admin_session(user):
         ttl = settings.PRIVATE_FILE_URL_SECONDS  # someone else's file: short-lived link
+        # Audited (written by the session's commit): staff opened someone else's file.
+        audit_begin("file.view", "file", key[:64], actor=user, request=request, after={"key": key})
     else:
         raise PermissionDeniedError()
     return DownloadResponse(url=storage.presigned_download(key, ttl), expires_in=ttl)

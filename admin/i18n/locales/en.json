@@ -15,7 +15,8 @@
     "subscriptions": "Subscriptions",
     "reports": "Reports",
     "finance": "Finance",
-    "system": "System"
+    "system": "System",
+    "audit": "Audit log"
   },
   "auth": {
     "title": "Admin sign in",
@@ -1299,5 +1300,122 @@
     "lastUsed": "Last used {time}",
     "close": "Sign out",
     "unknownDevice": "Unknown device"
+  },
+  "audit": {
+    "history": "History",
+    "seeAll": "See all ({n})",
+    "empty": "No recorded actions.",
+    "system": "System",
+    "help": "Every team action in the admin and every view of sensitive data is recorded here. It cannot be edited or deleted.",
+    "date": "Date",
+    "actor": "Who",
+    "action": "Action",
+    "entity": "Record",
+    "reason": "Reason",
+    "detail": "See detail",
+    "open": "Open",
+    "field": "Field",
+    "before": "Before",
+    "after": "After",
+    "data": "Data",
+    "noDetail": "No detail.",
+    "export": "Export CSV",
+    "actionFilter": "Action (e.g. wallet)",
+    "allEntities": "All records",
+    "entityId": "Record id",
+    "from": "From",
+    "to": "To",
+    "byActor": "Only this person",
+    "filterActor": "Show only their actions",
+    "total": "{n} actions",
+    "actions": {
+      "auth": {
+        "reauth": "Confirmed identity"
+      },
+      "audit": {
+        "export": "Exported the audit log"
+      },
+      "config": {
+        "update": "Changed settings"
+      },
+      "charge": {
+        "waive": "Waived a charge"
+      },
+      "driver": {
+        "approve": "Approved a driver",
+        "document_review": "Reviewed a document",
+        "reinstate": "Reinstated a driver",
+        "reject": "Rejected a driver",
+        "suspend": "Suspended a driver",
+        "view": "Viewed profile and documents"
+      },
+      "fee_schedule": {
+        "create": "Created a fee schedule"
+      },
+      "file": {
+        "view": "Opened someone else's file"
+      },
+      "finance": {
+        "export_entries": "Exported entries (CSV)",
+        "export_top_ups": "Exported top-ups (CSV)"
+      },
+      "notification": {
+        "send": "Sent a notification"
+      },
+      "promotion": {
+        "create": "Created a promotion",
+        "update": "Edited a promotion"
+      },
+      "rate": {
+        "refresh": "Refreshed the rate",
+        "set_manual": "Set a manual rate"
+      },
+      "report": {
+        "note": "Added a report note",
+        "reopen": "Reopened a report",
+        "resolve": "Resolved a report",
+        "update": "Edited a report"
+      },
+      "ride": {
+        "cancel": "Cancelled a ride"
+      },
+      "subscription": {
+        "run": "Ran monthly charges"
+      },
+      "top_up": {
+        "assign": "Assigned a top-up",
+        "confirm": "Confirmed a top-up",
+        "reject": "Rejected a top-up"
+      },
+      "user": {
+        "create": "Created a user",
+        "suspend": "Suspended an account",
+        "totp_reset": "Reset 2FA",
+        "unsuspend": "Lifted a suspension",
+        "update": "Edited a user",
+        "view": "Viewed personal data"
+      },
+      "wallet": {
+        "adjust": "Adjusted a balance"
+      }
+    },
+    "entities": {
+      "user": "User",
+      "driver": "Driver",
+      "ride": "Ride",
+      "promotion": "Promotion",
+      "report": "Report",
+      "wallet": "Balance",
+      "top_up": "Top-up",
+      "charge": "Charge",
+      "config": "Settings",
+      "rate": "Rate",
+      "subscription": "Subscription",
+      "fee_schedule": "Fee schedule",
+      "notification": "Notification",
+      "finance": "Finance",
+      "file": "File",
+      "audit": "Audit"
+    }
   }
 }

@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
+from apps.audit.services import audit
 from apps.config.services import get_app_config
 from apps.promotions import services
 from apps.promotions.schemas import (
@@ -31,7 +32,12 @@ async def list_promotions(
     return Page(items=items, total=total, limit=params.limit, offset=params.offset)
 
 
-@admin_router.post("", response_model=PromotionRead, status_code=201)
+@admin_router.post(
+    "",
+    dependencies=[audit("promotion.create", "promotion")],
+    response_model=PromotionRead,
+    status_code=201,
+)
 async def create(data: PromotionCreate, user: AdminUser, session: DBSession) -> PromotionRead:
     promotion = await services.create(session, user, data, await get_app_config(session))
     await session.commit()
@@ -50,7 +56,11 @@ async def detail(promotion_id: uuid.UUID, _: StaffUser, session: DBSession) -> P
     return await services.read(session, await services.get_or_404(session, promotion_id))
 
 
-@admin_router.patch("/{promotion_id}", response_model=PromotionRead)
+@admin_router.patch(
+    "/{promotion_id}",
+    dependencies=[audit("promotion.update", "promotion", "promotion_id")],
+    response_model=PromotionRead,
+)
 async def update(
     promotion_id: uuid.UUID, data: PromotionUpdate, _: AdminUser, session: DBSession
 ) -> PromotionRead:

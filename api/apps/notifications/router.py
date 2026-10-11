@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 
+from apps.audit.services import audit
 from apps.notifications import services, tasks
 from apps.notifications.schemas import (
     DeviceRead,
@@ -65,7 +66,11 @@ async def mark_read(
     )
 
 
-@router.post("/send", status_code=status.HTTP_202_ACCEPTED)
+@router.post(
+    "/send",
+    dependencies=[audit("notification.send", "notification")],
+    status_code=status.HTTP_202_ACCEPTED,
+)
 async def send(data: NotificationSend, _: StaffUser, session: DBSession) -> dict:
     """Admin panel: send a notification to one user, a role, or everyone."""
     if data.user_id:

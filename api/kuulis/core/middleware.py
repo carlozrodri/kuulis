@@ -8,7 +8,7 @@ import uuid
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from apps.monitoring import stats
-from kuulis.core.request_context import log_fields_ctx, request_id_ctx
+from kuulis.core.request_context import audit_ctx, log_fields_ctx, request_id_ctx
 from kuulis.settings import settings
 
 logger = logging.getLogger("kuulis.request")
@@ -39,6 +39,7 @@ class RequestContextMiddleware:
         if ride := RIDE_PATH.search(path):
             fields["ride_id"] = ride.group(1)
         fields_token = log_fields_ctx.set(fields)
+        audit_token = audit_ctx.set({})
         start = time.perf_counter()
         status_code = 500
 
@@ -57,6 +58,7 @@ class RequestContextMiddleware:
             if not path.startswith(("/health", "/api/health", "/api/metrics")):
                 logger.info("%s %s %s %sms", scope.get("method"), path, status_code, duration_ms)
                 await stats.record_request(status_code, duration_ms)
+            audit_ctx.reset(audit_token)
             log_fields_ctx.reset(fields_token)
             request_id_ctx.reset(token)
 

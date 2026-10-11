@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel
 
+from apps.audit.services import audit, note, snapshot
 from apps.config.services import get_app_config
 from apps.subscriptions import services as subscriptions
 from apps.subscriptions.schemas import ChargeRead
@@ -158,15 +159,24 @@ async def _top_up_response(session: DBSession, top_up: TopUp) -> TopUpAdminRead:
     return _top_up_admin(top_up, user)
 
 
-@admin_router.post("/top-ups/{top_up_id}/confirm", response_model=TopUpAdminRead)
+@admin_router.post(
+    "/top-ups/{top_up_id}/confirm",
+    dependencies=[audit("top_up.confirm", "top_up", "top_up_id")],
+    response_model=TopUpAdminRead,
+)
 async def confirm(
     top_up_id: uuid.UUID, data: TopUpConfirm, admin: VerifiedAdminUser, session: DBSession
 ) -> TopUpAdminRead:
     top_up = await services.confirm_top_up(session, admin, top_up_id, data.amount, data.reference)
+    note(after=snapshot(top_up, ("status", "user_id", "amount", "reference")))
     return await _top_up_response(session, top_up)
 
 
-@admin_router.post("/top-ups/{top_up_id}/reject", response_model=TopUpAdminRead)
+@admin_router.post(
+    "/top-ups/{top_up_id}/reject",
+    dependencies=[audit("top_up.reject", "top_up", "top_up_id")],
+    response_model=TopUpAdminRead,
+)
 async def reject(
     top_up_id: uuid.UUID, data: ReasonBody, admin: AdminUser, session: DBSession
 ) -> TopUpAdminRead:
@@ -174,7 +184,11 @@ async def reject(
     return await _top_up_response(session, top_up)
 
 
-@admin_router.post("/top-ups/{top_up_id}/assign", response_model=TopUpAdminRead)
+@admin_router.post(
+    "/top-ups/{top_up_id}/assign",
+    dependencies=[audit("top_up.assign", "top_up", "top_up_id")],
+    response_model=TopUpAdminRead,
+)
 async def assign(
     top_up_id: uuid.UUID, data: TopUpAssign, admin: VerifiedAdminUser, session: DBSession
 ) -> TopUpAdminRead:
@@ -218,11 +232,21 @@ async def admin_entries(
     return _page([WalletEntryRead.model_validate(r) for r in rows], total, params)
 
 
-@admin_router.post("/wallets/{user_id}/adjust", response_model=WalletEntryRead, status_code=201)
+@admin_router.post(
+    "/wallets/{user_id}/adjust",
+    dependencies=[audit("wallet.adjust", "wallet", "user_id")],
+    response_model=WalletEntryRead,
+    status_code=201,
+)
 async def adjust(
     user_id: uuid.UUID, data: Adjustment, admin: VerifiedAdminUser, session: DBSession
 ) -> WalletEntryRead:
+    before = await services.get_balance(session, user_id)
     entry = await services.adjust(session, admin, user_id, data.amount, data.reason)
+    note(
+        before={"balance": before},
+        after={"balance": before + data.amount, "amount": data.amount, "entry_id": entry.id},
+    )
     await session.commit()
     await session.refresh(entry)
     return WalletEntryRead.model_validate(entry)

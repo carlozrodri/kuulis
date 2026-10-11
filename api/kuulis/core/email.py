@@ -8,11 +8,23 @@ from kuulis.settings import settings
 
 logger = logging.getLogger(__name__)
 RESEND_URL = "https://api.resend.com/emails"
+# Domains that can never receive mail (RFC 2606 / 6761), used by test and smoke accounts: Resend
+# rejects them with a 422 and the task would retry for nothing.
+RESERVED_DOMAINS = {"example.com", "example.net", "example.org"}
+RESERVED_TLDS = (".test", ".example", ".invalid", ".localhost")
+
+
+def is_undeliverable(address: str) -> bool:
+    domain = address.rpartition("@")[2].strip().lower().rstrip(".")
+    return domain in RESERVED_DOMAINS or domain.endswith(RESERVED_TLDS)
 
 
 async def send_email(to: str, subject: str, html: str, text: str | None = None) -> bool:
     if not settings.EMAIL_ENABLED or not settings.RESEND_API_KEY:
         logger.info("Email disabled, skipping '%s' to %s", subject, to)
+        return False
+    if is_undeliverable(to):
+        logger.info("Reserved domain, skipping '%s' to %s", subject, to)
         return False
     payload = {"from": settings.EMAIL_FROM, "to": [to], "subject": subject, "html": html}
     if text:

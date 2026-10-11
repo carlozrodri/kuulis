@@ -1,0 +1,57 @@
+import type { AuditEntry } from '~/types/api'
+
+export const AUDIT_ENTITY_TYPES = [
+  'user',
+  'driver',
+  'ride',
+  'promotion',
+  'report',
+  'wallet',
+  'top_up',
+  'charge',
+  'config',
+  'rate',
+  'subscription',
+  'fee_schedule',
+  'notification',
+  'finance',
+  'file',
+  'audit',
+] as const
+
+/** Admin page of the audited record, when it has one. */
+export function auditEntityLink(entry: Pick<AuditEntry, 'entity_type' | 'entity_id'>): string | null {
+  const id = entry.entity_id
+  if (entry.entity_type === 'config') return '/settings'
+  if (!id) return null
+  switch (entry.entity_type) {
+    case 'user': return `/users/${id}`
+    case 'driver': return `/drivers/${id}`
+    case 'ride': return `/rides/${id}`
+    case 'promotion': return `/promotions/${id}`
+    case 'report': return `/reports/${id}`
+    case 'wallet': return `/wallets/${id}`
+    default: return null
+  }
+}
+
+export interface AuditChange {
+  key: string
+  before: unknown
+  after: unknown
+}
+
+/** Keys of before/after side by side (only after when the action stored no before). */
+export function auditChanges(entry: Pick<AuditEntry, 'before' | 'after'>): AuditChange[] {
+  const before = entry.before ?? {}
+  const after = entry.after ?? {}
+  const keys = [...new Set([...Object.keys(before), ...Object.keys(after)])]
+  return keys.map(key => ({ key, before: before[key], after: after[key] }))
+}
+
+export function auditValue(value: unknown): string {
+  if (value === undefined) return ''
+  if (value === null) return '—'
+  if (typeof value === 'object') return JSON.stringify(value)
+  return String(value)
+}

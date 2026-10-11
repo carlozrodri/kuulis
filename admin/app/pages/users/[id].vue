@@ -200,6 +200,10 @@ async function save() {
           @changed="refresh"
         />
         <ReportsList :user-id="user.id" />
+        <AuditHistoryCard
+          entity-type="user"
+          :entity-id="user.id"
+        />
       </div>
     </template>
   </UDashboardPanel>

@@ -152,6 +152,12 @@ function back() {
         </div>
       </section>
 
+      <AuditHistoryCard
+        entity-type="wallet"
+        :entity-id="userId"
+        class="mt-6"
+      />
+
       <AdjustBalanceModal
         v-if="wallet"
         v-model:open="adjustOpen"

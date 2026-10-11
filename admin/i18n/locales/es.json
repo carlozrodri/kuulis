@@ -15,7 +15,8 @@
     "subscriptions": "Suscripciones",
     "reports": "Reportes",
     "finance": "Finanzas",
-    "system": "Sistema"
+    "system": "Sistema",
+    "audit": "Auditoría"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -1299,5 +1300,122 @@
     "lastUsed": "Último uso {time}",
     "close": "Cerrar",
     "unknownDevice": "Dispositivo desconocido"
+  },
+  "audit": {
+    "history": "Historial",
+    "seeAll": "Ver todo ({n})",
+    "empty": "Sin acciones registradas.",
+    "system": "Sistema",
+    "help": "Cada acción del equipo en el admin y cada vista de datos sensibles queda registrada aquí. No se puede editar ni borrar.",
+    "date": "Fecha",
+    "actor": "Quién",
+    "action": "Acción",
+    "entity": "Registro",
+    "reason": "Motivo",
+    "detail": "Ver detalle",
+    "open": "Abrir",
+    "field": "Campo",
+    "before": "Antes",
+    "after": "Después",
+    "data": "Datos",
+    "noDetail": "Sin detalle.",
+    "export": "Exportar CSV",
+    "actionFilter": "Acción (p. ej. wallet)",
+    "allEntities": "Todos los registros",
+    "entityId": "Id del registro",
+    "from": "Desde",
+    "to": "Hasta",
+    "byActor": "Solo esta persona",
+    "filterActor": "Ver solo sus acciones",
+    "total": "{n} acciones",
+    "actions": {
+      "auth": {
+        "reauth": "Reconfirmó su identidad"
+      },
+      "audit": {
+        "export": "Exportó la auditoría"
+      },
+      "config": {
+        "update": "Cambió la configuración"
+      },
+      "charge": {
+        "waive": "Condonó un cobro"
+      },
+      "driver": {
+        "approve": "Aprobó un motorizado",
+        "document_review": "Revisó un documento",
+        "reinstate": "Reactivó un motorizado",
+        "reject": "Rechazó un motorizado",
+        "suspend": "Suspendió un motorizado",
+        "view": "Vio la ficha y documentos"
+      },
+      "fee_schedule": {
+        "create": "Creó un tramo de suscripción"
+      },
+      "file": {
+        "view": "Abrió un archivo ajeno"
+      },
+      "finance": {
+        "export_entries": "Exportó movimientos (CSV)",
+        "export_top_ups": "Exportó recargas (CSV)"
+      },
+      "notification": {
+        "send": "Envió una notificación"
+      },
+      "promotion": {
+        "create": "Creó una promoción",
+        "update": "Editó una promoción"
+      },
+      "rate": {
+        "refresh": "Actualizó la tasa",
+        "set_manual": "Fijó una tasa manual"
+      },
+      "report": {
+        "note": "Anotó un reporte",
+        "reopen": "Reabrió un reporte",
+        "resolve": "Resolvió un reporte",
+        "update": "Editó un reporte"
+      },
+      "ride": {
+        "cancel": "Canceló un viaje"
+      },
+      "subscription": {
+        "run": "Ejecutó los cobros del mes"
+      },
+      "top_up": {
+        "assign": "Asignó una recarga",
+        "confirm": "Confirmó una recarga",
+        "reject": "Rechazó una recarga"
+      },
+      "user": {
+        "create": "Creó un usuario",
+        "suspend": "Suspendió una cuenta",
+        "totp_reset": "Reinició el 2FA",
+        "unsuspend": "Levantó una suspensión",
+        "update": "Editó un usuario",
+        "view": "Vio los datos personales"
+      },
+      "wallet": {
+        "adjust": "Ajustó un saldo"
+      }
+    },
+    "entities": {
+      "user": "Usuario",
+      "driver": "Motorizado",
+      "ride": "Viaje",
+      "promotion": "Promoción",
+      "report": "Reporte",
+      "wallet": "Saldo",
+      "top_up": "Recarga",
+      "charge": "Cobro",
+      "config": "Configuración",
+      "rate": "Tasa",
+      "subscription": "Suscripción",
+      "fee_schedule": "Tramos",
+      "notification": "Notificación",
+      "finance": "Finanzas",
+      "file": "Archivo",
+      "audit": "Auditoría"
+    }
   }
 }

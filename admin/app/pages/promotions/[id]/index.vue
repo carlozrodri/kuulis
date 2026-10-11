@@ -356,6 +356,11 @@ const all = (list: string[] | undefined) => (list?.length ? list : null)
             />
           </div>
         </section>
+
+        <AuditHistoryCard
+          entity-type="promotion"
+          :entity-id="id"
+        />
       </div>
     </template>
   </UDashboardPanel>

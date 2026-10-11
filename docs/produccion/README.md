@@ -56,6 +56,8 @@ construir. Las preguntas de cada documento están en su sección final.
 - **03** hecho en código (2026-10-11); faltan el bot de Telegram, GlitchTip y UptimeRobot de parte de Carlos.
 - **05** hecho (2026-10-11): límites de uso con la IP real, bloqueo de login, 2FA del equipo, sesiones visibles,
   fotos sin EXIF y revisión de seguridad sin hallazgos altos (`revision-seguridad.md`).
+- **06** parte 1 en QA (2026-10-11): registro de auditoría de toda acción del admin y de las lecturas
+  sensibles, con su pantalla y el historial en cada ficha. Faltan permisos por rol y doble aprobación.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

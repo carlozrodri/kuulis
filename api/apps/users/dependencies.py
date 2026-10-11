@@ -68,6 +68,7 @@ def require_roles(*roles: Role):
             raise PermissionDeniedError("Sign in to the admin panel", code="admin_mfa_required")
         return user
 
+    _checker.admin_roles = roles  # type: ignore[attr-defined]  # found by the audit coverage test
     return _checker
 
 

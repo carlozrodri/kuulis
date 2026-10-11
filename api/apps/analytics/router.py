@@ -6,6 +6,7 @@ from fastapi.responses import Response
 
 from apps.analytics import services
 from apps.analytics.schemas import FinanceSummary, Metrics, Overview
+from apps.audit.services import audit
 from apps.config.services import get_app_config
 from apps.users.dependencies import DBSession, StaffUser
 from apps.wallet.models import EntryKind, TopUpStatus
@@ -32,7 +33,11 @@ async def finance_summary(
     return await services.finance_summary(session, first, last)
 
 
-@router.get("/finance/entries.csv", response_class=Response)
+@router.get(
+    "/finance/entries.csv",
+    dependencies=[audit("finance.export_entries", "finance")],
+    response_class=Response,
+)
 async def entries_csv(
     _: StaffUser,
     session: DBSession,
@@ -45,7 +50,11 @@ async def entries_csv(
     return _csv_response(body, "movimientos", first, last)
 
 
-@router.get("/finance/top-ups.csv", response_class=Response)
+@router.get(
+    "/finance/top-ups.csv",
+    dependencies=[audit("finance.export_top_ups", "finance")],
+    response_class=Response,
+)
 async def top_ups_csv(
     _: StaffUser,
     session: DBSession,
