@@ -14,7 +14,7 @@ existente de Carlos. No comparte nada con los proyectos NDS ni bidding-market.
 | Dominio | `kuulis-qa.top8.uk` | `kuulis-prod.top8.uk` |
 | API (`/api`) | `kuulis-api-qa` · `rayxgnveijwwq86tquloc3r8` | `kuulis-api-production` · `f14idkxf8c209b1hghrunmhb` |
 | Worker | `kuulis-worker-qa` · `i10vqipywxmdafk5sjaowzya` | `kuulis-worker-production` · `f3eiht6l1r439xxp3401u2ur` |
-| Admin (`admin.<dominio>`) | `kuulis-admin-qa` · `m37iqum9dy4n0o5281n0tvu5` | `kuulis-admin-production` · `ru2e54bw4mn4igqvvdmkgrys` |
+| Admin (`admin.top8.uk` en QA) | `kuulis-admin-qa` · `m37iqum9dy4n0o5281n0tvu5` | `kuulis-admin-production` · `ru2e54bw4mn4igqvvdmkgrys` |
 | Web pública (`/`) | `kuulis-web-qa` (por crear) | `kuulis-web-production` (por crear) |
 | PostgreSQL 17 | `kuulis-postgres-qa` · `v12h71ber6ifhpgcugm6adth` | `kuulis-postgres-production` · `pvx2gkfbo18zcld9x55t0tgp` |
 | Redis 7.4 | `kuulis-redis-qa` · `miq3v8c99isk848ps719a7dn` | `kuulis-redis-production` · `mgtsa16kwmktv0jl55belww8` |
@@ -55,9 +55,9 @@ funcionan (por ejemplo `testqa.top8.uk`), apuntando al Traefik de Coolify. Impor
 - Activar **Websockets Support** (la app usa `wss://<host>/api/v1/ws`).
 - Reenviar el host original (NPM lo hace por defecto) para que Traefik enrute por dominio.
 - Traefik enruta `/api/*` a la API y todo lo demás a la web pública.
-- El admin vive en `admin.kuulis-qa.top8.uk` / `admin.kuulis-prod.top8.uk` (proxy host propio en NPM, igual
-  que el principal). La app API tiene también el dominio `https://admin.<dominio>/api`, así el admin sigue
-  llamando a la API en su mismo origen, sin CORS.
+- El admin de QA vive en `admin.top8.uk` (un solo nivel, lo cubre el certificado `*.top8.uk`); el de
+  producción está por decidir. La app API tiene también el dominio `https://admin.top8.uk/api`, así el admin
+  sigue llamando a la API en su mismo origen, sin CORS.
 
 ### App web en Coolify
 Crear `kuulis-web-<entorno>` desde el UI: repositorio `carlozrodri/kuulis`, rama `qa` o `main`, build pack
