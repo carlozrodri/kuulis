@@ -87,6 +87,11 @@ servidor de Carlos.
 - `/api/health/live` y `/ready` muestran `env` y `commit`; `/ready` revisa OSRM y Photon y responde
   `degraded` (sin 503) si se cae uno. Sentry usa el commit como `release`. Configuración del admin muestra el
   commit de API y admin.
+- QA usa `kuulis-osrm` desde el 2026-10-11: una cotización de 8,5 km en Caracas responde en unos 450 ms medidos
+  desde fuera, casi todo red (el mismo viaje a `/health/live` tarda ~450 ms), así que el cálculo en el servidor es
+  de decenas de ms.
+- Redis de QA con AOF y `noeviction` (probado: una sesión sigue válida tras reiniciarlo) y Postgres de QA con la
+  configuración ajustada.
 - Migración que activa `pg_stat_statements` (sin bloquear el despliegue si no se puede).
 - `docs/deployment.md`: configuración de Redis (AOF, `noeviction`) y Postgres, límites de RAM, listas de
   encendido y de cada despliegue, contingencia del homelab.
