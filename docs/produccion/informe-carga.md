@@ -52,7 +52,7 @@ cada 5 s (limitado a los 8 hilos asignados), `cpu.stat` del cgroup de cada conte
 | **8** | 15 min | + max-requests 200k | ~220 | **180 ms** | **0** | **100 %** | **2,8 s** | **Cumple todo** salvo CPU < 70 % |
 | 9 | 40 min (30 a plena carga) | igual + campaña | 215–237 | 254 ms (86–230 ms por minuto) | 4440, todos en una caída de ~40 s | 97 % | 2,9 s | Caída del servidor entero sin despliegue; la campaña no afectó al despacho |
 | 10 | 20 min, caos | reinicio de API, worker y Redis | ~220 | 1,1 s | 779 | 98 % | 3,7 s (base) | 0 viajes sin oferta > 30 s |
-| 11 | 20 min, caos | + PR #35 y #36 | CHAOS2 | | | | | |
+| 11 | 20 min, caos | + PR #35 y #36 | ~215 | 1,3 s | 1009 | 98 % | 4,3 s (base) | 0 viajes sin oferta > 30 s; 0 sesiones revocadas |
 
 Prueba 8 en detalle (la de referencia): 148 619 peticiones, p50 24 ms, p95 180 ms, p99 499 ms; oferta p95
 85 ms; asignación p95 2,8 s; ~150 ubicaciones/s; 18 592 aperturas de socket con 0 cierres inesperados;
@@ -86,7 +86,19 @@ asignación p50 1,9 s, p95 3,7 s, máximo 37 s; **0 viajes en `searching` sin of
 aceptación). 21 viajes quedaron a medias porque el simulador abandonaba el viaje si un paso daba 5xx; ahora
 reintenta como la app (PR #36).
 
-CHAOS2_DETAIL
+Prueba 11, con el reintento del refresh (PR #35) y el simulador corregido (PR #36): `loadtest-report` da 1283
+viajes, primera oferta p95 197 ms y máximo 0,8 s, asignación p95 4,3 s y máximo 22 s, **0 viajes sin oferta más
+de 30 s** y solo 2 viajes a medias (antes 21). Ninguna renovación de sesión fue rechazada (`token_revoked`: 0).
+
+| Reinicio | Efecto (prueba 11) |
+| --- | --- |
+| API | ~40 s de 502/504 (833 errores) y 1775 sockets cortados; reconectaron casi todos (~8 motorizados del simulador siguen sin volver, antes 18). |
+| Worker | 2 errores; asignación p95 ~4,6 s durante 2 min. |
+| Redis | 134 errores 500 y 33 sockets cortados en unos segundos; la asignación llegó a p95 14 s ese minuto y luego se normalizó. |
+
+Notas: el "reinicio" de Coolify recrea el contenedor y gasta CPU antes de cortar, por eso el p95 sube ya el
+minuto anterior; además un despliegue del admin coincidió con el minuto 4 de la prueba 11. Tras una caída, k6
+no termina solo (hay que pararlo; los resultados se leen del CSV parcial).
 
 ## Cuellos de botella encontrados y cambios aplicados
 
@@ -112,6 +124,13 @@ Lo que **no** hizo falta: PgBouncer (Postgres nunca pasó de unas pocas conexion
 | `RATE_LIMIT_AUTH` | 20/min por IP (no subir; en QA se subió solo para la prueba) | Protege contra fuerza bruta. |
 | `RATE_LIMIT_REFRESH` | 3000/min por IP | CGNAT. |
 | Hilos de CPU | Más de 8 si el host lo permite | Es el límite medido. |
+
+## Estado de QA tras la prueba
+
+Datos sintéticos borrados (`loadtest-clean`: 5607 usuarios y 101 283 viajes). Variables de prueba quitadas
+(`LOADTEST_PASSWORD`, `RATE_LIMIT_AUTH`, pool, `EXPO_PUSH_URL` del worker) y `WEB_CONCURRENCY` de vuelta a 4;
+tareas programadas usadas para lanzar comandos borradas. El runner `kuulis-loadtest` (en "pc grande",
+`kuulis-carga.top8.uk`) se queda para repetir la prueba; ver `loadtest/README.md`.
 
 ## Pendiente (partes 2 y 3 del doc 18)
 
