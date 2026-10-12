@@ -14,6 +14,7 @@ import os
 import re
 import subprocess
 import sys
+import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -47,7 +48,13 @@ def apk_runtime(apk: str) -> str | None:
     except subprocess.CalledProcessError:
         return None
     match = re.search(r'string/expo_runtime_version[^\n]*\n\s*\([^)]*\)\s*"([^"]+)"', resources)
-    return match.group(1) if match else None
+    if not match:
+        return None
+    value = match.group(1)
+    if value.startswith("file:"):  # the fingerprint policy stores it in an asset: "file:fingerprint"
+        with zipfile.ZipFile(apk) as archive:
+            value = archive.read(f"assets/{value.removeprefix('file:')}").decode().strip()
+    return value
 
 
 def apk_version(apk: str) -> tuple[str, int]:
