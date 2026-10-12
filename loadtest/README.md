@@ -57,6 +57,9 @@ curl https://kuulis-carga.top8.uk/api/runs/<id> -H "Authorization: Bearer $RUNNE
 curl -X POST https://kuulis-carga.top8.uk/api/runs/<id>/stop -H "Authorization: Bearer $RUNNER_TOKEN"
 ```
 
+Los sockets de motorizados y de viajes se reconectan solos como en la app (1 s, duplicando hasta 30 s),
+y el viaje se vuelve a leer tras reconectar; `ws_reconnects` cuenta las reconexiones.
+
 Opciones (`env`): `SCENARIOS` (`drivers,riders,browsers,admins`), `SCALE` (multiplica motorizados,
 viajes y pasajeros), `DRIVERS` (600), `RIDES` (150 viajes simultáneos), `BROWSERS` (1500),
 `DURATION`, `RAMP`, `LOCATION_S` (4), `ARRIVE_S` (20), `TRIP_S` (60), `P_ACCOUNTS` / `D_ACCOUNTS`
