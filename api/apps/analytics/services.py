@@ -390,9 +390,7 @@ async def metrics(
                 .where(*where)
                 .group_by(Rating.rater_role)
             )
-        )
-        .tuples()
-        .all()
+        ).all()
     )
 
     day = _local_day(Ride.requested_at)
@@ -542,9 +540,7 @@ async def overview(session: AsyncSession) -> Overview:
                 .where(TopUp.status.in_([TopUpStatus.PENDING, TopUpStatus.UNMATCHED]))
                 .group_by(TopUp.status)
             )
-        )
-        .tuples()
-        .all()
+        ).all()
     )
     reports = await moderation.counts(session)
     overdue = await session.scalar(

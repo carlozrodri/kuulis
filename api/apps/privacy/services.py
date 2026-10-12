@@ -77,7 +77,7 @@ async def consents(session: AsyncSession, user_id: uuid.UUID) -> list[str]:
         .where(UserConsent.user_id == user_id)
         .order_by(UserConsent.created_at)
     )
-    latest = dict(rows.tuples().all())
+    latest = dict(rows.all())
     return [kind for kind in CONSENT_KINDS if latest.get(kind)]
 
 
@@ -471,4 +471,4 @@ async def exports(session: AsyncSession, params: PageParams) -> tuple[list[tuple
     )
     total = await session.scalar(select(func.count(DataExport.id))) or 0
     rows = await session.execute(stmt.limit(params.limit).offset(params.offset))
-    return list(rows.tuples().all()), int(total)
+    return list(rows.all()), int(total)
