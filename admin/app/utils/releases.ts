@@ -1,5 +1,8 @@
 import type { AdminRelease, ReleaseChannel } from '~/types/api'
 
+/** Badge color of each release channel (APK releases and JS updates). */
+export const CHANNEL_COLORS = { qa: 'neutral', beta: 'info', production: 'primary' } as const satisfies Record<ReleaseChannel, string>
+
 /** Bytes as megabytes for the tables: 52_428_800 → "50 MB". */
 export function formatMegabytes(bytes: number | null | undefined, locale: string): string {
   if (bytes === null || bytes === undefined || !Number.isFinite(bytes)) return '—'

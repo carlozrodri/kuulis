@@ -18,7 +18,6 @@ const channelItems = computed(() => [
   { label: t('versions.allChannels'), value: 'all' },
   ...RELEASE_CHANNELS.map(value => ({ label: t(`versions.channels.${value}`), value })),
 ])
-const CHANNEL_COLORS = { qa: 'neutral', beta: 'info', production: 'primary' } as const
 
 // All releases at once: the table filters them, and the usage table needs every channel's newest.
 const { data: releases, status: releasesStatus, error: releasesError, refresh: refreshReleases } = await useAsyncData(
@@ -408,6 +407,9 @@ function releaseActions(release: AdminRelease) {
           </template>
         </UTable>
       </section>
+
+      <!-- JS over-the-air updates -->
+      <VersionsOtaUpdates />
 
       <!-- Builds in use -->
       <section class="space-y-3">

@@ -1,22 +1,25 @@
 import { useTranslation } from 'react-i18next';
 import { type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native';
 
-import { Download, X } from '@/components/icons';
+import { Download, Sparkles, X } from '@/components/icons';
 import { Card, IconButton, IconTile, Txt } from '@/components/ui';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
+import { useCanRestart, useJsUpdate } from '@/hooks/useJsUpdate';
 import { formatMegabytes } from '@/lib/appVersion';
 import { space } from '@/theme';
 
+import { RestartControls } from './RestartControls';
 import { InstallControls } from './UpdateControls';
 
 /**
  * "Nueva versión disponible" card on the passenger and driver homes. Optional updates can be dismissed
- * for that build; a mandatory one postponed by a ride in progress cannot.
+ * for that build; a mandatory one postponed by a ride in progress cannot. Without a new APK to show, a
+ * downloaded JS update may show "Hay una mejora lista" instead.
  */
 export function UpdateBanner({ style }: { style?: StyleProp<ViewStyle> }) {
   const { t } = useTranslation();
   const { latest, available, required, dismissed, dismiss } = useAppUpdate();
-  if (!available || !latest || (!required && dismissed)) return null;
+  if (!available || !latest || (!required && dismissed)) return <JsUpdateBanner style={style} />;
   return (
     <Card tone="tint" style={[styles.card, style]}>
       <View style={styles.row}>
@@ -32,6 +35,32 @@ export function UpdateBanner({ style }: { style?: StyleProp<ViewStyle> }) {
         {!required ? <IconButton icon={X} label={t('update.banner.dismiss')} tone="plain" size={36} onPress={dismiss} /> : null}
       </View>
       <InstallControls size="sm" />
+    </Card>
+  );
+}
+
+/**
+ * A JS update was downloaded and applies on the next start. Offers a restart only when nothing would be
+ * interrupted: hidden during a ride and while the driver is online. Closing it hides it until the next start.
+ */
+function JsUpdateBanner({ style }: { style?: StyleProp<ViewStyle> }) {
+  const { t } = useTranslation();
+  const js = useJsUpdate();
+  const { allowed } = useCanRestart(js.pending && !js.dismissed);
+  if (!js.pending || js.dismissed || !allowed) return null;
+  return (
+    <Card tone="tint" style={[styles.card, style]}>
+      <View style={styles.row}>
+        <IconTile icon={Sparkles} tone="primary" size={40} />
+        <View style={{ flex: 1, gap: 2 }}>
+          <Txt variant="bodyStrong">{t('update.ota.bannerTitle')}</Txt>
+          <Txt variant="caption" color="muted">
+            {t('update.ota.bannerBody')}
+          </Txt>
+        </View>
+        <IconButton icon={X} label={t('update.banner.dismiss')} tone="plain" size={36} onPress={js.dismiss} />
+      </View>
+      <RestartControls size="sm" title={t('update.ota.restart')} />
     </Card>
   );
 }

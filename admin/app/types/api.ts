@@ -1118,3 +1118,44 @@ export interface BuildUsage {
   build: number
   users: number
 }
+
+// ---- JS over-the-air updates ----
+
+export interface AdminUpdate {
+  id: string
+  platform: string
+  channel: ReleaseChannel
+  /** Fingerprint of the native code (40 hex): only apps built with the same one receive it. */
+  runtime_version: string
+  /** rollback: the apps go back to the code inside the APK (no JS update). */
+  kind: 'update' | 'rollback'
+  commit: string | null
+  message: string | null
+  /** Stable share of devices that receive it (0 = paused). */
+  rollout_percent: number
+  /** Set on the replacement created by reverting that update. */
+  reverted_from_id: string | null
+  created_at: string
+  withdrawn_at: string | null
+  published_by_email: string | null
+}
+
+/** A JS export the compiler uploaded, publishable from the admin. */
+export interface UpdateCandidate {
+  key: string
+  platform: string
+  runtime_version: string
+  commit: string | null
+  message: string | null
+  built_at: string | null
+  /** Bytes. */
+  bundle_size: number | null
+  asset_count: number
+  published_channels: ReleaseChannel[]
+}
+
+/** Distinct users per running update over the last 7 days ('embedded': the APK's own code). */
+export interface UpdateUsage {
+  update_id: string
+  users: number
+}

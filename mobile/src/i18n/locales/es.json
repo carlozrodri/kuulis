@@ -1383,6 +1383,18 @@
       "download": "No pudimos descargar la actualización. Revisa tu conexión e inténtalo de nuevo.",
       "checksum": "El archivo descargado no coincide con la versión publicada y lo borramos. Inténtalo de nuevo.",
       "installer": "No pudimos abrir el instalador de Android."
+    },
+    "ota": {
+      "bannerTitle": "Hay una mejora lista",
+      "bannerBody": "Se aplicará al volver a abrir la app, o reinicia ahora.",
+      "restart": "Reiniciar",
+      "restartNow": "Reiniciar ahora",
+      "blocked": {
+        "ride": "Podrás reiniciar cuando termine tu viaje. Mientras tanto, la mejora se aplicará al volver a abrir la app.",
+        "online": "Desconéctate para reiniciar. Mientras estés conectado no cerramos la app.",
+        "unknown": "Comprobando que no tengas un viaje en curso…"
+      },
+      "restartError": "No pudimos reiniciar. Cierra y vuelve a abrir Kuulis para aplicar la mejora."
     }
   },
   "about": {
@@ -1401,6 +1413,11 @@
     "upToDate": "Tienes la última versión.",
     "available": "Kuulis {{version}} disponible",
     "availableBody": "Descarga de {{size}} MB.",
-    "unsupported": "Esta copia de Kuulis no se actualiza desde aquí (versión de desarrollo, web o iPhone)."
+    "unsupported": "Esta copia de Kuulis no se actualiza desde aquí (versión de desarrollo, web o iPhone).",
+    "update": "Actualización",
+    "embedded": "Incluida en la app",
+    "running": "{{id}} · {{date}}",
+    "jsReady": "Actualización lista: se aplicará al volver a abrir la app.",
+    "jsError": "No pudimos buscar actualizaciones. Revisa tu conexión e inténtalo de nuevo."
   }
 }

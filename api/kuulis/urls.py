@@ -34,6 +34,7 @@ from apps.staff.router import public_router as staff_public_router
 from apps.staff.router import router as staff_router
 from apps.subscriptions.router import admin_router as subscriptions_admin_router
 from apps.subscriptions.router import router as subscriptions_router
+from apps.updates.router import router as updates_router
 from apps.users.router import router as users_router
 from apps.wallet.router import admin_router as wallet_admin_router
 from apps.wallet.router import router as wallet_router
@@ -45,6 +46,7 @@ api_v1.include_router(users_router)
 api_v1.include_router(legal_router)
 api_v1.include_router(privacy_router)
 api_v1.include_router(releases_router)
+api_v1.include_router(updates_router)
 api_v1.include_router(referrals_router)
 api_v1.include_router(notifications_router)
 api_v1.include_router(files_router)

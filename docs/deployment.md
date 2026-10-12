@@ -111,6 +111,7 @@ chat ni los logs. Revisado el 2026-10-11 comparando huellas, sin leer valores.
 | `FIRST_SUPERUSER_PASSWORD` | API | distinta | alta | cambiar la contraseña desde Mi perfil; la variable solo sirve para el primer arranque |
 | `BINANCE_API_KEY` / `BINANCE_API_SECRET` | API y worker (solo QA por ahora) | — | alta | de solo lectura (confirmado por Carlos el 2026-10-11) |
 | `METRICS_TOKEN` | API | por entorno | aún sin poner | cambiarlo aquí y en el scraper |
+| `UPDATES_SIGNING_KEY` | API + gestor de contraseñas de Carlos | por entorno (prod aún sin crear) | 2026-10-12 (alta en QA) | exige APK nuevo con el certificado nuevo (ver «Clave de firma de las OTA») |
 | `ALERT_TELEGRAM_BOT_TOKEN` | API y worker | el mismo bot | 2026-10-11 (alta en QA) | `/revoke` en BotFather |
 | `SENTRY_DSN` | API y worker | por entorno | pendiente (GlitchTip listo el 2026-10-11) | nuevo DSN en GlitchTip |
 | Token de Expo (EAS) | cuenta de Expo de Carlos, `EXPO_ACCESS_TOKEN` | — | **pendiente**: se pegó en un chat; Carlos lo rota | revocarlo en expo.dev y crear otro |
@@ -311,14 +312,17 @@ App de Coolify en QA que compila el APK en nuestro servidor, sin la cola de EAS 
 - Al arrancar compila con `eas build --local --profile qa` (mismas credenciales y variables de EAS que en
   la nube) y sube el APK a S3 en `builds/qa/` (con fecha y hash) y como `builds/qa/kuulis-qa-qa-latest.apk`.
   El enlace firmado de 7 días queda en los logs del contenedor.
-- `watch_paths`: solo archivos que cambian la parte nativa (`package.json`, `app.config.ts`, `eas.json`,
-  `plugins/`, `builder/`). Para un APK con cambios solo de JS, redeplegar la app a mano.
+- Antes de compilar calcula el **runtime** de `expo-updates` (huella del código nativo: dependencias nativas,
+  plugins, `app.config.ts`, `eas.json`). Si ya hay un APK en S3 con ese runtime, no compila: exporta una
+  **actualización de JS (OTA)** en un par de minutos y la deja como candidata (ver «Publicar una
+  actualización OTA»). Si el runtime es nuevo, compila el APK. `FORCE_APK=1` fuerza el APK.
+- `watch_paths`: `mobile/**` para que cada cambio de la app genere su OTA o su APK.
 - Variables: `EXPO_TOKEN`, `EXPO_OWNER` (las mismas de `kuulis-expo-qa`) y las `AWS_*` de la API de QA.
 - Volumen persistente en `/cache` (caché de Gradle y npm): acelera las siguientes compilaciones y evita
   recompilar el mismo código si el contenedor se reinicia.
 - Necesita unos 6 GB de RAM libres mientras compila; la imagen ocupa ~10 GB.
-- Junto a cada APK sube `<nombre>.json` con versión, build (`versionCode`), tamaño, SHA-256 y MD5. El perfil
-  `qa` sube el build en cada compilación (`autoIncrement`, numerado por EAS).
+- Junto a cada APK sube `<nombre>.json` con versión, build (`versionCode`), tamaño, SHA-256, MD5 y runtime.
+  El perfil `qa` sube el build en cada compilación (`autoIncrement`, numerado por EAS).
 
 ## Publicar una versión del APK (doc 09)
 1. El compilador deja el APK en `builds/<entorno>/` (ver arriba).
@@ -330,6 +334,33 @@ App de Coolify en QA que compila el APK en nuestro servidor, sin la cola de EAS 
 4. Para revertir, **Retirar** la versión: vuelve a ofrecerse la anterior (y deja de bloquear si era
    obligatoria). Ojo: Android no deja instalar una build menor encima de una mayor, así que quien ya
    actualizó se queda con la retirada hasta que salga una nueva.
+
+## Publicar una actualización OTA (doc 09)
+Las OTA cambian solo el JS y las imágenes; llegan a las apps instaladas sin descargar un APK.
+1. El compilador sube cada archivo una vez a `updates/<entorno>/assets/<sha256>` y la candidata a
+   `updates/<entorno>/candidates/`.
+2. En el admin, **Versiones → Actualizaciones de JS → Publicar**: canal, porcentaje y mensaje. La API
+   (`GET /api/v1/updates/manifest`, protocolo Expo Updates v1) entrega a cada app la actualización más nueva
+   de su canal y su runtime, **firmada**; la app la descarga en segundo plano al abrirse y la aplica la
+   siguiente vez que se abre. Nunca reinicia sola (ni en un viaje ni con el motorizado conectado).
+3. **Porcentaje**: elige una parte estable de los teléfonos (por el id de instalación que manda la app); los
+   demás siguen con la anterior. Pausar = 0 %, luego ampliar a 100 %.
+4. **Revertir**: retira la actualización y publica una copia más nueva de la anterior (las apps se quedan
+   siempre con la más nueva que descargaron); si no había anterior, las apps vuelven al código del APK.
+5. Solo reciben la OTA las apps con el mismo runtime. Las instaladas antes de la parte 2 (sin `expo-updates`)
+   necesitan el APK nuevo.
+
+### Clave de firma de las OTA
+- Certificado (público) en `mobile/certs/updates-<entorno>.pem`; va dentro del APK. Sin certificado para el
+  entorno la app compila con las OTA apagadas (así está producción hasta crear su clave).
+- Clave privada en la variable `UPDATES_SIGNING_KEY` de la API (PEM; se aceptan los saltos de línea como
+  `\n`) y copia en el gestor de contraseñas de Carlos. Sin ella el manifiesto responde 503 y las apps se
+  quedan con lo que tienen.
+- Crear la de un entorno: `npx expo-updates codesigning:generate --key-output-directory <fuera del repo>
+  --certificate-output-directory certs --certificate-validity-duration-years 20 --certificate-common-name
+  "Kuulis <entorno> updates"` y renombrar `certs/certificate.pem` a `certs/updates-<entorno>.pem`.
+- Cambiar la clave obliga a un APK nuevo (el certificado viaja dentro): las apps viejas rechazan lo firmado
+  con la clave nueva. Si se filtra, se cambia igual y se publica un APK obligatorio.
 
 ## Firma de producción (pendiente de Carlos)
 El perfil `production` de `eas.json` genera un APK firmado con el keystore de producción que guarda EAS.

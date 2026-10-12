@@ -1,7 +1,9 @@
 import * as Application from 'expo-application';
+import * as Updates from 'expo-updates';
 import { Platform } from 'react-native';
 
 import { config } from './config';
+import { updateHeaderValue } from './jsUpdate';
 
 /** Release channel of the API's APK catalogue (doc 09). QA builds and local dev clients follow "qa". */
 export type AppChannel = 'qa' | 'beta' | 'production';
@@ -24,12 +26,29 @@ export const appVersion = {
   channel: channelFor(config.appEnv),
 } as const;
 
-/** Lets the API count builds in use and refuse ride actions from builds below a mandatory release. */
+/**
+ * JS updates from our update server (doc 09 part 2). Off in local and dev builds and Expo Go; the web module
+ * reports itself enabled but has nothing to update, so web counts as off too.
+ */
+export const otaEnabled = Platform.OS !== 'web' && Updates.isEnabled;
+
+/** Running update id, "embedded" for the APK's own code, null when updates are off. */
+const updateHeader = updateHeaderValue({
+  isEnabled: otaEnabled,
+  isEmbeddedLaunch: Updates.isEmbeddedLaunch,
+  updateId: Updates.updateId,
+});
+
+/**
+ * Lets the API count builds (and JS updates) in use and refuse ride actions from builds below a mandatory
+ * release.
+ */
 export const APP_VERSION_HEADERS: Record<string, string> = {
   'X-App-Platform': appVersion.platform,
   'X-App-Version': appVersion.version,
   'X-App-Build': String(appVersion.build),
   'X-App-Channel': appVersion.channel,
+  ...(updateHeader ? { 'X-App-Update': updateHeader } : {}),
 };
 
 /** Only installed Android builds can download and install an APK (dev clients report build 0 or skip). */

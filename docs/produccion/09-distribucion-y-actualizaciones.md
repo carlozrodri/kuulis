@@ -114,3 +114,23 @@ vía para los pasajeros con iPhone.
   Android, y **Perfil → Acerca de** con versión, build, canal y «Buscar actualizaciones».
 - Web: la página Descargar muestra el APK publicado con su versión, tamaño, fecha y huella SHA-256.
 - El primer APK con este código hay que instalarlo a mano (las versiones anteriores no saben actualizarse).
+
+### Parte 2 (2026-10-12)
+- El servidor de actualizaciones es la propia API (no un servicio aparte): `GET /api/v1/updates/manifest`
+  implementa el protocolo Expo Updates v1 y firma cada manifiesto (RSA SHA-256) con `UPDATES_SIGNING_KEY`.
+  La app lleva el certificado (`mobile/certs/updates-<entorno>.pem`) y rechaza lo que no venga firmado con esa
+  clave. Los archivos se sirven con enlaces firmados de S3.
+- `runtimeVersion` con la política `fingerprint`: una OTA solo llega a APKs con el mismo código nativo. El
+  compilador calcula esa huella; si ya hay un APK con ella, exporta una OTA en vez de compilar.
+- Tabla `app_updates` (aparte de `app_releases`): canal, runtime, porcentaje, retirada y de qué reversión
+  viene. Admin **Versiones → Actualizaciones de JS**: publicar una candidata en un canal con porcentaje,
+  pausar, ampliar, cambiar el porcentaje, revertir, y cuántos usuarios usan cada OTA (cabecera
+  `X-App-Update`).
+- Porcentaje estable por teléfono (id de instalación de `expo-updates` mezclado con el id de la OTA).
+  Revertir publica una copia más nueva de la anterior o, si no hay, manda a las apps al código del APK
+  (`rollBackToEmbedded`).
+- App: busca OTA al abrir y la aplica al volver a abrir; nunca se reinicia sola. «Hay una mejora lista ·
+  Reiniciar» y el botón de **Acerca de** solo funcionan sin viaje activo y con el motorizado desconectado.
+  Acerca de muestra la actualización en uso (id corto y fecha, o «Incluida en la app»).
+- Producción queda sin OTA hasta crear su clave (sin certificado la app compila con las OTA apagadas).
+- Las apps instaladas antes de esta parte necesitan el APK nuevo para recibir OTA.

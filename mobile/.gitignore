@@ -29,6 +29,8 @@ yarn-error.*
 # macOS
 .DS_Store
 *.pem
+# Code signing certificates of the OTA updates are public (the private keys never live in the repo).
+!certs/*.pem
 
 # local env files
 .env*.local

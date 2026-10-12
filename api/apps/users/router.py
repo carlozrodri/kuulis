@@ -10,6 +10,7 @@ from apps.moderation import services as moderation
 from apps.releases import services as releases
 from apps.rides import presence
 from apps.staff.services import permissions_of
+from apps.updates import services as updates
 from apps.users import services
 from apps.users.dependencies import (
     AdminUser,
@@ -42,9 +43,11 @@ async def read_me(
     session: DBSession,
     x_app_platform: Annotated[str | None, Header()] = None,
     x_app_build: Annotated[str | None, Header()] = None,
+    x_app_update: Annotated[str | None, Header()] = None,
 ) -> UserRead:
     # The apps load the profile on start: a cheap place to count which builds are in use (doc 09).
     await releases.record_usage(redis_client, x_app_platform, x_app_build, user.id)
+    await updates.record_usage(redis_client, x_app_platform, x_app_update, user.id)
     read = await moderation.user_read(session, user)
     if user.can_access_admin:
         read.permissions = sorted(await permissions_of(session, user))

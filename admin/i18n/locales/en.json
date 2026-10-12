@@ -324,7 +324,11 @@
     "build_not_found": "That build is no longer in storage",
     "release_exists": "That build is already published in that channel",
     "storage_unavailable": "File storage is not answering; try again in a moment.",
-    "storage_disabled": "File storage is not configured in this environment."
+    "storage_disabled": "File storage is not configured in this environment.",
+    "update_candidate_not_found": "That export is no longer in storage",
+    "update_exists": "That export is already published in that channel",
+    "update_not_current": "That update is no longer active; reload the page",
+    "updates_signing_disabled": "Update signing is not configured in this environment."
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -1535,6 +1539,11 @@
       "app_release": {
         "publish": "Published an app version",
         "update": "Changed an app version"
+      },
+      "app_update": {
+        "publish": "Published a JavaScript update",
+        "update": "Changed a JavaScript update",
+        "revert": "Reverted a JavaScript update"
       }
     },
     "entities": {
@@ -1557,7 +1566,8 @@
       "staff_role": "Team role",
       "approval": "Approval",
       "legal": "Legal",
-      "app_release": "App version"
+      "app_release": "App version",
+      "app_update": "JavaScript update"
     }
   },
   "team": {
@@ -1762,6 +1772,52 @@
     "confirmRestore": "It is offered again in the {channel} channel (if it is the newest build) and, if mandatory, blocks older builds again.",
     "notesTitle": "Notes for {version} ({build})",
     "platform": "Platform",
-    "actions": "Actions"
+    "actions": "Actions",
+    "ota": {
+      "title": "JavaScript updates (OTA)",
+      "help": "Changes to the JavaScript code that arrive without installing a new APK. Only apps built with the same native code (runtime) receive them. The app downloads them in the background and applies them the next time it is opened, never in the middle of a ride. The percentage picks a stable share of devices: the same phone is always in or out.",
+      "updates": "Published updates",
+      "candidates": "Available exports",
+      "candidatesHelp": "JavaScript bundles the compiler uploaded for this environment, newest first.",
+      "usage": "Usage per update",
+      "usageHelp": "Distinct people who used each update in the last 7 days.",
+      "update": "Update",
+      "commitMessage": "Commit and message",
+      "runtime": "Runtime",
+      "rollout": "Rollout",
+      "message": "Message",
+      "exported": "Exported",
+      "bundleSize": "Bundle",
+      "files": "Files",
+      "percent": "{percent} %",
+      "paused": "Paused",
+      "full": "At 100 %",
+      "current": "Current",
+      "rollbackKind": "Back to the APK's code",
+      "revertOf": "Revert of {id}",
+      "embedded": "APK's code",
+      "servingIn": "Current in {channel}",
+      "pause": "Pause (0 %)",
+      "widen": "Widen to 100 %",
+      "changePercent": "Change percentage",
+      "editMessage": "Edit message",
+      "revert": "Revert",
+      "publishTitle": "Publish update",
+      "publishHelp": "Apps in the chosen channel with the same runtime will download it and apply it when they are opened again.",
+      "rolloutLabel": "Share of devices",
+      "rolloutHelp": "Start small (10 %) to test and widen once everything looks fine. 0 % leaves it paused.",
+      "messageHelp": "What changed. Up to 500 characters.",
+      "publishedToast": "Update published in {channel}",
+      "updated": "Update changed",
+      "reverted": "Update reverted",
+      "percentTitle": "Percentage of {id}",
+      "messageTitle": "Message of {id}",
+      "confirmPauseTitle": "Pause {id}",
+      "confirmPause": "It stops reaching new devices in the {channel} channel. Devices that already downloaded it keep it.",
+      "confirmFullTitle": "Widen {id} to 100 %",
+      "confirmFull": "It will reach every app in the {channel} channel with the same runtime.",
+      "confirmRevertTitle": "Revert {id}",
+      "confirmRevert": "It is withdrawn in the {channel} channel and the apps receive a newer copy of the previous update that was at 100 % or, if there is none, go back to the APK's code. The change applies the next time the app is opened."
+    }
   }
 }
