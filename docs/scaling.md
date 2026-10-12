@@ -20,7 +20,7 @@ concurrentes mientras espera I/O).
 | Rate limit renovar sesión | 3000/min por IP (CGNAT: muchos usuarios por IP) | `RATE_LIMIT_REFRESH` |
 | Hash de contraseñas | Argon2id 19 MiB, 2 pasadas, 1 hilo (OWASP; ~30 ms de CPU por login) | `kuulis/core/security.py` |
 
-Además: `pool_pre_ping`, reciclado de conexiones cada 30 min, `max-requests` con jitter en gunicorn para
+Además: `pool_pre_ping`, reciclado de conexiones cada 30 min, `max-requests` alto (200k ± 20k por proceso: reciclar un worker corta sus WebSockets) para
 evitar fugas de memoria, gzip, índices en email, rol, `user_id` y `(user_id, created_at)` de notificaciones,
 paginación con límite máximo de 100, broadcast de notificaciones en lotes de 500 por keyset.
 
