@@ -83,6 +83,7 @@ const rideAssignedMs = new Trend('ride_assigned_ms', true); // request -> driver
 const rideOk = new Rate('ride_completed');
 const ridesNoDriver = new Counter('rides_no_driver');
 const locationsSent = new Counter('driver_locations_sent');
+const notJson = new Counter('http_not_json'); // proxy pages (HTML) where the API should answer
 const locationsForwarded = new Counter('driver_locations_forwarded');
 
 // --- Options ------------------------------------------------------------------------------------
@@ -118,6 +119,7 @@ export const options = {
     offer_delivery_ms: ['p(95)<2000'],
     ride_assigned_ms: ['p(95)<5000'],
     ride_completed: ['rate>0.95'],
+    http_not_json: ['count==0'],
   },
   summaryTrendStats: ['avg', 'min', 'med', 'p(90)', 'p(95)', 'p(99)', 'max', 'count'],
   discardResponseBodies: false,
@@ -158,6 +160,17 @@ function track(res, name, expected) {
   return res;
 }
 
+// While the API restarts, the proxy in front of it can answer with an HTML page, even with a 200.
+// `res.json()` throws on that and the throw ends the VU, so read bodies through here instead.
+function json(res, path) {
+  try {
+    return path === undefined ? res.json() : res.json(path);
+  } catch (e) {
+    notJson.add(1, { status: String(res.status) });
+    return null;
+  }
+}
+
 class Session {
   constructor(email) {
     this.email = email;
@@ -179,15 +192,15 @@ class Session {
           JSON.stringify({ email: this.email, password: PASSWORD }),
           { headers: { 'Content-Type': 'application/json' }, tags: { name: 'auth_login' } }),
         'auth_login', [200, 429]);
-      if (res.status === 200) {
-        const body = res.json();
+      const body = res.status === 200 ? json(res) : null;
+      if (body && body.access_token) {
         this.access = body.access_token;
         this.refresh = body.refresh_token;
         this.at = Date.now();
         return true;
       }
       if (res.status !== 429) return false;
-      const wait = (res.json('error.details.retry_after') || 60) * 1000;
+      const wait = (json(res, 'error.details.retry_after') || 60) * 1000;
       await sleep(wait + jitter(0, 10000));
     }
     return false;
@@ -209,8 +222,8 @@ class Session {
           JSON.stringify({ refresh_token: this.refresh }),
           { headers: { 'Content-Type': 'application/json' }, tags: { name: 'auth_refresh' } }),
         'auth_refresh', [200]);
-      if (res.status === 200) {
-        const body = res.json();
+      const body = res.status === 200 ? json(res) : null;
+      if (body && body.access_token) {
         this.access = body.access_token;
         this.refresh = body.refresh_token;
         this.at = Date.now();
@@ -254,7 +267,7 @@ class Realtime {
     setTimeout(() => {
       if (this.closing) return;
       wsReconnects.add(1);
-      this.session.fresh().then(() => this.open());
+      this.session.fresh().catch(() => false).then(() => this.open());
     }, delay);
   }
 
@@ -280,7 +293,8 @@ class Realtime {
           wsConnectMs.add(Date.now() - started);
           resolve(true);
         } else if (event === 'auth.expiring') {
-          this.session.fresh().then(() => this.send({ type: 'auth', token: this.session.access }));
+          this.session.fresh().catch(() => false)
+            .then(() => this.send({ type: 'auth', token: this.session.access }));
         }
         this.emit(event, data);
         if (event === 'ready' && this.opened++ > 0) this.emit('reconnected', null);
@@ -340,7 +354,7 @@ async function loadArea(session) {
   if (area) return;
   const res = await session.call('GET', '/config/public', undefined, 'config_public');
   if (res.status === 200) {
-    const areas = res.json('service_areas') || [];
+    const areas = json(res, 'service_areas') || [];
     area = areas.find((a) => a.name.toLowerCase() === 'caracas') || areas[0] || null;
   }
 }
@@ -361,7 +375,7 @@ export async function driver() {
   if (!(await session.fresh())) return;
   await loadArea(session);
   const cfg = await session.call('GET', '/config/public', undefined, 'config_public');
-  if (cfg.status === 200) offerTimeoutS = cfg.json('offer_timeout_seconds') || offerTimeoutS;
+  if (cfg.status === 200) offerTimeoutS = json(cfg, 'offer_timeout_seconds') || offerTimeoutS;
 
   let pos = randomPoint();
   const online = await session.call('POST', '/drivers/me/online', pos, 'driver_online');
@@ -385,7 +399,9 @@ export async function driver() {
     const sentAt = Date.parse(offer.expires_at) - offerTimeoutS * 1000;
     offerDeliveryMs.add(Math.max(0, Date.now() + CLOCK_OFFSET_MS - sentAt));
     busy = true;
-    driveRide(session, rt, offer).finally(() => { busy = false; });
+    driveRide(session, rt, offer)
+      .catch((e) => console.warn(`driveRide: ${e}`))
+      .finally(() => { busy = false; });
   });
 
   // Keep serving after the deadline so the trips riders already requested can finish.
@@ -440,8 +456,9 @@ export async function rider() {
 async function rideOnce(session) {
   await session.call('GET', '/rides/active', undefined, 'ride_active');
   const unrated = await session.call('GET', '/rides/pending-rating', undefined, 'ride_pending_rating');
-  if (unrated.status === 200 && unrated.json() && unrated.json('id')) {
-    await session.call('POST', `/rides/${unrated.json('id')}/rating`, { stars: 5, tags: [] }, 'ride_rate');
+  const unratedId = unrated.status === 200 ? json(unrated, 'id') : null;
+  if (unratedId) {
+    await session.call('POST', `/rides/${unratedId}/rating`, { stars: 5, tags: [] }, 'ride_rate');
   }
   const pickup = randomPoint();
   const dropoff = randomPoint();
@@ -450,7 +467,8 @@ async function rideOnce(session) {
     dropoff: Object.assign({ address: 'Carga destino' }, dropoff),
     vehicle_type: 'moto',
   }, 'ride_quote');
-  if (quote.status !== 200) return false;
+  const quoteId = quote.status === 200 ? json(quote, 'quote_id') : null;
+  if (!quoteId) return false;
   await sleep(jitter(2000, 5000)); // looking at the price
 
   const rt = new Realtime(session, true);
@@ -458,7 +476,7 @@ async function rideOnce(session) {
   const counter = { forwarded: 0 };
   rt.on('ride.driver_location', () => { counter.forwarded += 1; });
   // No try/finally: k6's JS engine (sobek) panics on finally blocks around await.
-  const ok = await followRide(session, rt, quote.json('quote_id'));
+  const ok = await followRide(session, rt, quoteId);
   locationsForwarded.add(counter.forwarded);
   rt.close();
   return ok;
@@ -468,14 +486,15 @@ async function followRide(session, rt, quoteId) {
   const requestedAt = Date.now();
   const created = await session.call('POST', '/rides',
     { quote_id: quoteId, payment_method: 'cash_usd' }, 'ride_create', [201]);
-  if (created.status !== 201) return false;
-  const id = created.json('id');
+  const id = created.status === 201 ? json(created, 'id') : null;
+  if (!id) return false;
   const isRide = (d) => d && d.id === id;
   // Like the app: after a reconnect, re-read the ride in case an update was missed.
   rt.on('reconnected', () => {
     session.call('GET', `/rides/${id}`, undefined, 'ride_get').then((res) => {
-      if (res.status === 200) rt.emit('ride.updated', res.json());
-    });
+      const ride = res.status === 200 ? json(res) : null;
+      if (ride) rt.emit('ride.updated', ride);
+    }).catch((e) => console.warn(`ride_get after reconnect: ${e}`));
   });
 
   const assigned = await rt.waitFor('ride.updated', (d) => isRide(d) && d.status !== 'searching', 200000);

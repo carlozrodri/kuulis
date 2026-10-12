@@ -68,6 +68,8 @@ por segundo aguanta la API (`prelogin` en `meta.json`). Opciones: `"prelogin": f
 
 Los sockets de motorizados y de viajes se reconectan solos como en la app (1 s, duplicando hasta 30 s),
 y el viaje se vuelve a leer tras reconectar; `ws_reconnects` cuenta las reconexiones.
+Si mientras la API se reinicia el proxy responde con una página HTML (aunque sea un 200), el script la
+trata como un fallo y sigue; `http_not_json` cuenta esas respuestas.
 
 Opciones (`env`): `SCENARIOS` (`drivers,riders,browsers,admins`), `SCALE` (multiplica motorizados,
 viajes y pasajeros), `DRIVERS` (600), `RIDES` (150 viajes simultáneos), `BROWSERS` (1500),
