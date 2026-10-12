@@ -14,6 +14,8 @@ Every ``/api`` call needs ``Authorization: Bearer $RUNNER_TOKEN``.
 import asyncio
 import base64
 import contextlib
+import csv
+import gzip
 import hashlib
 import hmac
 import json
@@ -44,8 +46,18 @@ SCRIPT = Path(os.environ.get("K6_SCRIPT", Path(__file__).resolve().parent.parent
 DOMAIN = "loadtest.example.com"
 CAMPAIGN_TITLE = "Prueba de carga Kuulis (ignorar)"  # apps/loadtest/services.py cleans these
 ALLOWED_ENV = {
-    "SCENARIOS", "SCALE", "DRIVERS", "RIDES", "BROWSERS", "DURATION", "RAMP", "LOCATION_S",
-    "ARRIVE_S", "TRIP_S", "P_ACCOUNTS", "D_ACCOUNTS",
+    "SCENARIOS",
+    "SCALE",
+    "DRIVERS",
+    "RIDES",
+    "BROWSERS",
+    "DURATION",
+    "RAMP",
+    "LOCATION_S",
+    "ARRIVE_S",
+    "TRIP_S",
+    "P_ACCOUNTS",
+    "D_ACCOUNTS",
 }
 
 RUNS = DATA_DIR / "runs"
@@ -91,8 +103,9 @@ class Admin:
 
     async def _code(self) -> str:
         """A code from a newer time step than the last one used (each works only once)."""
-        while int(time.time()) // 30 <= self.last_step:
-            await asyncio.sleep(1)
+        wait = (self.last_step + 1) * 30 - time.time()
+        if wait > 0:
+            await asyncio.sleep(wait + 0.5)
         self.last_step = int(time.time()) // 30
         return self.totp.now()
 
@@ -232,6 +245,77 @@ def _node_summary(run_dir: Path) -> dict[str, Any] | None:
     }
 
 
+# --- Per endpoint and per minute numbers from k6's CSV ------------------------------------------
+
+
+def _p(values: list[float], pct: float) -> float | None:
+    if not values:
+        return None
+    values.sort()
+    return round(values[min(len(values) - 1, int(pct / 100 * len(values)))], 1)
+
+
+def analyze_csv(run_dir: Path) -> dict[str, Any]:
+    """p50/p95/p99 and errors per endpoint (k6 ``name`` tag) and per minute of the test, so the
+    report can show where latency started to climb while the load ramped up."""
+    path = run_dir / "metrics.csv.gz"
+    if not path.exists():
+        return {}
+    endpoints: dict[str, dict[str, Any]] = {}
+    minutes: dict[int, dict[str, Any]] = {}
+    with gzip.open(path, "rt", newline="") as fh:
+        for row in csv.DictReader(fh):
+            metric = row["metric_name"]
+            if metric not in ("http_req_duration", "ws_connect_ms", "driver_locations_sent"):
+                continue
+            minute = int(row["timestamp"]) // 60 * 60
+            bucket = minutes.setdefault(
+                minute,
+                {"durations": [], "requests": 0, "errors_5xx": 0, "ws_connects": 0, "locations": 0},
+            )
+            if metric == "ws_connect_ms":
+                bucket["ws_connects"] += 1
+                continue
+            if metric == "driver_locations_sent":
+                bucket["locations"] += int(float(row["metric_value"]))
+                continue
+            value = float(row["metric_value"])
+            status = row.get("status") or "0"
+            name = row.get("name") or row.get("url") or "?"
+            entry = endpoints.setdefault(name, {"durations": [], "statuses": {}})
+            entry["durations"].append(value)
+            entry["statuses"][status] = entry["statuses"].get(status, 0) + 1
+            bucket["durations"].append(value)
+            bucket["requests"] += 1
+            if status == "0" or status.startswith("5"):
+                bucket["errors_5xx"] += 1
+    result = {
+        "endpoints": {
+            name: {
+                "count": len(e["durations"]),
+                "p50": _p(e["durations"], 50),
+                "p95": _p(e["durations"], 95),
+                "p99": _p(e["durations"], 99),
+                "statuses": e["statuses"],
+            }
+            for name, e in sorted(endpoints.items(), key=lambda kv: -len(kv[1]["durations"]))
+        },
+        "timeline": [
+            {
+                "minute": datetime.fromtimestamp(minute, UTC).isoformat(timespec="minutes"),
+                "req_per_s": round(b["requests"] / 60, 1),
+                "p95_ms": _p(b["durations"], 95),
+                "errors_5xx": b["errors_5xx"],
+                "ws_connects": b["ws_connects"],
+                "locations_per_s": round(b["locations"] / 60, 1),
+            }
+            for minute, b in sorted(minutes.items())
+        ],
+    }
+    (run_dir / "analysis.json").write_text(json.dumps(result, indent=1))
+    return result
+
+
 # --- Runs --------------------------------------------------------------------------------------
 
 
@@ -264,9 +348,19 @@ async def _run(run_dir: Path, env: dict[str, str], options: dict[str, Any]) -> N
         _save_meta(run_dir, meta)
         with (run_dir / "k6.log").open("wb") as log:
             process = await asyncio.create_subprocess_exec(
-                "k6", "run", "--quiet", "--out", f"csv={run_dir / 'metrics.csv.gz'}", str(SCRIPT),
-                env={**os.environ, **env, "PASSWORD": PASSWORD, "BASE_URL": BASE_URL,
-                     "SUMMARY_PATH": str(run_dir / "summary.json")},
+                "k6",
+                "run",
+                "--quiet",
+                "--out",
+                f"csv={run_dir / 'metrics.csv.gz'}",
+                str(SCRIPT),
+                env={
+                    **os.environ,
+                    **env,
+                    "PASSWORD": PASSWORD,
+                    "BASE_URL": BASE_URL,
+                    "SUMMARY_PATH": str(run_dir / "summary.json"),
+                },
                 stdout=log,
                 stderr=asyncio.subprocess.STDOUT,
             )
@@ -284,6 +378,10 @@ async def _run(run_dir: Path, env: dict[str, str], options: dict[str, Any]) -> N
         meta["finished_at"] = _now()
         meta["node"] = _node_summary(run_dir)
         meta["push"] = {k: v for k, v in push_stats.items() if k != "per_second"}
+        try:
+            await asyncio.to_thread(analyze_csv, run_dir)
+        except Exception as exc:
+            meta["analysis_error"] = repr(exc)
         _save_meta(run_dir, meta)
         state["process"] = None
         state["run"] = None
@@ -304,8 +402,14 @@ async def start_run(request: Request) -> Response:
     push_stats.update(requests=0, messages=0, first_at=None, last_at=None, per_second={})
     _save_meta(
         run_dir,
-        {"id": run_id, "status": "starting", "created_at": _now(), "base_url": BASE_URL,
-         "env": env, "options": {k: v for k, v in options.items() if k != "env"}},
+        {
+            "id": run_id,
+            "status": "starting",
+            "created_at": _now(),
+            "base_url": BASE_URL,
+            "env": env,
+            "options": {k: v for k, v in options.items() if k != "env"},
+        },
     )
     state["run"] = run_id
     asyncio.get_running_loop().create_task(_run(run_dir, env, options))
@@ -320,8 +424,11 @@ def _summary(run_dir: Path) -> dict[str, Any] | None:
     picked = {}
     for name, metric in metrics.items():
         values = metric.get("values", {})
-        keep = {k: round(v, 2) if isinstance(v, float) else v for k, v in values.items()
-                if k in ("count", "rate", "p(95)", "p(99)", "med", "max", "avg", "passes", "fails")}
+        keep = {
+            k: round(v, 2) if isinstance(v, float) else v
+            for k, v in values.items()
+            if k in ("count", "rate", "p(95)", "p(99)", "med", "max", "avg", "passes", "fails")
+        }
         thresholds = metric.get("thresholds")
         if thresholds:
             keep["thresholds"] = {k: v.get("ok") for k, v in thresholds.items()}
@@ -346,15 +453,17 @@ async def get_run(request: Request) -> Response:
     tail = log.read_text(errors="replace")[-4000:] if log.exists() else ""
     node = run_dir / "node.jsonl"
     last_node = node.read_text().strip().splitlines()[-1:] if node.exists() else []
-    return JSONResponse({
-        **_meta(run_dir),
-        "summary": _summary(run_dir),
-        "node_now": json.loads(last_node[0]) if last_node else None,
-        "node_summary": _node_summary(run_dir),
-        "push_now": {k: v for k, v in push_stats.items() if k != "per_second"},
-        "log_tail": tail,
-        "files": sorted(p.name for p in run_dir.iterdir()),
-    })
+    return JSONResponse(
+        {
+            **_meta(run_dir),
+            "summary": _summary(run_dir),
+            "node_now": json.loads(last_node[0]) if last_node else None,
+            "node_summary": _node_summary(run_dir),
+            "push_now": {k: v for k, v in push_stats.items() if k != "per_second"},
+            "log_tail": tail,
+            "files": sorted(p.name for p in run_dir.iterdir()),
+        }
+    )
 
 
 async def get_file(request: Request) -> Response:
