@@ -102,6 +102,59 @@ def createsuperuser(
     asyncio.run(_create())
 
 
+def _loadtest(action) -> None:
+    """Runs ``action(session)`` from apps.loadtest.services and prints its JSON result."""
+    import json
+
+    import kuulis.models  # noqa: F401  (every table, for clean's foreign key walk)
+    from apps.loadtest.services import LoadTestRefusedError
+    from kuulis.core.db import SessionLocal, engine
+
+    async def _run() -> None:
+        async with SessionLocal() as session:
+            try:
+                result = await action(session)
+            except LoadTestRefusedError as exc:
+                typer.echo(f"Refused: {exc}", err=True)
+                raise typer.Exit(1) from exc
+        typer.echo(json.dumps(result, indent=2, default=str))
+        await engine.dispose()
+
+    asyncio.run(_run())
+
+
+@cli.command("loadtest-seed")
+def loadtest_seed(
+    password: str = typer.Option(..., envvar="LOADTEST_PASSWORD"),
+    passengers: int = 5000,
+    drivers: int = 600,
+    admins: int = 7,  # 5 for the admin scenario, 2 to send and approve the push campaign
+    rides: int = 100_000,
+) -> None:
+    """Synthetic accounts and ride history for the load tests (doc 18; never in production)."""
+    from apps.loadtest import services
+
+    _loadtest(lambda s: services.seed(s, password, passengers, drivers, admins, rides))
+
+
+@cli.command("loadtest-report")
+def loadtest_report(since: str = typer.Option(..., help="ISO time the test started")) -> None:
+    """Dispatch times and outcomes of the rides synthetic riders requested since ``since``."""
+    from datetime import datetime
+
+    from apps.loadtest import services
+
+    _loadtest(lambda s: services.report(s, datetime.fromisoformat(since)))
+
+
+@cli.command("loadtest-clean")
+def loadtest_clean() -> None:
+    """Deletes every synthetic account and what it produced."""
+    from apps.loadtest import services
+
+    _loadtest(services.clean)
+
+
 @cli.command()
 def shell() -> None:
     """Python shell with settings and models loaded (use `await` with python -m asyncio)."""
