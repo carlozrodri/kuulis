@@ -45,6 +45,8 @@
   contenedor de la API, con un advisory lock para que dos contenedores no migren a la vez).
 - Auth: JWT de acceso (15 min) + refresh token rotativo (30 días) guardado en Redis, con detección de
   reutilización (si alguien reusa un refresh ya rotado se revocan todas las sesiones del usuario).
+  Un reintento del mismo refresh en los 30 s siguientes (la respuesta se perdió por la red) recibe
+  los mismos tokens nuevos, mientras la sesión no haya vuelto a rotar ni se haya cerrado.
   Roles: `user`, `staff`, `admin`. Login social preparado (tabla `social_accounts`, endpoint 501).
 - Errores con formato estable `{"error": {"code", "message", "details"}}`; los clientes traducen `code`.
 - Rate limiting en Redis (compartido entre workers y contenedores).

@@ -45,6 +45,9 @@ class BaseAppSettings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_TTL_MINUTES: int = 15
     REFRESH_TOKEN_TTL_DAYS: int = 30
+    # A refresh retried this soon after its rotation (the answer was lost on a bad connection)
+    # gets the same new tokens instead of tripping reuse detection.
+    REFRESH_RETRY_GRACE_SECONDS: int = 30
     PASSWORD_RESET_TTL_MINUTES: int = 30
     EMAIL_VERIFICATION_TTL_HOURS: int = 48
     # Social login: accepted ``aud`` values. Empty disables the provider.
