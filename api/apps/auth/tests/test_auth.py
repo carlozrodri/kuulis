@@ -97,3 +97,29 @@ async def test_access_token_cannot_be_used_as_refresh(client, user_headers):
     access = user_headers["Authorization"].split()[1]
     response = await client.post("/api/v1/auth/refresh", json={"refresh_token": access})
     assert response.status_code == 401
+
+
+async def test_login_upgrades_hashes_made_with_older_argon2_settings(client, user_headers):
+    from pwdlib import PasswordHash
+    from sqlalchemy import select, update
+
+    from apps.users.models import User
+    from conftest import PASSWORD
+    from kuulis.core.db import SessionLocal
+
+    old = PasswordHash.recommended().hash(PASSWORD)  # 64 MiB, 3 passes, 4 lanes
+    async with SessionLocal() as session:
+        await session.execute(
+            update(User).where(User.email == "user@example.com").values(hashed_password=old)
+        )
+        await session.commit()
+
+    response = await client.post(
+        "/api/v1/auth/login", json={"email": "user@example.com", "password": PASSWORD}
+    )
+    assert response.status_code == 200, response.text
+    async with SessionLocal() as session:
+        stored = await session.scalar(
+            select(User.hashed_password).where(User.email == "user@example.com")
+        )
+    assert stored.startswith("$argon2id$v=19$m=19456,t=2,p=1$")

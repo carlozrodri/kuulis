@@ -8,13 +8,18 @@ from typing import Any, Literal
 
 import jwt
 from pwdlib import PasswordHash
+from pwdlib.hashers.argon2 import Argon2Hasher
 
 from kuulis.core.exceptions import AuthenticationError
 from kuulis.settings import settings
 
 TokenType = Literal["access", "refresh", "password_reset", "email_verification", "staff_invite"]
 
-password_hasher = PasswordHash.recommended()
+# Argon2id with OWASP's first recommended configuration (19 MiB, 2 passes, 1 lane). pwdlib's default
+# (64 MiB, 3 passes, 4 lanes) costs ~230 ms of CPU per login against ~30 ms: in the doc 18 load test
+# the 8-thread QA server topped out at ~22 logins/s. Older hashes still verify and are upgraded on
+# the next login (verify_and_update).
+password_hasher = PasswordHash((Argon2Hasher(time_cost=2, memory_cost=19456, parallelism=1),))
 
 
 def hash_password(password: str) -> str:
@@ -26,7 +31,7 @@ def verify_password(password: str, hashed: str) -> tuple[bool, str | None]:
     return password_hasher.verify_and_update(password, hashed)
 
 
-# Argon2 takes ~100 ms of CPU and 64 MB on purpose. Run on the event loop it would freeze every
+# Argon2 takes ~30 ms of CPU and 19 MB on purpose. Run on the event loop it would freeze every
 # other request of the process meanwhile (doc 18 load test); a small pool keeps it off the loop
 # and caps the memory used by logins arriving together.
 _hash_pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="argon2")

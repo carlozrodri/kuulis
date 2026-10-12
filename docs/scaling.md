@@ -17,7 +17,8 @@ concurrentes mientras espera I/O).
 | Conexiones Postgres máximas usadas | 4×15 + 2×10 = 80 (< 100 por defecto) | — |
 | Rate limit general | 120/min por IP | `RATE_LIMIT_DEFAULT` |
 | Rate limit login/registro | 20/min por IP | `RATE_LIMIT_AUTH` |
-| Rate limit renovar sesión | 600/min por IP (CGNAT: muchos usuarios por IP) | `RATE_LIMIT_REFRESH` |
+| Rate limit renovar sesión | 3000/min por IP (CGNAT: muchos usuarios por IP) | `RATE_LIMIT_REFRESH` |
+| Hash de contraseñas | Argon2id 19 MiB, 2 pasadas, 1 hilo (OWASP; ~30 ms de CPU por login) | `kuulis/core/security.py` |
 
 Además: `pool_pre_ping`, reciclado de conexiones cada 30 min, `max-requests` con jitter en gunicorn para
 evitar fugas de memoria, gzip, índices en email, rol, `user_id` y `(user_id, created_at)` de notificaciones,
