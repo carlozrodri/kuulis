@@ -206,25 +206,29 @@ async def campaign(run_dir: Path, client: httpx.AsyncClient, delay: float, count
 
 
 def _node_values(text: str) -> dict[str, float]:
-    """CPU seconds (busy and total), memory and load from node-exporter's text format."""
-    busy = total = 0.0
-    values: dict[str, float] = {}
+    """CPU seconds per mode, memory, load and disk time from node-exporter's text format."""
+    values: dict[str, float] = {"cpu_total": 0.0, "cpu_busy": 0.0, "cpu_iowait": 0.0}
     for line in text.splitlines():
         if line.startswith("node_cpu_seconds_total{"):
             mode = re.search(r'mode="(\w+)"', line)
             seconds = float(line.rsplit(" ", 1)[1])
-            total += seconds
-            if mode and mode[1] not in ("idle", "iowait"):
-                busy += seconds
+            values["cpu_total"] += seconds
+            if mode and mode[1] == "iowait":
+                values["cpu_iowait"] += seconds
+            elif mode and mode[1] != "idle":
+                values["cpu_busy"] += seconds
+        elif line.startswith("node_disk_io_time_seconds_total{"):
+            values["disk_io"] = values.get("disk_io", 0.0) + float(line.rsplit(" ", 1)[1])
         else:
             for name in (
                 "node_memory_MemTotal_bytes",
                 "node_memory_MemAvailable_bytes",
                 "node_load1",
+                "node_procs_running",
+                "node_procs_blocked",
             ):
                 if line.startswith(name + " "):
                     values[name] = float(line.rsplit(" ", 1)[1])
-    values["cpu_busy"], values["cpu_total"] = busy, total
     return values
 
 
@@ -238,17 +242,25 @@ async def sample_node(run_dir: Path, every: float = 5.0) -> None:
                 values = _node_values((await client.get(NODE_EXPORTER_URL)).text)
                 row: dict[str, Any] = {"at": _now()}
                 if previous and values["cpu_total"] > previous["cpu_total"]:
+                    spent = values["cpu_total"] - previous["cpu_total"]
                     row["cpu_pct"] = round(
-                        100
-                        * (values["cpu_busy"] - previous["cpu_busy"])
-                        / (values["cpu_total"] - previous["cpu_total"]),
-                        1,
+                        100 * (values["cpu_busy"] - previous["cpu_busy"]) / spent, 1
                     )
+                    row["iowait_pct"] = round(
+                        100 * (values["cpu_iowait"] - previous["cpu_iowait"]) / spent, 1
+                    )
+                    if "disk_io" in values and "disk_io" in previous:
+                        # Busy seconds summed over disks per second of wall time.
+                        row["disk_busy"] = round(
+                            (values["disk_io"] - previous["disk_io"]) / every, 2
+                        )
                 total = values.get("node_memory_MemTotal_bytes")
                 avail = values.get("node_memory_MemAvailable_bytes")
                 if total and avail is not None:
                     row["mem_used_pct"] = round(100 * (1 - avail / total), 1)
                 row["load1"] = values.get("node_load1")
+                row["procs_running"] = values.get("node_procs_running")
+                row["procs_blocked"] = values.get("node_procs_blocked")
                 previous = values
                 with (run_dir / "node.jsonl").open("a") as fh:
                     fh.write(json.dumps(row) + "\n")
@@ -264,6 +276,7 @@ def _node_summary(run_dir: Path) -> dict[str, Any] | None:
         return None
     rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
     cpu = sorted(r["cpu_pct"] for r in rows if "cpu_pct" in r)
+    iowait = sorted(r["iowait_pct"] for r in rows if "iowait_pct" in r)
     mem = [r["mem_used_pct"] for r in rows if "mem_used_pct" in r]
     if not cpu:
         return {"samples": len(rows)}
@@ -273,6 +286,7 @@ def _node_summary(run_dir: Path) -> dict[str, Any] | None:
         "cpu_p95": cpu[min(len(cpu) - 1, int(0.95 * len(cpu)))],
         "cpu_max": cpu[-1],
         "mem_max": max(mem) if mem else None,
+        "iowait_max": iowait[-1] if iowait else None,
     }
 
 
