@@ -68,7 +68,8 @@ construir. Las preguntas de cada documento están en su sección final.
   viaje compartido (11), ayuda (13), analítica (19) y enlace de estado (03), que se suman con esos documentos.
 - **09** partes 1 y 2 hechas (2026-10-11/12): versiones del APK publicadas desde el admin, aviso y
   actualización dentro de la app, versión mínima obligatoria (426 en acciones de viaje), página Descargar con
-  el APK real y OTA firmadas desde la propia API con porcentaje y reversión. Falta la PWA para iPhone (parte 3).
+  el APK real y OTA firmadas desde la propia API con porcentaje y reversión. La PWA para iPhone (parte 3)
+  queda pospuesta por decisión de Carlos (2026-10-12).
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay
