@@ -13,12 +13,16 @@
 //   LOCATION_S  seconds between driver positions (4) ARRIVE_S / TRIP_S  simulated trip legs
 //   P_ACCOUNTS / D_ACCOUNTS  seeded riders / drivers (5000 / 600)
 //   ADMIN_TOKENS JSON [{access_token, refresh_token}] signed in by the runner (2FA)
+//   TOKENS_PATH JSON {email: refresh_token} signed in by the runner before the test: those users
+//               open the app already signed in (a token refresh, as in real life) instead of
+//               typing their password. Accounts missing from it sign in with the password.
 
 import http from 'k6/http';
 import exec from 'k6/execution';
 import { WebSocket } from 'k6/experimental/websockets';
 import { setTimeout, clearTimeout, setInterval, clearInterval } from 'k6/timers';
 import { Counter, Rate, Trend } from 'k6/metrics';
+import { SharedArray } from 'k6/data';
 
 const BASE_URL = (__ENV.BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const API = `${BASE_URL}/api/v1`;
@@ -43,6 +47,24 @@ const SCENARIOS = (__ENV.SCENARIOS || 'drivers,riders,browsers,admins').split(',
 const TOKEN_REFRESH_MS = 12 * 60 * 1000; // access tokens live 15 min
 // Ride flows run back to back: never more riders than accounts left after the browsers.
 const RIDER_POOL = P_ACCOUNTS - BROWSERS;
+
+// One array per kind, indexed by account number - 1 (SharedArray: one copy for all VUs).
+function loadTokens(kind, count) {
+  if (!__ENV.TOKENS_PATH) return [];
+  const tokens = JSON.parse(open(__ENV.TOKENS_PATH));
+  const list = [];
+  for (let n = 1; n <= count; n += 1) list.push(tokens[`lt-${kind}${String(n).padStart(5, '0')}@${DOMAIN}`] || '');
+  return list;
+}
+const P_TOKENS = new SharedArray('p_tokens', () => loadTokens('p', P_ACCOUNTS));
+const D_TOKENS = new SharedArray('d_tokens', () => loadTokens('d', D_ACCOUNTS));
+
+function savedRefresh(email) {
+  const m = email.match(/^lt-([pd])(\d+)@/);
+  if (!m) return null;
+  const list = m[1] === 'p' ? P_TOKENS : D_TOKENS;
+  return list[parseInt(m[2], 10) - 1] || null;
+}
 
 if (!PASSWORD) throw new Error('PASSWORD is required');
 if (DRIVERS > D_ACCOUNTS) throw new Error(`DRIVERS ${DRIVERS} > seeded drivers ${D_ACCOUNTS}`);
@@ -140,7 +162,7 @@ class Session {
   constructor(email) {
     this.email = email;
     this.access = null;
-    this.refresh = null;
+    this.refresh = savedRefresh(email); // signed in before the test: the first fresh() refreshes
     this.at = 0;
   }
 
@@ -336,7 +358,7 @@ export async function driver() {
   const session = new Session(`lt-d${pad(index + 1)}@${DOMAIN}`);
   await rampIn(index, DRIVERS);
   const end = deadline();
-  if (!(await session.login())) return;
+  if (!(await session.fresh())) return;
   await loadArea(session);
   const cfg = await session.call('GET', '/config/public', undefined, 'config_public');
   if (cfg.status === 200) offerTimeoutS = cfg.json('offer_timeout_seconds') || offerTimeoutS;
@@ -481,7 +503,7 @@ export async function browser() {
   await rampIn(index, BROWSERS);
   const end = deadline();
   const session = new Session(`lt-p${pad(index + 1)}@${DOMAIN}`);
-  if (!(await session.login())) return;
+  if (!(await session.fresh())) return;
   await loadArea(session);
 
   while (Date.now() < end) {
