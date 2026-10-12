@@ -30,8 +30,8 @@ export function useApi() {
       if (status === 401 && (await auth.refresh())) {
         return await call()
       }
-      if (status === 401) {
-        auth.clearSession()
+      // refresh() already ended a rejected session; after a network error it keeps it for the next try.
+      if (status === 401 && !auth.isAuthenticated.value) {
         await navigateTo('/login')
       }
       const code = (error as { data?: ApiErrorBody }).data?.error?.code

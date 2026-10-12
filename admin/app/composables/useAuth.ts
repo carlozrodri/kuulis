@@ -9,6 +9,12 @@ const cookieOptions = {
   path: '/',
 }
 
+// One refresh at a time for the whole tab. Each useAuth() call is a new closure, so a per-call
+// promise let the requests that hit 401 together (every 15 min, when the access token expires)
+// refresh in parallel with the same token: the API saw a reused refresh token and closed the session.
+// The panel is a SPA (ssr: false), so module state is per browser tab.
+let refreshing: Promise<boolean> | null = null
+
 /**
  * Session state for the admin panel. Tokens live in first-party cookies scoped to this domain;
  * the access token is short lived and refreshed transparently by useApi().
@@ -60,7 +66,6 @@ export function useAuth() {
     return data.recovery_codes ?? null
   }
 
-  let refreshing: Promise<boolean> | null = null
   async function refresh(): Promise<boolean> {
     if (!refreshToken.value) return false
     // Share one in-flight refresh between concurrent 401s.
@@ -74,8 +79,9 @@ export function useAuth() {
         refreshToken.value = data.refresh_token
         return true
       })
-      .catch(() => {
-        clearSession()
+      .catch((error: { status?: number }) => {
+        // Only a rejected token ends the session; a network blip or a 5xx keeps it for the next try.
+        if (error?.status === 401) clearSession()
         return false
       })
       .finally(() => {
