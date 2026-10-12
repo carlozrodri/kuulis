@@ -8,14 +8,18 @@ import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { Button, Card, IconTile, ListRow, Notice, Txt, Wordmark } from '@/components/ui';
 import { SuspendedPanel } from '@/features/account/SuspendedPanel';
+import { AnnouncementBanners } from '@/features/control/AnnouncementBanners';
+import { ServicePausedPanel } from '@/features/control/ServicePausedPanel';
 import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
 import { rideDraft, setDraftPlace } from '@/features/ride/store';
 import { useCurrentPickup } from '@/features/ride/useCurrentPickup';
+import { useBootstrap } from '@/hooks/useBootstrap';
 import { useUserLocation } from '@/hooks/useLocation';
 import { useActiveRide, useRideHistory } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
 import { api } from '@/lib/api';
+import { pauseNotice } from '@/lib/bootstrap';
 import { isActiveStatus, shortAddress } from '@/lib/ride';
 import type { Place } from '@/lib/types';
 import { useAuth } from '@/providers/AuthProvider';
@@ -60,6 +64,7 @@ export function PassengerHome() {
   const active = useActiveRide();
   const recents = useRecentDestinations();
   const { suspension } = useSuspension();
+  const paused = pauseNotice(useBootstrap().data);
   useCurrentPickup();
 
   useEffect(() => {
@@ -79,8 +84,11 @@ export function PassengerHome() {
     <MapSheetLayout
       map={(insets) => <RideMap insets={insets} followUser showUser />}
       topBar={
-        <View style={[styles.brand, { backgroundColor: theme.surface }, elevation(theme)]}>
-          <Wordmark size={22} />
+        <View style={{ gap: space.sm }} pointerEvents="box-none">
+          <View style={[styles.brand, { backgroundColor: theme.surface }, elevation(theme)]}>
+            <Wordmark size={22} />
+          </View>
+          <AnnouncementBanners />
         </View>
       }>
       <Txt variant="title" accessibilityRole="header">
@@ -105,6 +113,9 @@ export function PassengerHome() {
       ) : suspension ? (
         // Suspended: no ride requests (the API answers 403 account_suspended); a ride in progress still shows.
         <SuspendedPanel suspension={suspension} variant="passenger" />
+      ) : paused ? (
+        // New rides paused in this city (doc 10): the reason replaces "¿A dónde vamos?".
+        <ServicePausedPanel notice={paused} variant="passenger" />
       ) : (
         <Pressable
           accessibilityRole="search"
@@ -126,7 +137,7 @@ export function PassengerHome() {
 
       {permission !== 'granted' && !suspension ? <LocationPrompt /> : null}
 
-      {!activeRide && !suspension && recents.length ? (
+      {!activeRide && !suspension && !paused && recents.length ? (
         <View>
           {recents.map((place, index) => (
             <ListRow

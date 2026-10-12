@@ -8,11 +8,15 @@ import uuid
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from apps.monitoring import stats
+from kuulis.core.exceptions import PLANNED_HEADER
 from kuulis.core.request_context import audit_ctx, log_fields_ctx, request_id_ctx
 from kuulis.settings import settings
 
 logger = logging.getLogger("kuulis.request")
 RIDE_PATH = re.compile(r"/rides/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})")
+
+
+PLANNED = PLANNED_HEADER.lower().encode()
 
 
 class RequestContextMiddleware:
@@ -42,12 +46,14 @@ class RequestContextMiddleware:
         audit_token = audit_ctx.set({})
         start = time.perf_counter()
         status_code = 500
+        planned = False
 
         async def send_wrapper(message: Message) -> None:
-            nonlocal status_code
+            nonlocal status_code, planned
             if message["type"] == "http.response.start":
                 status_code = message["status"]
                 message.setdefault("headers", [])
+                planned = any(k.lower() == PLANNED for k, _ in message["headers"])
                 message["headers"].append((b"x-request-id", request_id.encode()))
             await send(message)
 
@@ -57,7 +63,8 @@ class RequestContextMiddleware:
             duration_ms = round((time.perf_counter() - start) * 1000, 1)
             if not path.startswith(("/health", "/api/health", "/api/metrics")):
                 logger.info("%s %s %s %sms", scope.get("method"), path, status_code, duration_ms)
-                await stats.record_request(status_code, duration_ms)
+                # Maintenance answers 503 on purpose; it must not page anyone as a 5xx spike.
+                await stats.record_request(200 if planned else status_code, duration_ms)
             audit_ctx.reset(audit_token)
             log_fields_ctx.reset(fields_token)
             request_id_ctx.reset(token)

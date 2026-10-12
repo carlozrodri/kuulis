@@ -6,6 +6,7 @@ from apps.approvals.schemas import ApprovalHeld
 from apps.audit.services import audit, note, snapshot
 from apps.config import services
 from apps.config.schemas import AppConfig, AppConfigUpdate, PublicSite
+from apps.control import services as control
 from apps.users.dependencies import AdminUser, DBSession, StaffUser
 
 router = APIRouter(tags=["config"])
@@ -62,4 +63,5 @@ async def update_config(
     note(before=snapshot(before, changed), after=snapshot(config, changed))
     await session.commit()
     await services.invalidate_cache()
+    await control.changed()
     return config

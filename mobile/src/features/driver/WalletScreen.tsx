@@ -34,6 +34,7 @@ import {
   goToTopUp,
   SubscriptionCard,
 } from "@/features/wallet/SubscriptionCard";
+import { useFlag } from "@/hooks/useBootstrap";
 import {
   useSubscription,
   useTopUps,
@@ -283,6 +284,8 @@ function BalanceCard({
   const { t } = useTranslation();
   const theme = useTheme();
   const unit = currency ?? "USDT";
+  // Transfers can be switched off remotely (doc 10): the button disappears.
+  const transfersOn = useFlag("transfers");
   return (
     <View style={[styles.card, { backgroundColor: theme.hero }]}>
       <Svg
@@ -357,11 +360,13 @@ function BalanceCard({
           filled
           onPress={goToTopUp}
         />
-        <CardButton
-          label={t("wallet.transfer")}
-          icon={ArrowUpRight}
-          onPress={() => router.push("/wallet/transfer")}
-        />
+        {transfersOn ? (
+          <CardButton
+            label={t("wallet.transfer")}
+            icon={ArrowUpRight}
+            onPress={() => router.push("/wallet/transfer")}
+          />
+        ) : null}
       </View>
     </View>
   );

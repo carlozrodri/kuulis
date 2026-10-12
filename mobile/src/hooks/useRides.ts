@@ -213,11 +213,13 @@ export function useQuote(
   dropoff: Place | null,
   vehicleType: VehicleType = 'moto',
   promoCode: string | null = null,
+  /** False while new rides are paused where the user is (doc 10): the quote would only answer 503. */
+  enabled = true,
 ) {
   return useQuery({
     queryKey: quoteKey(pickup, dropoff, vehicleType, promoCode),
     queryFn: ({ signal }) => fetchQuote(pickup!, dropoff!, vehicleType, promoCode, signal),
-    enabled: !!pickup && !!dropoff,
+    enabled: enabled && !!pickup && !!dropoff,
     staleTime: Infinity,
     gcTime: 5 * 60_000,
     retry: (count, error) => count < 2 && !(error as { status?: number }).status,

@@ -818,6 +818,115 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           </div>
         </UCard>
 
+        <!-- Doc 10: links and location intervals the app reads at start (no app update needed) -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.app.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.app.help') }}
+              <NuxtLink
+                v-if="auth.can('app_status.view')"
+                to="/app-status"
+                class="text-primary hover:underline"
+              >{{ t('settings.app.statusLink') }}</NuxtLink>
+            </p>
+          </template>
+          <div class="space-y-6">
+            <div class="grid gap-4 sm:grid-cols-2">
+              <UFormField
+                :label="t('settings.app.whatsapp')"
+                :help="t('settings.app.whatsappHelp')"
+              >
+                <UInput
+                  v-model="form.app_links.support_whatsapp"
+                  inputmode="tel"
+                  maxlength="20"
+                  placeholder="+584121234567"
+                  class="w-full font-mono"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+              <UFormField :label="t('settings.app.supportEmail')">
+                <UInput
+                  v-model="form.app_links.support_email"
+                  type="email"
+                  :maxlength="SUPPORT_EMAIL_MAX"
+                  class="w-full"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+              <UFormField
+                :label="t('settings.app.emergencyNumber')"
+                :help="t('settings.app.emergencyNumberHelp')"
+              >
+                <UInput
+                  v-model="form.app_links.emergency_number"
+                  inputmode="numeric"
+                  maxlength="10"
+                  class="w-full font-mono"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+            </div>
+            <div class="grid gap-4">
+              <UFormField :label="t('settings.app.termsUrl')">
+                <UInput
+                  v-model="form.app_links.terms_url"
+                  type="url"
+                  :maxlength="LINK_MAX"
+                  placeholder="https://"
+                  class="w-full"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+              <UFormField :label="t('settings.app.privacyUrl')">
+                <UInput
+                  v-model="form.app_links.privacy_url"
+                  type="url"
+                  :maxlength="LINK_MAX"
+                  placeholder="https://"
+                  class="w-full"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium">
+                {{ t('settings.app.intervals') }}
+              </h3>
+              <p class="mb-3 text-sm text-(--ui-text-muted)">
+                {{ t('settings.app.intervalsHelp') }}
+              </p>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <UFormField
+                  :label="t('settings.app.onlineSeconds')"
+                  :help="t('settings.app.secondsRange', { min: ONLINE_SECONDS_MIN, max: ONLINE_SECONDS_MAX })"
+                >
+                  <UInputNumber
+                    v-model="form.location_intervals.online_seconds"
+                    :min="ONLINE_SECONDS_MIN"
+                    :max="ONLINE_SECONDS_MAX"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+                <UFormField
+                  :label="t('settings.app.onRideSeconds')"
+                  :help="t('settings.app.secondsRange', { min: ON_RIDE_SECONDS_MIN, max: ON_RIDE_SECONDS_MAX })"
+                >
+                  <UInputNumber
+                    v-model="form.location_intervals.on_ride_seconds"
+                    :min="ON_RIDE_SECONDS_MIN"
+                    :max="ON_RIDE_SECONDS_MAX"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+              </div>
+            </div>
+          </div>
+        </UCard>
+
         <!-- Doc 06: four-eyes approvals -->
         <UCard>
           <template #header>

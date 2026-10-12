@@ -10,6 +10,7 @@ import { type MapInsets, MapSheetLayout } from '@/components/MapSheetLayout';
 import { DiscountNote, VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, EmptyState, IconButton, ProgressSteps, StatusPill, Txt } from '@/components/ui';
+import { useFlag } from '@/hooks/useBootstrap';
 import { applyRide, requestAgain, useActiveRide, useCancelRide, useRide } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
 import { apiErrorMessage } from '@/i18n';
@@ -189,6 +190,8 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
   const theme = useTheme();
   const now = useNow(15_000);
   const unread = useStore(chatUnread)[ride.id] ?? 0;
+  // The chat can be switched off remotely (doc 10): the button then disappears.
+  const chatOn = useFlag('chat');
   const cancel = useCancelFlow(ride);
   const [safety, setSafety] = useState(false);
   const { user } = useAuth();
@@ -243,12 +246,14 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
       </View>
 
       <View style={styles.actions}>
-        <RoundAction
-          icon={MessageCircle}
-          label={t('ride.chat')}
-          badge={unread}
-          onPress={() => router.push({ pathname: '/ride/chat', params: { id: ride.id } })}
-        />
+        {chatOn ? (
+          <RoundAction
+            icon={MessageCircle}
+            label={t('ride.chat')}
+            badge={unread}
+            onPress={() => router.push({ pathname: '/ride/chat', params: { id: ride.id } })}
+          />
+        ) : null}
         <RoundAction
           icon={Share2}
           label={user?.trusted_contact_name ? t('ride.shareWith', { name: firstName(user.trusted_contact_name) }) : t('ride.share')}

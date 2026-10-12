@@ -185,6 +185,9 @@ export interface AppConfig {
   approval_adjust_limit?: Decimal
   approval_fares?: boolean
   approval_broadcasts?: boolean
+  // ---- Remote control (doc 10). Maintenance and city pauses are edited on /app-status, not here. ----
+  app_links?: AppLinks
+  location_intervals?: LocationIntervals
 }
 
 // ---- Phase 1B: rides (docs/api/phase-1b.md) ----
@@ -1158,4 +1161,119 @@ export interface UpdateCandidate {
 export interface UpdateUsage {
   update_id: string
   users: number
+}
+
+// ---- Remote control of the app (doc 10) ----
+
+/** A text in both app languages (the app falls back to Spanish when `en` is empty). */
+export interface Localized {
+  es: string
+  en: string
+}
+
+export interface Maintenance {
+  enabled: boolean
+  message: Localized
+  /** Estimated end (ISO), shown in the app. */
+  eta: string | null
+  /** Empty = every city. */
+  areas: string[]
+}
+
+/** New rides stopped in one city (rain, protests, curfew). */
+export interface AreaPause {
+  area: string
+  message: Localized
+  eta: string | null
+}
+
+export interface AppStatus {
+  maintenance: Maintenance
+  area_pauses: AreaPause[]
+}
+
+export interface AppStatusRead extends AppStatus {
+  /** Service area names, for the pickers. */
+  areas: string[]
+}
+
+export const APP_PLATFORMS = ['android', 'ios', 'web'] as const
+export type AppPlatform = typeof APP_PLATFORMS[number]
+export const APP_MODES = ['passenger', 'driver'] as const
+export type AppMode = typeof APP_MODES[number]
+
+/** Who gets a flag that is on. An empty list (or null) does not narrow anything. */
+export interface FlagRules {
+  platforms: AppPlatform[]
+  min_build: number | null
+  areas: string[]
+  roles: AppMode[]
+  /** 0–100. */
+  percent: number
+}
+
+export interface FeatureFlag {
+  key: string
+  /** Spanish, from the API. */
+  description: string
+  default: boolean
+  enabled: boolean
+  rules: FlagRules
+  /** False while it still follows the default. */
+  changed: boolean
+  updated_at: string | null
+  updated_by_email: string | null
+}
+
+export interface FlagCheck {
+  email: string
+  role: AppMode
+  enabled: boolean
+}
+
+export const ANNOUNCEMENT_STYLES = ['info', 'warning', 'promo'] as const
+export type AnnouncementStyle = typeof ANNOUNCEMENT_STYLES[number]
+/** Screens a banner button can open in the app. */
+export const APP_SCREENS = ['home', 'wallet', 'promotions', 'profile', 'about', 'driver_signup'] as const
+export type AppScreen = typeof APP_SCREENS[number]
+
+export interface AnnouncementCta {
+  label: Localized
+  /** https:// only; exactly one of url and screen. */
+  url: string | null
+  screen: AppScreen | null
+}
+
+export interface AnnouncementInput {
+  title: Localized
+  body: Localized
+  target: { roles: AppMode[], areas: string[] }
+  cta: AnnouncementCta | null
+  starts_at: string
+  ends_at: string
+  dismissible: boolean
+  style: AnnouncementStyle
+}
+
+export interface AdminAnnouncement extends AnnouncementInput {
+  id: string
+  created_at: string
+  created_by_email: string | null
+  /** Accounts or devices that got it. */
+  seen: number
+  dismissed: number
+}
+
+export interface AppLinks {
+  support_whatsapp: string
+  support_email: string
+  emergency_number: string
+  terms_url: string
+  privacy_url: string
+}
+
+/** How often the driver app sends its location, in seconds. */
+export interface LocationIntervals {
+  online_seconds: number
+  on_ride_seconds: number
 }

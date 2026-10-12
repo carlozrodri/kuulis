@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
+  Linking,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -14,6 +15,8 @@ import {
   ChevronRight,
   CircleX,
   Flag,
+  Mail,
+  MessageCircle,
   PhoneCall,
   Route,
 } from "@/components/icons";
@@ -27,8 +30,10 @@ import {
   Txt,
 } from "@/components/ui";
 import { FlowHeader } from "@/features/wallet/components";
+import { useAppLinks } from "@/hooks/useBootstrap";
 import { useMyReports } from "@/hooks/useReports";
 import { apiErrorMessage } from "@/i18n";
+import { supportWhatsappUrl } from "@/lib/bootstrap";
 import { isUrgentCategory } from "@/lib/reports";
 import type { Report } from "@/lib/types";
 import { radius, space, useTheme } from "@/theme";
@@ -47,6 +52,11 @@ export function ReportsScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const reports = useMyReports();
+  // Remote settings (doc 10): emergency number (911 by default) and support contacts when configured.
+  const links = useAppLinks();
+  const emergency = links.emergency;
+  const whatsapp = supportWhatsappUrl(links.support_whatsapp);
+  const email = links.support_email;
   const items = reports.data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
@@ -113,10 +123,35 @@ export function ReportsScreen() {
                 icon={PhoneCall}
                 iconTone="danger"
                 title={t("reports.emergency")}
-                subtitle={t("reports.emergencyHint")}
+                subtitle={t("reports.emergencyHint", { number: emergency })}
                 onPress={callEmergency}
               />
             </Card>
+            {whatsapp || email ? (
+              <Card style={{ paddingVertical: space.xxs }}>
+                {whatsapp ? (
+                  <ListRow
+                    icon={MessageCircle}
+                    iconTone="success"
+                    title={t("reports.support.whatsapp")}
+                    subtitle={t("reports.support.whatsappHint")}
+                    divider={!!email}
+                    onPress={() => void Linking.openURL(whatsapp).catch(() => undefined)}
+                  />
+                ) : null}
+                {email ? (
+                  <ListRow
+                    icon={Mail}
+                    iconTone="neutral"
+                    title={t("reports.support.email")}
+                    subtitle={email}
+                    onPress={() =>
+                      void Linking.openURL(`mailto:${email}`).catch(() => undefined)
+                    }
+                  />
+                ) : null}
+              </Card>
+            ) : null}
             <Txt
               variant="overline"
               color="muted"

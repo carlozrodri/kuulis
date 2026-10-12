@@ -9,6 +9,8 @@ from apps.approvals import services as approvals
 from apps.approvals.schemas import ApprovalHeld
 from apps.audit.services import audit, note, snapshot
 from apps.config.services import get_app_config
+from apps.control import services as control
+from apps.control.flags import Audience
 from apps.subscriptions import services as subscriptions
 from apps.subscriptions.schemas import ChargeRead
 from apps.users import services as users
@@ -134,6 +136,7 @@ async def recipient(
 async def transfer(
     request: Request, data: TransferCreate, user: CurrentUser, session: DBSession
 ) -> WalletEntryRead:
+    await control.ensure_enabled(session, "transfers", Audience(ident=str(user.id), role="driver"))
     config = await get_app_config(session)
     entry = await services.transfer(session, user, data.to_user_id, data.amount, data.note, config)
     await session.commit()

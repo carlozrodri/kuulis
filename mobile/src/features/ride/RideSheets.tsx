@@ -5,6 +5,7 @@ import { Linking, Share } from 'react-native';
 
 import { CircleHelp, CircleX, Flag, HeartHandshake, MessageCircle, PhoneCall, Share2 } from '@/components/icons';
 import { Sheet } from '@/components/ui';
+import { useAppLinks } from '@/hooks/useBootstrap';
 import { whatsappUrl } from '@/lib/profile';
 import { CANCEL_REASONS, formatPlate, shortAddress } from '@/lib/ride';
 import type { Ride } from '@/lib/types';
@@ -83,6 +84,8 @@ export async function shareRideWhatsApp(ride: Ride, t: Translate, phone?: string
 /** Safety tools: call emergencies, report a problem, share the trip. */
 export function SafetySheet({ visible, ride, onClose }: { visible: boolean; ride: Ride; onClose: () => void }) {
   const { t } = useTranslation();
+  // Remote emergency number (doc 10), 911 by default.
+  const { emergency } = useAppLinks();
   const { user } = useAuth();
   const contact = user?.trusted_contact_phone ? { name: user.trusted_contact_name ?? '', phone: user.trusted_contact_phone } : null;
   return (
@@ -93,11 +96,11 @@ export function SafetySheet({ visible, ride, onClose }: { visible: boolean; ride
       onClose={onClose}
       options={[
         {
-          label: t('safety.call911'),
+          label: t('safety.call911', { number: emergency }),
           hint: t('safety.call911Hint'),
           icon: PhoneCall,
           destructive: true,
-          onPress: () => void Linking.openURL('tel:911').catch(() => undefined),
+          onPress: () => void Linking.openURL(`tel:${emergency}`).catch(() => undefined),
         },
         {
           label: t('safety.report'),

@@ -16,7 +16,10 @@ import { createStore } from '@/lib/store';
  */
 const TASK = 'kuulis-driver-location';
 
-type Copy = { title: string; body: string };
+/** Notification texts and how often to send the position (remote setting, doc 10). */
+type Copy = { title: string; body: string; intervalMs?: number };
+
+const DEFAULT_INTERVAL_MS = 5000;
 
 /** True while the background service is running (the "keep the app open" notice is then hidden). */
 export const backgroundLocationActive = createStore(false);
@@ -48,15 +51,20 @@ TaskManager.defineTask<TaskData>(TASK, async ({ data, error }) => {
 const supported = () => Platform.OS === 'android';
 
 let wanted: Copy | null = null;
+/** Interval the running service was started with (a new one restarts it while the app is on screen). */
+let startedInterval: number | null = null;
 
 async function start(copy: Copy) {
+  const interval = copy.intervalMs ?? DEFAULT_INTERVAL_MS;
   if (await Location.hasStartedLocationUpdatesAsync(TASK).catch(() => false)) {
     backgroundLocationActive.set(true);
-    return;
+    // A foreground service can only be (re)started with the app on screen.
+    if (startedInterval === null || startedInterval === interval || AppState.currentState !== 'active') return;
   }
+  startedInterval = interval;
   await Location.startLocationUpdatesAsync(TASK, {
     accuracy: Location.Accuracy.High,
-    timeInterval: 5000,
+    timeInterval: interval,
     distanceInterval: 10,
     pausesUpdatesAutomatically: false,
     foregroundService: {
@@ -80,6 +88,7 @@ export async function setBackgroundLocation(copy: Copy | null) {
     if (copy) await start(copy);
     else {
       backgroundLocationActive.set(false);
+      startedInterval = null;
       if (await Location.hasStartedLocationUpdatesAsync(TASK).catch(() => false)) {
         await Location.stopLocationUpdatesAsync(TASK);
       }

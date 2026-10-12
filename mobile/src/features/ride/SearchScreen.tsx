@@ -6,12 +6,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ArrowUpDown, ChevronLeft, LocateFixed, MapPin, MapPinned, SearchX, X } from '@/components/icons';
 import { IconButton, ListRow, Txt } from '@/components/ui';
+import { ServicePausedPanel } from '@/features/control/ServicePausedPanel';
 import { PLACE_ICONS } from '@/features/profile/PlacePickerScreen';
 import { usePlaceName } from '@/features/profile/SavedPlaces';
 import { useSavedPlaces } from '@/hooks/useAccount';
+import { bootstrapStore, useBootstrap } from '@/hooks/useBootstrap';
 import { useUserLocation } from '@/hooks/useLocation';
 import { useGeoSearch } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
+import { pauseNotice } from '@/lib/bootstrap';
 import { placeFromGeo, shortAddress } from '@/lib/ride';
 import { useStore } from '@/lib/store';
 import type { Place } from '@/lib/types';
@@ -28,6 +31,8 @@ export function SearchScreen() {
   const params = useLocalSearchParams<{ field?: DraftField }>();
   const draft = useStore(rideDraft);
   const { position, permission } = useUserLocation();
+  // New rides paused in this city (doc 10): the search says why instead of going on to the price.
+  const paused = pauseNotice(useBootstrap().data);
   useCurrentPickup();
 
   const [field, setField] = useState<DraftField>(params.field === 'pickup' ? 'pickup' : 'dropoff');
@@ -50,7 +55,7 @@ export function SearchScreen() {
   const shortcuts = searching ? [] : saved;
 
   const proceed = (nextDraft = rideDraft.get()) => {
-    if (nextDraft.pickup && nextDraft.dropoff) router.replace('/ride/quote');
+    if (nextDraft.pickup && nextDraft.dropoff && !pauseNotice(bootstrapStore.get().data)) router.replace('/ride/quote');
   };
 
   const choose = (place: Place) => {
@@ -129,6 +134,12 @@ export function SearchScreen() {
           {t('search.title')}
         </Txt>
       </View>
+
+      {paused ? (
+        <View style={{ paddingHorizontal: space.lg, paddingBottom: space.sm }}>
+          <ServicePausedPanel notice={paused} variant="passenger" />
+        </View>
+      ) : null}
 
       <View style={[styles.card, { backgroundColor: theme.surface }, elevation(theme)]}>
         <View style={{ flex: 1, gap: space.xs }}>

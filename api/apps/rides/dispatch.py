@@ -29,10 +29,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.config.schemas import AppConfig
 from apps.config.services import get_app_config
+from apps.control.services import notice
 from apps.drivers.models import DriverProfile, DriverStatus, Vehicle, VehicleType
 from apps.geo.clients import estimate_route
 from apps.moderation import services as moderation
 from apps.monitoring import stats
+from apps.realtime.manager import publish
 from apps.rides import events, presence
 from apps.rides.models import (
     ACTIVE_STATUSES,
@@ -59,6 +61,7 @@ LOOP_INTERVAL = 0.5
 BATCH = 50
 CONCURRENCY = 5
 MAINTENANCE_EVERY = 30
+PAUSED_EVENT = "driver.paused"  # taken offline: maintenance or city pause (doc 10)
 OFFLINE_AFTER_SECONDS = 30 * 60  # online drivers silent this long are taken offline
 
 _POP_DUE = """
@@ -286,6 +289,28 @@ async def maintenance() -> None:
     removed = await presence.cleanup_stale(OFFLINE_AFTER_SECONDS)
     if removed:
         logger.info("Took %s silent drivers offline", len(removed))
+    await offline_paused()
+
+
+async def offline_paused() -> list[str]:
+    """Drivers online where new rides are stopped go offline (after their current ride) and get
+    the reason, so the app shows it."""
+    async with SessionLocal() as session:
+        config = await get_app_config(session)
+    if not config.maintenance.enabled and not config.area_pauses:
+        return []
+
+    def found(lat: float, lng: float):
+        place = config.area_at(lat, lng)
+        return notice(config, place.name if place else None)
+
+    removed = await presence.offline_where(lambda lat, lng: found(lat, lng) is not None)
+    for uid, loc in removed.items():
+        reason = found(loc.lat, loc.lng)
+        await publish(PAUSED_EVENT, reason.model_dump(mode="json") if reason else None, [uid])
+    if removed:
+        logger.info("Took %s drivers offline in paused areas", len(removed))
+    return list(removed)
 
 
 async def loop() -> None:

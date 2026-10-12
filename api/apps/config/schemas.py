@@ -1,8 +1,8 @@
 import re
-from datetime import time
+from datetime import datetime, time
 from decimal import Decimal
 from itertools import pairwise
-from typing import Annotated, Self
+from typing import Annotated, Literal, Self
 
 from pydantic import (
     AfterValidator,
@@ -136,6 +136,51 @@ def _default_areas() -> list[ServiceArea]:
     ]
 
 
+class Localized(BaseModel):
+    """A text in both app languages (the app falls back to Spanish when ``en`` is empty)."""
+
+    es: str = Field(default="", max_length=300)
+    en: str = Field(default="", max_length=300)
+
+
+class Maintenance(BaseModel):
+    """Maintenance mode (doc 10): no new quotes, rides or drivers going online. ``areas`` empty
+    means every city; rides already under way go on."""
+
+    enabled: bool = False
+    message: Localized = Field(default_factory=Localized)
+    eta: datetime | None = None
+    areas: list[str] = Field(default_factory=list, max_length=20)
+
+
+class AreaPause(BaseModel):
+    """Requests paused in one city (heavy rain, protests, curfew), with its own message."""
+
+    area: str = Field(min_length=1, max_length=60)
+    message: Localized = Field(default_factory=Localized)
+    eta: datetime | None = None
+
+
+class AppLinks(BaseModel):
+    """Contact and legal links the app shows, editable without an app update."""
+
+    support_whatsapp: str = Field(default="", max_length=20, pattern=r"^\+?\d*$")
+    support_email: str = Field(default="", max_length=120)
+    emergency_number: str = Field(default="911", max_length=10, pattern=r"^\d*$")
+    terms_url: str = Field(default="", max_length=300)
+    privacy_url: str = Field(default="", max_length=300)
+
+
+class LocationIntervals(BaseModel):
+    """How often the driver app sends its location, in seconds."""
+
+    online_seconds: int = Field(default=10, ge=2, le=120)
+    on_ride_seconds: int = Field(default=4, ge=1, le=60)
+
+
+NoticeKind = Literal["maintenance", "pause"]
+
+
 Radius = Annotated[int, Field(ge=100, le=50_000)]
 StaleMinutes = Annotated[int, Field(ge=5, le=30 * 24 * 60)]
 
@@ -216,6 +261,13 @@ class AppConfig(BaseModel):
     approval_fares: bool = True
     approval_broadcasts: bool = True
 
+    # --- Remote control (doc 10) ----------------------------------------------------------------
+    # maintenance and area_pauses change only through PUT /admin/app/status (not in the update).
+    maintenance: Maintenance = Field(default_factory=Maintenance)
+    area_pauses: list[AreaPause] = Field(default_factory=list, max_length=20)
+    app_links: AppLinks = Field(default_factory=AppLinks)
+    location_intervals: LocationIntervals = Field(default_factory=LocationIntervals)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -243,6 +295,14 @@ class AppConfig(BaseModel):
 
     def area_at(self, lat: float, lng: float) -> ServiceArea | None:
         return next((area for area in self.service_areas if area.contains(lat, lng)), None)
+
+    def notice_for(self, area: str | None) -> tuple[NoticeKind, AreaPause] | None:
+        """Why new rides are stopped in ``area`` (None: unknown place), if they are."""
+        m = self.maintenance
+        if m.enabled and (not m.areas or area in m.areas):
+            return "maintenance", AreaPause(area=area or "*", message=m.message, eta=m.eta)
+        pause = next((p for p in self.area_pauses if p.area == area), None)
+        return ("pause", pause) if pause else None
 
 
 class AppConfigUpdate(BaseModel):
@@ -276,6 +336,8 @@ class AppConfigUpdate(BaseModel):
     approval_adjust_limit: Money | None = None
     approval_fares: bool | None = None
     approval_broadcasts: bool | None = None
+    app_links: AppLinks | None = None
+    location_intervals: LocationIntervals | None = None
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

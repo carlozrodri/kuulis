@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Linking, View } from 'react-native';
 
-import { ChevronLeft, FileText } from '@/components/icons';
-import { IconButton, IconTile, Notice, Row, Screen, Txt } from '@/components/ui';
+import { ChevronLeft, ExternalLink, FileText } from '@/components/icons';
+import { Button, IconButton, IconTile, Notice, Row, Screen, Txt } from '@/components/ui';
+import { useAppLinks } from '@/hooks/useBootstrap';
 import { apiErrorMessage } from '@/i18n';
 import { api } from '@/lib/api';
 import { isLegalKind, type LegalDocument } from '@/lib/legal';
@@ -24,6 +25,10 @@ export function LegalDocumentScreen() {
     queryFn: () => api<LegalDocument>(`/legal/${kind}?locale=${locale}`, { auth: false }),
     enabled: isLegalKind(kind),
   });
+  // Web copies of the terms and the privacy policy (remote settings, doc 10), when configured.
+  const links = useAppLinks();
+  const webUrl = kind === 'terms' ? links.terms_url : kind === 'privacy' ? links.privacy_url : '';
+  const safeWebUrl = /^https:\/\//i.test(webUrl) ? webUrl : null;
 
   return (
     <Screen
@@ -49,6 +54,16 @@ export function LegalDocumentScreen() {
       {isLoading ? <ActivityIndicator /> : null}
       {error ? <Notice tone="danger">{apiErrorMessage(error)}</Notice> : null}
       {data ? <Markdown source={data.body_md} /> : null}
+      {safeWebUrl && (error || data) ? (
+        <Button
+          title={t('legal.openWeb')}
+          variant="ghost"
+          size="sm"
+          icon={ExternalLink}
+          style={{ marginTop: space.lg, alignSelf: 'flex-start' }}
+          onPress={() => void Linking.openURL(safeWebUrl).catch(() => undefined)}
+        />
+      ) : null}
     </Screen>
   );
 }

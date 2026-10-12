@@ -13,6 +13,7 @@ Drivers are identified by their *user* id everywhere (sockets, rides, offers).
 
 import time
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
@@ -246,6 +247,23 @@ async def clear_active_ride(driver_id: uuid.UUID | None, ride_id: uuid.UUID) -> 
     raw = await redis_client.get(key)
     if raw and raw.split("|", 1)[0] == str(ride_id):
         await redis_client.delete(key)
+
+
+async def offline_where(stopped: Callable[[float, float], bool]) -> dict[str, Location]:
+    """Takes offline the drivers whose last location is in a stopped place (maintenance or a
+    city pause, doc 10), except during a ride or an open offer: they go offline at the next check
+    after it."""
+    entries = await online_entries()
+    if not entries:
+        return {}
+    locations = await get_locations(list(entries))
+    removed: dict[str, Location] = {}
+    for uid, loc in locations.items():
+        busy = await redis_client.exists(active_key(uid), offer_key(uid))
+        if stopped(loc.lat, loc.lng) and not busy:
+            await go_offline(uid)
+            removed[uid] = loc
+    return removed
 
 
 async def cleanup_stale(max_age_seconds: int) -> list[str]:

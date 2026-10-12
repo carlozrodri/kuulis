@@ -16,6 +16,10 @@ describe('audit helpers', () => {
     expect(auditEntityLink({ entity_type: 'config', entity_id: null })).toBe('/settings')
     expect(auditEntityLink({ entity_type: 'app_update', entity_id: 'u1' })).toBe('/versions')
     expect(auditEntityLink({ entity_type: 'file', entity_id: 'k' })).toBeNull()
+    expect(auditEntityLink({ entity_type: 'config', entity_id: null, action: 'app_status.update' })).toBe('/app-status')
+    expect(auditEntityLink({ entity_type: 'config', entity_id: null, action: 'config.update' })).toBe('/settings')
+    expect(auditEntityLink({ entity_type: 'feature_flag', entity_id: 'chat' })).toBe('/flags')
+    expect(auditEntityLink({ entity_type: 'announcement', entity_id: 'a1' })).toBe('/announcements')
   })
 
   it('formats values', () => {

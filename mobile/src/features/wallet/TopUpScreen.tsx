@@ -27,6 +27,7 @@ import {
   type Tone,
   Txt,
 } from "@/components/ui";
+import { useFlag } from "@/hooks/useBootstrap";
 import {
   useNotifyTopUp,
   useSaveBinancePayId,
@@ -69,6 +70,7 @@ export function TopUpScreen() {
   const { t } = useTranslation();
   const wallet = useWallet();
   const info = useTopUpInfo();
+  const binanceAuto = useFlag("binance_auto");
   const [editingId, setEditingId] = useState(false);
   const [step, setStep] = useState<Exclude<Step, "binance">>("pay");
 
@@ -108,12 +110,14 @@ export function TopUpScreen() {
       </Screen>
     );
   }
+  // "Automatic" top-up hints only while automatic Binance matching is switched on (doc 10).
+  const topUpInfo = binanceAuto ? info.data : { ...info.data, automatic: false };
 
   if (current === "binance") {
     return (
       <BinanceIdStep
         initial={payerId ?? ""}
-        automatic={info.data.automatic}
+        automatic={topUpInfo.automatic}
         editing={!!payerId}
         onCancel={() => setEditingId(false)}
         onSaved={() => {
@@ -126,7 +130,7 @@ export function TopUpScreen() {
   if (current === "notify") {
     return (
       <NotifyStep
-        info={info.data}
+        info={topUpInfo}
         onBack={() => setStep("pay")}
         onSent={() => setStep("sent")}
       />
@@ -134,12 +138,12 @@ export function TopUpScreen() {
   }
   if (current === "sent") {
     return (
-      <SentStep automatic={info.data.automatic} onMore={() => setStep("pay")} />
+      <SentStep automatic={topUpInfo.automatic} onMore={() => setStep("pay")} />
     );
   }
   return (
     <PayStep
-      info={info.data}
+      info={topUpInfo}
       payerId={payerId ?? ""}
       verified={verified}
       onChangeId={() => setEditingId(true)}

@@ -588,7 +588,9 @@
     "account_open_reports": "Hay reportes abiertos sobre tu cuenta. Soporte debe cerrarlos antes de eliminarla.",
     "account_fee_pending": "Paga tu cuota pendiente antes de eliminar tu cuenta.",
     "export_too_soon": "Puedes descargar tus datos una vez al día.",
-    "app_update_required": "Necesitas actualizar Kuulis para hacer esto"
+    "app_update_required": "Necesitas actualizar Kuulis para hacer esto",
+    "feature_disabled": "Esta función no está disponible por ahora.",
+    "service_paused": "Por ahora no se pueden pedir viajes en tu zona. Vuelve a intentarlo en un rato."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -773,7 +775,7 @@
   "safety": {
     "title": "Tu seguridad",
     "subtitle": "Si algo no anda bien, actúa rápido.",
-    "call911": "Llamar al 911",
+    "call911": "Llamar al {{number}}",
     "call911Hint": "Emergencias en Venezuela",
     "share": "Compartir mi viaje",
     "shareHint": "Envía los datos del motorizado y tu destino a alguien de confianza",
@@ -1191,8 +1193,8 @@
     },
     "urgent": {
       "title": "Lo tratamos como urgente",
-      "body": "El equipo de Kuulis revisa estos reportes primero. Si estás en peligro ahora mismo, llama al 911.",
-      "call": "Llamar al 911"
+      "body": "El equipo de Kuulis revisa estos reportes primero. Si estás en peligro ahora mismo, llama al {{number}}.",
+      "call": "Llamar al {{number}}"
     },
     "detailsTitle": "Cuéntanos qué pasó",
     "detailsSubtitle": "Con más detalles podemos ayudarte mejor. Solo el equipo de Kuulis lo leerá.",
@@ -1210,7 +1212,7 @@
     "submit": "Enviar reporte",
     "sentTitle": "Recibimos tu reporte",
     "sentBody": "El equipo de Kuulis lo va a revisar y te avisaremos cuando tengamos una respuesta.",
-    "sentBodyUrgent": "Lo estamos tratando como urgente. Si estás en peligro ahora mismo, llama al 911.",
+    "sentBodyUrgent": "Lo estamos tratando como urgente. Si estás en peligro ahora mismo, llama al {{number}}.",
     "viewReport": "Ver mi reporte",
     "alreadyOpen": {
       "title": "Ya reportaste este viaje",
@@ -1234,7 +1236,7 @@
     "newHint": "De la app, un objeto olvidado u otra cosa",
     "rideHint": "Para un viaje, ábrelo en Tus viajes y toca «Reportar un problema».",
     "emergency": "¿Estás en peligro?",
-    "emergencyHint": "Llama al 911, la línea de emergencias de Venezuela",
+    "emergencyHint": "Llama al {{number}}, la línea de emergencias de Venezuela",
     "mine": "Mis reportes",
     "empty": "Aún no tienes reportes",
     "emptyBody": "Si algo sale mal en un viaje o en la app, cuéntanos y lo resolvemos.",
@@ -1270,7 +1272,12 @@
     },
     "resolution": "Respuesta del equipo Kuulis",
     "noResolution": "El equipo cerró este reporte.",
-    "newAboutRide": "Hacer otro reporte"
+    "newAboutRide": "Hacer otro reporte",
+    "support": {
+      "whatsapp": "Escríbenos por WhatsApp",
+      "whatsappHint": "Soporte de Kuulis",
+      "email": "Escríbenos un correo"
+    }
   },
   "suspension": {
     "title": "Tu cuenta está suspendida",
@@ -1323,7 +1330,8 @@
     "required": "Acepta los términos y confirma que eres mayor de 18 años.",
     "signUpPrefix": "Acepto los ",
     "signUpAnd": " y la ",
-    "socialNote": "Si entras con Google o Apple te pediremos aceptar los términos al entrar."
+    "socialNote": "Si entras con Google o Apple te pediremos aceptar los términos al entrar.",
+    "openWeb": "Ver en la web"
   },
   "privacy": {
     "delete": {
@@ -1419,5 +1427,41 @@
     "running": "{{id}} · {{date}}",
     "jsReady": "Actualización lista: se aplicará al volver a abrir la app.",
     "jsError": "No pudimos buscar actualizaciones. Revisa tu conexión e inténtalo de nuevo."
+  },
+  "control": {
+    "etaSentence": "Volvemos hacia las {{time}}.",
+    "featureOff": "Esta función no está disponible por ahora.",
+    "chatOff": "El chat no está disponible por ahora. Si necesitas algo urgente, llama.",
+    "maintenance": {
+      "title": "Estamos en mantenimiento",
+      "titleArea": "Mantenimiento en {{area}}",
+      "defaultBody": "Estamos mejorando Kuulis. Vuelve en un rato para pedir o hacer viajes.",
+      "eta": "Volvemos hacia las {{time}}",
+      "auto": "Esta pantalla se actualiza sola cuando terminemos.",
+      "retry": "Reintentar",
+      "history": "Tus viajes",
+      "account": "Tu cuenta"
+    },
+    "pause": {
+      "title": "Pausamos los pedidos",
+      "titleArea": "Pausamos los pedidos en {{area}}",
+      "driverTitle": "No puedes conectarte por ahora",
+      "driverTitleArea": "No puedes conectarte en {{area}} por ahora",
+      "defaultBody": "Por ahora no se pueden pedir viajes en tu zona. Vuelve a intentarlo en un rato.",
+      "driverHint": "Podrás conectarte en cuanto reactivemos los pedidos."
+    },
+    "driverPaused": {
+      "title": "Pausamos los pedidos en tu zona",
+      "maintenanceTitle": "Estamos en mantenimiento",
+      "body": "Te desconectamos. Si estás en un viaje, termínalo con normalidad."
+    },
+    "banner": {
+      "open": "Ver más",
+      "close": "Cerrar aviso"
+    },
+    "transfersOff": {
+      "title": "Transferencias no disponibles",
+      "body": "Por ahora no se pueden hacer transferencias. Tu saldo sigue seguro; inténtalo más tarde."
+    }
   }
 }

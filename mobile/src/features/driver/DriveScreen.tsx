@@ -12,6 +12,7 @@ import { Button, EmptyState, IconButton, ProgressSteps, StatusPill, Txt } from '
 import { Avatar, PAYMENT_ICONS, RatingBadge, RoundAction } from '@/features/ride/components';
 import { CancelSheet } from '@/features/ride/RideSheets';
 import { chatUnread } from '@/features/ride/store';
+import { useFlag } from '@/hooks/useBootstrap';
 import { useUserLocation } from '@/hooks/useLocation';
 import { useActiveRide, useCancelRide, useDriverRideAction, useRide } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
@@ -61,6 +62,8 @@ export function DriveScreen() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const { position } = useUserLocation();
   const unread = useStore(chatUnread)[rideId ?? ''] ?? 0;
+  // The chat can be switched off remotely (doc 10): the button then disappears.
+  const chatOn = useFlag('chat');
   const route = useMemo(() => decodePolyline(ride?.polyline), [ride?.polyline]);
 
   if (!ride) {
@@ -193,7 +196,7 @@ export function DriveScreen() {
           </Txt>
           <RatingBadge rating={ride.passenger.rating} />
         </View>
-        {!ended ? (
+        {!ended && chatOn ? (
           <RoundAction
             icon={MessageCircle}
             label={t('ride.chat')}

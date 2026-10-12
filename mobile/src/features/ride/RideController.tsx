@@ -7,6 +7,7 @@ import { AppState } from 'react-native';
 
 import { showToast } from '@/components/Toast';
 import { IncomingOffer } from '@/features/driver/IncomingOffer';
+import { useLocationIntervals } from '@/hooks/useBootstrap';
 import { useDriverProfile } from '@/hooks/useDriver';
 import { getLastPosition, useUserLocation } from '@/hooks/useLocation';
 import { useRealtimeContext, useRealtimeEvent } from '@/hooks/useRealtime';
@@ -22,6 +23,7 @@ import {
 } from '@/hooks/useRides';
 import { api } from '@/lib/api';
 import { setBackgroundLocation } from '@/lib/backgroundLocation';
+import { locationIntervalMs } from '@/lib/bootstrap';
 import { confirmHaptic, heavyHaptic, preloadRideSounds, tick } from '@/lib/feedback';
 import { isActiveStatus, rideRole, rideRoleStrict } from '@/lib/ride';
 import type { DriverLocationEvent, DriverState, Offer, Ride, RideMessage } from '@/lib/types';
@@ -172,8 +174,11 @@ export function RideNavigator() {
   return null;
 }
 
-/** Sends the driver's position over the socket every ~4 s while online and the app is in the foreground. */
-function useLocationBroadcast(enabled: boolean) {
+/**
+ * Sends the driver's position over the socket while online and the app is in the foreground: every
+ * `location_intervals.online_seconds`, or `on_ride_seconds` during a ride (remote settings, doc 10; 4 s by default).
+ */
+function useLocationBroadcast(enabled: boolean, intervalMs: number) {
   const { send, status } = useRealtimeContext();
   useUserLocation({ watch: enabled });
 
@@ -192,9 +197,9 @@ function useLocationBroadcast(enabled: boolean) {
       });
     };
     push();
-    const timer = setInterval(push, 4000);
+    const timer = setInterval(push, intervalMs);
     return () => clearInterval(timer);
-  }, [enabled, status, send]);
+  }, [enabled, status, send, intervalMs]);
 }
 
 /**
@@ -215,15 +220,16 @@ export function DriverController() {
     onlineRef.current = { online: !!state.data?.online, driving };
   }, [state.data?.online, driving]);
 
-  useLocationBroadcast(online);
+  const intervalMs = locationIntervalMs(useLocationIntervals(), driving);
+  useLocationBroadcast(online, intervalMs);
 
   // Keep sharing the position with the app minimized (Android foreground service) while online.
   const { t } = useTranslation();
   const bgTitle = t('drive.home.bgTitle');
   const bgBody = t('drive.home.bgBody');
   useEffect(() => {
-    void setBackgroundLocation(online ? { title: bgTitle, body: bgBody } : null);
-  }, [online, bgTitle, bgBody]);
+    void setBackgroundLocation(online ? { title: bgTitle, body: bgBody, intervalMs } : null);
+  }, [online, bgTitle, bgBody, intervalMs]);
   useEffect(() => () => void setBackgroundLocation(null), []);
 
   useEffect(() => {

@@ -27,6 +27,7 @@ import {
   toneColors,
   Txt,
 } from '@/components/ui';
+import { AnnouncementBanners } from '@/features/control/AnnouncementBanners';
 import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { useAppConfig, useDriverProfile } from '@/hooks/useDriver';
 import { apiErrorMessage } from '@/i18n';
@@ -92,6 +93,7 @@ function DriverIntro({ profile, refresh }: { profile: DriverProfile | null; refr
         <Txt color="muted">{t('driver.intro.subtitle')}</Txt>
       </View>
 
+      <AnnouncementBanners style={{ marginTop: space.lg }} />
       <UpdateBanner style={{ marginTop: space.lg }} />
 
       {started ? (
@@ -229,6 +231,7 @@ function DriverStatus({
         </View>
       ) : null}
 
+      <AnnouncementBanners style={{ marginTop: space.lg }} />
       <UpdateBanner style={{ marginTop: space.lg }} />
 
       <Txt variant="overline" color="muted" style={{ marginTop: space.xl, marginBottom: space.xs }}>

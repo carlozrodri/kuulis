@@ -24,6 +24,7 @@ import {
   Txt,
 } from "@/components/ui";
 import { Avatar, PlaceRows } from "@/features/ride/components";
+import { currentEmergencyNumber, useAppLinks } from "@/hooks/useBootstrap";
 import { heavyHaptic } from "@/lib/feedback";
 import { isUrgentCategory } from "@/lib/reports";
 import { rideRole } from "@/lib/ride";
@@ -64,7 +65,7 @@ export function ReportStatusPill({ status }: { status: ReportStatus }) {
 
 export const callEmergency = () => {
   heavyHaptic();
-  void Linking.openURL("tel:911").catch(() => undefined);
+  void Linking.openURL(`tel:${currentEmergencyNumber()}`).catch(() => undefined);
 };
 
 /** Large tappable card with an icon and a one-line explanation. Safety and harassment are drawn in red. */
@@ -147,6 +148,7 @@ export function CategoryCard({
 export function UrgentNote({ compact }: { compact?: boolean }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { emergency } = useAppLinks();
   return (
     <View
       accessibilityRole="alert"
@@ -160,11 +162,11 @@ export function UrgentNote({ compact }: { compact?: boolean }) {
       </View>
       {!compact ? (
         <Txt variant="caption" style={{ fontSize: 14, lineHeight: 20 }}>
-          {t("report.urgent.body")}
+          {t("report.urgent.body", { number: emergency })}
         </Txt>
       ) : null}
       <Button
-        title={t("report.urgent.call")}
+        title={t("report.urgent.call", { number: emergency })}
         variant="danger"
         size="sm"
         icon={PhoneCall}

@@ -22,7 +22,10 @@
     "approvals": "Approvals",
     "legal": "Legal",
     "privacy": "Privacy",
-    "versions": "Versions"
+    "versions": "Versions",
+    "appStatus": "App status",
+    "flags": "Features",
+    "announcements": "Announcements"
   },
   "auth": {
     "title": "Admin sign in",
@@ -146,7 +149,8 @@
       "subscriptions": "Subscriptions",
       "finance": "Finance",
       "system": "System",
-      "releases": "App versions"
+      "releases": "App versions",
+      "app_control": "App control"
     },
     "permissions": {
       "users": {
@@ -211,6 +215,18 @@
       "releases": {
         "view": "See app versions",
         "manage": "Publish, withdraw and mark versions mandatory"
+      },
+      "app_status": {
+        "view": "See maintenance and pauses",
+        "manage": "Turn on maintenance and pause cities"
+      },
+      "flags": {
+        "view": "See features",
+        "manage": "Turn features on, off and limit them"
+      },
+      "announcements": {
+        "view": "See announcements",
+        "manage": "Create, edit and delete announcements"
       }
     }
   },
@@ -328,7 +344,8 @@
     "update_candidate_not_found": "That export is no longer in storage",
     "update_exists": "That export is already published in that channel",
     "update_not_current": "That update is no longer active; reload the page",
-    "updates_signing_disabled": "Update signing is not configured in this environment."
+    "updates_signing_disabled": "Update signing is not configured in this environment.",
+    "flag_not_found": "That feature does not exist"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -459,7 +476,14 @@
       "transferLimit": "Transfer limit: between 0 and {max} USDT.",
       "freeMonths": "Free months: whole number between {min} and {max}.",
       "graceDays": "Grace days: whole number between {min} and {max}.",
-      "approvalLimit": "Four-eyes limit: between 0 and {max} USD."
+      "approvalLimit": "Four-eyes limit: between 0 and {max} USD.",
+      "whatsapp": "Support WhatsApp: digits only, with an optional leading + (up to 20).",
+      "supportEmail": "The support email is not valid.",
+      "emergencyNumber": "Emergency number: digits only, up to 10.",
+      "termsUrl": "The terms link must start with https:// (up to 300 characters).",
+      "privacyUrl": "The privacy link must start with https:// (up to 300 characters).",
+      "onlineSeconds": "Location without a ride: between {min} and {max} seconds.",
+      "onRideSeconds": "Location on a ride: between {min} and {max} seconds."
     },
     "fares": {
       "title": "Fares",
@@ -556,6 +580,23 @@
       "faresHelp": "Fare or rounding changes in Settings and new fee schedules. Only another admin can approve them.",
       "broadcasts": "Mass notifications",
       "broadcastsHelp": "Notifications to everyone or a whole role. Single-user ones go out right away."
+    },
+    "app": {
+      "title": "Contact and location in the app",
+      "help": "Support and legal links, and how often the driver app sends its location. The app reads them at start, no update needed. Maintenance and city pauses are in",
+      "statusLink": "App status",
+      "whatsapp": "Support WhatsApp",
+      "whatsappHelp": "With country code, digits only (e.g. +584121234567).",
+      "supportEmail": "Support email",
+      "emergencyNumber": "Emergency number",
+      "emergencyNumberHelp": "The emergency button dials it. Digits only.",
+      "termsUrl": "Terms link",
+      "privacyUrl": "Privacy policy link",
+      "intervals": "Driver location updates",
+      "intervalsHelp": "Fewer seconds = a more accurate map, but more battery and data.",
+      "onlineSeconds": "Online, no ride (seconds)",
+      "onRideSeconds": "On a ride (seconds)",
+      "secondsRange": "Between {min} and {max} seconds."
     }
   },
   "paymentMethods": {
@@ -1544,6 +1585,17 @@
         "publish": "Published a JavaScript update",
         "update": "Changed a JavaScript update",
         "revert": "Reverted a JavaScript update"
+      },
+      "app_status": {
+        "update": "Changed maintenance or city pauses"
+      },
+      "flag": {
+        "update": "Changed a feature"
+      },
+      "announcement": {
+        "create": "Created an announcement",
+        "update": "Edited an announcement",
+        "delete": "Deleted an announcement"
       }
     },
     "entities": {
@@ -1567,7 +1619,9 @@
       "approval": "Approval",
       "legal": "Legal",
       "app_release": "App version",
-      "app_update": "JavaScript update"
+      "app_update": "JavaScript update",
+      "feature_flag": "Feature",
+      "announcement": "Announcement"
     }
   },
   "team": {
@@ -1819,5 +1873,219 @@
       "confirmRevertTitle": "Revert {id}",
       "confirmRevert": "It is withdrawn in the {channel} channel and the apps receive a newer copy of the previous update that was at 100 % or, if there is none, go back to the APK's code. The change applies the next time the app is opened."
     }
+  },
+  "control": {
+    "spanish": "Spanish",
+    "english": "English",
+    "englishFallback": "Leave empty to show the Spanish text",
+    "modes": {
+      "passenger": "Passengers",
+      "driver": "Drivers"
+    }
+  },
+  "appStatus": {
+    "help": "Stop new rides without shipping a release: maintenance in every city or some of them, or a pause in one city (heavy rain, protests, curfew). Rides under way go on; online drivers go offline when their ride ends.",
+    "readOnly": "Read only: your role can see the status but not change it.",
+    "onTitle": "Maintenance ON · {where}",
+    "onBody": "Nobody can get quotes or request rides, and drivers cannot go online. The app shows this message:",
+    "etaLine": "Estimated back at: {date}",
+    "pausedTitle": "Rides paused in {areas}",
+    "allGood": "The app is working normally in every city.",
+    "maintenance": "Maintenance",
+    "maintenanceHelp": "Maintenance screen in the app and no new rides where it applies.",
+    "on": "On",
+    "off": "Off",
+    "scope": "Where",
+    "scopeAll": "Every city",
+    "scopeAreas": "Only some cities",
+    "cities": "Cities",
+    "everywhere": "every city",
+    "message": "Message for users",
+    "messageHelp": "Explain what is going on and what they can do. Up to 300 characters.",
+    "eta": "Estimated time back",
+    "etaHelp": "Optional. In your browser's time; the app shows it in the user's time.",
+    "fixErrors": "Still missing:",
+    "turnOn": "Turn maintenance on",
+    "saveChanges": "Save changes",
+    "turnOff": "Turn maintenance off",
+    "pauses": "City pauses",
+    "pausesHelp": "Stop new rides in one city with its own message, leaving the rest alone.",
+    "addPause": "Pause a city",
+    "noPauses": "No city is paused.",
+    "city": "City",
+    "noEta": "No estimate",
+    "editPause": "Edit pause",
+    "removePause": "Resume",
+    "editPauseTitle": "Pause in {area}",
+    "pauseModalHelp": "Nobody can request rides or go online as a driver in that city until you resume it.",
+    "pauseMessageHelp": "For example: “Rides are paused because of the rain. We'll be back as soon as it is safe.”",
+    "continue": "Continue",
+    "errors": {
+      "messageEs": "Write the message in Spanish.",
+      "areas": "Choose at least one city.",
+      "tooManyAreas": "Up to 20 cities.",
+      "eta": "The estimated time is not valid.",
+      "area": "Choose the city.",
+      "duplicate": "That city is already paused."
+    },
+    "confirm": {
+      "maintenanceOn": {
+        "title": "Turn maintenance on?",
+        "body": "New rides stop in {where}: nobody can get quotes or request rides, and online drivers go offline when their ride ends. Apps find out within seconds."
+      },
+      "maintenanceUpdate": {
+        "title": "Save the maintenance changes?",
+        "body": "Maintenance stays on in {where} with the new message and estimated time."
+      },
+      "maintenanceOff": {
+        "title": "Turn maintenance off?",
+        "body": "Rides work again in {where} (except in paused cities)."
+      },
+      "pauseAdd": {
+        "title": "Pause {area}?",
+        "body": "Nobody can request rides or go online as a driver in {area} until you resume it."
+      },
+      "pauseUpdate": {
+        "title": "Save the pause in {area}?",
+        "body": "The app shows the new message and estimated time in {area}."
+      },
+      "pauseRemove": {
+        "title": "Resume {area}?",
+        "body": "Rides work again in {area}."
+      }
+    },
+    "done": {
+      "maintenanceOn": "Maintenance turned on",
+      "maintenanceUpdate": "Maintenance updated",
+      "maintenanceOff": "Maintenance turned off",
+      "pauseAdd": "{area} paused",
+      "pauseUpdate": "Pause in {area} saved",
+      "pauseRemove": "{area} resumed"
+    }
+  },
+  "flags": {
+    "help": "Turn app features on or off without shipping a release, and choose who gets them. The app notices within minutes and the API also blocks them while they are off.",
+    "readOnly": "Read only: your role can see the features but not change them.",
+    "byDefault": "Default",
+    "defaultIs": "default: {value}",
+    "on": "On",
+    "off": "Off",
+    "updated": "changed on {date} by {email}",
+    "whoGetsIt": "Who gets it:",
+    "saved": "Feature {key} saved",
+    "rules": {
+      "roles": "Account type",
+      "platforms": "Platform",
+      "areas": "Cities",
+      "emptyMeansAll": "Leave all unchecked to apply to everyone.",
+      "noAreas": "The list of cities could not be loaded.",
+      "minBuild": "Minimum build",
+      "minBuildHelp": "Only apps with this build number or newer. Empty = any.",
+      "anyBuild": "Any",
+      "percent": "Percentage of people",
+      "percentHelp": "Each person always lands on the same side: raising the percentage only adds people."
+    },
+    "preview": {
+      "title": "Preview for one account",
+      "help": "Type an account's email to see whether it gets this feature (as saved). What the API does not know about it, like its city or platform, does not exclude it.",
+      "unsaved": "You have unsaved changes: the preview uses what is saved.",
+      "email": "Account email",
+      "auto": "From the account",
+      "check": "Check",
+      "yes": "{email} gets it (as {role}).",
+      "no": "{email} does not get it (as {role})."
+    },
+    "summary": {
+      "off": "nobody (it is off).",
+      "nobody": "nobody (0 %).",
+      "who": {
+        "all": "everyone",
+        "passenger": "passengers",
+        "driver": "drivers"
+      },
+      "percentOf": "{percent} % of {who}",
+      "inAreas": "in {areas}",
+      "onPlatforms": "using {platforms}",
+      "minBuild": "with build ≥ {build}"
+    }
+  },
+  "announcements": {
+    "help": "In-app banners for passengers, drivers or both, by city and with a start and end date. They show up without shipping a release.",
+    "new": "New announcement",
+    "create": "Create announcement",
+    "editTitle": "Edit announcement",
+    "title": "Title",
+    "body": "Text",
+    "status": "Status",
+    "when": "Runs",
+    "audienceCol": "Audience",
+    "reach": "Reach",
+    "empty": "No announcements yet.",
+    "until": "until {date}",
+    "seen": "{n} saw it",
+    "dismissed": "{n} closed it ({rate})",
+    "notDismissible": "Cannot be closed",
+    "actions": "Actions",
+    "edit": "Edit",
+    "copy": "Duplicate",
+    "delete": "Delete",
+    "style": "Style",
+    "styles": {
+      "info": "Info",
+      "warning": "Warning",
+      "promo": "Promotion"
+    },
+    "statuses": {
+      "scheduled": "Scheduled",
+      "active": "Active",
+      "ended": "Ended"
+    },
+    "roles": "Account type",
+    "cities": "Cities",
+    "emptyMeansAll": "Leave all unchecked to show it to everyone.",
+    "startsAt": "From",
+    "endsAt": "Until",
+    "timeZone": "Dates in your browser's time ({zone}).",
+    "dismissible": "Can be closed",
+    "dismissibleHelp": "Shows an X; whoever closes it does not see it again.",
+    "cta": "Button",
+    "ctaHelp": "Optional: a button that opens an app screen or a link.",
+    "ctaLabel": "Button text",
+    "ctaOpens": "Opens",
+    "ctaScreen": "An app screen",
+    "ctaUrl": "A link",
+    "ctaUrlHelp": "Must start with https://",
+    "screens": {
+      "home": "Home",
+      "wallet": "Balance",
+      "promotions": "Promotions",
+      "profile": "Profile",
+      "about": "About",
+      "driver_signup": "Driver sign-up"
+    },
+    "fixErrors": "Check the announcement:",
+    "errors": {
+      "titleEs": "Write the title in Spanish.",
+      "dates": "Set the start and end dates.",
+      "order": "The end must be after the start.",
+      "tooManyAreas": "Up to 20 cities.",
+      "ctaLabel": "Write the button text in Spanish.",
+      "ctaUrl": "The button link must be a valid https:// address."
+    },
+    "preview": "How it will look",
+    "previewTitle": "Announcement title",
+    "previewButton": "Button",
+    "audienceLine": "Who will see it: {audience}.",
+    "audience": {
+      "all": "Everyone",
+      "passenger": "Passengers",
+      "driver": "Drivers",
+      "inAreas": "{who} in {areas}"
+    },
+    "created": "Announcement created",
+    "updated": "Announcement saved",
+    "deleted": "Announcement deleted",
+    "deleteTitle": "Delete the announcement?",
+    "deleteBody": "“{title}” stops showing in the app and its reach numbers are lost. If you only want it to end, edit its end date."
   }
 }

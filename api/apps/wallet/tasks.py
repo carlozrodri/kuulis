@@ -7,6 +7,8 @@ import logging
 
 from taskiq import TaskiqEvents, TaskiqState
 
+from apps.control import services as control
+from apps.control.flags import Audience
 from apps.monitoring import stats
 from apps.subscriptions import tasks as subscription_tasks
 from apps.wallet import binance
@@ -25,6 +27,10 @@ async def _binance_loop() -> None:
     while True:
         try:
             async with SessionLocal() as session:
+                # Turned off from the admin (doc 10): top-ups wait for manual review.
+                if not await control.is_enabled(session, "binance_auto", Audience()):
+                    await asyncio.sleep(binance.POLL_SECONDS)
+                    continue
                 credited = await binance.reconcile(session)
             await stats.beat("binance")
             if credited is None:  # another worker's turn

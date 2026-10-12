@@ -47,6 +47,21 @@ DEFAULTS = {
     "approval_adjust_limit": "20.00",
     "approval_fares": True,
     "approval_broadcasts": True,
+    "maintenance": {
+        "enabled": False,
+        "message": {"es": "", "en": ""},
+        "eta": None,
+        "areas": [],
+    },
+    "area_pauses": [],
+    "app_links": {
+        "support_whatsapp": "",
+        "support_email": "",
+        "emergency_number": "911",
+        "terms_url": "",
+        "privacy_url": "",
+    },
+    "location_intervals": {"online_seconds": 10, "on_ride_seconds": 4},
 }
 
 
