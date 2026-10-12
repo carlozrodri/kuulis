@@ -531,7 +531,18 @@ async def stop_run(request: Request) -> Response:
         return JSONResponse({"error": "nothing running"}, 409)
     with contextlib.suppress(ProcessLookupError):
         process.send_signal(signal.SIGINT)  # k6 stops gracefully and still writes the summary
+    asyncio.get_running_loop().create_task(_force_stop(process))
     return JSONResponse({"stopping": state["run"]})
+
+
+async def _force_stop(process: asyncio.subprocess.Process) -> None:
+    # Iterations blocked on sockets can keep k6 waiting after the first signal; a second one
+    # makes it stop at once (the summary is still written).
+    with contextlib.suppress(TimeoutError):
+        await asyncio.wait_for(process.wait(), timeout=60)
+        return
+    with contextlib.suppress(ProcessLookupError):
+        process.send_signal(signal.SIGINT)
 
 
 # --- Fake Expo push ----------------------------------------------------------------------------
