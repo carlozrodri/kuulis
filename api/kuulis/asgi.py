@@ -12,6 +12,7 @@ from slowapi.middleware import SlowAPIASGIMiddleware
 
 import kuulis.models  # noqa: F401  (register models)
 from apps.geo import clients as geo_clients
+from apps.monitoring import stats as monitoring_stats
 from apps.monitoring import tasks as monitoring
 from apps.realtime.manager import manager
 from kuulis.core.db import engine
@@ -40,6 +41,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     monitoring.start()
     yield
     await monitoring.stop()
+    await monitoring_stats.flush_requests()
     await manager.stop()
     await geo_clients.aclose()
     if not broker.is_worker_process:

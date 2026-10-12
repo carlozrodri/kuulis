@@ -35,10 +35,17 @@ class BaseAppSettings(BaseSettings):
     DB_MAX_OVERFLOW: int = 10
     DB_POOL_TIMEOUT: int = 30
     DB_POOL_RECYCLE: int = 1800
+    # A "SELECT 1" before every checkout costs ~10 % of the CPU of a simple request. Without it a
+    # Postgres restart fails the requests that were using a dropped connection, and the pool then
+    # replaces all of them at once (SQLAlchemy invalidates the pool on a disconnect error).
+    DB_POOL_PRE_PING: bool = False
     DB_ECHO: bool = False
 
     # --- Redis ----------------------------------------------------------------
     REDIS_URL: RedisDsn = RedisDsn("redis://localhost:6379/0")
+    # Per process; a request waits up to REDIS_POOL_TIMEOUT seconds for a free connection.
+    REDIS_MAX_CONNECTIONS: int = 100
+    REDIS_POOL_TIMEOUT: int = 5
     CACHE_DEFAULT_TTL: int = 60
 
     # --- Auth -----------------------------------------------------------------
