@@ -276,11 +276,15 @@ class Realtime {
     this.ready = new Promise((resolve) => {
       const ws = new WebSocket(WS_URL);
       this.ws = ws;
+      // A socket left half-open by a restart may never fire close: after 15 s without `ready`, drop
+      // it (ignoring anything it sends later) and start over, so a driver is never left deaf.
       const timer = setTimeout(() => {
         resolve(false);
-        if (this.reconnect && !this.closing) {
-          try { ws.close(); } catch (e) { /* already closed */ }
-        }
+        if (!this.reconnect || this.closing) return;
+        ws.onmessage = () => {};
+        ws.onclose = () => {};
+        try { ws.close(); } catch (e) { /* already closed */ }
+        this.retry();
       }, 15000);
       ws.onopen = () => ws.send(JSON.stringify({ type: 'auth', token: this.session.access }));
       ws.onmessage = (msg) => {
@@ -413,6 +417,20 @@ export async function driver() {
   await session.call('POST', '/drivers/me/offline', undefined, 'driver_offline', [200, 409]);
 }
 
+// Like the app, a ride step that hits a restart (5xx or no answer) is retried instead of
+// abandoning the trip half-way.
+async function step(session, path, name, expected) {
+  let res;
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    res = await session.call('POST', path, undefined, name, expected);
+    // A 409 on a retry means the lost attempt went through: the ride already moved on.
+    if (attempt > 0 && res.status === 409) return { status: 200 };
+    if (res.status !== 0 && res.status < 500) break;
+    await sleep(2000 * (attempt + 1));
+  }
+  return res;
+}
+
 async function driveRide(session, rt, offer) {
   await sleep(jitter(800, 2500)); // reading the offer
   const id = offer.ride_id;
@@ -420,12 +438,12 @@ async function driveRide(session, rt, offer) {
     [200, 409, 410]);
   if (accepted.status !== 200) return;
   await sleep(ARRIVE_S * 1000 * jitter(0.8, 1.2));
-  if ((await session.call('POST', `/rides/${id}/arrive`, undefined, 'ride_arrive', [200, 409])).status !== 200) return;
+  if ((await step(session, `/rides/${id}/arrive`, 'ride_arrive', [200, 409])).status !== 200) return;
   await session.call('POST', `/rides/${id}/messages`, { text: 'Ya llegué, estoy afuera' }, 'chat_send');
   await sleep(jitter(5000, 10000));
-  if ((await session.call('POST', `/rides/${id}/start`, undefined, 'ride_start', [200, 409])).status !== 200) return;
+  if ((await step(session, `/rides/${id}/start`, 'ride_start', [200, 409])).status !== 200) return;
   await sleep(TRIP_S * 1000 * jitter(0.8, 1.2));
-  if ((await session.call('POST', `/rides/${id}/complete`, undefined, 'ride_complete', [200, 409])).status !== 200) return;
+  if ((await step(session, `/rides/${id}/complete`, 'ride_complete', [200, 409])).status !== 200) return;
   await sleep(jitter(2000, 5000));
   await session.call('POST', `/rides/${id}/rating`, { stars: 5, tags: [] }, 'ride_rate');
 }
