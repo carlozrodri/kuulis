@@ -1410,7 +1410,7 @@
       "production": "Producción"
     },
     "check": "Buscar actualizaciones",
-    "upToDate": "Tienes la última versión.",
+    "upToDate": "Tienes la última versión de Kuulis.",
     "available": "Kuulis {{version}} disponible",
     "availableBody": "Descarga de {{size}} MB.",
     "unsupported": "Esta copia de Kuulis no se actualiza desde aquí (versión de desarrollo, web o iPhone).",
