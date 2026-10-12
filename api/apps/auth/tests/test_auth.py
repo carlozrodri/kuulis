@@ -35,15 +35,58 @@ async def test_refresh_rotation_and_reuse_detection(client):
         "/api/v1/auth/refresh", json={"refresh_token": tokens["refresh_token"]}
     )
     assert first.status_code == 200
+    second = await client.post(
+        "/api/v1/auth/refresh", json={"refresh_token": first.json()["refresh_token"]}
+    )
+    assert second.status_code == 200
+    # The first token again, after the client already moved on: treated as stolen.
     reused = await client.post(
         "/api/v1/auth/refresh", json={"refresh_token": tokens["refresh_token"]}
     )
     assert reused.status_code == 401
     # Reuse revokes every session, including the rotated one.
     rotated = await client.post(
+        "/api/v1/auth/refresh", json={"refresh_token": second.json()["refresh_token"]}
+    )
+    assert rotated.status_code == 401
+
+
+async def test_retried_refresh_gets_the_same_tokens(client):
+    """A refresh whose answer was lost and is sent again does not log the user out."""
+    tokens = (await client.post("/api/v1/auth/register", json=REGISTER)).json()
+    body = {"refresh_token": tokens["refresh_token"]}
+    first = await client.post("/api/v1/auth/refresh", json=body)
+    retry = await client.post("/api/v1/auth/refresh", json=body)
+    assert retry.status_code == 200
+    assert retry.json()["refresh_token"] == first.json()["refresh_token"]
+    following = await client.post(
+        "/api/v1/auth/refresh", json={"refresh_token": retry.json()["refresh_token"]}
+    )
+    assert following.status_code == 200
+
+
+async def test_retried_refresh_after_grace_is_reuse(client):
+    from apps.auth import services
+
+    tokens = (await client.post("/api/v1/auth/register", json=REGISTER)).json()
+    body = {"refresh_token": tokens["refresh_token"]}
+    first = await client.post("/api/v1/auth/refresh", json=body)
+    jti = services.decode_token(tokens["refresh_token"], "refresh")["jti"]
+    await services.redis_client.delete(services._rotated_key(jti))  # the grace period is over
+    assert (await client.post("/api/v1/auth/refresh", json=body)).status_code == 401
+    rotated = await client.post(
         "/api/v1/auth/refresh", json={"refresh_token": first.json()["refresh_token"]}
     )
     assert rotated.status_code == 401
+
+
+async def test_retried_refresh_of_logged_out_session_fails(client):
+    tokens = (await client.post("/api/v1/auth/register", json=REGISTER)).json()
+    body = {"refresh_token": tokens["refresh_token"]}
+    first = await client.post("/api/v1/auth/refresh", json=body)
+    await client.post("/api/v1/auth/logout", json={"refresh_token": first.json()["refresh_token"]})
+    response = await client.post("/api/v1/auth/refresh", json=body)
+    assert response.status_code == 401
 
 
 async def test_logout_revokes_refresh_token(client):

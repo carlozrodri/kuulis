@@ -34,6 +34,10 @@ def _session_key(sid: str) -> str:
     return f"{_PREFIX}:session:{sid}"
 
 
+def _rotated_key(jti: str) -> str:
+    return f"{_PREFIX}:rotated:{jti}"
+
+
 def _used_token_key(jti: str) -> str:
     return f"{_PREFIX}:used:{jti}"
 
@@ -122,7 +126,8 @@ async def rotate_refresh_token(
     jti, user_id, sid = payload["jti"], payload["sub"], payload.get("sid")
     # GETDEL makes the token single use even with concurrent requests.
     stored = await redis_client.getdel(_refresh_key(jti))
-    if stored != user_id:
+    retried = None if stored == user_id else await _retried_rotation(jti, sid)
+    if stored != user_id and retried is None:
         if sid and not await redis_client.exists(_session_key(sid)):
             # The session was closed (from the session list): only this device is out.
             raise AuthenticationError("Session closed", code="token_revoked")
@@ -132,10 +137,34 @@ async def rotate_refresh_token(
     user = await users.get_by_id(session, uuid.UUID(user_id))
     if user is None or not user.is_active:
         raise AuthenticationError("User not found or inactive", code="user_inactive")
+    if retried is not None:
+        return user, retried
     mfa = bool(sid) and await redis_client.hget(_session_key(sid), "mfa") == "1"
     if not sid:  # token from before sessions had ids
         await redis_client.srem(_user_sessions_key(user_id), jti)
-    return user, await issue_tokens(user, request, mfa=mfa, sid=sid)
+    tokens = await issue_tokens(user, request, mfa=mfa, sid=sid)
+    if sid:
+        await redis_client.set(
+            _rotated_key(jti), tokens.model_dump_json(), ex=settings.REFRESH_RETRY_GRACE_SECONDS
+        )
+    return user, tokens
+
+
+async def _retried_rotation(jti: str, sid: str | None) -> TokenPair | None:
+    """The tokens a refresh with ``jti`` already got, when this is a retry of it: the client lost
+    the answer (a dropped connection, a proxy error) and sent the same token again. Only within
+    the grace period and while the session still holds those tokens; a reuse after the client
+    moved on, or of a closed session, is still treated as a stolen token."""
+    if not sid:
+        return None
+    saved = await redis_client.get(_rotated_key(jti))
+    if saved is None:
+        return None
+    tokens = TokenPair.model_validate_json(saved)
+    current = await redis_client.hget(_session_key(sid), "jti")
+    if current != decode_token(tokens.refresh_token, "refresh")["jti"]:
+        return None
+    return tokens
 
 
 async def _close_sessions(user_id: str, sids: list[str]) -> None:
