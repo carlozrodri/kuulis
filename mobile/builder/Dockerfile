@@ -15,6 +15,10 @@ ENV ANDROID_HOME=/opt/android-sdk \
     EAS_SKIP_AUTO_FINGERPRINT=1 \
     GRADLE_USER_HOME=/cache/gradle \
     npm_config_cache=/cache/npm
+# Phones only (ARM): skipping the emulator ABIs (x86, x86_64) roughly halves the native compile time and
+# memory. Fewer parallel Gradle workers so a build fits next to the rest of the server.
+ENV ORG_GRADLE_PROJECT_reactNativeArchitectures=armeabi-v7a,arm64-v8a \
+    GRADLE_OPTS="-Dorg.gradle.workers.max=4"
 ENV ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION \
     PATH=$PATH:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools
 
