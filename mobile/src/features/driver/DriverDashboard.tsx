@@ -10,10 +10,13 @@ import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { showToast } from '@/components/Toast';
 import { Button, Card, IconTile, Notice, Sheet, Skeleton, StatusPill, Txt } from '@/components/ui';
 import { SuspendedPanel } from '@/features/account/SuspendedPanel';
+import { AnnouncementBanners } from '@/features/control/AnnouncementBanners';
+import { ServicePausedPanel } from '@/features/control/ServicePausedPanel';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
 import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { useWalletFormat } from '@/features/wallet/format';
 import { EarningsCard, goToTopUp } from '@/features/wallet/SubscriptionCard';
+import { useBootstrap } from '@/hooks/useBootstrap';
 import { getFreshPosition, requestLocationPermission, useUserLocation } from '@/hooks/useLocation';
 import { useActiveRide, useDriverState, useGoOffline, useGoOnline } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
@@ -22,6 +25,7 @@ import { apiErrorMessage } from '@/i18n';
 import { api } from '@/lib/api';
 import { confirmHaptic, heavyHaptic } from '@/lib/feedback';
 import { backgroundLocationActive } from '@/lib/backgroundLocation';
+import { serviceNotice } from '@/lib/bootstrap';
 import { formatAmount } from '@/lib/money';
 import { formatFare, isActiveStatus } from '@/lib/ride';
 import { useStore } from '@/lib/store';
@@ -92,6 +96,10 @@ export function DriverDashboard() {
     fee === 'blocked' || (overdueAt !== null && (!summary || subscription.dataUpdatedAt <= overdueAt));
   // The API disconnects a suspended driver; while the state catches up the disconnect button stays.
   const suspended = !!suspension && !online;
+  // Maintenance or a pause in this city (doc 10): cannot go online and sees why. Online drivers are taken
+  // offline by the server when their ride ends (driver.paused).
+  const pausedNotice = serviceNotice(useBootstrap().data);
+  const paused = !!pausedNotice && !online && !suspended;
 
   // Android keeps sharing the position with the app minimized: Google Play requires saying so, and the
   // driver's explicit OK is recorded once (doc 07).
@@ -165,6 +173,7 @@ export function DriverDashboard() {
               <Txt variant="bodyStrong">{online ? t('drive.home.onlineChip') : t('drive.home.offlineChip')}</Txt>
             </View>
           </View>
+          <AnnouncementBanners />
         </View>
       }>
       {state.isPending ? (
@@ -176,6 +185,8 @@ export function DriverDashboard() {
         <>
           {suspended && suspension ? (
             <SuspendedPanel suspension={suspension} variant="driver" />
+          ) : paused && pausedNotice ? (
+            <ServicePausedPanel notice={pausedNotice} variant="driver" />
           ) : blocked && !online ? (
             <BlockedPanel summary={summary} balance={wallet.data?.balance} />
           ) : (
@@ -224,6 +235,8 @@ export function DriverDashboard() {
               size="lg"
               icon={Power}
               loading={locating || goOnline.isPending}
+              disabled={paused}
+              accessibilityHint={paused ? t('control.pause.driverHint') : undefined}
               onPress={() => void connect()}
             />
           )}

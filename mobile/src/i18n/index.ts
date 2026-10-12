@@ -3,6 +3,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import { ApiError, setApiLocale } from '@/lib/api';
+import { formatEta, localize, type Notice, parseNotice } from '@/lib/bootstrap';
 import en from './locales/en.json';
 import es from './locales/es.json';
 
@@ -31,11 +32,27 @@ export function errorMessage(code: string | undefined): string {
 }
 
 /**
+ * Why rides are stopped, in the app language (English falls back to Spanish), with the estimated time back
+ * in local time: "Pausamos los pedidos por lluvia fuerte. Volvemos hacia las 16:30."
+ */
+export function noticeText(notice: Notice, language: string = i18n.language): string {
+  const message =
+    localize(notice.message, language) ||
+    i18n.t(notice.kind === 'maintenance' ? 'control.maintenance.defaultBody' : 'control.pause.defaultBody');
+  const eta = formatEta(notice.eta, language);
+  return eta ? `${message} ${i18n.t('control.etaSentence', { time: eta })}` : message;
+}
+
+/**
  * Human message for any error thrown by `api()`. The API does not localize messages, so we translate by
  * error code (with `details` such as {min_year} as interpolation values), falling back to its message.
  */
 export function apiErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
+    if (error.code === 'service_paused') {
+      const notice = parseNotice(error.details);
+      if (notice) return noticeText(notice);
+    }
     if (i18n.exists(`errors.${error.code}`)) {
       const values = error.details && typeof error.details === 'object' && !Array.isArray(error.details) ? error.details : {};
       return i18n.t(`errors.${error.code}`, values as Record<string, unknown>);

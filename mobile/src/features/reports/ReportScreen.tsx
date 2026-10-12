@@ -13,6 +13,7 @@ import {
   Screen,
   Txt,
 } from "@/components/ui";
+import { useAppLinks } from "@/hooks/useBootstrap";
 import { useCreateReport } from "@/hooks/useReports";
 import { useRide } from "@/hooks/useRides";
 import { apiErrorMessage } from "@/i18n";
@@ -60,6 +61,7 @@ function leave() {
 export function ReportScreen() {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const { emergency } = useAppLinks();
   const params = useLocalSearchParams<{
     ride_id?: string;
     category?: string;
@@ -197,7 +199,7 @@ export function ReportScreen() {
             {t("report.sentTitle")}
           </Txt>
           <Txt color="muted" align="center">
-            {urgent ? t("report.sentBodyUrgent") : t("report.sentBody")}
+            {urgent ? t("report.sentBodyUrgent", { number: emergency }) : t("report.sentBody")}
           </Txt>
           {urgent ? (
             <View style={{ alignSelf: "stretch", marginTop: space.sm }}>

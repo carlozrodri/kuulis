@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronLeft, MessageCircle, Send } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { EmptyState, IconButton, Notice, Txt } from '@/components/ui';
+import { useFlag } from '@/hooks/useBootstrap';
 import { useRide, useRideMessages, useSendMessage } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { ApiError } from '@/lib/api';
@@ -48,6 +49,8 @@ export function ChatScreen() {
   const send = useSendMessage(id ?? '');
   const [text, setText] = useState('');
   const [closed, setClosed] = useState(false);
+  // Switched off remotely (doc 10): the history stays readable, writing is not offered.
+  const chatOn = useFlag('chat');
 
   useEffect(() => {
     if (!id) return;
@@ -61,7 +64,7 @@ export function ChatScreen() {
 
   const role = ride ? rideRole(ride, user?.id, mode ?? 'passenger') : 'passenger';
   const other = role === 'passenger' ? ride?.driver : ride?.passenger;
-  const canWrite = !closed && (!ride || isChatOpen(ride.status));
+  const canWrite = chatOn && !closed && (!ride || isChatOpen(ride.status));
   const items = useMemo(() => [...(messages.data ?? [])].reverse(), [messages.data]);
 
   const submit = (value: string) => {
@@ -182,7 +185,7 @@ export function ChatScreen() {
             </View>
           </>
         ) : (
-          <Notice tone="info">{t('errors.chat_closed')}</Notice>
+          <Notice tone="info">{chatOn ? t('errors.chat_closed') : t('control.chatOff')}</Notice>
         )}
       </View>
     </KeyboardAvoidingView>

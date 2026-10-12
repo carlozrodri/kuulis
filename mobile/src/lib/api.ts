@@ -29,6 +29,7 @@ let refreshPromise: Promise<boolean> | null = null;
 let onSessionExpired: (() => void) | null = null;
 let onLegalRequired: ((kinds: string[]) => void) | null = null;
 let onUpdateRequired: ((minimumBuild: number) => void) | null = null;
+let onControlError: ((code: ControlErrorCode, details: unknown) => void) | null = null;
 let currentLocale = 'es';
 
 export const tokens = {
@@ -65,6 +66,14 @@ export function setLegalRequiredHandler(handler: (kinds: string[]) => void) {
 /** Ride actions answer 426 app_update_required when this build is below the newest mandatory release (doc 09). */
 export function setUpdateRequiredHandler(handler: (minimumBuild: number) => void) {
   onUpdateRequired = handler;
+}
+
+/** Errors from the remote control (doc 10): a city paused / maintenance, or a feature switched off. */
+export type ControlErrorCode = 'service_paused' | 'feature_disabled';
+
+/** 503 service_paused (details = Notice) and 403 feature_disabled: the app re-reads GET /app/bootstrap. */
+export function setControlErrorHandler(handler: (code: ControlErrorCode, details: unknown) => void) {
+  onControlError = handler;
 }
 
 export function setApiLocale(locale: string) {
@@ -131,6 +140,13 @@ export async function api<T>(path: string, options: RequestOptions = {}, retried
     const error = payload?.error;
     if (error?.code === 'legal_acceptance_required') onLegalRequired?.(error.details?.kinds ?? []);
     if (error?.code === 'app_update_required') onUpdateRequired?.(Number(error.details?.minimum_build) || 0);
+    if (error?.code === 'service_paused' || error?.code === 'feature_disabled') {
+      try {
+        onControlError?.(error.code, error.details);
+      } catch {
+        // never hides the original error
+      }
+    }
     throw new ApiError(
       response.status,
       error?.code ?? `http_${response.status}`,

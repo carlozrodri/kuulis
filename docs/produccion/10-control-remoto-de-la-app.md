@@ -68,3 +68,57 @@ todos con un banner y activar funciones poco a poco.
 
 ## Preguntas para Carlos
 Ninguna bloqueante.
+
+## Cómo quedó (2026-10-12)
+### API (`api/apps/control`)
+- **Mantenimiento y pausas** viven en `AppConfig` (`maintenance`, `area_pauses`) pero solo se cambian con
+  `PUT /admin/app/status` (permiso `app_status.manage`, auditado como `app_status.update`). Mientras aplican,
+  cotizar, pedir y conectarse responden 503 `service_paused` con `details: {kind, area, message, eta}`. Los
+  viajes ya pedidos o en curso siguen. El despachador desconecta cada 30 s a los motorizados conectados en una
+  ciudad detenida que no tienen viaje ni oferta abierta (y lo hace al guardar el estado), y les envía el evento
+  `driver.paused` con el motivo.
+  Esas respuestas llevan `X-Planned-Outage: 1` y no cuentan como 5xx en el monitoreo (03), para que un
+  mantenimiento no dispare alertas.
+- **Interruptores** (`feature_flags`): las claves y su valor por defecto están en `apps/control/flags.py`
+  (`chat`, `promotions`, `transfers`, `binance_auto`, `share_live_link`). Reglas: plataformas, build mínimo,
+  ciudades, roles y porcentaje (hash estable de clave + id de cuenta, o del dispositivo antes de iniciar
+  sesión). Lo que el servidor no sabe (sin cabeceras de la app o sin ubicación) no excluye. La API también
+  rechaza lo apagado con 403 `feature_disabled`: mensajes del chat, transferencias y cotizar con código de
+  promoción (sin código, simplemente no se aplica promoción); el worker deja de acreditar Binance Pay solo.
+  `GET /admin/flags/{key}/check?email=` dice si una cuenta concreta lo recibe.
+- **Anuncios** (`announcements`): título y texto es/en, audiencia (roles, ciudades), botón a una URL https o a
+  una pantalla de la app, fechas, estilo y si se puede cerrar. Alcance y cierres se cuentan en Redis
+  (HyperLogLog y un set por anuncio, 90 días después del fin).
+- **Configuración remota**: `app_links` (WhatsApp y email de soporte, número de emergencias, términos y
+  privacidad) y `location_intervals` se editan en Ajustes como cualquier otra clave.
+- `GET /app/bootstrap?mode&lat&lng&client_id` (cuenta opcional) devuelve todo evaluado para quien pregunta:
+  `area`, `maintenance` (global), `paused_areas`, `service` (lo que aplica en su ubicación), `flags`,
+  `announcements`, `links`, `location_intervals`, `min_build` y `refresh_seconds`. Flags y anuncios se
+  guardan 30 s en Redis; cualquier cambio (también en Ajustes) borra esa caché y emite `config.updated`
+  por WebSocket para que las apps abiertas relean al instante.
+- Permisos nuevos (grupo `app_control`): `app_status.view/manage`, `flags.view/manage`,
+  `announcements.view/manage`. La migración se los da al rol Operaciones, salvo `flags.manage`.
+
+### Admin
+- **Estado de la app** (`/app-status`): mantenimiento global o por ciudades y pausas por ciudad, con mensaje
+  es/en, hora estimada y confirmación antes de cada cambio; aviso rojo grande mientras hay mantenimiento.
+- **Funciones** (`/flags`): interruptor y reglas por flag, resumen en palabras ("20 % de los motorizados en
+  Caracas con build ≥ 7") y prueba por email de si una cuenta lo recibe.
+- **Anuncios** (`/announcements`): crear, programar, duplicar y borrar, con vista previa del banner, estado
+  (programado, activo, terminado), alcance y cuántos lo cerraron.
+- **Ajustes**: tarjeta "Contacto y ubicación en la app" con `app_links` y `location_intervals`.
+
+### App móvil (llega como OTA, sin APK nuevo)
+- `<BootstrapSync/>` lee el bootstrap al abrir, cada `refresh_seconds` (30 s durante mantenimiento), al volver
+  al frente, al cambiar de ciudad y con `config.updated`; guarda la última respuesta en el dispositivo y un
+  fallo nunca bloquea la app.
+- Pantalla de mantenimiento a pantalla completa que reintenta sola; viajes en curso, cuenta y billetera siguen
+  accesibles. Con la ciudad en pausa, el pasajero ve el motivo en vez de cotizar y el motorizado no puede
+  conectarse; `driver.paused` le avisa cuando el servidor lo desconecta.
+- Banners arriba de la pantalla principal (máximo dos), con botón a URL o pantalla; los cerrados no vuelven.
+- Flags apagados ocultan chat, código de promoción, transferencias y el texto de recarga automática.
+- El número de emergencias, el soporte (WhatsApp/email), los enlaces legales y el intervalo de ubicación del
+  motorizado salen de la configuración remota.
+
+### Decidido
+- `pwa_passengers` no se creó: la PWA está pospuesta (09, decisión 5).

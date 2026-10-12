@@ -1,4 +1,4 @@
-import type { AppConfig, DocumentKind, PaymentMethod, RateSource, ServiceArea, VehicleType } from '~/types/api'
+import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, PaymentMethod, RateSource, ServiceArea, VehicleType } from '~/types/api'
 import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/types/api'
 
 /** Editable copy of AppConfig: decimals as numbers so they bind to numeric inputs. */
@@ -34,6 +34,8 @@ export interface SettingsForm {
   approval_adjust_limit: number
   approval_fares: boolean
   approval_broadcasts: boolean
+  app_links: AppLinks
+  location_intervals: LocationIntervals
 }
 
 export const FARE_FIELDS = ['base', 'per_km', 'per_minute', 'minimum'] as const
@@ -58,6 +60,15 @@ export const TRANSFER_LIMIT_MAX = 10_000
 export const APPROVAL_LIMIT_MAX = 1000
 export const FREE_MONTHS_MAX = 24
 export const GRACE_DAYS_MAX = 60
+/** Doc 10 limits (contract). */
+export const WHATSAPP = /^\+?\d{0,19}$/
+export const EMERGENCY_NUMBER = /^\d{0,10}$/
+export const LINK_MAX = 300
+export const SUPPORT_EMAIL_MAX = 120
+export const ONLINE_SECONDS_MIN = 2
+export const ONLINE_SECONDS_MAX = 120
+export const ON_RIDE_SECONDS_MIN = 1
+export const ON_RIDE_SECONDS_MAX = 60
 
 /** Defaults from docs/api/phase-1a.md, phase-1b.md and phase-1c.md, used for keys an older API does not return yet. */
 export function defaultSettings(): SettingsForm {
@@ -93,6 +104,8 @@ export function defaultSettings(): SettingsForm {
     approval_adjust_limit: 20,
     approval_fares: true,
     approval_broadcasts: true,
+    app_links: { support_whatsapp: '', support_email: '', emergency_number: '911', terms_url: '', privacy_url: '' },
+    location_intervals: { online_seconds: 10, on_ride_seconds: 4 },
   }
 }
 
@@ -154,6 +167,11 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
     approval_adjust_limit: num(config.approval_adjust_limit, d.approval_adjust_limit),
     approval_fares: config.approval_fares ?? d.approval_fares,
     approval_broadcasts: config.approval_broadcasts ?? d.approval_broadcasts,
+    app_links: { ...d.app_links, ...config.app_links },
+    location_intervals: {
+      online_seconds: num(config.location_intervals?.online_seconds, d.location_intervals.online_seconds),
+      on_ride_seconds: num(config.location_intervals?.on_ride_seconds, d.location_intervals.on_ride_seconds),
+    },
   }
 }
 
@@ -204,6 +222,14 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
     approval_adjust_limit: money(form.approval_adjust_limit),
     approval_fares: form.approval_fares,
     approval_broadcasts: form.approval_broadcasts,
+    app_links: {
+      support_whatsapp: form.app_links.support_whatsapp.replace(/[\s-]+/g, ''),
+      support_email: form.app_links.support_email.trim(),
+      emergency_number: form.app_links.emergency_number.replace(/\s+/g, ''),
+      terms_url: form.app_links.terms_url.trim(),
+      privacy_url: form.app_links.privacy_url.trim(),
+    },
+    location_intervals: { ...form.location_intervals },
   }
 }
 
@@ -287,6 +313,21 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
   }
   if (!(Number.isFinite(form.approval_adjust_limit) && form.approval_adjust_limit >= 0 && form.approval_adjust_limit <= APPROVAL_LIMIT_MAX)) {
     issues.push({ key: 'approvalLimit', params: { max: APPROVAL_LIMIT_MAX } })
+  }
+  const links = form.app_links
+  if (!WHATSAPP.test(links.support_whatsapp.replace(/[\s-]+/g, ''))) issues.push({ key: 'whatsapp' })
+  const email = links.support_email.trim()
+  if (email && (email.length > SUPPORT_EMAIL_MAX || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) issues.push({ key: 'supportEmail' })
+  if (!EMERGENCY_NUMBER.test(links.emergency_number.replace(/\s+/g, ''))) issues.push({ key: 'emergencyNumber' })
+  for (const key of ['terms_url', 'privacy_url'] as const) {
+    const url = links[key].trim()
+    if (url && (url.length > LINK_MAX || !/^https?:\/\/\S+$/.test(url))) issues.push({ key: key === 'terms_url' ? 'termsUrl' : 'privacyUrl' })
+  }
+  if (!between(form.location_intervals.online_seconds, ONLINE_SECONDS_MIN, ONLINE_SECONDS_MAX)) {
+    issues.push({ key: 'onlineSeconds', params: { min: ONLINE_SECONDS_MIN, max: ONLINE_SECONDS_MAX } })
+  }
+  if (!between(form.location_intervals.on_ride_seconds, ON_RIDE_SECONDS_MIN, ON_RIDE_SECONDS_MAX)) {
+    issues.push({ key: 'onRideSeconds', params: { min: ON_RIDE_SECONDS_MIN, max: ON_RIDE_SECONDS_MAX } })
   }
   return issues
 }

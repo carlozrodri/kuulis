@@ -7,6 +7,7 @@ from apps.approvals.router import router as approvals_router
 from apps.audit.router import router as audit_router
 from apps.auth.router import router as auth_router
 from apps.config.router import router as config_router
+from apps.control.router import router as control_router
 from apps.drivers.router import admin_router as drivers_admin_router
 from apps.drivers.router import router as drivers_router
 from apps.files.router import router as files_router
@@ -47,6 +48,7 @@ api_v1.include_router(legal_router)
 api_v1.include_router(privacy_router)
 api_v1.include_router(releases_router)
 api_v1.include_router(updates_router)
+api_v1.include_router(control_router)
 api_v1.include_router(referrals_router)
 api_v1.include_router(notifications_router)
 api_v1.include_router(files_router)

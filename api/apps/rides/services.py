@@ -7,6 +7,7 @@ Pattern for every change: lock the ride row, validate + mutate, commit, then emi
 import secrets
 import uuid
 from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 
 import orjson
 from sqlalchemy import Numeric, Select, cast, func, or_, select, update
@@ -16,6 +17,8 @@ from sqlalchemy.orm import aliased, selectinload
 
 from apps.config.schemas import AppConfig
 from apps.config.services import get_app_config
+from apps.control import services as control
+from apps.control.flags import Audience
 from apps.drivers.models import DriverProfile, DriverStatus
 from apps.geo import clients as geo
 from apps.moderation import services as moderation
@@ -172,11 +175,17 @@ async def create_quote(session: AsyncSession, user: User, data: QuoteRequest) ->
     area = _check_area(
         config, (data.pickup.lat, data.pickup.lng), (data.dropoff.lat, data.dropoff.lng)
     )
+    control.ensure_open(config, area)
     route = await geo.route(data.pickup.lat, data.pickup.lng, data.dropoff.lat, data.dropoff.lng)
     fare, surge = pricing.quote_price(config, data.vehicle_type, route.distance_m, route.duration_s)
-    promotion, discount = await promotions.for_quote(
-        session, promotions.RideContext(user.id, area, data.vehicle_type, fare), data.promo_code
-    )
+    promotion, discount = None, Decimal(0)
+    who = Audience(ident=str(user.id), role="passenger", area=area)
+    if await control.is_enabled(session, "promotions", who):
+        promotion, discount = await promotions.for_quote(
+            session, promotions.RideContext(user.id, area, data.vehicle_type, fare), data.promo_code
+        )
+    elif data.promo_code:
+        raise control.FeatureDisabledError(details={"feature": "promotions"})
     total = fare - discount
     quote = Quote(
         quote_id=secrets.token_urlsafe(18),
@@ -225,6 +234,7 @@ async def create_ride(session: AsyncSession, user: User, data: RideCreate) -> Ri
     area = _check_area(
         config, (quote.pickup.lat, quote.pickup.lng), (quote.dropoff.lat, quote.dropoff.lng)
     )
+    control.ensure_open(config, area)
     if quote.promotion is not None:
         # Locks the promotion until the commit, so its budget cannot be overspent.
         await promotions.lock_for_ride(
@@ -327,6 +337,8 @@ async def go_online(session: AsyncSession, user: User, lat: float, lng: float) -
     assert vehicle is not None
     if vehicle.type not in config.enabled_vehicle_types:
         raise AppError("This vehicle type is not available", code="vehicle_type_not_enabled")
+    place = config.area_at(lat, lng)
+    control.ensure_open(config, place.name if place else None)
     await presence.go_online(user.id, profile.id, vehicle.type, lat, lng)
     return await driver_state(session, user)
 
@@ -560,6 +572,8 @@ async def post_message(
     session: AsyncSession, user: User, ride_id: uuid.UUID, data: MessageCreate
 ) -> RideMessage:
     ride = await get_for_participant(session, user, ride_id)
+    role = "driver" if user.id == ride.driver_id else "passenger"
+    await control.ensure_enabled(session, "chat", Audience(ident=str(user.id), role=role))
     if ride.status not in ASSIGNED_STATUSES:
         raise ChatClosedError(details={"status": ride.status.value})
     message = RideMessage(ride_id=ride.id, sender_id=user.id, text=data.text)

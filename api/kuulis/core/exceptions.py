@@ -16,6 +16,8 @@ class AppError(Exception):
     status_code: int = status.HTTP_400_BAD_REQUEST
     code: str = "bad_request"
     message: str = "Bad request"
+    # A refusal the team chose (maintenance, a paused city): not counted as a server error.
+    planned: bool = False
 
     def __init__(self, message: str | None = None, *, code: str | None = None, details: Any = None):
         self.message = message or self.message
@@ -60,6 +62,9 @@ class ServiceUnavailableError(AppError):
     message = "Service temporarily unavailable"
 
 
+PLANNED_HEADER = "X-Planned-Outage"
+
+
 def _envelope(code: str, message: str, details: Any = None) -> dict[str, Any]:
     return {"error": {"code": code, "message": message, "details": details}}
 
@@ -68,6 +73,8 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def _app_error(_: Request, exc: AppError) -> JSONResponse:
         headers = {"WWW-Authenticate": "Bearer"} if exc.status_code == 401 else None
+        if exc.planned:
+            headers = {PLANNED_HEADER: "1"}
         return JSONResponse(
             _envelope(exc.code, exc.message, exc.details),
             status_code=exc.status_code,

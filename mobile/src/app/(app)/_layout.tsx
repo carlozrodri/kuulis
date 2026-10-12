@@ -3,8 +3,10 @@ import { View } from 'react-native';
 
 import { ConnectionBanner } from '@/components/ConnectionBanner';
 import { ToastHost } from '@/components/Toast';
+import { MaintenanceGate } from '@/features/control/MaintenanceScreen';
 import { DriverController, RideNavigator, RideSync } from '@/features/ride/RideController';
 import { UpdateGate } from '@/features/update/UpdateGate';
+import { BootstrapSync } from '@/hooks/useBootstrap';
 import { RealtimeProvider } from '@/hooks/useRealtime';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
@@ -50,9 +52,13 @@ export default function AppLayout() {
           <Stack.Screen name="profile/delete" />
           <Stack.Screen name="profile/about" />
         </Stack>
+        {/* Remote control (doc 10): maintenance, city pauses, feature flags, banners and remote settings. */}
+        <BootstrapSync />
         <RideSync />
         <RideNavigator />
         {mode === 'driver' ? <DriverController /> : null}
+        {/* Maintenance (doc 10): covers home and ride requests, never a ride in progress. */}
+        <MaintenanceGate />
         {/* Mandatory APK update (doc 09): covers everything above, except during a ride. */}
         <UpdateGate />
         <ConnectionBanner />

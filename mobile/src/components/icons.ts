@@ -106,3 +106,8 @@ export { default as Ticket } from 'lucide-react-native/icons/ticket';
 export { default as ScrollText } from 'lucide-react-native/icons/scroll-text';
 export { default as Download } from 'lucide-react-native/icons/download';
 export { default as Archive } from 'lucide-react-native/icons/archive';
+export { default as Wrench } from 'lucide-react-native/icons/wrench';
+export { default as Cog } from 'lucide-react-native/icons/cog';
+export { default as CirclePause } from 'lucide-react-native/icons/circle-pause';
+export { default as Megaphone } from 'lucide-react-native/icons/megaphone';
+export { default as ExternalLink } from 'lucide-react-native/icons/external-link';

@@ -11,12 +11,15 @@ import { VesTiles } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, Card, IconButton, Notice, Skeleton, Txt } from '@/components/ui';
 import { SuspendedPanel } from '@/features/account/SuspendedPanel';
+import { ServicePausedPanel } from '@/features/control/ServicePausedPanel';
+import { useBootstrap, useFlag } from '@/hooks/useBootstrap';
 import { useAppConfig } from '@/hooks/useDriver';
 import { fetchQuote, quoteKey, rideKeys, useQuote, useRequestRide } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
 import { apiErrorMessage } from '@/i18n';
 import { ApiError } from '@/lib/api';
 import { confirmHaptic, selectionHaptic } from '@/lib/feedback';
+import { pauseNotice } from '@/lib/bootstrap';
 import { amountToPay, hasDiscount, normalizePromoCode, promotionInvalidReason } from '@/lib/money';
 import {
   decodePolyline,
@@ -37,6 +40,7 @@ import { PaymentChips, PlaceRows } from './components';
 import { loadSavedPayment, rideDraft, routedRides, setDraftPayment, setDraftPromoCode } from './store';
 
 const isPromoInvalid = (error: unknown) => error instanceof ApiError && error.code === 'promotion_invalid';
+const isFeatureDisabled = (error: unknown) => error instanceof ApiError && error.code === 'feature_disabled';
 
 /**
  * Route and price before confirming: big price (the total after any promotion, with the original fare struck
@@ -48,7 +52,11 @@ export function QuoteScreen() {
   const queryClient = useQueryClient();
   const draft = useStore(rideDraft);
   const { config } = useAppConfig();
-  const quote = useQuote(draft.pickup, draft.dropoff, 'moto', draft.promoCode);
+  // Doc 10: a paused city shows why instead of a price; promotions switched off hide the promo code.
+  const paused = pauseNotice(useBootstrap().data);
+  const promotionsOn = useFlag('promotions');
+  const promoCode = promotionsOn ? draft.promoCode : null;
+  const quote = useQuote(draft.pickup, draft.dropoff, 'moto', promoCode, !paused);
   const request = useRequestRide();
   const [now, setNow] = useState(() => Date.now());
   const { suspension, handleError: handleSuspended } = useSuspension();
@@ -71,6 +79,18 @@ export function QuoteScreen() {
     if (expired && !request.isPending) void quote.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expired]);
+
+  // Promotions switched off remotely: forget a typed code (the price is quoted again without it).
+  useEffect(() => {
+    if (!promotionsOn && draft.promoCode) setDraftPromoCode(null);
+  }, [promotionsOn, draft.promoCode]);
+  const disabledFor = useRef<unknown>(null);
+  useEffect(() => {
+    if (!draft.promoCode || !isFeatureDisabled(quote.error) || disabledFor.current === quote.error) return;
+    disabledFor.current = quote.error;
+    setDraftPromoCode(null);
+    showToast(t('control.featureOff'));
+  }, [draft.promoCode, quote.error, t]);
 
   // A code that stops applying on a later re-quote (expired, exhausted…) is dropped so the price still shows.
   const droppedFor = useRef<unknown>(null);
@@ -133,7 +153,8 @@ export function QuoteScreen() {
   const fare = quote.data ? formatFare(amountToPay(quote.data)) : '';
   const discounted = !!quote.data && hasDiscount(quote.data);
   // A promotion_invalid while a code is applied is handled above (the code is dropped and the price re-quoted).
-  const quoteError = quote.isError && !(draft.promoCode && isPromoInvalid(quote.error)) ? quote.error : null;
+  const quoteError =
+    quote.isError && !(draft.promoCode && (isPromoInvalid(quote.error) || isFeatureDisabled(quote.error))) ? quote.error : null;
   const outside = quoteError instanceof ApiError && quoteError.code === 'outside_service_area';
   // Suspended accounts cannot request rides: the suspension replaces the price and the request button.
   const suspendedBy = suspension ?? suspensionFromError(quoteError) ?? suspensionFromError(request.error);
@@ -157,7 +178,7 @@ export function QuoteScreen() {
         </View>
       }
       footer={
-        suspendedBy ? (
+        suspendedBy || paused ? (
           <Button title={t('ride.backHome')} variant="secondary" onPress={() => router.dismissTo('/')} />
         ) : quoteError ? (
           <Button title={t('quote.changeDestination')} variant="secondary" onPress={() => router.back()} />
@@ -182,6 +203,8 @@ export function QuoteScreen() {
 
       {suspendedBy ? (
         <SuspendedPanel suspension={suspendedBy} variant="passenger" />
+      ) : paused ? (
+        <ServicePausedPanel notice={paused} variant="passenger" />
       ) : quoteError ? (
         <Notice tone={outside ? 'warning' : 'danger'} icon={CircleX} title={outside ? t('quote.outsideTitle') : t('common.error')}>
           <Txt variant="caption" style={{ fontSize: 14, lineHeight: 20 }}>
@@ -260,7 +283,7 @@ export function QuoteScreen() {
         </Card>
       )}
 
-      {!quoteError && !suspendedBy && quote.data ? (
+      {!quoteError && !suspendedBy && !paused && quote.data ? (
         <>
           {discounted || draft.promoCode ? (
             <PromotionBanner
@@ -275,11 +298,11 @@ export function QuoteScreen() {
             />
           ) : null}
           <VesTiles ves={quote.data.total_ves} />
-          {!draft.promoCode ? <PromoCodeEntry /> : null}
+          {!draft.promoCode && promotionsOn ? <PromoCodeEntry /> : null}
         </>
       ) : null}
 
-      {!quoteError && !suspendedBy ? (
+      {!quoteError && !suspendedBy && !paused ? (
         <View style={{ gap: space.xs }}>
           <Txt variant="overline" color="muted">
             {t('ride.paymentMethod')}

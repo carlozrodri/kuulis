@@ -22,12 +22,18 @@ export const AUDIT_ENTITY_TYPES = [
   'legal',
   'app_release',
   'app_update',
+  'feature_flag',
+  'announcement',
 ] as const
 
 /** Admin page of the audited record, when it has one. */
-export function auditEntityLink(entry: Pick<AuditEntry, 'entity_type' | 'entity_id'>): string | null {
+export function auditEntityLink(entry: Pick<AuditEntry, 'entity_type' | 'entity_id'> & Partial<Pick<AuditEntry, 'action'>>): string | null {
   const id = entry.entity_id
+  // Maintenance and city pauses live in the config but are edited on their own page (doc 10).
+  if (entry.action === 'app_status.update') return '/app-status'
   if (entry.entity_type === 'config') return '/settings'
+  if (entry.entity_type === 'feature_flag') return '/flags'
+  if (entry.entity_type === 'announcement') return '/announcements'
   if (!id) return null
   switch (entry.entity_type) {
     case 'user': return `/users/${id}`

@@ -25,6 +25,7 @@ import {
   Txt,
 } from "@/components/ui";
 import { Avatar } from "@/features/ride/components";
+import { useFlag } from "@/hooks/useBootstrap";
 import { useDriverProfile } from "@/hooks/useDriver";
 import {
   useFindRecipient,
@@ -60,6 +61,28 @@ const NOTE_MAX = 140;
  * limit, which counts only what is sent), confirm and send. Transfers are instant and final.
  */
 export function TransferScreen() {
+  // Transfers can be switched off remotely (doc 10).
+  const enabled = useFlag("transfers");
+  return enabled ? <TransferFlow /> : <TransfersOff />;
+}
+
+function TransfersOff() {
+  const { t } = useTranslation();
+  return (
+    <Screen
+      header={<FlowHeader title={t("transfer.title")} />}
+      footer={<Button title={t("common.back")} variant="secondary" onPress={leaveFlow} />}
+    >
+      <EmptyState
+        icon={Info}
+        title={t("control.transfersOff.title")}
+        body={t("control.transfersOff.body")}
+      />
+    </Screen>
+  );
+}
+
+function TransferFlow() {
   const { t } = useTranslation();
   const theme = useTheme();
   const queryClient = useQueryClient();

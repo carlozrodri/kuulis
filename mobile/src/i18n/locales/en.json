@@ -588,7 +588,9 @@
     "account_open_reports": "There are open reports about your account. Support must close them before it can be deleted.",
     "account_fee_pending": "Pay your pending fee before deleting your account.",
     "export_too_soon": "You can download your data once a day.",
-    "app_update_required": "You need to update Kuulis to do this"
+    "app_update_required": "You need to update Kuulis to do this",
+    "feature_disabled": "This feature isn't available right now.",
+    "service_paused": "Rides can't be requested in your area right now. Try again in a little while."
   },
   "map": {
     "recenter": "Recenter map"
@@ -773,7 +775,7 @@
   "safety": {
     "title": "Your safety",
     "subtitle": "If something feels wrong, act fast.",
-    "call911": "Call 911",
+    "call911": "Call {{number}}",
     "call911Hint": "Emergencies in Venezuela",
     "share": "Share my ride",
     "shareHint": "Send the driver's details and your destination to someone you trust",
@@ -1191,8 +1193,8 @@
     },
     "urgent": {
       "title": "We treat this as urgent",
-      "body": "The Kuulis team reviews these reports first. If you are in danger right now, call 911.",
-      "call": "Call 911"
+      "body": "The Kuulis team reviews these reports first. If you are in danger right now, call {{number}}.",
+      "call": "Call {{number}}"
     },
     "detailsTitle": "Tell us what happened",
     "detailsSubtitle": "More details help us help you. Only the Kuulis team will read it.",
@@ -1210,7 +1212,7 @@
     "submit": "Send report",
     "sentTitle": "We got your report",
     "sentBody": "The Kuulis team will review it and we'll let you know when we have an answer.",
-    "sentBodyUrgent": "We're treating it as urgent. If you are in danger right now, call 911.",
+    "sentBodyUrgent": "We're treating it as urgent. If you are in danger right now, call {{number}}.",
     "viewReport": "View my report",
     "alreadyOpen": {
       "title": "You already reported this ride",
@@ -1234,7 +1236,7 @@
     "newHint": "About the app, a lost item or anything else",
     "rideHint": "For a ride, open it in Your rides and tap “Report a problem”.",
     "emergency": "Are you in danger?",
-    "emergencyHint": "Call 911, Venezuela's emergency line",
+    "emergencyHint": "Call {{number}}, Venezuela's emergency line",
     "mine": "My reports",
     "empty": "No reports yet",
     "emptyBody": "If something goes wrong on a ride or in the app, tell us and we'll sort it out.",
@@ -1270,7 +1272,12 @@
     },
     "resolution": "Answer from the Kuulis team",
     "noResolution": "The team closed this report.",
-    "newAboutRide": "Make another report"
+    "newAboutRide": "Make another report",
+    "support": {
+      "whatsapp": "Message us on WhatsApp",
+      "whatsappHint": "Kuulis support",
+      "email": "Send us an email"
+    }
   },
   "suspension": {
     "title": "Your account is suspended",
@@ -1323,7 +1330,8 @@
     "required": "Accept the terms and confirm you are over 18.",
     "signUpPrefix": "I accept the ",
     "signUpAnd": " and the ",
-    "socialNote": "If you sign in with Google or Apple we will ask you to accept the terms when you sign in."
+    "socialNote": "If you sign in with Google or Apple we will ask you to accept the terms when you sign in.",
+    "openWeb": "View on the web"
   },
   "privacy": {
     "delete": {
@@ -1419,5 +1427,41 @@
     "running": "{{id}} · {{date}}",
     "jsReady": "Update ready: it applies the next time you open the app.",
     "jsError": "We could not check for updates. Check your connection and try again."
+  },
+  "control": {
+    "etaSentence": "We'll be back around {{time}}.",
+    "featureOff": "This feature isn't available right now.",
+    "chatOff": "Chat isn't available right now. If it's urgent, call.",
+    "maintenance": {
+      "title": "We're under maintenance",
+      "titleArea": "Maintenance in {{area}}",
+      "defaultBody": "We're improving Kuulis. Come back in a little while to request or drive rides.",
+      "eta": "We'll be back around {{time}}",
+      "auto": "This screen updates by itself when we are done.",
+      "retry": "Try again",
+      "history": "Your rides",
+      "account": "Your account"
+    },
+    "pause": {
+      "title": "Ride requests are paused",
+      "titleArea": "Ride requests are paused in {{area}}",
+      "driverTitle": "You can't go online right now",
+      "driverTitleArea": "You can't go online in {{area}} right now",
+      "defaultBody": "Rides can't be requested in your area right now. Try again in a little while.",
+      "driverHint": "You'll be able to go online as soon as requests are back on."
+    },
+    "driverPaused": {
+      "title": "Ride requests are paused in your area",
+      "maintenanceTitle": "We're under maintenance",
+      "body": "We took you offline. If you're on a ride, finish it as usual."
+    },
+    "banner": {
+      "open": "Learn more",
+      "close": "Close notice"
+    },
+    "transfersOff": {
+      "title": "Transfers unavailable",
+      "body": "Transfers aren't available right now. Your balance is safe; try again later."
+    }
   }
 }

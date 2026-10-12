@@ -16,6 +16,14 @@ PERMISSIONS: dict[str, tuple[str, ...]] = {
     "finance": ("finance.view", "finance.export"),
     "system": ("dashboard.view", "system.view", "config.view"),
     "releases": ("releases.view", "releases.manage"),
+    "app_control": (
+        "app_status.view",
+        "app_status.manage",
+        "flags.view",
+        "flags.manage",
+        "announcements.view",
+        "announcements.manage",
+    ),
 }
 ALL_PERMISSIONS: frozenset[str] = frozenset(p for group in PERMISSIONS.values() for p in group)
 
@@ -73,6 +81,11 @@ DEFAULT_ROLES: dict[str, tuple[str, tuple[str, ...]]] = {
             "notifications.send",
             "system.view",
             "config.view",
+            "app_status.view",
+            "app_status.manage",
+            "flags.view",
+            "announcements.view",
+            "announcements.manage",
         ),
     ),
 }

@@ -22,7 +22,10 @@
     "approvals": "Aprobaciones",
     "legal": "Legal",
     "privacy": "Privacidad",
-    "versions": "Versiones"
+    "versions": "Versiones",
+    "appStatus": "Estado de la app",
+    "flags": "Funciones",
+    "announcements": "Anuncios"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -146,7 +149,8 @@
       "subscriptions": "Suscripciones",
       "finance": "Finanzas",
       "system": "Sistema",
-      "releases": "Versiones de la app"
+      "releases": "Versiones de la app",
+      "app_control": "Control de la app"
     },
     "permissions": {
       "users": {
@@ -211,6 +215,18 @@
       "releases": {
         "view": "Ver versiones de la app",
         "manage": "Publicar, retirar y marcar versiones obligatorias"
+      },
+      "app_status": {
+        "view": "Ver el mantenimiento y las pausas",
+        "manage": "Activar mantenimiento y pausar ciudades"
+      },
+      "flags": {
+        "view": "Ver las funciones",
+        "manage": "Encender, apagar y limitar funciones"
+      },
+      "announcements": {
+        "view": "Ver los anuncios",
+        "manage": "Crear, editar y borrar anuncios"
       }
     }
   },
@@ -328,7 +344,8 @@
     "update_candidate_not_found": "Esa exportación ya no está en el almacenamiento",
     "update_exists": "Esa exportación ya está publicada en ese canal",
     "update_not_current": "Esa actualización ya no está activa; recarga la página",
-    "updates_signing_disabled": "La firma de actualizaciones no está configurada en este entorno."
+    "updates_signing_disabled": "La firma de actualizaciones no está configurada en este entorno.",
+    "flag_not_found": "Esa función no existe"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -459,7 +476,14 @@
       "transferLimit": "Límite de transferencias: entre 0 y {max} USDT.",
       "freeMonths": "Meses gratis: entero entre {min} y {max}.",
       "graceDays": "Días de gracia: entero entre {min} y {max}.",
-      "approvalLimit": "Límite de doble aprobación: entre 0 y {max} USD."
+      "approvalLimit": "Límite de doble aprobación: entre 0 y {max} USD.",
+      "whatsapp": "WhatsApp de soporte: solo dígitos, con + opcional al inicio (máximo 20).",
+      "supportEmail": "El correo de soporte no es válido.",
+      "emergencyNumber": "Número de emergencias: solo dígitos, máximo 10.",
+      "termsUrl": "El enlace a los términos debe empezar con https:// (máximo 300 caracteres).",
+      "privacyUrl": "El enlace a la privacidad debe empezar con https:// (máximo 300 caracteres).",
+      "onlineSeconds": "Ubicación sin viaje: entre {min} y {max} segundos.",
+      "onRideSeconds": "Ubicación en viaje: entre {min} y {max} segundos."
     },
     "fares": {
       "title": "Tarifas",
@@ -556,6 +580,23 @@
       "faresHelp": "Cambios de tarifas o redondeo en Configuración y nuevos tramos. Solo otro admin los aprueba.",
       "broadcasts": "Notificaciones masivas",
       "broadcastsHelp": "Notificaciones a todos o a un rol completo. Las de un solo usuario salen al momento."
+    },
+    "app": {
+      "title": "Contacto y ubicación en la app",
+      "help": "Enlaces de soporte y legales, y cada cuánto envía su ubicación la app del motorizado. La app los lee al abrir, sin actualizarla. El mantenimiento y las pausas por ciudad están en",
+      "statusLink": "Estado de la app",
+      "whatsapp": "WhatsApp de soporte",
+      "whatsappHelp": "Con código de país, solo dígitos (p. ej. +584121234567).",
+      "supportEmail": "Correo de soporte",
+      "emergencyNumber": "Número de emergencias",
+      "emergencyNumberHelp": "El botón de emergencia lo marca. Solo dígitos.",
+      "termsUrl": "Enlace a los términos",
+      "privacyUrl": "Enlace a la política de privacidad",
+      "intervals": "Envío de ubicación del motorizado",
+      "intervalsHelp": "Menos segundos = mapa más preciso, pero más batería y datos.",
+      "onlineSeconds": "Conectado, sin viaje (segundos)",
+      "onRideSeconds": "En viaje (segundos)",
+      "secondsRange": "Entre {min} y {max} segundos."
     }
   },
   "paymentMethods": {
@@ -1544,6 +1585,17 @@
         "publish": "Publicó una actualización de JavaScript",
         "update": "Cambió una actualización de JavaScript",
         "revert": "Revirtió una actualización de JavaScript"
+      },
+      "app_status": {
+        "update": "Cambió el mantenimiento o las pausas"
+      },
+      "flag": {
+        "update": "Cambió una función"
+      },
+      "announcement": {
+        "create": "Creó un anuncio",
+        "update": "Editó un anuncio",
+        "delete": "Borró un anuncio"
       }
     },
     "entities": {
@@ -1567,7 +1619,9 @@
       "approval": "Aprobación",
       "legal": "Legal",
       "app_release": "Versión de la app",
-      "app_update": "Actualización de JavaScript"
+      "app_update": "Actualización de JavaScript",
+      "feature_flag": "Función",
+      "announcement": "Anuncio"
     }
   },
   "team": {
@@ -1819,5 +1873,219 @@
       "confirmRevertTitle": "Revertir {id}",
       "confirmRevert": "Se retira en el canal {channel} y las apps reciben una copia nueva de la actualización anterior que estaba al 100 % o, si no hay, vuelven al código del APK. El cambio se aplica la próxima vez que se abra la app."
     }
+  },
+  "control": {
+    "spanish": "Español",
+    "english": "Inglés",
+    "englishFallback": "Si lo dejas vacío, se muestra el texto en español",
+    "modes": {
+      "passenger": "Pasajeros",
+      "driver": "Motorizados"
+    }
+  },
+  "appStatus": {
+    "help": "Detén los viajes nuevos sin publicar una versión: mantenimiento en todas las ciudades o en algunas, o una pausa en una ciudad (lluvia fuerte, protestas, toque de queda). Los viajes en curso siguen; los motorizados conectados se desconectan al terminar su viaje.",
+    "readOnly": "Solo lectura: tu rol puede ver el estado, pero no cambiarlo.",
+    "onTitle": "Mantenimiento ACTIVO · {where}",
+    "onBody": "Nadie puede cotizar ni pedir viajes, y los motorizados no pueden conectarse. La app muestra este mensaje:",
+    "etaLine": "Hora estimada de regreso: {date}",
+    "pausedTitle": "Viajes pausados en {areas}",
+    "allGood": "La app funciona con normalidad en todas las ciudades.",
+    "maintenance": "Mantenimiento",
+    "maintenanceHelp": "Pantalla de mantenimiento en la app y sin viajes nuevos donde aplique.",
+    "on": "Activo",
+    "off": "Apagado",
+    "scope": "Dónde",
+    "scopeAll": "Todas las ciudades",
+    "scopeAreas": "Solo algunas ciudades",
+    "cities": "Ciudades",
+    "everywhere": "todas las ciudades",
+    "message": "Mensaje para los usuarios",
+    "messageHelp": "Explica qué pasa y qué pueden hacer. Máximo 300 caracteres.",
+    "eta": "Hora estimada de regreso",
+    "etaHelp": "Opcional. En la hora de tu navegador; la app la muestra en la hora del usuario.",
+    "fixErrors": "Falta completar:",
+    "turnOn": "Activar mantenimiento",
+    "saveChanges": "Guardar cambios",
+    "turnOff": "Desactivar mantenimiento",
+    "pauses": "Pausas por ciudad",
+    "pausesHelp": "Detén los viajes nuevos en una ciudad con su propio mensaje, sin tocar el resto.",
+    "addPause": "Pausar una ciudad",
+    "noPauses": "Ninguna ciudad pausada.",
+    "city": "Ciudad",
+    "noEta": "Sin hora estimada",
+    "editPause": "Editar pausa",
+    "removePause": "Reanudar",
+    "editPauseTitle": "Pausa en {area}",
+    "pauseModalHelp": "Nadie podrá pedir viajes ni conectarse como motorizado en esa ciudad hasta que la reanudes.",
+    "pauseMessageHelp": "Por ejemplo: «Pausamos los viajes por la lluvia. Volvemos en cuanto sea seguro».",
+    "continue": "Continuar",
+    "errors": {
+      "messageEs": "Escribe el mensaje en español.",
+      "areas": "Elige al menos una ciudad.",
+      "tooManyAreas": "Máximo 20 ciudades.",
+      "eta": "La hora estimada no es válida.",
+      "area": "Elige la ciudad.",
+      "duplicate": "Esa ciudad ya tiene una pausa."
+    },
+    "confirm": {
+      "maintenanceOn": {
+        "title": "¿Activar el mantenimiento?",
+        "body": "Se detienen los viajes nuevos en {where}: nadie podrá cotizar ni pedir, y los motorizados conectados se desconectan al terminar su viaje. Las apps se enteran en segundos."
+      },
+      "maintenanceUpdate": {
+        "title": "¿Guardar los cambios del mantenimiento?",
+        "body": "El mantenimiento sigue activo en {where} con el nuevo mensaje y la nueva hora estimada."
+      },
+      "maintenanceOff": {
+        "title": "¿Desactivar el mantenimiento?",
+        "body": "Los viajes vuelven a funcionar en {where} (salvo en las ciudades con pausa)."
+      },
+      "pauseAdd": {
+        "title": "¿Pausar {area}?",
+        "body": "Nadie podrá pedir viajes ni conectarse como motorizado en {area} hasta que la reanudes."
+      },
+      "pauseUpdate": {
+        "title": "¿Guardar la pausa de {area}?",
+        "body": "La app muestra el nuevo mensaje y la nueva hora estimada en {area}."
+      },
+      "pauseRemove": {
+        "title": "¿Reanudar {area}?",
+        "body": "Los viajes vuelven a funcionar en {area}."
+      }
+    },
+    "done": {
+      "maintenanceOn": "Mantenimiento activado",
+      "maintenanceUpdate": "Mantenimiento actualizado",
+      "maintenanceOff": "Mantenimiento desactivado",
+      "pauseAdd": "{area} pausada",
+      "pauseUpdate": "Pausa de {area} guardada",
+      "pauseRemove": "{area} reanudada"
+    }
+  },
+  "flags": {
+    "help": "Enciende o apaga funciones de la app sin publicar una versión, y decide quién las recibe. La app lo nota en unos minutos y la API también las bloquea cuando están apagadas.",
+    "readOnly": "Solo lectura: tu rol puede ver las funciones, pero no cambiarlas.",
+    "byDefault": "Por defecto",
+    "defaultIs": "por defecto: {value}",
+    "on": "Encendida",
+    "off": "Apagada",
+    "updated": "cambiada el {date} por {email}",
+    "whoGetsIt": "Quién la recibe:",
+    "saved": "Función {key} guardada",
+    "rules": {
+      "roles": "Tipo de cuenta",
+      "platforms": "Plataforma",
+      "areas": "Ciudades",
+      "emptyMeansAll": "Si no marcas ninguna, aplica a todas.",
+      "noAreas": "No se pudo cargar la lista de ciudades.",
+      "minBuild": "Build mínimo",
+      "minBuildHelp": "Solo apps con este número de build o más nuevo. Vacío = cualquiera.",
+      "anyBuild": "Cualquiera",
+      "percent": "Porcentaje de personas",
+      "percentHelp": "Cada persona cae siempre del mismo lado: subir el porcentaje solo suma gente."
+    },
+    "preview": {
+      "title": "Vista previa por cuenta",
+      "help": "Escribe el correo de una cuenta para saber si recibe esta función (según lo guardado). Lo que la API no sabe de ella, como su ciudad o su plataforma, no la excluye.",
+      "unsaved": "Tienes cambios sin guardar: la vista previa usa lo que está guardado.",
+      "email": "Correo de la cuenta",
+      "auto": "Según la cuenta",
+      "check": "Comprobar",
+      "yes": "{email} la recibe (como {role}).",
+      "no": "{email} no la recibe (como {role})."
+    },
+    "summary": {
+      "off": "nadie (está apagada).",
+      "nobody": "nadie (0 %).",
+      "who": {
+        "all": "todas las personas",
+        "passenger": "los pasajeros",
+        "driver": "los motorizados"
+      },
+      "percentOf": "{percent} % de {who}",
+      "inAreas": "en {areas}",
+      "onPlatforms": "que usan {platforms}",
+      "minBuild": "con build ≥ {build}"
+    }
+  },
+  "announcements": {
+    "help": "Banners dentro de la app para pasajeros, motorizados o ambos, por ciudad y con fecha de inicio y fin. Se muestran sin publicar una versión.",
+    "new": "Nuevo anuncio",
+    "create": "Crear anuncio",
+    "editTitle": "Editar anuncio",
+    "title": "Título",
+    "body": "Texto",
+    "status": "Estado",
+    "when": "Vigencia",
+    "audienceCol": "Para quién",
+    "reach": "Alcance",
+    "empty": "Todavía no hay anuncios.",
+    "until": "hasta {date}",
+    "seen": "{n} lo vieron",
+    "dismissed": "{n} lo cerraron ({rate})",
+    "notDismissible": "No se puede cerrar",
+    "actions": "Acciones",
+    "edit": "Editar",
+    "copy": "Duplicar",
+    "delete": "Borrar",
+    "style": "Estilo",
+    "styles": {
+      "info": "Informativo",
+      "warning": "Aviso",
+      "promo": "Promoción"
+    },
+    "statuses": {
+      "scheduled": "Programado",
+      "active": "Activo",
+      "ended": "Terminado"
+    },
+    "roles": "Tipo de cuenta",
+    "cities": "Ciudades",
+    "emptyMeansAll": "Si no marcas ninguna, lo ven todas.",
+    "startsAt": "Desde",
+    "endsAt": "Hasta",
+    "timeZone": "Fechas en la hora de tu navegador ({zone}).",
+    "dismissible": "Se puede cerrar",
+    "dismissibleHelp": "Muestra una X; quien lo cierra no lo vuelve a ver.",
+    "cta": "Botón",
+    "ctaHelp": "Opcional: un botón que abre una pantalla de la app o un enlace.",
+    "ctaLabel": "Texto del botón",
+    "ctaOpens": "Abre",
+    "ctaScreen": "Una pantalla de la app",
+    "ctaUrl": "Un enlace",
+    "ctaUrlHelp": "Debe empezar con https://",
+    "screens": {
+      "home": "Inicio",
+      "wallet": "Saldo",
+      "promotions": "Promociones",
+      "profile": "Perfil",
+      "about": "Acerca de",
+      "driver_signup": "Registro de motorizado"
+    },
+    "fixErrors": "Revisa el anuncio:",
+    "errors": {
+      "titleEs": "Escribe el título en español.",
+      "dates": "Indica la fecha de inicio y la de fin.",
+      "order": "El fin debe ser después del inicio.",
+      "tooManyAreas": "Máximo 20 ciudades.",
+      "ctaLabel": "Escribe el texto del botón en español.",
+      "ctaUrl": "El enlace del botón debe ser una dirección https:// válida."
+    },
+    "preview": "Así se verá",
+    "previewTitle": "Título del anuncio",
+    "previewButton": "Botón",
+    "audienceLine": "Lo verán: {audience}.",
+    "audience": {
+      "all": "Todos",
+      "passenger": "Pasajeros",
+      "driver": "Motorizados",
+      "inAreas": "{who} en {areas}"
+    },
+    "created": "Anuncio creado",
+    "updated": "Anuncio guardado",
+    "deleted": "Anuncio borrado",
+    "deleteTitle": "¿Borrar el anuncio?",
+    "deleteBody": "«{title}» deja de mostrarse en la app y se pierden sus números de alcance. Si solo quieres que termine, edita su fecha de fin."
   }
 }
