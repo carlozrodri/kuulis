@@ -41,6 +41,9 @@ RUNNER_TOKEN = os.environ.get("RUNNER_TOKEN", "")
 BASE_URL = os.environ.get("BASE_URL", "https://kuulis-qa.top8.uk").rstrip("/")
 PASSWORD = os.environ.get("LOADTEST_PASSWORD", "")
 NODE_EXPORTER_URL = os.environ.get("NODE_EXPORTER_URL", "")
+# CPUs the API server may use (its cpuset, e.g. "0,4,6,8"). node-exporter reports every CPU of the
+# physical host, so on a VM/LXC pinned to some of them the others would dilute the percentage.
+NODE_CPUS = {c.strip() for c in os.environ.get("NODE_CPUS", "").split(",") if c.strip()}
 PUSH_LATENCY_MS = int(os.environ.get("PUSH_LATENCY_MS", "150"))
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 SCRIPT = Path(os.environ.get("K6_SCRIPT", Path(__file__).resolve().parent.parent / "k6/kuulis.js"))
@@ -211,6 +214,9 @@ def _node_values(text: str) -> dict[str, float]:
     for line in text.splitlines():
         if line.startswith("node_cpu_seconds_total{"):
             mode = re.search(r'mode="(\w+)"', line)
+            cpu = re.search(r'cpu="(\w+)"', line)
+            if NODE_CPUS and (not cpu or cpu[1] not in NODE_CPUS):
+                continue
             seconds = float(line.rsplit(" ", 1)[1])
             values["cpu_total"] += seconds
             if mode and mode[1] == "iowait":
@@ -372,6 +378,53 @@ def _save_meta(run_dir: Path, meta: dict[str, Any]) -> None:
     (run_dir / "meta.json").write_text(json.dumps(meta, indent=1))
 
 
+async def prelogin(run_dir: Path, client: httpx.AsyncClient, emails: list[str], workers: int) -> dict:
+    """Sign riders and drivers in before the test, ``workers`` logins at a time.
+
+    Real users open the app already signed in (a token refresh), so the test starts from refresh
+    tokens instead of thousands of password logins in the ramp. It also measures how many password
+    logins per second the API sustains. Tokens go to ``tokens.json``, deleted after the run.
+    """
+    tokens: dict[str, str] = {}
+    durations: list[float] = []
+    errors: dict[str, int] = {}
+    pending = iter(emails)
+    started = time.monotonic()
+
+    async def sign_in() -> None:
+        for email in pending:
+            for _ in range(5):
+                began = time.monotonic()
+                try:
+                    res = await client.post("/auth/login", json={"email": email, "password": PASSWORD})
+                    status = str(res.status_code)
+                except httpx.HTTPError as exc:
+                    res, status = None, type(exc).__name__
+                durations.append((time.monotonic() - began) * 1000)
+                if res is not None and res.status_code == 200:
+                    tokens[email] = res.json()["refresh_token"]
+                    break
+                errors[status] = errors.get(status, 0) + 1
+                wait = 1.0
+                if res is not None and res.status_code == 429:
+                    wait = float(res.json().get("error", {}).get("details", {}).get("retry_after", 5))
+                await asyncio.sleep(wait)
+
+    await asyncio.gather(*(sign_in() for _ in range(workers)))
+    elapsed = time.monotonic() - started
+    (run_dir / "tokens.json").write_text(json.dumps(tokens))
+    return {
+        "accounts": len(emails),
+        "signed_in": len(tokens),
+        "workers": workers,
+        "seconds": round(elapsed, 1),
+        "logins_per_s": round(len(tokens) / elapsed, 1) if elapsed else None,
+        "p50_ms": _p(durations, 50),
+        "p95_ms": _p(durations, 95),
+        "errors": errors,
+    }
+
+
 async def _run(run_dir: Path, env: dict[str, str], options: dict[str, Any]) -> None:
     meta = _meta(run_dir)
     client = httpx.AsyncClient(base_url=f"{BASE_URL}/api/v1", timeout=30)
@@ -383,6 +436,18 @@ async def _run(run_dir: Path, env: dict[str, str], options: dict[str, Any]) -> N
         for n in range(1, admins + 1):
             tokens.append(await Admin(client, n).login())
         env["ADMIN_TOKENS"] = json.dumps(tokens)
+        if options.get("prelogin", True):
+            p_accounts = int(env.get("P_ACCOUNTS", 5000))
+            d_accounts = int(env.get("D_ACCOUNTS", 600))
+            emails = [f"lt-d{n:05d}@{DOMAIN}" for n in range(1, d_accounts + 1)]
+            emails += [f"lt-p{n:05d}@{DOMAIN}" for n in range(1, p_accounts + 1)]
+            meta["status"] = "signing_in"
+            _save_meta(run_dir, meta)
+            meta["prelogin"] = await prelogin(
+                run_dir, client, emails, int(options.get("prelogin_workers", 16))
+            )
+            _save_meta(run_dir, meta)
+            env["TOKENS_PATH"] = str(run_dir / "tokens.json")
         state["tasks"] = [asyncio.create_task(sample_node(run_dir))]
         if options.get("campaign_at"):
             state["tasks"].append(
@@ -419,6 +484,7 @@ async def _run(run_dir: Path, env: dict[str, str], options: dict[str, Any]) -> N
         meta["status"] = "failed"
         meta["error"] = repr(exc)
     finally:
+        (run_dir / "tokens.json").unlink(missing_ok=True)
         for task in state["tasks"]:
             task.cancel()
         await client.aclose()

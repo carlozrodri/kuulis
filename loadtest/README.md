@@ -39,6 +39,9 @@ notificación de la campaña ("Prueba de carga Kuulis (ignorar)").
    - `TARGET_IP=192.168.0.148` (opcional): entra por el Nginx Proxy Manager de la LAN sin depender
      del DNS público.
    - `NODE_EXPORTER_URL=http://<ip-del-servidor-de-la-api>:9100/metrics` (opcional).
+   - `NODE_CPUS` (opcional): CPUs que el servidor de la API puede usar, por ejemplo `0,4,6,8,10,11,15,19`
+     (`python -c "import os; print(os.sched_getaffinity(0))"` dentro de la API). node-exporter ve todos
+     los hilos de la máquina física; sin esto un LXC o VM con 8 de 20 hilos marca 40 % cuando está al 100 %.
    - `PUSH_LATENCY_MS=150`: lo que tarda Expo en responder.
 2. **node-exporter** en el servidor de la API (imagen `prom/node-exporter`, red del host, puerto
    9100) para medir CPU y RAM durante la prueba.
@@ -56,6 +59,12 @@ curl -X POST https://kuulis-carga.top8.uk/api/runs -H "Authorization: Bearer $RU
 curl https://kuulis-carga.top8.uk/api/runs/<id> -H "Authorization: Bearer $RUNNER_TOKEN"
 curl -X POST https://kuulis-carga.top8.uk/api/runs/<id>/stop -H "Authorization: Bearer $RUNNER_TOKEN"
 ```
+
+Antes de lanzar k6 el runner inicia sesión con todas las cuentas sintéticas (16 a la vez) y le pasa
+los refresh tokens: como en la vida real, los usuarios abren la app con la sesión ya iniciada (un
+refresh) en lugar de miles de logins con contraseña en la subida. Esa fase mide además cuántos logins
+por segundo aguanta la API (`prelogin` en `meta.json`). Opciones: `"prelogin": false` para no hacerlo,
+`"prelogin_workers"` para cambiar la concurrencia. Los tokens se borran al terminar.
 
 Los sockets de motorizados y de viajes se reconectan solos como en la app (1 s, duplicando hasta 30 s),
 y el viaje se vuelve a leer tras reconectar; `ws_reconnects` cuenta las reconexiones.
