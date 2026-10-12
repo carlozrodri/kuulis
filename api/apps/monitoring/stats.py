@@ -40,15 +40,38 @@ async def heartbeats() -> dict[str, float]:
     }
 
 
+# Per-process totals not yet written: minute -> [requests, 5xx, total ms]. One Redis write a
+# second instead of one per request (that write was ~5 % of the CPU of a simple request).
+_pending: dict[int, list[float]] = {}
+_last_flush = 0.0
+FLUSH_EVERY_SECONDS = 1.0
+
+
 async def record_request(status_code: int, duration_ms: float) -> None:
-    key = f"{HTTP_KEY}{int(time.time() // 60)}"
+    totals = _pending.setdefault(int(time.time() // 60), [0, 0, 0.0])
+    totals[0] += 1
+    totals[1] += status_code >= 500
+    totals[2] += duration_ms
+    if time.monotonic() - _last_flush >= FLUSH_EVERY_SECONDS:
+        await flush_requests()
+
+
+async def flush_requests() -> None:
+    global _last_flush
+    _last_flush = time.monotonic()
+    if not _pending:
+        return
+    pending = dict(_pending)
+    _pending.clear()
     try:
         async with redis_client.pipeline(transaction=False) as pipe:
-            pipe.hincrby(key, "total", 1)
-            if status_code >= 500:
-                pipe.hincrby(key, "errors", 1)
-            pipe.hincrbyfloat(key, "ms", duration_ms)
-            pipe.expire(key, HTTP_KEEP_SECONDS)
+            for minute, (total, errors, ms) in pending.items():
+                key = f"{HTTP_KEY}{minute}"
+                pipe.hincrby(key, "total", int(total))
+                if errors:
+                    pipe.hincrby(key, "errors", int(errors))
+                pipe.hincrbyfloat(key, "ms", ms)
+                pipe.expire(key, HTTP_KEEP_SECONDS)
             await pipe.execute()
     except RedisError:
         pass
@@ -56,6 +79,7 @@ async def record_request(status_code: int, duration_ms: float) -> None:
 
 async def http_totals(minutes: int) -> dict[str, float]:
     """Requests, 5xx and average latency over the last ``minutes`` complete or current minutes."""
+    await flush_requests()  # this process's latest ones too
     current = int(time.time() // 60)
     async with redis_client.pipeline(transaction=False) as pipe:
         for minute in range(current - minutes + 1, current + 1):
