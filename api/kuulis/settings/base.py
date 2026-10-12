@@ -70,6 +70,13 @@ class BaseAppSettings(BaseSettings):
     ACCOUNT_DELETION_GRACE_DAYS: int = 30
     STORAGE_MAX_UPLOAD_MB: int = 20
 
+    # --- App updates (doc 09) ---------------------------------------------------
+    # Private key (PEM, "\n" escapes allowed) that signs the OTA manifests. Its certificate ships
+    # inside the app (mobile/certs/updates-<APP_ENV>.pem). Empty: apps that expect a signature get
+    # 503 and keep the code they have.
+    UPDATES_SIGNING_KEY: str = ""
+    UPDATES_SIGNING_KEY_ID: str = "main"
+
     # --- Email (Resend) ---------------------------------------------------------
     RESEND_API_KEY: str = ""
     EMAIL_FROM: str = "Kuulis <no-reply@email.top8.uk>"

@@ -33,6 +33,7 @@
     "expo-status-bar": "~57.0.1",
     "expo-system-ui": "~57.0.4",
     "expo-task-manager": "~57.0.21",
+    "expo-updates": "~57.0.25",
     "i18next": "^26.4.2",
     "lucide-react-native": "^1.54.0",
     "react": "19.2.3",

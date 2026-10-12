@@ -1383,6 +1383,18 @@
       "download": "We could not download the update. Check your connection and try again.",
       "checksum": "The downloaded file does not match the published version, so we deleted it. Try again.",
       "installer": "We could not open the Android installer."
+    },
+    "ota": {
+      "bannerTitle": "An improvement is ready",
+      "bannerBody": "It applies the next time you open the app, or restart now.",
+      "restart": "Restart",
+      "restartNow": "Restart now",
+      "blocked": {
+        "ride": "You can restart when your ride ends. Meanwhile, the improvement applies the next time you open the app.",
+        "online": "Go offline to restart. We never close the app while you are online.",
+        "unknown": "Checking that you have no ride in progress…"
+      },
+      "restartError": "We could not restart. Close and reopen Kuulis to apply the improvement."
     }
   },
   "about": {
@@ -1401,6 +1413,11 @@
     "upToDate": "You have the latest version.",
     "available": "Kuulis {{version}} available",
     "availableBody": "{{size}} MB download.",
-    "unsupported": "This copy of Kuulis is not updated from here (development build, web or iPhone)."
+    "unsupported": "This copy of Kuulis is not updated from here (development build, web or iPhone).",
+    "update": "Update",
+    "embedded": "Included in the app",
+    "running": "{{id}} · {{date}}",
+    "jsReady": "Update ready: it applies the next time you open the app.",
+    "jsError": "We could not check for updates. Check your connection and try again."
   }
 }

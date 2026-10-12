@@ -324,7 +324,11 @@
     "build_not_found": "Esa compilación ya no está en el almacenamiento",
     "release_exists": "Esa compilación ya está publicada en ese canal",
     "storage_unavailable": "El almacenamiento de archivos no responde; prueba de nuevo en un momento.",
-    "storage_disabled": "El almacenamiento de archivos no está configurado en este entorno."
+    "storage_disabled": "El almacenamiento de archivos no está configurado en este entorno.",
+    "update_candidate_not_found": "Esa exportación ya no está en el almacenamiento",
+    "update_exists": "Esa exportación ya está publicada en ese canal",
+    "update_not_current": "Esa actualización ya no está activa; recarga la página",
+    "updates_signing_disabled": "La firma de actualizaciones no está configurada en este entorno."
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -1535,6 +1539,11 @@
       "app_release": {
         "publish": "Publicó una versión de la app",
         "update": "Cambió una versión de la app"
+      },
+      "app_update": {
+        "publish": "Publicó una actualización de JavaScript",
+        "update": "Cambió una actualización de JavaScript",
+        "revert": "Revirtió una actualización de JavaScript"
       }
     },
     "entities": {
@@ -1557,7 +1566,8 @@
       "staff_role": "Rol del equipo",
       "approval": "Aprobación",
       "legal": "Legal",
-      "app_release": "Versión de la app"
+      "app_release": "Versión de la app",
+      "app_update": "Actualización de JavaScript"
     }
   },
   "team": {
@@ -1762,6 +1772,52 @@
     "confirmRestore": "Se vuelve a ofrecer en el canal {channel} (si es la compilación más nueva) y, si es obligatoria, vuelve a bloquear las compilaciones más viejas.",
     "notesTitle": "Notas de {version} ({build})",
     "platform": "Plataforma",
-    "actions": "Acciones"
+    "actions": "Acciones",
+    "ota": {
+      "title": "Actualizaciones de JavaScript (OTA)",
+      "help": "Cambios del código JavaScript que llegan sin instalar un APK nuevo. Solo los reciben las apps compiladas con el mismo código nativo (runtime). La app los descarga en segundo plano y los aplica la próxima vez que se abre, nunca en medio de un viaje. El porcentaje elige una parte estable de los dispositivos: el mismo teléfono queda siempre dentro o fuera.",
+      "updates": "Actualizaciones publicadas",
+      "candidates": "Exportaciones disponibles",
+      "candidatesHelp": "Paquetes de JavaScript que subió el compilador para este entorno, del más nuevo al más viejo.",
+      "usage": "Uso por actualización",
+      "usageHelp": "Personas distintas que usaron cada actualización en los últimos 7 días.",
+      "update": "Actualización",
+      "commitMessage": "Commit y mensaje",
+      "runtime": "Runtime",
+      "rollout": "Alcance",
+      "message": "Mensaje",
+      "exported": "Exportada",
+      "bundleSize": "Paquete",
+      "files": "Archivos",
+      "percent": "{percent} %",
+      "paused": "Pausada",
+      "full": "Al 100 %",
+      "current": "Actual",
+      "rollbackKind": "Vuelve al código del APK",
+      "revertOf": "Reversión de {id}",
+      "embedded": "Código del APK",
+      "servingIn": "Actual en {channel}",
+      "pause": "Pausar (0 %)",
+      "widen": "Ampliar al 100 %",
+      "changePercent": "Cambiar porcentaje",
+      "editMessage": "Editar mensaje",
+      "revert": "Revertir",
+      "publishTitle": "Publicar actualización",
+      "publishHelp": "Las apps del canal elegido con el mismo runtime la descargarán y la aplicarán al volver a abrirse.",
+      "rolloutLabel": "Porcentaje de dispositivos",
+      "rolloutHelp": "Empieza con poco (10 %) para probar y amplía cuando veas que todo va bien. 0 % la deja pausada.",
+      "messageHelp": "Qué cambió. Hasta 500 caracteres.",
+      "publishedToast": "Actualización publicada en {channel}",
+      "updated": "Actualización cambiada",
+      "reverted": "Actualización revertida",
+      "percentTitle": "Porcentaje de {id}",
+      "messageTitle": "Mensaje de {id}",
+      "confirmPauseTitle": "Pausar {id}",
+      "confirmPause": "Deja de llegar a dispositivos nuevos del canal {channel}. Quienes ya la descargaron la conservan.",
+      "confirmFullTitle": "Ampliar {id} al 100 %",
+      "confirmFull": "Llegará a todas las apps del canal {channel} con el mismo runtime.",
+      "confirmRevertTitle": "Revertir {id}",
+      "confirmRevert": "Se retira en el canal {channel} y las apps reciben una copia nueva de la actualización anterior que estaba al 100 % o, si no hay, vuelven al código del APK. El cambio se aplica la próxima vez que se abra la app."
+    }
   }
 }

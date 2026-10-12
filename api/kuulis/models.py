@@ -20,6 +20,7 @@ from apps.releases.models import AppRelease  # noqa: F401
 from apps.rides.models import Rating, Ride, RideMessage, RideOffer  # noqa: F401
 from apps.staff.models import StaffRole  # noqa: F401
 from apps.subscriptions.models import Charge, FeeSchedule  # noqa: F401
+from apps.updates.models import AppUpdate  # noqa: F401
 from apps.users.models import SocialAccount, User  # noqa: F401
 from apps.wallet.models import TopUp, Wallet, WalletEntry  # noqa: F401
 from kuulis.core.models import Base

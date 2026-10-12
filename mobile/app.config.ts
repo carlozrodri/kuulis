@@ -40,6 +40,15 @@ const GOOGLE_SERVICES_FILE =
   process.env.GOOGLE_SERVICES_JSON ||
   (existsSync(`./google-services.${APP_ENV}.json`) ? `./google-services.${APP_ENV}.json` : undefined);
 
+/**
+ * JS updates over the air (doc 09) come from our own API, signed with the environment's key. The
+ * certificate ships in the app, so an update not signed by that key is refused. Without a certificate for
+ * the environment (local, or production until its key exists) updates stay off.
+ */
+const UPDATES_CERTIFICATE = `./certs/updates-${APP_ENV}.pem`;
+const UPDATES_ENABLED = APP_ENV !== 'local' && existsSync(UPDATES_CERTIFICATE);
+const UPDATES_CHANNEL = APP_ENV === 'production' ? 'production' : 'qa';
+
 const suffix = APP_ENV === 'production' ? '' : `.${APP_ENV}`;
 const nameSuffix = APP_ENV === 'production' ? '' : ` (${APP_ENV.toUpperCase()})`;
 
@@ -51,6 +60,23 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'kuulis',
   version: '1.0.0',
   orientation: 'portrait',
+  // Updates only reach builds with the same native code: the fingerprint changes with native dependencies
+  // and config, and then the compiler builds a new APK instead of an update.
+  runtimeVersion: { policy: 'fingerprint' },
+  updates: {
+    enabled: UPDATES_ENABLED,
+    url: `${API_URLS[APP_ENV]}/updates/manifest`,
+    // Checks on every launch in the background and applies on the next one: never restarts a ride.
+    checkAutomatically: 'ON_LOAD',
+    fallbackToCacheTimeout: 0,
+    requestHeaders: { 'expo-channel-name': UPDATES_CHANNEL },
+    ...(UPDATES_ENABLED
+      ? {
+          codeSigningCertificate: UPDATES_CERTIFICATE,
+          codeSigningMetadata: { keyid: 'main', alg: 'rsa-v1_5-sha256' as const },
+        }
+      : {}),
+  },
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
   ios: {
