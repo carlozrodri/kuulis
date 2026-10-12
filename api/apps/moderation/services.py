@@ -474,7 +474,7 @@ async def notes_counts(session: AsyncSession, report_ids: list[uuid.UUID]) -> di
         .where(ReportNote.report_id.in_(report_ids))
         .group_by(ReportNote.report_id)
     )
-    return dict(rows.tuples().all())
+    return dict(rows.all())
 
 
 async def notes(session: AsyncSession, report_id: uuid.UUID) -> list[ReportNote]:

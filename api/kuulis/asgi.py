@@ -82,9 +82,10 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestContextMiddleware)
     app.add_middleware(RestoreApiPrefixMiddleware)
 
+    # The API first: routes are tried in order on every request (health checks are few).
+    app.include_router(api_v1, prefix=settings.API_V1_PREFIX)
     app.include_router(root)
     app.include_router(root, prefix="/api")
-    app.include_router(api_v1, prefix=settings.API_V1_PREFIX)
     return app
 
 
