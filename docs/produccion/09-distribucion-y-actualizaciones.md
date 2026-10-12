@@ -94,6 +94,8 @@ vía para los pasajeros con iPhone.
    producción mientras seguimos en desarrollo.
 4. La versión mínima no es un número aparte: es la última versión **obligatoria** publicada en el canal.
    Marcar una versión como obligatoria bloquea los viajes de las anteriores; retirarla deshace el bloqueo.
+5. (2026-10-12) Carlos decidió dejar la PWA para iPhone fuera por ahora: la parte 3 queda pospuesta y el
+   doc 09 se cierra con las partes 1 y 2.
 
 ## Cómo quedó
 ### Parte 1 (2026-10-11)
