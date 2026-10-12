@@ -16,7 +16,8 @@ concurrentes mientras espera I/O).
 | Tareas async por proceso worker | 100 | `WORKER_MAX_ASYNC_TASKS` |
 | Conexiones Postgres máximas usadas | 4×15 + 2×10 = 80 (< 100 por defecto) | — |
 | Rate limit general | 120/min por IP | `RATE_LIMIT_DEFAULT` |
-| Rate limit login/registro | 10/min por IP | `RATE_LIMIT_AUTH` |
+| Rate limit login/registro | 20/min por IP | `RATE_LIMIT_AUTH` |
+| Rate limit renovar sesión | 600/min por IP (CGNAT: muchos usuarios por IP) | `RATE_LIMIT_REFRESH` |
 
 Además: `pool_pre_ping`, reciclado de conexiones cada 30 min, `max-requests` con jitter en gunicorn para
 evitar fugas de memoria, gzip, índices en email, rol, `user_id` y `(user_id, created_at)` de notificaciones,

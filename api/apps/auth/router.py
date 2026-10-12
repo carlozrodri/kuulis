@@ -107,7 +107,7 @@ async def admin_reauth(
 
 
 @router.post("/refresh", response_model=TokenPair)
-@limiter.limit("30/minute")
+@limiter.limit(settings.RATE_LIMIT_REFRESH)
 async def refresh(request: Request, data: RefreshRequest, session: DBSession) -> TokenPair:
     _, tokens = await services.rotate_refresh_token(session, data.refresh_token, request)
     return tokens

@@ -55,6 +55,9 @@ class BaseAppSettings(BaseSettings):
     RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_DEFAULT: str = "120/minute"
     RATE_LIMIT_AUTH: str = "20/minute"  # per IP; logins are also locked per email
+    # Per IP too, and many riders share one carrier-grade NAT address: a refresh token cannot be
+    # guessed, so this only guards against floods (30/minute logged real users out, doc 18).
+    RATE_LIMIT_REFRESH: str = "600/minute"
 
     # --- Storage (S3 compatible) ------------------------------------------------
     AWS_ACCESS_KEY_ID: str = ""
