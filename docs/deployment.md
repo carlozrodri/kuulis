@@ -320,7 +320,9 @@ App de Coolify en QA que compila el APK en nuestro servidor, sin la cola de EAS 
 - Variables: `EXPO_TOKEN`, `EXPO_OWNER` (las mismas de `kuulis-expo-qa`) y las `AWS_*` de la API de QA.
 - Volumen persistente en `/cache` (caché de Gradle y npm): acelera las siguientes compilaciones y evita
   recompilar el mismo código si el contenedor se reinicia.
-- Necesita unos 6 GB de RAM libres mientras compila; la imagen ocupa ~10 GB.
+- Compila solo para teléfonos (ARM: `armeabi-v7a`, `arm64-v8a`), no para emuladores, y con 4 hilos de Gradle
+  como máximo. Necesita unos 6 GB de RAM libres mientras compila; la imagen ocupa ~10 GB. Si se queda quieto en
+  el mismo paso de Gradle mucho rato, casi siempre es falta de memoria en la VM.
 - Junto a cada APK sube `<nombre>.json` con versión, build (`versionCode`), tamaño, SHA-256, MD5 y runtime.
   El perfil `qa` sube el build en cada compilación (`autoIncrement`, numerado por EAS).
 
