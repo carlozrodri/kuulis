@@ -1,6 +1,8 @@
 """Password hashing (Argon2) and JWT helpers."""
 
+import asyncio
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
@@ -22,6 +24,22 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed: str) -> tuple[bool, str | None]:
     """Returns (is_valid, new_hash_if_rehash_needed)."""
     return password_hasher.verify_and_update(password, hashed)
+
+
+# Argon2 takes ~100 ms of CPU and 64 MB on purpose. Run on the event loop it would freeze every
+# other request of the process meanwhile (doc 18 load test); a small pool keeps it off the loop
+# and caps the memory used by logins arriving together.
+_hash_pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="argon2")
+
+
+async def hash_password_async(password: str) -> str:
+    return await asyncio.get_running_loop().run_in_executor(_hash_pool, hash_password, password)
+
+
+async def verify_password_async(password: str, hashed: str) -> tuple[bool, str | None]:
+    return await asyncio.get_running_loop().run_in_executor(
+        _hash_pool, verify_password, password, hashed
+    )
 
 
 def create_token(

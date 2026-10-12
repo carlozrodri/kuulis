@@ -13,7 +13,7 @@ from apps.users.schemas import UserAdminCreate, UserAdminUpdate, UserCreate, Use
 from kuulis.core import storage
 from kuulis.core.exceptions import AppError, AuthenticationError, ConflictError, NotFoundError
 from kuulis.core.pagination import PageParams, paginate
-from kuulis.core.security import hash_password, verify_password
+from kuulis.core.security import hash_password_async, verify_password_async
 from kuulis.settings import settings
 
 
@@ -48,7 +48,7 @@ async def create_user(
         raise ConflictError("Email already registered", code="email_taken")
     user = User(
         email=email,
-        hashed_password=hash_password(data.password),
+        hashed_password=await hash_password_async(data.password),
         full_name=data.full_name,
         locale=data.locale,
         role=role,
@@ -68,9 +68,9 @@ async def authenticate(session: AsyncSession, email: str, password: str) -> User
     user = await get_by_email(session, email)
     if user is None or not user.hashed_password:
         # Hash anyway to keep timing similar for unknown emails.
-        hash_password(password)
+        await hash_password_async(password)
         raise AuthenticationError("Invalid email or password", code="invalid_credentials")
-    valid, new_hash = verify_password(password, user.hashed_password)
+    valid, new_hash = await verify_password_async(password, user.hashed_password)
     if not valid:
         raise AuthenticationError("Invalid email or password", code="invalid_credentials")
     restore_if_pending_deletion(user)
@@ -108,16 +108,16 @@ async def update_me(user: User, data: UserUpdateMe) -> User:
 
 
 async def change_password(user: User, current: str, new: str) -> None:
-    valid, _ = verify_password(current, user.hashed_password or "")
+    valid, _ = await verify_password_async(current, user.hashed_password or "")
     if not valid:
         raise AuthenticationError("Current password is incorrect", code="invalid_credentials")
     passwords.ensure_allowed(new)
-    user.hashed_password = hash_password(new)
+    user.hashed_password = await hash_password_async(new)
 
 
 async def set_password(user: User, new: str) -> None:
     passwords.ensure_allowed(new)
-    user.hashed_password = hash_password(new)
+    user.hashed_password = await hash_password_async(new)
 
 
 async def admin_update_user(user: User, data: UserAdminUpdate) -> User:
