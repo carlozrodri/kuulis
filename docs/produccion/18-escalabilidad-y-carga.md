@@ -71,5 +71,5 @@ Demostrar con mediciones que Kuulis aguanta **5000 usuarios activos al día** co
 02 (infraestructura final), 03 (métricas para medir).
 
 ## Preguntas para Carlos
-1. ¿Podemos usar QA con su servidor real para la prueba (afectará otros servicios de tu homelab durante
-   ~1 h)? Recomendado: sí, en un horario acordado.
+1. **Decidido (12-10-2026):** sí, QA en su servidor real; "pc grande" solo genera la carga. Resultados en
+   `docs/produccion/informe-carga.md`.
