@@ -147,6 +147,14 @@ def loadtest_report(since: str = typer.Option(..., help="ISO time the test start
     _loadtest(lambda s: services.report(s, datetime.fromisoformat(since)))
 
 
+@cli.command("loadtest-pgstats")
+def loadtest_pgstats(samples: int = 1, every: float = 5.0) -> None:
+    """Snapshot of Postgres connections, waits and slowest statements (run during a test)."""
+    from apps.loadtest import services
+
+    _loadtest(lambda s: services.pg_stats(s, samples, every))
+
+
 @cli.command("loadtest-clean")
 def loadtest_clean() -> None:
     """Deletes every synthetic account and what it produced."""

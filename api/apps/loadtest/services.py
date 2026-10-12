@@ -384,6 +384,66 @@ async def report(session: AsyncSession, since: datetime) -> dict[str, Any]:
     }
 
 
+# --- Database snapshot -------------------------------------------------------------------------
+
+
+async def pg_stats(session: AsyncSession, samples: int = 1, every: float = 5.0) -> dict[str, Any]:
+    """What Postgres is doing right now: connections by state and wait, the longest running
+    statements, and (with pg_stat_statements) the statements that took the most time."""
+    import asyncio
+
+    snapshots = []
+    for n in range(samples):
+        if n:
+            await asyncio.sleep(every)
+        by_state = await session.execute(
+            text(
+                "SELECT state, wait_event_type, wait_event, count(*) FROM pg_stat_activity "
+                "WHERE datname = current_database() GROUP BY 1, 2, 3 ORDER BY 4 DESC"
+            )
+        )
+        longest = await session.execute(
+            text(
+                "SELECT round(extract(epoch FROM now() - query_start)::numeric, 2), state, "
+                "wait_event, left(regexp_replace(query, '\\s+', ' ', 'g'), 200) "
+                "FROM pg_stat_activity WHERE datname = current_database() AND state <> 'idle' "
+                "AND pid <> pg_backend_pid() ORDER BY 1 DESC NULLS LAST LIMIT 10"
+            )
+        )
+        snapshots.append(
+            {
+                "at": datetime.now(UTC).isoformat(timespec="seconds"),
+                "connections": [list(r) for r in by_state],
+                "longest": [[float(r[0] or 0), r[1], r[2], r[3]] for r in longest],
+            }
+        )
+        await session.rollback()
+    settings_rows = await session.execute(
+        text(
+            "SELECT name, setting FROM pg_settings WHERE name IN ('max_connections', "
+            "'shared_buffers', 'work_mem', 'effective_cache_size', 'synchronous_commit')"
+        )
+    )
+    result: dict[str, Any] = {"settings": dict(list(settings_rows)), "snapshots": snapshots}
+    has_statements = await session.scalar(
+        text(
+            "SELECT count(*) FROM pg_extension WHERE extname = 'pg_stat_statements' "
+            "AND current_setting('shared_preload_libraries') LIKE '%pg_stat_statements%'"
+        )
+    )
+    if has_statements:
+        top = await session.execute(
+            text(
+                "SELECT calls, round(total_exec_time::numeric, 0), "
+                "round(mean_exec_time::numeric, 2), "
+                "left(regexp_replace(query, '\\s+', ' ', 'g'), 200) "
+                "FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 15"
+            )
+        )
+        result["top_statements"] = [[r[0], float(r[1]), float(r[2]), r[3]] for r in top]
+    return result
+
+
 # --- Clean -------------------------------------------------------------------------------------
 
 

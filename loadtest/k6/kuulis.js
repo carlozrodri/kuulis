@@ -54,6 +54,7 @@ if (SCENARIOS.includes('riders') && RIDER_POOL < RIDES) {
 const http5xx = new Counter('http_5xx');
 const httpUnexpected = new Counter('http_unexpected');
 const wsUnexpectedClose = new Counter('ws_unexpected_close');
+const wsReconnects = new Counter('ws_reconnects');
 const wsConnectMs = new Trend('ws_connect_ms', true);
 const offerDeliveryMs = new Trend('offer_delivery_ms', true); // offer created -> driver socket
 const rideAssignedMs = new Trend('ride_assigned_ms', true); // request -> driver_assigned event
@@ -207,14 +208,32 @@ class Session {
 }
 
 // One realtime socket. `on(event, fn)` handlers; `waitFor(event, test, ms)` resolves with the
-// matching data or null on timeout.
+// matching data or null on timeout. With `reconnect`, an unexpected close reopens the socket with
+// the same backoff as the app (1 s doubling up to 30 s), keeping the handlers.
 class Realtime {
-  constructor(session) {
+  constructor(session, reconnect = false) {
     this.session = session;
+    this.reconnect = reconnect;
+    this.attempts = 0;
+    this.opened = 0;
     this.handlers = {};
     this.waiters = [];
     this.closing = false;
     this.ready = null;
+  }
+
+  get isOpen() {
+    return Boolean(this.ws) && this.ws.readyState === 1;
+  }
+
+  retry() {
+    const delay = Math.min(30000, 1000 * 2 ** this.attempts);
+    this.attempts += 1;
+    setTimeout(() => {
+      if (this.closing) return;
+      wsReconnects.add(1);
+      this.session.fresh().then(() => this.open());
+    }, delay);
   }
 
   open() {
@@ -222,7 +241,12 @@ class Realtime {
     this.ready = new Promise((resolve) => {
       const ws = new WebSocket(WS_URL);
       this.ws = ws;
-      const timer = setTimeout(() => resolve(false), 15000);
+      const timer = setTimeout(() => {
+        resolve(false);
+        if (this.reconnect && !this.closing) {
+          try { ws.close(); } catch (e) { /* already closed */ }
+        }
+      }, 15000);
       ws.onopen = () => ws.send(JSON.stringify({ type: 'auth', token: this.session.access }));
       ws.onmessage = (msg) => {
         let parsed;
@@ -230,29 +254,39 @@ class Realtime {
         const { event, data } = parsed;
         if (event === 'ready') {
           clearTimeout(timer);
+          this.attempts = 0;
           wsConnectMs.add(Date.now() - started);
           resolve(true);
         } else if (event === 'auth.expiring') {
           this.session.fresh().then(() => this.send({ type: 'auth', token: this.session.access }));
         }
-        (this.handlers[event] || []).forEach((fn) => fn(data));
-        this.waiters = this.waiters.filter((w) => {
-          if (w.event !== event || !w.test(data)) return true;
-          clearTimeout(w.timer);
-          w.resolve(data);
-          return false;
-        });
+        this.emit(event, data);
+        if (event === 'ready' && this.opened++ > 0) this.emit('reconnected', null);
       };
       ws.onclose = (e) => {
         clearTimeout(timer);
         if (!this.closing) wsUnexpectedClose.add(1, { code: String(e && e.code) });
         resolve(false);
+        if (this.reconnect && !this.closing) {
+          this.retry();
+          return;
+        }
         this.waiters.forEach((w) => { clearTimeout(w.timer); w.resolve(null); });
         this.waiters = [];
       };
       ws.onerror = () => {};
     });
     return this.ready;
+  }
+
+  emit(event, data) {
+    (this.handlers[event] || []).forEach((fn) => fn(data));
+    this.waiters = this.waiters.filter((w) => {
+      if (w.event !== event || !w.test(data)) return true;
+      clearTimeout(w.timer);
+      w.resolve(data);
+      return false;
+    });
   }
 
   on(event, fn) {
@@ -312,12 +346,14 @@ export async function driver() {
   if (online.status !== 200) return;
   await session.call('GET', '/drivers/me/state', undefined, 'driver_state');
 
-  const rt = new Realtime(session);
-  if (!(await rt.open())) return;
+  // Like the app, a driver's socket reconnects on its own; locations only count while it is open.
+  const rt = new Realtime(session, true);
+  await rt.open();
   let busy = false;
 
   const tick = setInterval(() => {
     pos = { lat: pos.lat + jitter(-0.0004, 0.0004), lng: pos.lng + jitter(-0.0004, 0.0004) };
+    if (!rt.isOpen) return;
     rt.send({ type: 'location', lat: pos.lat, lng: pos.lng, heading: jitter(0, 359), speed: jitter(0, 12) });
     locationsSent.add(1);
   }, LOCATION_S * 1000);
@@ -395,8 +431,8 @@ async function rideOnce(session) {
   if (quote.status !== 200) return false;
   await sleep(jitter(2000, 5000)); // looking at the price
 
-  const rt = new Realtime(session);
-  if (!(await rt.open())) return false;
+  const rt = new Realtime(session, true);
+  if (!(await rt.open())) { rt.close(); return false; }
   const counter = { forwarded: 0 };
   rt.on('ride.driver_location', () => { counter.forwarded += 1; });
   // No try/finally: k6's JS engine (sobek) panics on finally blocks around await.
@@ -413,6 +449,12 @@ async function followRide(session, rt, quoteId) {
   if (created.status !== 201) return false;
   const id = created.json('id');
   const isRide = (d) => d && d.id === id;
+  // Like the app: after a reconnect, re-read the ride in case an update was missed.
+  rt.on('reconnected', () => {
+    session.call('GET', `/rides/${id}`, undefined, 'ride_get').then((res) => {
+      if (res.status === 200) rt.emit('ride.updated', res.json());
+    });
+  });
 
   const assigned = await rt.waitFor('ride.updated', (d) => isRide(d) && d.status !== 'searching', 200000);
   if (!assigned || assigned.status !== 'driver_assigned') {

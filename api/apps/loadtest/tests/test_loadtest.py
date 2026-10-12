@@ -92,3 +92,10 @@ async def test_report_and_clean() -> None:
     assert await _count(Ride) == 0
     assert await _count(User) == 1
     assert await _count(Notification) == 1
+
+
+async def test_pg_stats_snapshot() -> None:
+    async with SessionLocal() as session:
+        stats = await services.pg_stats(session, samples=2, every=0)
+    assert "max_connections" in stats["settings"]
+    assert len(stats["snapshots"]) == 2
