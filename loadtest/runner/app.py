@@ -26,6 +26,7 @@ import signal
 import time
 import uuid
 from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any
 
@@ -85,6 +86,35 @@ def _seconds(value: str | int | float) -> float:
     return float(match[1]) * {"s": 1, "m": 60, "h": 3600}[match[2] or "s"]
 
 
+# --- Clock -------------------------------------------------------------------------------------
+
+# Seconds to add to this machine's clock to get the API server's. TOTP codes and the offer
+# delivery times compare both clocks, and the load generator's may be off.
+clock = {"offset": 0.0}
+
+
+def server_time() -> float:
+    return time.time() + clock["offset"]
+
+
+async def measure_clock_offset(client: httpx.AsyncClient) -> float:
+    """Polls the API until its ``Date`` header (whole seconds) ticks over: at that moment the
+    server's clock is on the new second, which pins the offset to within the request time."""
+    previous = None
+    for _ in range(80):
+        before = time.time()
+        response = await client.get("/config/public")
+        after = time.time()
+        stamp = parsedate_to_datetime(response.headers["date"]).timestamp()
+        if previous is not None and stamp > previous:
+            clock["offset"] = round(stamp - (before + after) / 2, 3)
+            return clock["offset"]
+        previous = stamp
+        await asyncio.sleep(0.05)
+    clock["offset"] = round(previous - time.time() + 0.5, 3) if previous else 0.0
+    return clock["offset"]
+
+
 # --- Synthetic admins (same derivation as apps/loadtest/services.py) ---------------------------
 
 
@@ -103,11 +133,12 @@ class Admin:
 
     async def _code(self) -> str:
         """A code from a newer time step than the last one used (each works only once)."""
-        wait = (self.last_step + 1) * 30 - time.time()
+        wait = (self.last_step + 1) * 30 - server_time()
         if wait > 0:
             await asyncio.sleep(wait + 0.5)
-        self.last_step = int(time.time()) // 30
-        return self.totp.now()
+        now = server_time()
+        self.last_step = int(now) // 30
+        return self.totp.at(now)
 
     async def login(self) -> dict[str, str]:
         email = f"lt-a{self.n:05d}@{DOMAIN}"
@@ -331,6 +362,8 @@ async def _run(run_dir: Path, env: dict[str, str], options: dict[str, Any]) -> N
     meta = _meta(run_dir)
     client = httpx.AsyncClient(base_url=f"{BASE_URL}/api/v1", timeout=30)
     try:
+        meta["clock_offset_s"] = await measure_clock_offset(client)
+        env["CLOCK_OFFSET_MS"] = str(int(clock["offset"] * 1000))
         admins = int(options.get("admins", 5))
         tokens = []
         for n in range(1, admins + 1):

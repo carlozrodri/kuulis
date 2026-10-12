@@ -37,6 +37,8 @@ const LOCATION_S = parseFloat(__ENV.LOCATION_S || '4');
 const ARRIVE_S = parseFloat(__ENV.ARRIVE_S || '20');
 const TRIP_S = parseFloat(__ENV.TRIP_S || '60');
 const ADMIN_TOKENS = JSON.parse(__ENV.ADMIN_TOKENS || '[]');
+// API server clock minus this machine's (measured by the runner) for cross-machine times.
+const CLOCK_OFFSET_MS = parseInt(__ENV.CLOCK_OFFSET_MS || '0', 10);
 const SCENARIOS = (__ENV.SCENARIOS || 'drivers,riders,browsers,admins').split(',');
 const TOKEN_REFRESH_MS = 12 * 60 * 1000; // access tokens live 15 min
 // Ride flows run back to back: never more riders than accounts left after the browsers.
@@ -323,7 +325,7 @@ export async function driver() {
   rt.on('ride.offer', (offer) => {
     if (busy) return;
     const sentAt = Date.parse(offer.expires_at) - offerTimeoutS * 1000;
-    offerDeliveryMs.add(Math.max(0, Date.now() - sentAt));
+    offerDeliveryMs.add(Math.max(0, Date.now() + CLOCK_OFFSET_MS - sentAt));
     busy = true;
     driveRide(session, rt, offer).finally(() => { busy = false; });
   });
