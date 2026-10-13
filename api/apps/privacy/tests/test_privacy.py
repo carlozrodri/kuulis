@@ -215,7 +215,7 @@ async def test_download_my_data(client, passenger, recorder, monkeypatch):
         storage, "presigned_download", lambda key, ttl=None: f"https://s3/{key}?ttl={ttl}"
     )
 
-    async def send(to, subject, html):
+    async def send(to, subject, html, text=None):
         emails.append((to, subject, html))
         return True
 

@@ -83,6 +83,9 @@ construir. Las preguntas de cada documento están en su sección final.
 - **13** hecho (2026-10-13): conversación en cada reporte con fotos, push y CSAT; tiempos de respuesta con
   alerta y cierre automático; respuestas guardadas, etiquetas y métricas; centro de ayuda en app y web;
   objeto perdido con chat temporal; contacto sin cuenta desde la web. Abierto: quién atiende y en qué horario.
+- **14** hecho (2026-10-13): cada push abre su pantalla, canales de Android por tipo, preferencias y horario
+  silencioso, campañas segmentadas y programadas con resultados, emails con la marca y limpieza diaria.
+  Pendiente: sonido propio de la oferta (necesita APK) y Web Push (espera a la PWA).
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

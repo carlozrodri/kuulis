@@ -10,6 +10,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.notifications import emails
 from apps.notifications import services as notifications
 from apps.notifications import tasks as notification_tasks
 from apps.users.models import User
@@ -74,6 +75,9 @@ TEMPLATES: dict[str, dict[str, tuple[str, str]]] = {
     },
 }
 
+
+# Wallet and fee events that also send an email (doc 14), named like the email templates.
+EMAIL_EVENTS = frozenset({"top_up_credited", "fee_paid", "fee_pending"})
 
 _MONTHS = {
     "es": [
@@ -152,3 +156,5 @@ async def send(
     payload = {"type": kind, "event": event} | (data or {})
     await notifications.create_notifications(session, [user.id], title, body, payload)
     await notification_tasks.send_push.kiq([str(user.id)], title, body, payload)
+    if templates is None and event in EMAIL_EVENTS:
+        await emails.send_to_user(user.id, event, {k: str(v) for k, v in values.items()})

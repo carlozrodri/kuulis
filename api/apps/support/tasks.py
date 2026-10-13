@@ -4,7 +4,6 @@ the user for ``support.auto_close_days``."""
 
 import asyncio
 import contextlib
-import html
 import logging
 
 from taskiq import TaskiqEvents, TaskiqState
@@ -18,46 +17,20 @@ logger = logging.getLogger(__name__)
 CHECK_EVERY_SECONDS = 60
 _task: asyncio.Task | None = None
 
-EMAILS = {
-    "received": {
-        "es": (
-            "Recibimos tu mensaje",
-            "Hola, recibimos tu mensaje y te responderemos a este correo.",
-        ),
-        "en": ("We got your message", "Hi, we got your message and will answer to this email."),
-    },
-    "support_reply": {
-        "es": ("Respuesta de soporte de Kuulis", "Hola, te respondemos:"),
-        "en": ("Kuulis support answer", "Hi, here is our answer:"),
-    },
-    "report_resolved": {
-        "es": ("Respuesta de soporte de Kuulis", "Hola, te respondemos:"),
-        "en": ("Kuulis support answer", "Hi, here is our answer:"),
-    },
-    "report_closed_inactive": {
-        "es": ("Cerramos tu consulta", "Hola,"),
-        "en": ("We closed your request", "Hi,"),
-    },
-}
-FOOTER = {
-    "es": "Si necesitas algo más, responde a este correo o escríbenos desde {site}/contacto.",
-    "en": "If you need anything else, reply to this email or write to us at {site}/contacto.",
+# Ticket events -> email templates (apps/notifications/emails.py).
+EMAIL_TEMPLATES = {
+    "received": "support_received",
+    "support_reply": "support_reply",
+    "report_resolved": "support_reply",
+    "report_closed_inactive": "support_closed",
 }
 
 
 def ticket_email(locale: str, event: str, text: str) -> tuple[str, str, str]:
-    """Subject, HTML and plain text. The text is user or staff input: escaped."""
-    locale = locale if locale in ("es", "en") else "es"
-    subject, intro = EMAILS[event][locale]
-    site = settings.FRONTEND_URL.rstrip("/")
-    footer = FOOTER[locale].format(site=site)
-    quoted = html.escape(text).replace("\n", "<br>")
-    body = f"<p>{html.escape(intro)}</p>"
-    if text:
-        body += f"<blockquote>{quoted}</blockquote>"
-    body += f"<p>{html.escape(footer)}</p><p>Kuulis</p>"
-    plain = f"{intro}\n\n{text}\n\n{footer}\n\nKuulis" if text else f"{intro}\n\n{footer}"
-    return subject, body, plain
+    """Subject, HTML and plain text. The text is user or staff input: the template escapes it."""
+    from apps.notifications import emails
+
+    return emails.render(EMAIL_TEMPLATES[event], locale, {"text": text})
 
 
 @broker.task(task_name="support.send_ticket_email", retry_on_error=True, max_retries=3)

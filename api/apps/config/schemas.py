@@ -234,6 +234,22 @@ class SupportSettings(BaseModel):
     lost_item_chat_hours: int = Field(default=72, ge=1, le=24 * 14)
 
 
+class NotificationSettings(BaseModel):
+    """Notifications (doc 14): marketing limits, default quiet hours and housekeeping."""
+
+    # Marketing (campaigns) never goes out in these hours, Caracas time; each user can change
+    # their own window in the app. Equal values turn the default window off.
+    quiet_start: str = Field(default="21:00", pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+    quiet_end: str = Field(default="08:00", pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+    # At most this many marketing notifications per user per day (0 = no limit).
+    marketing_daily_cap: int = Field(default=1, ge=0, le=10)
+    # Inbox rows older than this are deleted; phones unused this long stop getting pushes.
+    inbox_retention_days: int = Field(default=90, ge=7, le=730)
+    device_idle_days: int = Field(default=60, ge=7, le=365)
+    # Drivers get a summary email of their month on the 1st.
+    monthly_summary: bool = True
+
+
 class VerificationSettings(BaseModel):
     """Ongoing driver verification (doc 12): expiring documents, the random live selfie,
     re-verification after reports and the optional induction."""
@@ -373,6 +389,9 @@ class AppConfig(BaseModel):
     # --- Support (doc 13) -------------------------------------------------------------------------
     support: SupportSettings = Field(default_factory=SupportSettings)
 
+    # --- Notifications (doc 14) ---------------------------------------------------------------
+    notifications: NotificationSettings = Field(default_factory=NotificationSettings)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -446,6 +465,7 @@ class AppConfigUpdate(BaseModel):
     safety: SafetySettings | None = None
     verification: VerificationSettings | None = None
     support: SupportSettings | None = None
+    notifications: NotificationSettings | None = None
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

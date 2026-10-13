@@ -94,6 +94,14 @@ DEFAULTS = {
         "lost_item_days": 7,
         "lost_item_chat_hours": 72,
     },
+    "notifications": {
+        "quiet_start": "21:00",
+        "quiet_end": "08:00",
+        "marketing_daily_cap": 1,
+        "inbox_retention_days": 90,
+        "device_idle_days": 60,
+        "monthly_summary": True,
+    },
 }
 
 

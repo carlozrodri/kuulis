@@ -45,6 +45,7 @@ from apps.drivers.schemas import (
 )
 from apps.files import metadata
 from apps.files.schemas import UploadResponse
+from apps.notifications import emails
 from apps.notifications import services as notifications
 from apps.notifications import tasks as notification_tasks
 from apps.users.models import User
@@ -757,6 +758,14 @@ def render(event: str, locale: str, **values: str) -> tuple[str, str]:
     return title.format(document=label, **values), body.format(document=label, **values)
 
 
+# Events that also send an email (doc 14), named like the email templates.
+EMAIL_EVENTS = {
+    "approved": "driver_approved",
+    "rejected": "driver_rejected",
+    "document_expiring": "document_expiring",
+}
+
+
 async def notify(
     session: AsyncSession,
     profile: DriverProfile,
@@ -786,3 +795,14 @@ async def notify(
     await notifications.create_notifications(session, [user.id], title, body, data)
     await session.commit()
     await notification_tasks.send_push.kiq([str(user.id)], title, body, data)
+    if event in EMAIL_EVENTS:
+        label = (
+            DOCUMENT_LABELS[user.locale if user.locale == "en" else "es"].get(document.kind, "")
+            if document is not None
+            else ""
+        )
+        await emails.send_to_user(
+            user.id,
+            EMAIL_EVENTS[event],
+            {"reason": reason or "", "document": label[:1].lower() + label[1:]} | (values or {}),
+        )

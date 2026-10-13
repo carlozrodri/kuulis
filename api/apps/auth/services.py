@@ -286,6 +286,10 @@ async def send_verification_email(user: User) -> None:
 async def verify_email(session: AsyncSession, token: str) -> User:
     payload = await consume_one_time_token(token, "email_verification")
     user = await users.get_or_404(session, uuid.UUID(payload["sub"]))
+    if not user.is_verified:
+        from apps.notifications import emails
+
+        await emails.send_to_user(user.id, "welcome", {"link": settings.FRONTEND_URL})
     user.is_verified = True
     return user
 
@@ -310,6 +314,15 @@ async def confirm_password_reset(session: AsyncSession, token: str, new_password
     user = await users.get_or_404(session, uuid.UUID(payload["sub"]))
     await users.set_password(user, new_password)
     await revoke_all(str(user.id))
+    await password_changed(user)
+
+
+async def password_changed(user: User) -> None:
+    """Tells the owner by email (doc 14): if it was not them, they can act."""
+    from apps.notifications import emails
+
+    link = f"{settings.FRONTEND_URL.rstrip('/')}/ayuda/no-puedo-entrar"
+    await emails.send_to_user(user.id, "password_changed", {"link": link})
 
 
 async def social_login(

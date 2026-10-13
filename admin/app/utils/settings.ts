@@ -1,4 +1,4 @@
-import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, PaymentMethod, RateSource, SafetySettings, ServiceArea, SupportSettings, VehicleType, VerificationSettings } from '~/types/api'
+import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, NotificationSettings, PaymentMethod, RateSource, SafetySettings, ServiceArea, SupportSettings, VehicleType, VerificationSettings } from '~/types/api'
 import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/types/api'
 
 /** Editable copy of AppConfig: decimals as numbers so they bind to numeric inputs. */
@@ -39,6 +39,7 @@ export interface SettingsForm {
   safety: SafetySettings
   verification: VerificationSettings
   support: SupportSettings
+  notifications: NotificationSettings
 }
 
 export const FARE_FIELDS = ['base', 'per_km', 'per_minute', 'minimum'] as const
@@ -100,6 +101,14 @@ export const SUPPORT_LIMITS = {
 export type SupportNumber = keyof typeof SUPPORT_LIMITS
 export const SUPPORT_NUMBERS = Object.keys(SUPPORT_LIMITS) as SupportNumber[]
 export const PROMISE_MAX = 120
+/** Doc 14: notification limits (same as the API validation). */
+export const NOTIFICATION_LIMITS = {
+  marketing_daily_cap: [0, 10],
+  inbox_retention_days: [7, 730],
+  device_idle_days: [7, 365],
+} as const
+export type NotificationNumber = keyof typeof NOTIFICATION_LIMITS
+export const NOTIFICATION_NUMBERS = Object.keys(NOTIFICATION_LIMITS) as NotificationNumber[]
 export const NOTICE_DAYS_MAX = 120
 export const NOTICE_DAYS_COUNT = 5
 /** Selfie and moto photos are taken on the spot: they never expire nor are optional. */
@@ -182,6 +191,14 @@ export function defaultSettings(): SettingsForm {
       lost_item_days: 7,
       lost_item_chat_hours: 72,
     },
+    notifications: {
+      quiet_start: '21:00',
+      quiet_end: '08:00',
+      marketing_daily_cap: 1,
+      inbox_retention_days: 90,
+      device_idle_days: 60,
+      monthly_summary: true,
+    },
   }
 }
 
@@ -257,6 +274,7 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
       expiry_notice_days: [...(config.verification?.expiry_notice_days ?? d.verification.expiry_notice_days)],
     },
     support: { ...d.support, ...config.support },
+    notifications: { ...d.notifications, ...config.notifications },
   }
 }
 
@@ -333,6 +351,7 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
       response_promise_es: form.support.response_promise_es.trim(),
       response_promise_en: form.support.response_promise_en.trim(),
     },
+    notifications: { ...form.notifications },
   }
 }
 
@@ -454,6 +473,16 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
   }
   if ([form.support.response_promise_es, form.support.response_promise_en].some(text => text.trim().length > PROMISE_MAX)) {
     issues.push({ key: 'supportPromise', params: { max: PROMISE_MAX } })
+  }
+  // Equal start and end is allowed: it means no default quiet hours.
+  if (!TIME.test(form.notifications.quiet_start) || !TIME.test(form.notifications.quiet_end)) {
+    issues.push({ key: 'quietHours' })
+  }
+  for (const key of NOTIFICATION_NUMBERS) {
+    const [min, max] = NOTIFICATION_LIMITS[key]
+    if (!between(Number(form.notifications[key]), min, max)) {
+      issues.push({ key: 'notificationNumber', params: { min, max } })
+    }
   }
   return issues
 }
