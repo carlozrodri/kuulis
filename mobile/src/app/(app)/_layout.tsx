@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { ConnectionBanner } from '@/components/ConnectionBanner';
 import { ToastHost } from '@/components/Toast';
 import { MaintenanceGate } from '@/features/control/MaintenanceScreen';
+import { NotificationOpener } from '@/features/notifications/NotificationOpener';
 import { DriverController, RideNavigator, RideSync } from '@/features/ride/RideController';
 import { SafetyController } from '@/features/safety/SafetyController';
 import { UpdateGate } from '@/features/update/UpdateGate';
@@ -57,6 +58,7 @@ export default function AppLayout() {
           <Stack.Screen name="profile/delete" />
           <Stack.Screen name="profile/about" />
           <Stack.Screen name="profile/settings" />
+          <Stack.Screen name="profile/notifications" />
           <Stack.Screen name="profile/legal" />
           <Stack.Screen name="profile/payment" />
           <Stack.Screen name="profile/frequent" />
@@ -66,6 +68,8 @@ export default function AppLayout() {
         <BootstrapSync />
         <RideSync />
         <RideNavigator />
+        {/* Doc 14: tapping a push (also the one that started the app) opens its screen. */}
+        <NotificationOpener />
         {mode === 'driver' ? <DriverController /> : null}
         {/* Trip safety (doc 11): "¿Todo bien?", the open SOS banner and its live position. */}
         <SafetyController />

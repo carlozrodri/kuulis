@@ -1177,6 +1177,62 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           </div>
         </UCard>
 
+        <!-- Doc 14: notifications -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.notifications.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.notifications.help') }}
+            </p>
+          </template>
+          <div class="space-y-6">
+            <div>
+              <div class="grid gap-4 sm:grid-cols-3">
+                <UFormField :label="t('settings.notifications.quietStart')">
+                  <UInput
+                    v-model="form.notifications.quiet_start"
+                    type="time"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+                <UFormField :label="t('settings.notifications.quietEnd')">
+                  <UInput
+                    v-model="form.notifications.quiet_end"
+                    type="time"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+              </div>
+              <p class="mt-1 text-xs text-(--ui-text-muted)">
+                {{ form.notifications.quiet_start === form.notifications.quiet_end ? t('settings.notifications.quietOff') : t('settings.notifications.quietHelp') }}
+              </p>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-3">
+              <UFormField
+                v-for="key in NOTIFICATION_NUMBERS"
+                :key="key"
+                :label="t(`settings.notifications.numbers.${key}`)"
+                :help="t(`settings.notifications.numbersHelp.${key}`, { min: NOTIFICATION_LIMITS[key][0], max: NOTIFICATION_LIMITS[key][1] })"
+              >
+                <UInputNumber
+                  v-model="form.notifications[key]"
+                  :min="NOTIFICATION_LIMITS[key][0]"
+                  :max="NOTIFICATION_LIMITS[key][1]"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+            </div>
+            <USwitch
+              v-model="form.notifications.monthly_summary"
+              :label="t('settings.notifications.monthlySummary')"
+              :description="t('settings.notifications.monthlySummaryHelp')"
+              :disabled="readOnly"
+            />
+          </div>
+        </UCard>
+
         <UAlert
           v-if="!readOnly && dirty && issues.length"
           color="error"

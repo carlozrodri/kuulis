@@ -58,9 +58,29 @@ export interface AppNotification {
   title: string;
   body: string;
   data: Record<string, unknown>;
+  /** Doc 14. Older API versions leave these out. */
+  category?: NotificationCategory | null;
+  /** App path ("/wallet") or https URL set by campaigns. */
+  deep_link?: string | null;
   read_at: string | null;
   created_at: string;
 }
+
+export type NotificationCategory = "transactional" | "safety" | "support" | "marketing";
+
+/** GET/PUT /notifications/preferences (doc 14). Times are "HH:MM", Caracas time. */
+export interface NotificationPreferences {
+  marketing_push: boolean;
+  marketing_email: boolean;
+  quiet_start: string;
+  quiet_end: string;
+  default_quiet_start: string;
+  default_quiet_end: string;
+}
+
+export type NotificationPreferencesUpdate = Partial<
+  Pick<NotificationPreferences, "marketing_push" | "marketing_email" | "quiet_start" | "quiet_end">
+>;
 
 // ── Phase 1A: configuration and drivers (docs/api/phase-1a.md) ──
 

@@ -78,3 +78,41 @@ profesionales y que el equipo pueda enviar campañas segmentadas y programadas s
 
 ## Preguntas para Carlos
 1. ¿Límite de campañas de marketing: 1 al día por usuario? Recomendado: sí, y ninguna en horario silencioso.
+   **Decidido** (recomendado): 1 al día, configurable en Ajustes → Notificaciones; en horario silencioso esperan.
+
+## Cómo quedó (2026-10-13)
+### API (`api/apps/notifications`)
+- **Categorías:** cada notificación de la bandeja tiene `category` (transactional, safety, support, marketing)
+  y un `deep_link` opcional. La migración clasifica las existentes por su `data.type`.
+- **Canales de Android:** la app crea `ride_offer`, `ride_updates`, `safety`, `account`, `marketing` y
+  `default`, y al registrar el teléfono dice cuáles tiene. El servidor elige el canal de cada push entre los
+  que ese teléfono reportó; a una app vieja le llega por `default` (un canal que no existe ocultaría el aviso).
+- **Preferencias:** `GET/PUT /notifications/preferences`. Solo se apaga el marketing (push y email por
+  separado). Horario silencioso por usuario, por defecto 21:00–08:00 Caracas.
+- **Campañas:** segmentos (pasajeros/motorizados, ciudad, activos o inactivos en N días, cuota pendiente,
+  nuevos sin viaje, versión de app, idioma), canales push, bandeja y email, programación, aprobación de dos
+  personas si está activa para envíos masivos, prueba a mí mismo y resultados (enviados, omitidos por motivo,
+  push entregados según los *receipts* de Expo, emails y abiertos). Al empezar se congela la lista de
+  destinatarios; quien está en horario silencioso espera, quien ya recibió marketing ese día se omite.
+- **Emails con la marca:** un diseño único (tabla con estilos en línea, probado para Gmail y Outlook) para todos
+  los correos, en es/en: confirmar correo, bienvenida, contraseña restablecida y cambiada, invitación, intentos
+  fallidos, motorizado aprobado/rechazado, documento por vencer, recarga acreditada, recibo y aviso de cuota,
+  resumen mensual del motorizado (el día 1), soporte, descarga de datos y eliminación de cuenta.
+- **Mantenimiento** (bucle del worker, latido `notifications`): campañas cada 30 s, *receipts* de Expo cada
+  15 min (tokens muertos se desactivan), y una vez al día se borran notificaciones de más de 90 días y se
+  desactivan teléfonos sin uso en 60 días. Todo configurable en `notifications` de los ajustes.
+### Admin
+- **Campañas** (lista, editor con alcance en vivo y vista de teléfono, prueba, programar, resultados en vivo),
+  **Plantillas de email** (vista previa es/en, diseño o texto, ancho de teléfono o escritorio) y el bloque
+  Notificaciones en Ajustes. La página de Notificaciones queda como **Envío rápido**.
+### App
+- Tocar cualquier push abre su pantalla, también con la app cerrada (tabla en `src/lib/notificationRoutes.ts`).
+- Perfil → Ajustes → Notificaciones: promociones por push y por email, lo que siempre llega, horario silencioso.
+- Bandeja agrupada por día, con ícono por tipo y "Marcar todo como leído".
+### Pendiente
+- **Sonido propio de la oferta y aviso a pantalla completa** para el motorizado: necesitan un APK nuevo (el
+  sonido va dentro de la app). Cuando se haga, ese APK crea el canal `ride_offer_sound` y el servidor ya lo
+  prefiere para las ofertas.
+- **Web Push para la PWA:** espera a la PWA de iPhone, que se pospuso en 09.
+- Probar en un Android físico que cada tipo de push abre su pantalla con la app cerrada.
+

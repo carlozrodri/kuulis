@@ -1,7 +1,6 @@
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { useQueryClient } from '@tanstack/react-query';
-import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 
@@ -11,12 +10,12 @@ import { rideKeys } from '@/hooks/useRides';
 import { answerCheckIn, refreshAlerts } from '@/hooks/useSafety';
 import { isSubscriptionNotification, isWalletNotification, refreshSubscription, refreshWallet } from '@/hooks/useWallet';
 import { api } from '@/lib/api';
+import { appVersion } from '@/lib/appVersion';
 import { config } from '@/lib/config';
 import i18n from '@/i18n';
+import { type ChannelId, type ChannelImportance, NOTIFICATION_CHANNELS, reportedChannels } from '@/lib/notificationChannels';
 import { isAccountNotification, isReportNotification } from '@/lib/reports';
 import { alertIdOf, checkInAnswerOf, isSafetyNotification, SAFETY_CATEGORY } from '@/lib/safety';
-import { supportHrefOf } from '@/lib/support';
-import { verificationHrefOf } from '@/lib/verification';
 import { useAuth } from '@/providers/AuthProvider';
 
 Notifications.setNotificationHandler({
@@ -27,6 +26,34 @@ Notifications.setNotificationHandler({
     shouldSetBadge: true,
   }),
 });
+
+const IMPORTANCE: Record<ChannelImportance, Notifications.AndroidImportance> = {
+  max: Notifications.AndroidImportance.MAX,
+  high: Notifications.AndroidImportance.HIGH,
+  default: Notifications.AndroidImportance.DEFAULT,
+  low: Notifications.AndroidImportance.LOW,
+};
+
+/**
+ * Creates (or renames, after a language change) the Android channels of doc 14 and returns the ids that exist.
+ * Android keeps a channel's importance and vibration as first created; only name and description update.
+ */
+async function createNotificationChannels(): Promise<string[]> {
+  const created = await Promise.all(
+    NOTIFICATION_CHANNELS.map((channel) =>
+      Notifications.setNotificationChannelAsync(channel.id, {
+        name: i18n.t(channel.nameKey),
+        description: i18n.t(channel.descriptionKey),
+        importance: IMPORTANCE[channel.importance],
+        ...(channel.vibrationPattern ? { vibrationPattern: channel.vibrationPattern, enableVibrate: true } : {}),
+        ...(channel.publicOnLockScreen ? { lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC } : {}),
+      })
+        .then((result) => (result ? channel.id : null))
+        .catch(() => null),
+    ),
+  );
+  return created.filter((id): id is ChannelId => id !== null);
+}
 
 /** Ride pushes carry {type: "ride.*" | "ride_*", ride_id, ...} (assumed; anything with a ride_id counts). */
 export function isRideNotification(payload: unknown): boolean {
@@ -86,13 +113,7 @@ export function usePushNotifications(enabled: boolean) {
       const data = r.notification.request.content.data;
       handle(data);
       answerFrom(r);
-      // Doc 13: a support answer opens the conversation (also the older "report" pushes); a lost item push
-      // opens the ride's lost item screen (the driver answers "Lo tengo / No lo tengo" there).
-      const support = supportHrefOf(data);
-      if (support) router.push(support);
-      // Doc 12: "Verifica tu identidad" opens the live selfie; expiring documents open Mis documentos.
-      const verification = support ? null : verificationHrefOf(data);
-      if (verification) router.push(verification);
+      // Opening the right screen (doc 14) is NotificationOpener's job, inside the signed-in navigator.
     });
     // A button pressed while the app was closed: the response is waiting here.
     void Notifications.getLastNotificationResponseAsync()
@@ -110,12 +131,7 @@ export function usePushNotifications(enabled: boolean) {
     if (!enabled || Platform.OS === 'web' || !Device.isDevice || !config.easProjectId) return;
 
     (async () => {
-      if (Platform.OS === 'android') {
-        await Notifications.setNotificationChannelAsync('default', {
-          name: 'default',
-          importance: Notifications.AndroidImportance.DEFAULT,
-        });
-      }
+      const channels = Platform.OS === 'android' ? await createNotificationChannels() : [];
       // Doc 11: action buttons of the "¿Todo bien?" push. "Estoy bien" answers in the background; asking for
       // help opens the app so the person can also call the emergency number.
       await Notifications.setNotificationCategoryAsync(SAFETY_CATEGORY, [
@@ -129,7 +145,13 @@ export function usePushNotifications(enabled: boolean) {
       const { data: pushToken } = await Notifications.getExpoPushTokenAsync({ projectId: config.easProjectId });
       await api('/notifications/devices', {
         method: 'POST',
-        body: { push_token: pushToken, platform: Platform.OS },
+        // Every start: the server refreshes last_seen_at, and only uses the channels this phone has (doc 14).
+        body: {
+          push_token: pushToken,
+          platform: Platform.OS,
+          channels: reportedChannels(Platform.OS, channels),
+          ...(appVersion.version ? { app_version: appVersion.version } : {}),
+        },
       });
     })().catch((error) => console.warn('Push registration failed', error));
   }, [enabled]);

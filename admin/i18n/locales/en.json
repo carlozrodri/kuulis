@@ -2,7 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "users": "Users",
-    "notifications": "Notifications",
+    "notifications": "Quick send",
     "profile": "My profile",
     "drivers": "Drivers",
     "settings": "Settings",
@@ -30,7 +30,9 @@
     "driverChecks": "Re-verifications",
     "cannedReplies": "Saved replies",
     "supportMetrics": "Support metrics",
-    "help": "Help center"
+    "help": "Help center",
+    "campaigns": "Campaigns",
+    "emailTemplates": "Email templates"
   },
   "auth": {
     "title": "Admin sign in",
@@ -248,7 +250,9 @@
     "title": "Title",
     "body": "Message",
     "send": "Send",
-    "queued": "Notification queued"
+    "queued": "Notification queued",
+    "quickTitle": "Quick send",
+    "quickHelp": "A notice that goes out right away to everyone, a role or one person. To pick who gets it, schedule it and see results, use Campaigns."
   },
   "profile": {
     "changePassword": "Change password",
@@ -382,7 +386,10 @@
     "help_article_not_found": "The article does not exist",
     "attachment_invalid": "A photo is not valid; remove it and upload it again",
     "file_type_not_allowed": "That file type is not allowed",
-    "file_too_large": "The file is too large"
+    "file_too_large": "The file is too large",
+    "campaign_not_found": "We could not find that campaign",
+    "campaign_not_editable": "That campaign was already sent or cancelled: it cannot change",
+    "email_template_not_found": "We could not find that template"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -527,7 +534,9 @@
       "noticeDays": "Expiry notices: up to {count} values between 1 and {max} days",
       "verificationNumber": "Driver verification: values must be between {min} and {max}",
       "supportNumber": "Support: values must be between {min} and {max}",
-      "supportPromise": "Support: the response promise has at most {max} characters"
+      "supportPromise": "Support: the response promise has at most {max} characters",
+      "quietHours": "Quiet hours must be HH:MM",
+      "notificationNumber": "Notifications: values must be between {min} and {max}"
     },
     "fares": {
       "title": "Fares",
@@ -622,8 +631,8 @@
       "adjustLimitHelp": "Adjustments above this amount, credit or debit, wait for approval. 0 turns it off.",
       "fares": "Fares and subscription fee schedules",
       "faresHelp": "Fare or rounding changes in Settings and new fee schedules. Only another admin can approve them.",
-      "broadcasts": "Mass notifications",
-      "broadcastsHelp": "Notifications to everyone or a whole role. Single-user ones go out right away."
+      "broadcasts": "Mass notifications and campaigns",
+      "broadcastsHelp": "Notifications to everyone or a whole role, and sending campaigns. Single-user ones go out right away."
     },
     "app": {
       "title": "Contact and location in the app",
@@ -712,6 +721,26 @@
       "promiseHelp": "What the app and the website show when writing. Empty = hidden. At most {max} characters.",
       "autoAssign": "Assign tickets automatically",
       "autoAssignHelp": "Each new ticket goes to the staff member with support permission and the fewest open tickets."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "help": "Quiet hours, the marketing limit, inbox cleanup and the drivers' monthly summary.",
+      "quietStart": "Quiet from",
+      "quietEnd": "Quiet until",
+      "quietHelp": "Caracas time. No campaigns go out in these hours: they wait until they end. Each person can change their own in the app.",
+      "quietOff": "Same start and end: no default quiet hours.",
+      "numbers": {
+        "marketing_daily_cap": "Marketing per person per day",
+        "inbox_retention_days": "Keep the inbox (days)",
+        "device_idle_days": "Unused phone (days)"
+      },
+      "numbersHelp": {
+        "marketing_daily_cap": "Most campaigns each person gets in a day. 0 = no limit. Between {min} and {max}.",
+        "inbox_retention_days": "Older notifications are deleted from the inbox. Between {min} and {max}.",
+        "device_idle_days": "A phone that does not open the app in this many days stops getting push. Between {min} and {max}."
+      },
+      "monthlySummary": "Monthly summary email to drivers",
+      "monthlySummaryHelp": "On the 1st of each month every driver gets an email with last month's rides and earnings."
     }
   },
   "paymentMethods": {
@@ -1831,6 +1860,9 @@
       },
       "notification": {
         "broadcast": "Mass notification"
+      },
+      "campaign": {
+        "send": "Campaign send"
       }
     }
   },
@@ -2679,5 +2711,217 @@
     "position": "Position",
     "positionHelp": "Order within the topic (lowest first).",
     "stats": "Statistics"
+  },
+  "campaigns": {
+    "new": "New campaign",
+    "empty": "No campaigns yet",
+    "allStatuses": "All statuses",
+    "name": "Name",
+    "nameHelp": "Only the team sees it.",
+    "status": "Status",
+    "audience": "Audience",
+    "whenCol": "Date",
+    "results": "Results",
+    "sentCount": "{n} sent",
+    "openedShort": "{rate} opened",
+    "createdBy": "Created by",
+    "details": "Details",
+    "fixErrors": "Please check these points",
+    "statuses": {
+      "draft": "Draft",
+      "pending_approval": "Waiting for approval",
+      "scheduled": "Scheduled",
+      "sending": "Sending",
+      "sent": "Sent",
+      "cancelled": "Cancelled"
+    },
+    "when": {
+      "sentAt": "Finished",
+      "cancelledAt": "Cancelled",
+      "startedAt": "Started",
+      "scheduledFor": "Scheduled for",
+      "createdAt": "Created"
+    },
+    "audiences": {
+      "all": "Everyone",
+      "passengers": "Passengers",
+      "drivers": "Drivers"
+    },
+    "channels": {
+      "push": "Push",
+      "inbox": "Inbox",
+      "email": "Email"
+    },
+    "channelsHelp": {
+      "push": "A notice on the phone. It also stays in the inbox.",
+      "inbox": "Only in the app's notification inbox.",
+      "email": "An email with the campaign template."
+    },
+    "summary": {
+      "all": "Everyone",
+      "passengers": "Passengers",
+      "drivers": "Drivers",
+      "inCities": "{who} in {cities}",
+      "active": "signed in within the last {n} days",
+      "inactive": "not signed in for {n} days",
+      "feePending": "with a pending fee",
+      "newWithoutRide": "new accounts ({n} days) without rides",
+      "versionBelow": "app below {version}",
+      "locale": {
+        "es": "in Spanish",
+        "en": "in English"
+      }
+    },
+    "segment": {
+      "title": "Audience",
+      "help": "Each condition you tick narrows the group: all of them must match.",
+      "audience": "For",
+      "locale": "App language",
+      "anyLocale": "Any language",
+      "cities": "Cities",
+      "citiesHelp": "None ticked = all. Drivers by their city, passengers by where they rode in the last 90 days.",
+      "active": "Signed in to the app within the last",
+      "inactive": "Have not signed in to the app for",
+      "newWithoutRide": "New accounts without any ride, created within the last",
+      "days": "days",
+      "versionBelow": "With an app version below",
+      "feePending": "Drivers with a pending fee",
+      "feePendingHelp": "Only reaches drivers who have not paid this month's fee yet.",
+      "summary": "Who:"
+    },
+    "message": {
+      "title": "Message",
+      "channels": "Channels",
+      "spanish": "Spanish",
+      "english": "English (optional)",
+      "englishHelp": "If you leave it empty, people using the app in English get the Spanish text.",
+      "titleField": "Title",
+      "body": "Text",
+      "deepLink": "Tapping it opens",
+      "deepLinkHelp": "An app screen (starts with /) or an https:// link. Empty = opens the inbox."
+    },
+    "links": {
+      "home": "Home",
+      "wallet": "Wallet",
+      "invite": "Invite friends",
+      "help": "Help center",
+      "inbox": "Notifications"
+    },
+    "schedule": {
+      "title": "When",
+      "now": "Send now",
+      "later": "Schedule",
+      "timeZone": "This is your computer's time ({zone})."
+    },
+    "reach": {
+      "title": "Reach",
+      "people": "people match these conditions today",
+      "withPush": "With push",
+      "passengers": "Passengers",
+      "drivers": "Drivers",
+      "help": "An estimate: when sending, people who turned marketing off or already got a campaign today are left out.",
+      "fixSegment": "Fix the audience to see how many people it reaches.",
+      "failed": "We could not count the reach."
+    },
+    "preview": {
+      "title": "Preview",
+      "placeholderTitle": "Campaign title",
+      "now": "now",
+      "inbox": "Notifications",
+      "noPush": "No push: it only shows in the inbox.",
+      "noInbox": "It does not show in the inbox.",
+      "opens": "Tapping it opens {link}",
+      "email": "It is also sent by email.",
+      "fallback": "No English text: showing the Spanish one."
+    },
+    "rules": {
+      "title": "How it is sent",
+      "cap": "Each person gets at most 1 marketing message a day (change it in Settings).",
+      "quiet": "Never during each person's quiet hours: their message waits until they end.",
+      "optOut": "People who turned marketing off in the app do not get it."
+    },
+    "actions": {
+      "saveDraft": "Save draft",
+      "test": "Send me a test",
+      "sendNow": "Send now",
+      "schedule": "Schedule",
+      "cancel": "Cancel campaign",
+      "duplicate": "Duplicate",
+      "delete": "Delete"
+    },
+    "pendingTitle": "Waiting for a second approval",
+    "pendingHelp": "Someone else on the team must approve sending it in Approvals. If you change it, it goes back to draft and must be requested again.",
+    "scheduledTitle": "Scheduled for {date}",
+    "scheduledHelp": "You can change or cancel it until it starts going out.",
+    "confirmSend": {
+      "title": "Send the campaign?",
+      "reach": "It will reach about {n} people, {when}.",
+      "now": "right now",
+      "at": "on {date}",
+      "rules": "Each person's daily limit and quiet hours are respected, and people who turned marketing off are skipped.",
+      "noCount": "It will be sent {when}."
+    },
+    "confirmCancel": {
+      "title": "Cancel the campaign?",
+      "body": "People who have not got it yet will not get it. What was already sent cannot be undone."
+    },
+    "confirmDelete": {
+      "title": "Delete the draft?",
+      "body": "«{name}» will be deleted. This cannot be undone."
+    },
+    "toast": {
+      "saved": "Campaign saved",
+      "testSent": "Test sent to your account",
+      "testWays": "Check: {ways}.",
+      "scheduled": "Campaign scheduled",
+      "sending": "The campaign starts going out in a few seconds",
+      "cancelled": "Campaign cancelled",
+      "duplicated": "Copy created as a draft",
+      "deleted": "Draft deleted"
+    },
+    "stats": {
+      "title": "Results",
+      "live": "Refreshes every 5 seconds",
+      "progress": "{done} of {total} processed, {pending} to go",
+      "targeted": "Audience",
+      "sent": "Sent",
+      "pushed": "Push to phones",
+      "delivered": "Push delivered",
+      "ofPushed": "{rate} of push",
+      "emailed": "Emails",
+      "opened": "Opened",
+      "openRate": "Open rate",
+      "skipped": "Skipped",
+      "skippedWhy": "Why they were skipped",
+      "skipped_opt_out": "Turned marketing off",
+      "skipped_cap": "Already got one today",
+      "skipped_no_channel": "No channel available",
+      "help": "Opened = read in the inbox or tapped the push. The open rate is over the ones sent."
+    },
+    "errors": {
+      "name": "Give it a name of 2 to 120 characters",
+      "days": "Days must be between {min} and {max}",
+      "activeInactive": "«Have not signed in for» must be smaller than «Signed in within the last»",
+      "version": "The version must look like 1.4.0",
+      "cities": "Pick at most 20 cities",
+      "channels": "Pick at least one channel",
+      "titleEs": "The Spanish title is missing",
+      "titleEn": "If you write the English text, give it a title too",
+      "tooLong": "Titles have at most 120 characters and texts 1000",
+      "deepLink": "The link must start with / (an app screen) or https://",
+      "scheduleMissing": "Pick the send date and time",
+      "schedulePast": "The send date has already passed"
+    }
+  },
+  "emailTemplates": {
+    "help": "How the emails arrive, with sample data.",
+    "empty": "No templates",
+    "subject": "Subject:",
+    "html": "Design",
+    "text": "Plain text",
+    "desktop": "Desktop",
+    "phone": "Phone",
+    "frameTitle": "Preview of the {name} email",
+    "sample": "Names, amounts and dates are samples."
   }
 }

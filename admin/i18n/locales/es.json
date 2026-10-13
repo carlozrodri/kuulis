@@ -2,7 +2,7 @@
   "nav": {
     "dashboard": "Panel",
     "users": "Usuarios",
-    "notifications": "Notificaciones",
+    "notifications": "Envío rápido",
     "profile": "Mi perfil",
     "drivers": "Motorizados",
     "settings": "Configuración",
@@ -30,7 +30,9 @@
     "driverChecks": "Reverificaciones",
     "cannedReplies": "Respuestas guardadas",
     "supportMetrics": "Métricas de soporte",
-    "help": "Centro de ayuda"
+    "help": "Centro de ayuda",
+    "campaigns": "Campañas",
+    "emailTemplates": "Plantillas de email"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -248,7 +250,9 @@
     "title": "Título",
     "body": "Mensaje",
     "send": "Enviar",
-    "queued": "Notificación en cola de envío"
+    "queued": "Notificación en cola de envío",
+    "quickTitle": "Envío rápido",
+    "quickHelp": "Un aviso que sale al momento a todos, a un rol o a una persona. Para elegir a quién, programar la hora y ver resultados, usa Campañas."
   },
   "profile": {
     "changePassword": "Cambiar contraseña",
@@ -382,7 +386,10 @@
     "help_article_not_found": "El artículo no existe",
     "attachment_invalid": "Una foto no es válida; quítala y súbela de nuevo",
     "file_type_not_allowed": "Ese tipo de archivo no está permitido",
-    "file_too_large": "El archivo es demasiado grande"
+    "file_too_large": "El archivo es demasiado grande",
+    "campaign_not_found": "No encontramos esa campaña",
+    "campaign_not_editable": "Esa campaña ya salió o se canceló: no se puede cambiar",
+    "email_template_not_found": "No encontramos esa plantilla"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -527,7 +534,9 @@
       "noticeDays": "Avisos de vencimiento: hasta {count} valores entre 1 y {max} días",
       "verificationNumber": "Verificación de motorizados: los valores deben estar entre {min} y {max}",
       "supportNumber": "Soporte: los valores deben estar entre {min} y {max}",
-      "supportPromise": "Soporte: la promesa de respuesta tiene máximo {max} caracteres"
+      "supportPromise": "Soporte: la promesa de respuesta tiene máximo {max} caracteres",
+      "quietHours": "El horario silencioso debe ser HH:MM",
+      "notificationNumber": "Notificaciones: los valores deben estar entre {min} y {max}"
     },
     "fares": {
       "title": "Tarifas",
@@ -622,8 +631,8 @@
       "adjustLimitHelp": "Los ajustes por encima de este monto, a favor o en contra, esperan aprobación. 0 la desactiva.",
       "fares": "Tarifas y tramos de suscripción",
       "faresHelp": "Cambios de tarifas o redondeo en Configuración y nuevos tramos. Solo otro admin los aprueba.",
-      "broadcasts": "Notificaciones masivas",
-      "broadcastsHelp": "Notificaciones a todos o a un rol completo. Las de un solo usuario salen al momento."
+      "broadcasts": "Notificaciones masivas y campañas",
+      "broadcastsHelp": "Notificaciones a todos o a un rol completo, y el envío de campañas. Las de un solo usuario salen al momento."
     },
     "app": {
       "title": "Contacto y ubicación en la app",
@@ -712,6 +721,26 @@
       "promiseHelp": "Lo que muestran la app y la web al escribir. Vacío = no se muestra. Máximo {max} caracteres.",
       "autoAssign": "Asignar tickets automáticamente",
       "autoAssignHelp": "Cada ticket nuevo va a la persona del equipo con permiso de soporte que tenga menos tickets abiertos."
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "help": "Horario silencioso, límite de marketing, limpieza de la bandeja y el resumen mensual de los motorizados.",
+      "quietStart": "Silencio desde",
+      "quietEnd": "Silencio hasta",
+      "quietHelp": "Hora de Caracas. En ese horario no salen campañas: esperan a que termine. Cada persona puede cambiar el suyo en la app.",
+      "quietOff": "Misma hora de inicio y fin: sin horario silencioso por defecto.",
+      "numbers": {
+        "marketing_daily_cap": "Marketing por persona al día",
+        "inbox_retention_days": "Guardar la bandeja (días)",
+        "device_idle_days": "Teléfono sin uso (días)"
+      },
+      "numbersHelp": {
+        "marketing_daily_cap": "Máximo de campañas que recibe cada persona en un día. 0 = sin límite. Entre {min} y {max}.",
+        "inbox_retention_days": "Las notificaciones más viejas se borran de la bandeja. Entre {min} y {max}.",
+        "device_idle_days": "Un teléfono que no abre la app en estos días deja de recibir push. Entre {min} y {max}."
+      },
+      "monthlySummary": "Resumen mensual por email a los motorizados",
+      "monthlySummaryHelp": "El día 1 de cada mes cada motorizado recibe un email con sus viajes y ganancias del mes anterior."
     }
   },
   "paymentMethods": {
@@ -1831,6 +1860,9 @@
       },
       "notification": {
         "broadcast": "Notificación masiva"
+      },
+      "campaign": {
+        "send": "Envío de campaña"
       }
     }
   },
@@ -2679,5 +2711,217 @@
     "position": "Posición",
     "positionHelp": "Orden dentro del tema (menor primero).",
     "stats": "Estadísticas"
+  },
+  "campaigns": {
+    "new": "Nueva campaña",
+    "empty": "Todavía no hay campañas",
+    "allStatuses": "Todos los estados",
+    "name": "Nombre",
+    "nameHelp": "Solo lo ve el equipo.",
+    "status": "Estado",
+    "audience": "Destinatarios",
+    "whenCol": "Fecha",
+    "results": "Resultados",
+    "sentCount": "{n} enviadas",
+    "openedShort": "{rate} abiertas",
+    "createdBy": "Creada por",
+    "details": "Detalles",
+    "fixErrors": "Revisa estos puntos",
+    "statuses": {
+      "draft": "Borrador",
+      "pending_approval": "Esperando aprobación",
+      "scheduled": "Programada",
+      "sending": "Enviando",
+      "sent": "Enviada",
+      "cancelled": "Cancelada"
+    },
+    "when": {
+      "sentAt": "Terminó",
+      "cancelledAt": "Cancelada",
+      "startedAt": "Empezó",
+      "scheduledFor": "Programada para",
+      "createdAt": "Creada"
+    },
+    "audiences": {
+      "all": "Todos",
+      "passengers": "Pasajeros",
+      "drivers": "Motorizados"
+    },
+    "channels": {
+      "push": "Push",
+      "inbox": "Bandeja",
+      "email": "Email"
+    },
+    "channelsHelp": {
+      "push": "Aviso en el teléfono. También queda en la bandeja.",
+      "inbox": "Solo en la bandeja de notificaciones de la app.",
+      "email": "Email con la plantilla de campañas."
+    },
+    "summary": {
+      "all": "Todos",
+      "passengers": "Pasajeros",
+      "drivers": "Motorizados",
+      "inCities": "{who} en {cities}",
+      "active": "entraron en los últimos {n} días",
+      "inactive": "sin entrar hace {n} días",
+      "feePending": "con cuota pendiente",
+      "newWithoutRide": "cuentas nuevas ({n} días) sin viajes",
+      "versionBelow": "app menor a {version}",
+      "locale": {
+        "es": "en español",
+        "en": "en inglés"
+      }
+    },
+    "segment": {
+      "title": "Destinatarios",
+      "help": "Cada condición que marques reduce el grupo: deben cumplirse todas.",
+      "audience": "Para",
+      "locale": "Idioma de la app",
+      "anyLocale": "Cualquier idioma",
+      "cities": "Ciudades",
+      "citiesHelp": "Sin marcar = todas. Motorizados por su ciudad, pasajeros por dónde viajaron en los últimos 90 días.",
+      "active": "Entraron a la app en los últimos",
+      "inactive": "No entran a la app hace",
+      "newWithoutRide": "Cuentas nuevas sin ningún viaje, creadas en los últimos",
+      "days": "días",
+      "versionBelow": "Con una versión de la app menor a",
+      "feePending": "Motorizados con la cuota pendiente",
+      "feePendingHelp": "Solo llega a motorizados que todavía no pagaron su cuota del mes.",
+      "summary": "Quiénes:"
+    },
+    "message": {
+      "title": "Mensaje",
+      "channels": "Canales",
+      "spanish": "Español",
+      "english": "Inglés (opcional)",
+      "englishHelp": "Si lo dejas vacío, quien usa la app en inglés lo recibe en español.",
+      "titleField": "Título",
+      "body": "Texto",
+      "deepLink": "Al tocarla abre",
+      "deepLinkHelp": "Una pantalla de la app (empieza con /) o un enlace https://. Vacío = abre la bandeja."
+    },
+    "links": {
+      "home": "Inicio",
+      "wallet": "Billetera",
+      "invite": "Invitar amigos",
+      "help": "Centro de ayuda",
+      "inbox": "Notificaciones"
+    },
+    "schedule": {
+      "title": "Cuándo",
+      "now": "Enviar ahora",
+      "later": "Programar",
+      "timeZone": "Es la hora de tu computadora ({zone})."
+    },
+    "reach": {
+      "title": "Alcance",
+      "people": "personas cumplen hoy estas condiciones",
+      "withPush": "Con push",
+      "passengers": "Pasajeros",
+      "drivers": "Motorizados",
+      "help": "Es una estimación: al enviar se descuentan quienes apagaron el marketing o ya recibieron una campaña hoy.",
+      "fixSegment": "Corrige los destinatarios para ver cuántas personas son.",
+      "failed": "No pudimos calcular el alcance."
+    },
+    "preview": {
+      "title": "Vista previa",
+      "placeholderTitle": "Título de la campaña",
+      "now": "ahora",
+      "inbox": "Notificaciones",
+      "noPush": "Sin push: solo aparece en la bandeja.",
+      "noInbox": "No aparece en la bandeja.",
+      "opens": "Al tocarla abre {link}",
+      "email": "También se envía por email.",
+      "fallback": "Sin texto en inglés: se muestra el español."
+    },
+    "rules": {
+      "title": "Cómo se envía",
+      "cap": "Cada persona recibe como máximo 1 mensaje de marketing al día (se cambia en Configuración).",
+      "quiet": "Nunca en el horario silencioso de cada persona: su mensaje espera a que termine.",
+      "optOut": "Quien apagó el marketing en la app no lo recibe."
+    },
+    "actions": {
+      "saveDraft": "Guardar borrador",
+      "test": "Enviarme una prueba",
+      "sendNow": "Enviar ahora",
+      "schedule": "Programar",
+      "cancel": "Cancelar campaña",
+      "duplicate": "Duplicar",
+      "delete": "Eliminar"
+    },
+    "pendingTitle": "Esperando una segunda aprobación",
+    "pendingHelp": "Otra persona del equipo debe aprobar el envío en Aprobaciones. Si la cambias, vuelve a borrador y hay que pedirlo otra vez.",
+    "scheduledTitle": "Programada para {date}",
+    "scheduledHelp": "Puedes cambiarla o cancelarla hasta que empiece a salir.",
+    "confirmSend": {
+      "title": "¿Enviar la campaña?",
+      "reach": "Llegará a unas {n} personas, {when}.",
+      "now": "ahora mismo",
+      "at": "el {date}",
+      "rules": "Se respeta el límite diario y el horario silencioso de cada persona, y se salta a quien apagó el marketing.",
+      "noCount": "Se enviará {when}."
+    },
+    "confirmCancel": {
+      "title": "¿Cancelar la campaña?",
+      "body": "Quienes todavía no la recibieron ya no la recibirán. Lo enviado no se puede deshacer."
+    },
+    "confirmDelete": {
+      "title": "¿Eliminar el borrador?",
+      "body": "Se borra «{name}». No se puede deshacer."
+    },
+    "toast": {
+      "saved": "Campaña guardada",
+      "testSent": "Prueba enviada a tu cuenta",
+      "testWays": "Revisa: {ways}.",
+      "scheduled": "Campaña programada",
+      "sending": "La campaña empieza a salir en unos segundos",
+      "cancelled": "Campaña cancelada",
+      "duplicated": "Copia creada como borrador",
+      "deleted": "Borrador eliminado"
+    },
+    "stats": {
+      "title": "Resultados",
+      "live": "Se actualiza cada 5 segundos",
+      "progress": "{done} de {total} procesadas, faltan {pending}",
+      "targeted": "Destinatarios",
+      "sent": "Enviadas",
+      "pushed": "Push a teléfonos",
+      "delivered": "Push entregados",
+      "ofPushed": "{rate} de los push",
+      "emailed": "Emails",
+      "opened": "Abiertas",
+      "openRate": "Tasa de apertura",
+      "skipped": "Saltadas",
+      "skippedWhy": "Por qué se saltaron",
+      "skipped_opt_out": "Apagaron el marketing",
+      "skipped_cap": "Ya recibieron una hoy",
+      "skipped_no_channel": "Sin un canal disponible",
+      "help": "Abiertas = la leyeron en la bandeja o tocaron el push. La tasa de apertura es sobre las enviadas."
+    },
+    "errors": {
+      "name": "Ponle un nombre de 2 a 120 caracteres",
+      "days": "Los días deben estar entre {min} y {max}",
+      "activeInactive": "«No entran hace» debe ser menor que «Entraron en los últimos»",
+      "version": "La versión debe ser como 1.4.0",
+      "cities": "Elige como máximo 20 ciudades",
+      "channels": "Elige al menos un canal",
+      "titleEs": "Falta el título en español",
+      "titleEn": "Si escribes el texto en inglés, ponle también un título",
+      "tooLong": "Los títulos tienen máximo 120 caracteres y los textos 1000",
+      "deepLink": "El enlace debe empezar con / (pantalla de la app) o con https://",
+      "scheduleMissing": "Elige la fecha y hora del envío",
+      "schedulePast": "La fecha del envío ya pasó"
+    }
+  },
+  "emailTemplates": {
+    "help": "Así llegan los emails, con datos de ejemplo.",
+    "empty": "No hay plantillas",
+    "subject": "Asunto:",
+    "html": "Diseño",
+    "text": "Texto plano",
+    "desktop": "Computadora",
+    "phone": "Teléfono",
+    "frameTitle": "Vista previa del email {name}",
+    "sample": "Los nombres, montos y fechas son de ejemplo."
   }
 }

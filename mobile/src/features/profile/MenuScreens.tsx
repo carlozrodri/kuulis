@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 import {
+  Bell,
   Download,
   Gift,
   HeartHandshake,
@@ -120,6 +121,14 @@ export function SettingsScreen() {
               ]}
             />
           </View>
+        </Card>
+        <Card style={{ paddingVertical: space.xxs }}>
+          <ListRow
+            icon={Bell}
+            title={t('notifications.settings.title')}
+            subtitle={t('notifications.settings.rowHint')}
+            onPress={() => router.push('/profile/notifications')}
+          />
         </Card>
       </Section>
       <Section title={t('profile.security')}>

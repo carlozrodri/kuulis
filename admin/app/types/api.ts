@@ -305,6 +305,8 @@ export interface AppConfig {
   verification?: VerificationSettings
   // ---- Support (doc 13). ----
   support?: SupportSettings
+  // ---- Notifications (doc 14). ----
+  notifications?: NotificationSettings
 }
 
 // ---- Phase 1B: rides (docs/api/phase-1b.md) ----
@@ -1684,4 +1686,139 @@ export interface SafetySummary {
   open: number
   acknowledged: number
   latest_id: string | null
+}
+
+// ---- Notifications and campaigns (doc 14) ----
+
+export const NOTIFICATION_CATEGORIES = ['transactional', 'safety', 'support', 'marketing'] as const
+export type NotificationCategory = typeof NOTIFICATION_CATEGORIES[number]
+
+/** A row of a user's inbox. */
+export interface NotificationRead {
+  id: string
+  title: string
+  body: string
+  data: Record<string, unknown>
+  category: NotificationCategory
+  /** App path ("/wallet") or an https link; set by campaigns. */
+  deep_link: string | null
+  read_at: string | null
+  created_at: string
+}
+
+export const CAMPAIGN_STATUSES = ['draft', 'pending_approval', 'scheduled', 'sending', 'sent', 'cancelled'] as const
+export type CampaignStatus = typeof CAMPAIGN_STATUSES[number]
+export const CAMPAIGN_CHANNELS = ['push', 'inbox', 'email'] as const
+export type CampaignChannel = typeof CAMPAIGN_CHANNELS[number]
+export const CAMPAIGN_AUDIENCES = ['all', 'passengers', 'drivers'] as const
+export type CampaignAudience = typeof CAMPAIGN_AUDIENCES[number]
+
+/** Who gets a campaign. Every condition narrows the audience. */
+export interface Segment {
+  audience: CampaignAudience
+  /** Service area names; empty = everywhere. */
+  cities: string[]
+  /** Signed in within the last N days. */
+  active_days?: number | null
+  /** Not signed in within the last N days. */
+  inactive_days?: number | null
+  /** Drivers with a pending monthly fee. */
+  fee_pending: boolean
+  /** Accounts created in the last N days without a completed ride. */
+  new_without_ride_days?: number | null
+  /** Phone app version lower than this ("1.4.0"). */
+  app_version_below?: string | null
+  locale?: 'es' | 'en' | null
+}
+
+/** targeted = frozen audience; sent = got it on some channel; skipped by reason; pushed = phones;
+ *  delivered = push receipts ok; opened = read or tapped. */
+export interface CampaignStats {
+  targeted: number
+  pending: number
+  sent: number
+  skipped: number
+  skipped_opt_out: number
+  skipped_cap: number
+  skipped_no_channel: number
+  pushed: number
+  delivered: number
+  emailed: number
+  opened: number
+}
+
+export interface CampaignRead {
+  id: string
+  name: string
+  status: CampaignStatus
+  segment: Segment
+  channels: CampaignChannel[]
+  title_es: string
+  body_es: string
+  title_en: string | null
+  body_en: string | null
+  deep_link: string | null
+  scheduled_at: string | null
+  started_at: string | null
+  finished_at: string | null
+  stats: CampaignStats
+  created_by_id: string | null
+  created_by_name: string | null
+  created_at: string
+  updated_at: string
+}
+
+/** POST /admin/campaigns body (PATCH takes any subset). */
+export interface CampaignCreate {
+  name: string
+  segment: Segment
+  channels: CampaignChannel[]
+  title_es: string
+  body_es: string
+  title_en?: string | null
+  body_en?: string | null
+  deep_link?: string | null
+  scheduled_at?: string | null
+}
+export type CampaignUpdate = Partial<CampaignCreate>
+
+export interface AudienceCount {
+  total: number
+  /** Users with an active phone. */
+  with_push: number
+  passengers: number
+  drivers: number
+}
+
+/** POST /admin/campaigns/{id}/test */
+export interface CampaignTestResult {
+  pushed: boolean
+  emailed: boolean
+}
+
+export interface EmailTemplateInfo {
+  name: string
+  /** Spanish label and description. */
+  label: string
+  description: string
+}
+
+export interface EmailPreview {
+  name: string
+  locale: 'es' | 'en'
+  subject: string
+  html: string
+  text: string
+}
+
+/** config.notifications (doc 14). */
+export interface NotificationSettings {
+  /** Caracas time "HH:MM"; equal values = no default quiet hours. */
+  quiet_start: string
+  quiet_end: string
+  /** Marketing notifications per user per day (0 = no limit). */
+  marketing_daily_cap: number
+  inbox_retention_days: number
+  device_idle_days: number
+  monthly_summary: boolean
 }

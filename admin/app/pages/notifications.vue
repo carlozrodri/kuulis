@@ -50,6 +50,15 @@ async function send() {
       </UDashboardNavbar>
     </template>
     <template #body>
+      <UAlert
+        class="mb-4 max-w-2xl"
+        color="neutral"
+        variant="subtle"
+        icon="i-lucide-zap"
+        :title="t('notifications.quickTitle')"
+        :description="t('notifications.quickHelp')"
+        :actions="[{ label: t('nav.campaigns'), to: '/campaigns', color: 'neutral', variant: 'outline', icon: 'i-lucide-send' }]"
+      />
       <UCard class="max-w-2xl">
         <form
           class="space-y-4"

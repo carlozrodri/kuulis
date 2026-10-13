@@ -44,3 +44,19 @@ describe('support settings (doc 13)', () => {
     expect(settingsToPayload(form).support.response_promise_en).toBe('Soon.')
   })
 })
+
+describe('notification settings (doc 14)', () => {
+  it('fills defaults from an older API and validates ranges', () => {
+    const form = settingsFromConfig({ ...settingsToPayload(defaultSettings()), notifications: undefined } as unknown as AppConfig)
+    expect(form.notifications).toMatchObject({ quiet_start: '21:00', quiet_end: '08:00', marketing_daily_cap: 1 })
+    form.notifications.marketing_daily_cap = 11
+    form.notifications.quiet_end = '8:00'
+    expect(keys(form)).toEqual(['quietHours', 'notificationNumber'])
+  })
+
+  it('allows turning the default quiet hours off', () => {
+    const form = defaultSettings()
+    form.notifications.quiet_end = '21:00'
+    expect(keys(form)).toEqual([])
+  })
+})
