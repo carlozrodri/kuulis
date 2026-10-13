@@ -358,18 +358,15 @@
       "unknownDevice": "Unknown device"
     },
     "menu": {
-      "title": "Settings and help",
-      "settings": "Account and preferences",
-      "settingsHint": "Your details, password, language and appearance",
-      "security": "Security and privacy",
-      "securityHint": "Trusted contacts, sessions and your data",
-      "sessions": "Sessions",
+      "settings": "Settings",
+      "settingsHint": "Account, preferences, security, privacy, help and legal",
       "privacy": "Privacy",
       "legalHint": "Terms, privacy and community guidelines",
       "frequentCount_one": "{{count}} place you go often",
       "frequentCount_other": "{{count}} places you go often",
       "paymentHint": "Choose how you usually pay",
-      "inviteHint": "Share your code or use the one that invited you"
+      "inviteHint": "Share your code or use the one that invited you",
+      "helpLegal": "Help and legal"
     }
   },
   "driver": {
