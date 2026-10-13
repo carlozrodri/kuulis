@@ -14,7 +14,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from sqlalchemy import func, or_, select, update
+from sqlalchemy import func, or_, select, true, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.config.schemas import SafetySettings
@@ -352,13 +352,15 @@ async def sos(session: AsyncSession, user: User, ride_id: uuid.UUID, data: SosRe
     link = await _new_link(session, ride, user)
     await session.commit()
     await session.refresh(alert)
-    if created:
-        await _alert_team(alert)
     config = await get_app_config(session)
+    team = config.safety.sos_team_alert
+    if created and team:
+        await _alert_team(alert)
     return SosRead(
         **AlertRead.model_validate(alert).model_dump(),
         share_url=link.url,
         location_seconds=config.safety.sos_location_seconds,
+        team_alerted=team,
     )
 
 
@@ -669,18 +671,21 @@ async def list_admin(
 
 
 async def summary(session: AsyncSession) -> AlertSummary:
+    # Without an on-call team, SOS alerts stay in the list but neither count for the badge nor ring.
+    config = await get_app_config(session)
+    counted = true() if config.safety.sos_team_alert else SafetyAlert.kind != AlertKind.SOS
     rows = dict(
         (
             await session.execute(
                 select(SafetyAlert.status, func.count())
-                .where(SafetyAlert.status.in_(ACTIVE_ALERT_STATUSES))
+                .where(SafetyAlert.status.in_(ACTIVE_ALERT_STATUSES), counted)
                 .group_by(SafetyAlert.status)
             )
         ).all()
     )
     latest = await session.scalar(
         select(SafetyAlert.id)
-        .where(SafetyAlert.status == AlertStatus.OPEN)
+        .where(SafetyAlert.status == AlertStatus.OPEN, counted)
         .order_by(SafetyAlert.escalated_at.desc().nulls_last(), SafetyAlert.created_at.desc())
         .limit(1)
     )

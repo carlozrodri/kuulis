@@ -835,7 +835,8 @@
       "cancelTitle": "Cancel the SOS?",
       "cancelBody": "Only if you are safe. We will stop sharing your location.",
       "cancelConfirm": "I'm safe",
-      "cancelled": "SOS cancelled"
+      "cancelled": "SOS cancelled",
+      "sentContacts": "SOS on. Alert your contacts with your live location"
     },
     "pin": {
       "title": "Your ride PIN",
@@ -888,7 +889,7 @@
         },
         "sos": {
           "title": "SOS always at hand",
-          "body": "Hold SOS for 2 seconds: we call 911 and alert the Kuulis team."
+          "body": "Hold SOS for 2 seconds: we call 911 and help you alert your contacts with your live location."
         }
       },
       "driver": {
@@ -906,7 +907,7 @@
         },
         "sos": {
           "title": "SOS always at hand",
-          "body": "Hold SOS for 2 seconds: we call 911 and alert the Kuulis team."
+          "body": "Hold SOS for 2 seconds: we call 911 and help you alert your contacts with your live location."
         }
       }
     }

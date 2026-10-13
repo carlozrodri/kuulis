@@ -73,6 +73,7 @@ DEFAULTS = {
         "overtime_factor": 2.0,
         "check_in_seconds": 120,
         "sos_location_seconds": 5,
+        "sos_team_alert": False,
     },
 }
 

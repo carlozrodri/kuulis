@@ -90,9 +90,10 @@ ubicación, y detectar situaciones anómalas. Es el principal riesgo listado en 
 
 ## Preguntas para Carlos
 1. **Decidido (recomendado):** PIN siempre en Caracas. Se cambia en Ajustes → Seguridad (`pin_areas`).
-2. ¿Habrá alguien de guardia para atender SOS? Si no, el SOS solo llama al 911 y avisa a contactos.
-   **Pendiente.** Mientras tanto el SOS llama al 911, avisa a los contactos **y** llega al admin y a Telegram;
-   si no hay guardia basta con no mirar el centro de seguridad o quitar el permiso `safety.view`.
+2. **Decidido (13-10-2026): no hay guardia.** El SOS llama al 911 y avisa a los contactos de confianza; no va a
+   Telegram ni suena en el admin (queda registrado en el centro de seguridad). Si algún día hay guardia, se
+   enciende en Ajustes → Seguridad → "Equipo de guardia para el SOS" (`safety.sos_team_alert`). Las anomalías
+   sin respuesta sí siguen llegando al admin y a Telegram.
 
 ## Cómo quedó (2026-10-13)
 ### API (`api/apps/safety`)
@@ -111,7 +112,8 @@ ubicación, y detectar situaciones anómalas. Es el principal riesgo listado en 
   (`users.trusted_contact_*`) a la tabla nueva y borra esas columnas. Entran en la descarga de datos y se
   borran con la cuenta.
 - **SOS:** `POST /rides/{id}/sos` (pasajero o motorizado, hasta 30 min después de terminar) abre una alerta con
-  la ubicación, crea un enlace en vivo para los contactos y avisa al equipo por Telegram. Repetirlo solo
+  la ubicación y crea un enlace en vivo para los contactos; solo con `sos_team_alert` avisa al equipo por
+  Telegram y cuenta en la alarma del admin (`team_alerted` en la respuesta). Repetirlo solo
   actualiza la posición. `POST /safety/location` cada 5 s mientras esté abierto (404 `no_active_sos` le dice a
   la app que pare) y `POST /safety/alerts/{id}/cancel` para una falsa alarma.
 - **Recorrido:** cada posición del motorizado durante el viaje va a una lista en Redis (una cada 5 s) y al

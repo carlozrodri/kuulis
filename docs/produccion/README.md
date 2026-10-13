@@ -74,9 +74,9 @@ construir. Las preguntas de cada documento están en su sección final.
   reglas y porcentaje, banners programados y configuración remota (soporte, emergencias, enlaces legales,
   intervalo de ubicación), todo desde el admin y aplicado en la app sin publicar código.
 - **11** hecho (2026-10-13): PIN de inicio (siempre en Caracas), enlace en vivo `/v/{token}`, hasta 5
-  contactos de confianza con compartir automático, SOS con ubicación cada 5 s hacia el admin y Telegram,
+  contactos de confianza con compartir automático, SOS con ubicación cada 5 s,
   recorrido guardado, detección de paradas, desvíos y demoras con "¿Todo bien?", centro de seguridad en el
-  admin y consejos. Pendiente: si habrá guardia para el SOS (pregunta 2).
+  admin y consejos. Sin guardia por ahora (decisión de Carlos): el SOS va al 911 y a los contactos.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

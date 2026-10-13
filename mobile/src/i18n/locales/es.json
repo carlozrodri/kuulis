@@ -835,7 +835,8 @@
       "cancelTitle": "¿Cancelar el SOS?",
       "cancelBody": "Hazlo solo si estás a salvo. Dejaremos de compartir tu ubicación.",
       "cancelConfirm": "Estoy a salvo",
-      "cancelled": "SOS cancelado"
+      "cancelled": "SOS cancelado",
+      "sentContacts": "SOS activado. Avisa a tus contactos con tu ubicación en vivo"
     },
     "pin": {
       "title": "Tu PIN de viaje",
@@ -888,7 +889,7 @@
         },
         "sos": {
           "title": "SOS siempre a mano",
-          "body": "Mantén presionado SOS 2 segundos: llamamos al 911 y avisamos al equipo de Kuulis."
+          "body": "Mantén presionado SOS 2 segundos: llamamos al 911 y te ayudamos a avisar a tus contactos con tu ubicación en vivo."
         }
       },
       "driver": {
@@ -906,7 +907,7 @@
         },
         "sos": {
           "title": "SOS siempre a mano",
-          "body": "Mantén presionado SOS 2 segundos: llamamos al 911 y avisamos al equipo de Kuulis."
+          "body": "Mantén presionado SOS 2 segundos: llamamos al 911 y te ayudamos a avisar a tus contactos con tu ubicación en vivo."
         }
       }
     }

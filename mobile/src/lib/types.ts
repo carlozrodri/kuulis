@@ -682,4 +682,6 @@ export interface SafetyAlert {
 export interface SosResult extends SafetyAlert {
   share_url: string | null;
   location_seconds: number;
+  /** The Kuulis team was told (only when there is someone on call). */
+  team_alerted?: boolean;
 }

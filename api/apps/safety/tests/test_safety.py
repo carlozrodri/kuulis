@@ -242,7 +242,26 @@ def test_track_thinning():
 # --- SOS ---------------------------------------------------------------------------------------
 
 
+async def test_sos_without_on_call_team(client, passenger, team):
+    """Default: the SOS goes to 911 and the contacts; no Telegram and no admin alarm."""
+    driver = await make_driver(client, "luis@example.com", "Luis Gómez")
+    ride_id = await _in_progress(client, passenger, driver)
+    response = await client.post(
+        f"{API}/rides/{ride_id}/sos", json={"lat": 10.49, "lng": -66.87}, headers=passenger.headers
+    )
+    sos = response.json()
+    assert response.status_code == 200 and sos["team_alerted"] is False
+    assert "/v/" in sos["share_url"]
+    assert not [t for t in team if t.startswith("🆘")]
+    admin = await _admin(client)
+    summary = (await client.get(f"{API}/admin/safety/summary", headers=admin)).json()
+    assert summary == {"open": 0, "acknowledged": 0, "latest_id": None}
+    listed = (await client.get(f"{API}/admin/safety/alerts", headers=admin)).json()
+    assert [a["id"] for a in listed["items"]] == [sos["id"]]  # still on record
+
+
 async def test_sos_reaches_the_team(client, passenger, team):
+    await set_config(safety=SafetySettings(sos_team_alert=True).model_dump())
     driver = await make_driver(client, "luis@example.com", "Luis Gómez")
     ride_id = await _in_progress(client, passenger, driver)
     response = await client.post(
@@ -251,6 +270,7 @@ async def test_sos_reaches_the_team(client, passenger, team):
     assert response.status_code == 200, response.text
     sos = response.json()
     assert sos["kind"] == "sos" and sos["status"] == "open" and sos["location_seconds"] == 5
+    assert sos["team_alerted"] is True
     assert "/v/" in sos["share_url"]
     telegram = [t for t in team if t.startswith("🆘")]
     assert len(telegram) == 1 and "Ana Pérez" in telegram[0] and "maps.google.com" in telegram[0]

@@ -624,7 +624,9 @@
         "check_in_seconds": "Tiempo para responder (s)",
         "sos_location_seconds": "Ubicación durante SOS (s)"
       },
-      "range": "Entre {min} y {max}"
+      "range": "Entre {min} y {max}",
+      "sosTeam": "Equipo de guardia para el SOS",
+      "sosTeamHelp": "Encendido: cada SOS llega a Telegram y suena en el Centro de seguridad. Apagado: el SOS llama al 911 y avisa a los contactos de confianza; aquí solo queda el registro."
     }
   },
   "paymentMethods": {

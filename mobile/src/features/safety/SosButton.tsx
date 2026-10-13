@@ -23,8 +23,9 @@ import { radius, space, useTheme } from '@/theme';
 import { sosSheetOpen, sosShare } from './store';
 
 /**
- * SOS (doc 11): hold for two seconds → calls the emergency number and opens an alert for the Kuulis team with
- * the live position; then offers to send the live link to the trusted contacts (SosContactsSheet).
+ * SOS (doc 11): hold for two seconds → calls the emergency number and opens an alert with the live position
+ * (the Kuulis team hears of it only with an on-call team); then offers to send the live link to the trusted
+ * contacts (SosContactsSheet).
  */
 export function SosButton({ ride }: { ride: Ride }) {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ export function SosButton({ ride }: { ride: Ride }) {
     void Linking.openURL(`tel:${emergency}`).catch(() => undefined);
     triggerSos(ride.id)
       .then((sos) => {
-        showToast(t('safety.sos.sent'), 'success');
+        showToast(sos.team_alerted ? t('safety.sos.sent') : t('safety.sos.sentContacts'), 'success');
         if (sos.share_url) {
           sosShare.set({ ride, url: sos.share_url });
           sosSheetOpen.set(true);

@@ -624,7 +624,9 @@
         "check_in_seconds": "Time to answer (s)",
         "sos_location_seconds": "Location during SOS (s)"
       },
-      "range": "Between {min} and {max}"
+      "range": "Between {min} and {max}",
+      "sosTeam": "On-call team for SOS",
+      "sosTeamHelp": "On: every SOS goes to Telegram and rings in the Safety center. Off: the SOS calls 911 and alerts the trusted contacts; only the record stays here."
     }
   },
   "paymentMethods": {

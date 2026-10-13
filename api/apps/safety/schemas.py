@@ -124,6 +124,7 @@ class AlertRead(BaseModel):
 class SosRead(AlertRead):
     share_url: str | None  # to send to the trusted contacts
     location_seconds: int  # send POST /safety/location this often while the SOS is open
+    team_alerted: bool = False  # the Kuulis team was told (only with an on-call team)
 
 
 class CheckInAnswer(BaseModel):

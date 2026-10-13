@@ -129,6 +129,7 @@ export function defaultSettings(): SettingsForm {
       overtime_factor: 2,
       check_in_seconds: 120,
       sos_location_seconds: 5,
+      sos_team_alert: false,
     },
   }
 }

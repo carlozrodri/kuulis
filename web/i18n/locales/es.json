@@ -252,7 +252,7 @@
     "to": "Hasta",
     "updated": "Se actualiza solo · última vez a las {time}",
     "sosTitle": "{name} activó el SOS.",
-    "sosBody": "El equipo de Kuulis ya fue avisado. Si puedes, llámale o llama al 911.",
+    "sosBody": "Si puedes, llámale ya o llama al 911 y comparte esta ubicación.",
     "help": "Esta página deja de funcionar cuando termina el viaje.",
     "endedTitle": "Este viaje terminó",
     "endedBody": "Ya no se comparte la ubicación. Gracias por estar pendiente.",

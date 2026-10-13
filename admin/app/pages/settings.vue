@@ -977,6 +977,12 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
             </p>
           </template>
           <div class="space-y-6">
+            <USwitch
+              v-model="form.safety.sos_team_alert"
+              :label="t('settings.safety.sosTeam')"
+              :description="t('settings.safety.sosTeamHelp')"
+              :disabled="readOnly"
+            />
             <UFormField
               :label="t('settings.safety.pinAreas')"
               :help="t('settings.safety.pinAreasHelp')"

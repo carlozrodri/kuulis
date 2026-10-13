@@ -195,6 +195,10 @@ class SafetySettings(BaseModel):
     check_in_seconds: int = Field(default=120, ge=30, le=900)
     # How often the app sends its location while an SOS is active.
     sos_location_seconds: int = Field(default=5, ge=2, le=60)
+    # Someone on call answers SOS alerts: Telegram plus the admin alarm. Off (Carlos, 2026-10-13):
+    # the SOS calls the emergency number and goes to the trusted contacts only; the admin keeps
+    # the record.
+    sos_team_alert: bool = False
 
     @field_validator("night_start", "night_end")
     @classmethod

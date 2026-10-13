@@ -252,7 +252,7 @@
     "to": "To",
     "updated": "Refreshes on its own · last update {time}",
     "sosTitle": "{name} pressed SOS.",
-    "sosBody": "The Kuulis team has been alerted. If you can, call them or call 911.",
+    "sosBody": "If you can, call them now or call 911 and share this location.",
     "help": "This page stops working when the ride ends.",
     "endedTitle": "This ride has ended",
     "endedBody": "The location is no longer shared. Thanks for keeping an eye out.",

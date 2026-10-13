@@ -1302,6 +1302,8 @@ export interface SafetySettings {
   overtime_factor: number
   check_in_seconds: number
   sos_location_seconds: number
+  /** Someone on call answers SOS: Telegram and the admin alarm (off by default). */
+  sos_team_alert: boolean
 }
 
 export type AlertKind = 'sos' | 'stop' | 'deviation' | 'overtime'
