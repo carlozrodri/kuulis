@@ -12,6 +12,7 @@ describe('audit helpers', () => {
 
   it('links the audited record', () => {
     expect(auditEntityLink({ entity_type: 'driver', entity_id: 'd1' })).toBe('/drivers/d1')
+    expect(auditEntityLink({ entity_type: 'driver_check', entity_id: 'c1' })).toBe('/drivers/checks/c1')
     expect(auditEntityLink({ entity_type: 'wallet', entity_id: 'u1' })).toBe('/wallets/u1')
     expect(auditEntityLink({ entity_type: 'config', entity_id: null })).toBe('/settings')
     expect(auditEntityLink({ entity_type: 'app_update', entity_id: 'u1' })).toBe('/versions')

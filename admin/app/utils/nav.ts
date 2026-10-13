@@ -12,6 +12,7 @@ export const NAV: NavEntry[] = [
   { key: 'dashboard', icon: 'i-lucide-layout-dashboard', to: '/', permission: 'dashboard.view' },
   { key: 'users', icon: 'i-lucide-users', to: '/users', permission: 'users.view' },
   { key: 'drivers', icon: 'i-lucide-bike', to: '/drivers', permission: 'drivers.view' },
+  { key: 'driverChecks', icon: 'i-lucide-scan-face', to: '/drivers/checks', permission: 'drivers.view' },
   { key: 'rides', icon: 'i-lucide-route', to: '/rides', permission: 'rides.view' },
   { key: 'live', icon: 'i-lucide-radar', to: '/live', permission: 'live.view' },
   { key: 'safety', icon: 'i-lucide-siren', to: '/safety', permission: 'safety.view' },

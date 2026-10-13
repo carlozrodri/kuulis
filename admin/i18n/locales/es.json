@@ -26,7 +26,8 @@
     "versions": "Versiones",
     "appStatus": "Estado de la app",
     "flags": "Funciones",
-    "announcements": "Anuncios"
+    "announcements": "Anuncios",
+    "driverChecks": "Reverificaciones"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -60,7 +61,9 @@
       "driverApplications": "Solicitudes de motorizado por revisar: {n}",
       "pendingTopUps": "Recargas pendientes: {n}",
       "unmatchedTopUps": "Pagos sin asignar: {n}",
-      "overdueDrivers": "Motorizados bloqueados por cuota vencida: {n}"
+      "overdueDrivers": "Motorizados bloqueados por cuota vencida: {n}",
+      "pendingReverifications": "Reverificaciones por revisar: {n}",
+      "documentsExpiringWeek": "Documentos que vencen esta semana: {n}"
     },
     "metrics": {
       "title": "Métricas",
@@ -346,7 +349,29 @@
     "update_exists": "Esa exportación ya está publicada en ese canal",
     "update_not_current": "Esa actualización ya no está activa; recarga la página",
     "updates_signing_disabled": "La firma de actualizaciones no está configurada en este entorno.",
-    "flag_not_found": "Esa función no existe"
+    "flag_not_found": "Esa función no existe",
+    "document_expired": "El motorizado tiene documentos vencidos",
+    "selfie_required": "El motorizado debe enviar una selfie de verificación",
+    "expiry_required": "Escribe la fecha de vencimiento para aprobar",
+    "document_already_expired": "La fecha de vencimiento ya pasó",
+    "expiry_confirmed": "La fecha de vencimiento ya fue confirmada",
+    "check_not_found": "Reverificación no encontrada",
+    "check_not_pending": "Esta reverificación ya no está esperando revisión",
+    "check_not_requested": "Esta reverificación ya no espera fotos",
+    "check_files_missing": "Faltan fotos en la reverificación",
+    "check_files_invalid": "Los archivos de la reverificación no son válidos",
+    "induction_required": "Marca la inducción como completada antes de aprobar al motorizado",
+    "not_staff": "Solo se puede asignar a alguien del equipo",
+    "vehicle_change_not_found": "El cambio de moto ya no está pendiente",
+    "vehicle_change_pending": "Ya hay un cambio de moto en revisión",
+    "vehicle_same_plate": "La moto nueva tiene la misma placa que la actual",
+    "plate_taken": "Esa placa ya está registrada en otra cuenta",
+    "vehicle_too_old": "La moto no cumple el año mínimo",
+    "vehicle_type_not_enabled": "Ese tipo de vehículo no está habilitado",
+    "document_not_found": "Documento no encontrado",
+    "driver_invalid_status": "El motorizado no está en un estado que permita esta acción",
+    "driver_invalid_transition": "El motorizado no admite ese cambio de estado",
+    "driver_documents_rejected": "Hay documentos rechazados: rechaza la solicitud en su lugar"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -397,7 +422,8 @@
       "medical_certificate": "Certificado médico",
       "vehicle_registration": "Carnet de circulación",
       "selfie": "Selfie",
-      "vehicle_photo": "Foto de la moto"
+      "vehicle_photo": "Foto de la moto",
+      "criminal_record": "Certificado de antecedentes penales"
     },
     "actions": {
       "approve": "Aprobar",
@@ -486,7 +512,9 @@
       "onlineSeconds": "Ubicación sin viaje: entre {min} y {max} segundos.",
       "onRideSeconds": "Ubicación en viaje: entre {min} y {max} segundos.",
       "nightHours": "Las horas de noche deben ser HH:MM y distintas",
-      "safetyNumber": "Un valor de seguridad está fuera de rango ({min}–{max})"
+      "safetyNumber": "Un valor de seguridad está fuera de rango ({min}–{max})",
+      "noticeDays": "Avisos de vencimiento: hasta {count} valores entre 1 y {max} días",
+      "verificationNumber": "Verificación de motorizados: los valores deben estar entre {min} y {max}"
     },
     "fares": {
       "title": "Tarifas",
@@ -627,6 +655,25 @@
       "range": "Entre {min} y {max}",
       "sosTeam": "Equipo de guardia para el SOS",
       "sosTeamHelp": "Encendido: cada SOS llega a Telegram y suena en el Centro de seguridad. Apagado: el SOS llama al 911 y avisa a los contactos de confianza; aquí solo queda el registro."
+    },
+    "verification": {
+      "title": "Verificación de motorizados",
+      "help": "Documentos que vencen, selfie al azar, reverificación por reportes e inducción.",
+      "expiring": "Documentos con fecha de vencimiento",
+      "expiringHelp": "El motorizado indica la fecha y el verificador la confirma. Vencido, no puede conectarse hasta que se apruebe el nuevo.",
+      "optional": "Documentos opcionales",
+      "optionalHelp": "El motorizado puede subirlos sin que se le pidan (por ejemplo, el certificado de antecedentes penales).",
+      "noticeDays": "Avisos antes del vencimiento (días)",
+      "noticeDaysHelp": "Separados por comas, por ejemplo 30, 7, 1 (máximo {max} días).",
+      "noticeDaysInvalid": "Escribe solo números separados por comas",
+      "numbers": {
+        "selfie_every_days": "Selfie al azar cada (días)",
+        "mismatch_reports": "Reportes de «no es la moto» para reverificar",
+        "report_window_days": "En un plazo de (días)"
+      },
+      "selfieHelp": "Al conectarse, en un día al azar. 0 = sin selfie al azar.",
+      "induction": "Inducción obligatoria para aprobar",
+      "inductionHelp": "Antes de aprobar a un motorizado hay que marcar «Inducción completada» en su ficha (charla o video)."
     }
   },
   "paymentMethods": {
@@ -1454,7 +1501,8 @@
       "monitoring": "Monitoreo",
       "rates": "Tasas",
       "binance": "Binance Pay",
-      "privacy_retention": "Retención de datos"
+      "privacy_retention": "Retención de datos",
+      "driver_expirations": "Vencimientos de motorizados"
     },
     "dashboardAlert": "Hay {count} alertas del sistema abiertas",
     "dashboardAlertHelp": "Algún servicio o proceso de fondo tiene problemas.",
@@ -1547,7 +1595,13 @@
         "reinstate": "Reactivó un motorizado",
         "reject": "Rechazó un motorizado",
         "suspend": "Suspendió un motorizado",
-        "view": "Vio la ficha y documentos"
+        "view": "Vio la ficha y documentos",
+        "check_view": "Vio una reverificación",
+        "check_review": "Revisó una reverificación",
+        "check_assign": "Asignó una reverificación",
+        "assign": "Asignó una solicitud de motorizado",
+        "induction": "Marcó la inducción",
+        "reverify": "Pidió una reverificación"
       },
       "fee_schedule": {
         "create": "Creó un tramo de suscripción"
@@ -1658,7 +1712,8 @@
       "app_release": "Versión de la app",
       "app_update": "Actualización de JavaScript",
       "feature_flag": "Función",
-      "announcement": "Anuncio"
+      "announcement": "Anuncio",
+      "driver_check": "Reverificación"
     }
   },
   "team": {
@@ -2190,5 +2245,202 @@
       "passenger_ok": "El pasajero dijo que estaba bien"
     },
     "pick": "Elige una alerta para ver sus datos."
+  },
+  "verification": {
+    "kind": "Tipo",
+    "allKinds": "Todos los tipos",
+    "kinds": {
+      "selfie": "Selfie de verificación",
+      "reverification": "Reverificación (selfie y moto)",
+      "document_renewal": "Documento renovado",
+      "vehicle_change": "Cambio de moto"
+    },
+    "status": "Estado",
+    "statuses": {
+      "pending": "Por revisar",
+      "requested": "Esperando fotos",
+      "approved": "Aprobada",
+      "rejected": "Rechazada",
+      "cancelled": "Cancelada"
+    },
+    "why": {
+      "title": "Motivo",
+      "random": "Selfie al azar",
+      "reports": "Reportes de pasajeros",
+      "team": "Pedida por el equipo",
+      "driver": "Enviada por el motorizado"
+    },
+    "assignee": {
+      "all": "Todas",
+      "mine": "Mías",
+      "unassigned": "Sin asignar"
+    },
+    "assignedTo": "Asignada a",
+    "me": "Yo",
+    "unassigned": "Sin asignar",
+    "take": "Tomar",
+    "release": "Soltar",
+    "driver": "Motorizado",
+    "sentAt": "Enviada",
+    "requestedAt": "Pedida",
+    "notSentYet": "Aún no la envía",
+    "reviewedBy": "Revisada por",
+    "currentPlate": "Placa actual",
+    "newApplications": "Solicitudes nuevas",
+    "queueHelp": "Selfies, documentos renovados y cambios de moto de motorizados ya aprobados, de la más antigua a la más nueva. Las solicitudes nuevas están en Motorizados.",
+    "empty": "No hay reverificaciones con estos filtros.",
+    "total": "{n} reverificaciones",
+    "nextCheck": "Siguiente",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "expiresOn": "Fecha de vencimiento",
+    "expiresOnHelp": "Confírmala o corrígela con la que aparece en el documento.",
+    "expiryIssues": {
+      "required": "Escribe la fecha de vencimiento",
+      "past": "La fecha ya pasó"
+    },
+    "pendingVehicle": "Cambio de moto en revisión",
+    "openCheck": "Revisar",
+    "history": "Historial ({n})",
+    "replaced": "Reemplazado",
+    "reasonPlaceholder": "Explica al motorizado qué debe corregir",
+    "toast": {
+      "assigned": "Asignada a ti",
+      "unassigned": "Asignación quitada",
+      "approved": "Reverificación aprobada",
+      "rejected": "Reverificación rechazada"
+    },
+    "viewer": {
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar",
+      "rotate": "Rotar",
+      "reset": "Restablecer",
+      "noPreview": "Este archivo no se puede mostrar aquí"
+    },
+    "review": {
+      "sent": "Lo que envió",
+      "references": "Referencia aprobada",
+      "waitingPhotos": "El motorizado aún no envía las fotos.",
+      "noFiles": "Sin archivos.",
+      "noReferences": "No hay documentos aprobados para comparar.",
+      "newVehicle": "Moto nueva",
+      "suspendWarning": "Si la rechazas, el perfil del motorizado queda suspendido de inmediato y se abre un reporte urgente.",
+      "suspendConfirmTitle": "Rechazar suspende al motorizado",
+      "rejectAndSuspend": "Rechazar y suspender",
+      "rejectTitle": "Rechazar: {kind}",
+      "approveHint": "Marca todo el checklist (y la fecha de vencimiento si aplica) para aprobar.",
+      "readOnly": "Tu rol puede ver, pero no revisar."
+    },
+    "documentReview": {
+      "title": "Revisar {kind}",
+      "backToChecklist": "Volver al checklist"
+    },
+    "checklist": {
+      "title": "Checklist",
+      "legible": "Se lee completo y nítido",
+      "clearPhoto": "Foto clara, sin filtros ni recortes",
+      "nameMatches": "El nombre coincide con el del motorizado",
+      "numberMatches": "El número coincide con la cédula registrada",
+      "valid": "Vigente y la fecha coincide con el documento",
+      "live": "Foto en vivo (no es una foto de otra foto o de una pantalla)",
+      "faceMatchesSelfie": "La cara coincide con la selfie aprobada",
+      "faceMatchesId": "La cara coincide con la foto de la cédula",
+      "plateMatches": "La placa coincide",
+      "vehicleMatches": "Marca, modelo y color coinciden"
+    },
+    "reasonLabels": {
+      "blurry": "Borrosa o ilegible",
+      "incomplete": "Incompleta o recortada",
+      "wrongDocument": "No es el documento pedido",
+      "nameMismatch": "El nombre no coincide",
+      "numberMismatch": "El número no coincide",
+      "expired": "Vencido",
+      "dateMismatch": "Fecha incorrecta",
+      "faceMismatch": "La cara no coincide",
+      "notLive": "No es una foto en vivo",
+      "plateMismatch": "La placa no coincide",
+      "vehicleMismatch": "La moto no coincide",
+      "other": "Otro"
+    },
+    "reasons": {
+      "blurry": "La foto está borrosa o no se lee. Toma una foto nítida, con buena luz y sin reflejos.",
+      "incomplete": "El documento sale incompleto o recortado. Toma una foto donde se vea completo.",
+      "wrongDocument": "El archivo no corresponde al documento pedido. Sube el documento correcto.",
+      "nameMismatch": "El nombre del documento no coincide con el de tu cuenta.",
+      "numberMismatch": "El número del documento no coincide con tu cédula registrada.",
+      "expired": "El documento está vencido. Sube uno vigente.",
+      "dateMismatch": "La fecha de vencimiento que escribiste no coincide con la del documento.",
+      "faceMismatch": "La cara de la selfie no coincide con la de tu cédula y tu selfie aprobada.",
+      "notLive": "La selfie debe ser en vivo con la cámara frontal, no una foto de otra foto o de una pantalla.",
+      "plateMismatch": "La placa de las fotos no coincide con la registrada.",
+      "vehicleMismatch": "La moto de las fotos no coincide con la registrada (marca, modelo o color)."
+    },
+    "shortcuts": {
+      "title": "Atajos de teclado",
+      "help": "Haz clic en una imagen para que el zoom, la rotación y las flechas actúen sobre ella.",
+      "tick": "Marcar ítem del checklist",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "zoomIn": "Acercar / alejar",
+      "rotate": "Rotar",
+      "reset": "Restablecer zoom y rotación",
+      "next": "Imagen anterior / siguiente",
+      "nextCheck": "Siguiente reverificación"
+    },
+    "duplicates": {
+      "title": "Posible duplicado: {n} coincidencias con otras cuentas",
+      "help": "Estos datos aparecen en otras cuentas (también eliminadas o suspendidas). Revisa antes de aprobar.",
+      "erased": "cuenta eliminada",
+      "deleted": "Eliminada",
+      "suspended": "Suspendida",
+      "kinds": {
+        "national_id": "Cédula",
+        "rif": "RIF",
+        "plate": "Placa",
+        "phone": "Teléfono",
+        "binance_pay_id": "Binance Pay ID",
+        "device": "Dispositivo"
+      }
+    },
+    "card": {
+      "title": "Verificación",
+      "reviewer": "Verificador",
+      "canGoOnline": "Puede conectarse",
+      "blocked": "No puede conectarse",
+      "expired": "Vencido: {kind}",
+      "missingExpiry": "Sin fecha: {kind}",
+      "requiredCheck": "Pendiente: {kind}"
+    },
+    "induction": {
+      "label": "Inducción completada",
+      "help": "Marca cuando el motorizado complete la charla o el video de inducción.",
+      "doneAt": "Completada el {date}",
+      "done": "Inducción marcada como completada",
+      "undone": "Inducción desmarcada",
+      "missing": "Falta marcar la inducción: es obligatoria para aprobar."
+    },
+    "reverify": {
+      "button": "Pedir reverificación",
+      "title": "¿Pedir reverificación?",
+      "help": "El motorizado no podrá conectarse hasta enviar una selfie en vivo y fotos nuevas de la moto. Recibirá una notificación.",
+      "confirm": "Pedir reverificación",
+      "sent": "Reverificación pedida"
+    },
+    "timeline": {
+      "title": "Línea de tiempo de verificaciones",
+      "empty": "Sin verificaciones todavía.",
+      "reviewed": "revisada {date}"
+    },
+    "expiry": {
+      "column": "Vencimientos",
+      "until": "Vence el {date}",
+      "expired": "Vencido",
+      "today": "Vence hoy",
+      "soon": "Vence en {n} días",
+      "valid": "Vigente",
+      "noDate": "Sin fecha",
+      "unconfirmed": "Por confirmar",
+      "confirm": "Confirmar fecha"
+    }
   }
 }

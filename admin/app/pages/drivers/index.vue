@@ -62,6 +62,7 @@ const columns = computed<TableColumn<AdminDriver>[]>(() => [
   { accessorKey: 'national_id', header: t('drivers.nationalId') },
   { id: 'plate', header: t('drivers.plate') },
   { accessorKey: 'status', header: t('drivers.status') },
+  { id: 'expiry', header: t('verification.expiry.column') },
   { accessorKey: 'submitted_at', header: t('drivers.submittedAt') },
 ])
 </script>
@@ -85,6 +86,13 @@ const columns = computed<TableColumn<AdminDriver>[]>(() => [
           />
         </template>
         <template #right>
+          <UButton
+            to="/drivers/checks"
+            icon="i-lucide-scan-face"
+            color="neutral"
+            variant="ghost"
+            :label="t('nav.driverChecks')"
+          />
           <UInput
             v-model="search"
             icon="i-lucide-search"
@@ -130,6 +138,23 @@ const columns = computed<TableColumn<AdminDriver>[]>(() => [
           >
             {{ t(`drivers.statuses.${row.original.status}`) }}
           </UBadge>
+        </template>
+        <template #expiry-cell="{ row }">
+          <UBadge
+            v-if="nearestExpiry(row.original.verification)"
+            :color="nearestExpiry(row.original.verification)!.days_left <= 7 ? 'error' : 'warning'"
+            variant="subtle"
+            size="sm"
+          >
+            {{ t(`drivers.kinds.${nearestExpiry(row.original.verification)!.kind}`) }} ·
+            {{ nearestExpiry(row.original.verification)!.days_left < 0
+              ? t('verification.expiry.expired')
+              : t(nearestExpiry(row.original.verification)!.days_left === 0 ? 'verification.expiry.today' : 'verification.expiry.soon', { n: nearestExpiry(row.original.verification)!.days_left }) }}
+          </UBadge>
+          <span
+            v-else
+            class="text-(--ui-text-muted)"
+          >—</span>
         </template>
         <template #submitted_at-cell="{ row }">
           {{ formatDate(row.original.submitted_at, locale) }}

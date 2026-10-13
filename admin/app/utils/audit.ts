@@ -3,6 +3,7 @@ import type { AuditEntry } from '~/types/api'
 export const AUDIT_ENTITY_TYPES = [
   'user',
   'driver',
+  'driver_check',
   'ride',
   'promotion',
   'report',
@@ -38,6 +39,7 @@ export function auditEntityLink(entry: Pick<AuditEntry, 'entity_type' | 'entity_
   switch (entry.entity_type) {
     case 'user': return `/users/${id}`
     case 'driver': return `/drivers/${id}`
+    case 'driver_check': return `/drivers/checks/${id}`
     case 'ride': return `/rides/${id}`
     case 'promotion': return `/promotions/${id}`
     case 'report': return `/reports/${id}`
