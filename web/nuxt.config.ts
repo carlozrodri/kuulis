@@ -35,6 +35,9 @@ export default defineNuxtConfig({
       siteUrl: 'http://localhost:3001',
       // Shown in the footer and the help section when set (NUXT_PUBLIC_SUPPORT_EMAIL).
       supportEmail: '',
+      // Map tiles for the live ride page (OSM's tile policy: light use, attribution, a Referer). Point
+      // NUXT_PUBLIC_MAP_TILE_URL at a self-hosted or commercial server if usage grows.
+      mapTileUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     },
   },
 

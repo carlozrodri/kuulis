@@ -39,7 +39,8 @@ onMounted(() => {
 onBeforeUnmount(() => clearInterval(timer))
 
 const center = computed(() => (ride.value ? focusPoint(ride.value) : null))
-const tiles = computed(() => (center.value ? tilesAround(center.value) : []))
+const { mapTileUrl } = useRuntimeConfig().public
+const tiles = computed(() => (center.value ? tilesAround(center.value, mapTileUrl) : []))
 const markers = computed(() => {
   const current = ride.value
   const c = center.value
@@ -110,7 +111,7 @@ const vehicle = computed(() => {
               class="tile"
               :style="{ left: `calc(50% + ${tile.left}px)`, top: `calc(50% + ${tile.top}px)` }"
               loading="lazy"
-              referrerpolicy="no-referrer"
+              referrerpolicy="strict-origin"
             >
             <span
               v-for="marker in markers"
