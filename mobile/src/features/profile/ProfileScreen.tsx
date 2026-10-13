@@ -10,48 +10,36 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Bike,
   Camera,
-  Download,
-  HeartHandshake,
   Info,
   LifeBuoy,
-  LockKeyhole,
   LogOut,
   Mail,
   MapPin,
-  Moon,
-  MonitorSmartphone,
   Pencil,
-  Smartphone,
   Sparkles,
   Star,
-  Sun,
-  UserX,
   ScrollText,
+  Settings,
+  ShieldCheck,
 } from '@/components/icons';
 import { showToast } from '@/components/Toast';
-import { Button, Card, IconTile, ListRow, Sheet, TAB_BAR_SPACE, Txt, Wordmark } from '@/components/ui';
+import { Button, Card, IconTile, ListRow, TAB_BAR_SPACE, Txt, Wordmark } from '@/components/ui';
 import { useDriverProfile } from '@/hooks/useDriver';
 import { useDriverStats, usePassengerStats } from '@/hooks/useRides';
 import { useTrustedContacts } from '@/hooks/useSafety';
-import { apiErrorMessage, SUPPORTED_LOCALES, type Locale } from '@/i18n';
+import { apiErrorMessage } from '@/i18n';
 import { api } from '@/lib/api';
 import { config as appConfig } from '@/lib/config';
-import { DRIVER_KINDS, type LegalKind } from '@/lib/legal';
 import { formatKm, missingProfileSteps, PROFILE_STEPS_TOTAL, type ProfileStep, ratingValue } from '@/lib/profile';
 import { formatFare } from '@/lib/ride';
-import { useStore } from '@/lib/store';
 import { useAuth } from '@/providers/AuthProvider';
 import { type AppMode, useMode } from '@/providers/ModeProvider';
-import { setThemePreference, space, themePreference, type ThemePreference, useTheme } from '@/theme';
+import { space, useTheme } from '@/theme';
 
 import { Meter, Section, Segmented, type Stat, StatStrip } from './components';
 import { DriverProfile } from './DriverProfile';
 import { PassengerProfile } from './PassengerProfile';
 import { HEADER_OVERLAP, ProfileHeader } from './ProfileHeader';
-
-const LANGUAGE_LABELS: Record<Locale, string> = { es: 'Español', en: 'English' };
-
-type Confirm = 'logoutAll' | null;
 
 export function ProfileScreen() {
   const { t, i18n } = useTranslation();
@@ -61,9 +49,7 @@ export function ProfileScreen() {
   const contactCount = useTrustedContacts(!!user).data?.length ?? 0;
   const { mode: storedMode, setMode } = useMode();
   const mode: AppMode = storedMode ?? 'passenger';
-  const preference = useStore(themePreference);
   const [signingOut, setSigningOut] = useState(false);
-  const [confirm, setConfirm] = useState<Confirm>(null);
   const [verifySent, setVerifySent] = useState(false);
 
   // White status bar text over the green header while this tab is on screen.
@@ -75,7 +61,6 @@ export function ProfileScreen() {
   );
 
   const driver = useDriverProfile(mode === 'driver');
-  const legalKinds: LegalKind[] = ['terms', 'privacy', 'community', ...(mode === 'driver' ? DRIVER_KINDS : [])];
   const approvedDriver = mode === 'driver' && (driver.data?.status === 'approved' || driver.data?.status === 'suspended');
   const driverStats = useDriverStats(approvedDriver);
   const passengerStats = usePassengerStats(!approvedDriver);
@@ -119,16 +104,6 @@ export function ProfileScreen() {
     void setMode(next);
   }
 
-  async function changeLanguage(locale: Locale) {
-    if (locale === i18n.language) return;
-    await i18n.changeLanguage(locale);
-    try {
-      await api('/users/me', { method: 'PATCH', body: { locale } });
-      await refreshUser();
-    } catch (e) {
-      showToast(apiErrorMessage(e), 'danger');
-    }
-  }
 
   async function resendVerification() {
     try {
@@ -140,15 +115,6 @@ export function ProfileScreen() {
     }
   }
 
-  async function logoutEverywhere() {
-    try {
-      await api('/auth/logout-all', { method: 'POST' });
-    } catch (e) {
-      showToast(apiErrorMessage(e), 'danger');
-      return;
-    }
-    await signOut();
-  }
 
   const missing = missingProfileSteps(user);
 
@@ -191,109 +157,32 @@ export function ProfileScreen() {
             <PassengerProfile stats={passengerStats.data} loading={passengerStats.isPending} />
           )}
 
-          <Section title={t('profile.account')}>
-            <Card style={{ paddingVertical: space.xxs }}>
-              <ListRow icon={Pencil} title={t('profile.edit.title')} subtitle={t('profile.edit.hint')} divider onPress={() => router.push('/profile/edit')} />
-              <ListRow icon={LockKeyhole} title={t('profile.password.title')} subtitle={t('profile.password.hint')} divider onPress={() => router.push('/profile/password')} />
-              <ListRow icon={LifeBuoy} title={t('profile.help')} subtitle={t('profile.helpHint')} onPress={() => router.push('/reports')} />
-            </Card>
-          </Section>
-
-          <Section title={t('profile.preferences')}>
-            <Card style={{ gap: space.lg }}>
-              <View style={{ gap: space.xs }}>
-                <Txt variant="label" color="muted">
-                  {t('profile.language')}
-                </Txt>
-                <Segmented
-                  label={t('profile.language')}
-                  value={(SUPPORTED_LOCALES.includes(i18n.language as Locale) ? i18n.language : 'es') as Locale}
-                  onChange={(locale) => void changeLanguage(locale)}
-                  options={SUPPORTED_LOCALES.map((locale) => ({ value: locale, label: LANGUAGE_LABELS[locale] }))}
-                />
-              </View>
-              <View style={{ gap: space.xs }}>
-                <Txt variant="label" color="muted">
-                  {t('profile.appearance.title')}
-                </Txt>
-                <Segmented<ThemePreference>
-                  label={t('profile.appearance.title')}
-                  value={preference}
-                  onChange={(value) => {
-                    void Haptics.selectionAsync().catch(() => undefined);
-                    setThemePreference(value);
-                  }}
-                  options={[
-                    { value: 'system', label: t('profile.appearance.system') },
-                    { value: 'light', label: t('profile.appearance.light'), icon: Sun },
-                    { value: 'dark', label: t('profile.appearance.dark'), icon: Moon },
-                  ]}
-                />
-              </View>
-            </Card>
-          </Section>
-
-          <Section title={t('profile.security')}>
+          <Section title={t('profile.menu.title')}>
             <Card style={{ paddingVertical: space.xxs }}>
               <ListRow
-                icon={HeartHandshake}
+                icon={Settings}
+                title={t('profile.menu.settings')}
+                subtitle={t('profile.menu.settingsHint')}
+                divider
+                onPress={() => router.push('/profile/settings')}
+              />
+              <ListRow
+                icon={ShieldCheck}
                 iconTone="accent"
-                title={t('profile.contact.title')}
-                subtitle={contactCount ? t('profile.contact.current', { count: contactCount }) : t('profile.contact.rowHint')}
+                title={t('profile.menu.security')}
+                subtitle={contactCount ? t('profile.contact.current', { count: contactCount }) : t('profile.menu.securityHint')}
                 divider
-                onPress={() => router.push('/profile/contact')}
+                onPress={() => router.push('/profile/security')}
               />
+              <ListRow icon={LifeBuoy} title={t('profile.help')} subtitle={t('profile.helpHint')} divider onPress={() => router.push('/reports')} />
               <ListRow
-                icon={Smartphone}
+                icon={ScrollText}
                 iconTone="neutral"
-                title={t('profile.sessions.title')}
-                subtitle={t('profile.sessions.rowHint')}
+                title={t('legal.title')}
+                subtitle={t('profile.menu.legalHint')}
                 divider
-                onPress={() => router.push('/profile/sessions')}
+                onPress={() => router.push('/profile/legal')}
               />
-              <ListRow
-                icon={MonitorSmartphone}
-                iconTone="neutral"
-                title={t('profile.logoutAll.title')}
-                subtitle={t('profile.logoutAll.hint')}
-                divider
-                onPress={() => setConfirm('logoutAll')}
-              />
-              <ListRow
-                icon={Download}
-                iconTone="neutral"
-                title={t('privacy.export.title')}
-                subtitle={t('privacy.export.rowHint')}
-                divider
-                onPress={() => router.push('/profile/data')}
-              />
-              <ListRow
-                icon={UserX}
-                iconTone="danger"
-                title={t('profile.deactivate.title')}
-                subtitle={t('profile.deactivate.hint')}
-                onPress={() => router.push('/profile/delete')}
-              />
-            </Card>
-          </Section>
-
-          <Section title={t('legal.title')}>
-            <Card style={{ paddingVertical: space.xxs }}>
-              {legalKinds.map((kind, index) => (
-                <ListRow
-                  key={kind}
-                  icon={ScrollText}
-                  iconTone="neutral"
-                  title={t(`legal.kinds.${kind}`)}
-                  divider={index < legalKinds.length - 1}
-                  onPress={() => router.push({ pathname: '/legal/[kind]', params: { kind } })}
-                />
-              ))}
-            </Card>
-          </Section>
-
-          <Section title={t('about.section')}>
-            <Card style={{ paddingVertical: space.xxs }}>
               <ListRow
                 icon={Info}
                 iconTone="neutral"
@@ -325,13 +214,6 @@ export function ProfileScreen() {
         </View>
       </ScrollView>
 
-      <Sheet
-        visible={confirm !== null}
-        title={t('profile.logoutAll.confirmTitle')}
-        subtitle={t('profile.logoutAll.confirmBody')}
-        onClose={() => setConfirm(null)}
-        options={[{ label: t('profile.logoutAll.confirm'), icon: LogOut, destructive: true, onPress: () => void logoutEverywhere() }]}
-      />
     </View>
   );
 }

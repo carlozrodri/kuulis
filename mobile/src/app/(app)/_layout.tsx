@@ -52,6 +52,12 @@ export default function AppLayout() {
           <Stack.Screen name="profile/data" />
           <Stack.Screen name="profile/delete" />
           <Stack.Screen name="profile/about" />
+          <Stack.Screen name="profile/settings" />
+          <Stack.Screen name="profile/security" />
+          <Stack.Screen name="profile/legal" />
+          <Stack.Screen name="profile/payment" />
+          <Stack.Screen name="profile/frequent" />
+          <Stack.Screen name="profile/invite" />
         </Stack>
         {/* Remote control (doc 10): maintenance, city pauses, feature flags, banners and remote settings. */}
         <BootstrapSync />
