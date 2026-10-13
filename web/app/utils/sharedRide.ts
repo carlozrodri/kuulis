@@ -97,8 +97,13 @@ export interface MapTile {
   top: number
 }
 
-/** The tiles around `center` (a `size`×`size` grid) positioned so `center` sits in the middle. */
-export function tilesAround(center: LatLng, size = 3, zoom = MAP_ZOOM): MapTile[] {
+export const OSM_TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+
+/**
+ * The tiles around `center` (a `size`×`size` grid) positioned so `center` sits in the middle. OSM's servers
+ * refuse tiles requested without a Referer, so the page sends its origin (never the path with the token).
+ */
+export function tilesAround(center: LatLng, template = OSM_TILES, size = 3, zoom = MAP_ZOOM): MapTile[] {
   const { x, y } = toPixel(center, zoom)
   const cx = Math.floor(x / TILE_SIZE)
   const cy = Math.floor(y / TILE_SIZE)
@@ -111,7 +116,7 @@ export function tilesAround(center: LatLng, size = 3, zoom = MAP_ZOOM): MapTile[
       const ty = cy + dy
       if (ty < 0 || ty >= max) continue
       tiles.push({
-        url: `https://tile.openstreetmap.org/${zoom}/${tx}/${ty}.png`,
+        url: template.replace('{z}', String(zoom)).replace('{x}', String(tx)).replace('{y}', String(ty)),
         left: (cx + dx) * TILE_SIZE - x,
         top: ty * TILE_SIZE - y,
       })
