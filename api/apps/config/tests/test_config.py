@@ -102,6 +102,24 @@ DEFAULTS = {
         "device_idle_days": 60,
         "monthly_summary": True,
     },
+    "quality": {
+        "pickup_wait_minutes": 5,
+        "passenger_cancel_grace_s": 120,
+        "window_days": 30,
+        "driver_cancel_burst": 3,
+        "driver_decline_streak": 5,
+        "driver_pause_minutes": 15,
+        "driver_cancel_warn": 0.15,
+        "driver_cancel_low_priority": 0.25,
+        "driver_cancel_review": 0.35,
+        "min_rides": 10,
+        "passenger_no_show_warn": 2,
+        "passenger_no_show_pause": 3,
+        "passenger_pause_hours": 24,
+        "rating_review_below": 4.3,
+        "rating_min_count": 20,
+        "dispatch_quality_weight": 0.2,
+    },
 }
 
 

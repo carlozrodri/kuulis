@@ -11,6 +11,7 @@ from apps.rides import events, presence, services, stats
 from apps.rides.models import Ride, RideStatus
 from apps.rides.schemas import (
     AdminCancelRequest,
+    CancellationAdminRead,
     CancelRequest,
     DriverState,
     DriverStats,
@@ -109,15 +110,37 @@ async def list_rides(
 
 @router.get("/{ride_id}", response_model=RideRead)
 async def get_ride(ride_id: uuid.UUID, user: CurrentUser, session: DBSession) -> RideRead:
+    ride = await session.get(Ride, ride_id)
+    if ride is not None and _left(ride, user):
+        return await events.left_read(session, ride)
     ride = await services.get_for_participant(session, user, ride_id)
     return await _read(session, ride, user)
+
+
+def _left(ride: Ride, user: User) -> bool:
+    """The driver cancelled and the ride went to someone else: for them it is cancelled."""
+    return ride.reassigned_from_driver_id == user.id and user.id not in (
+        ride.passenger_id,
+        ride.driver_id,
+    )
 
 
 @router.post("/{ride_id}/cancel", response_model=RideRead)
 async def cancel(
     ride_id: uuid.UUID, user: CurrentUser, session: DBSession, data: CancelRequest | None = None
 ) -> RideRead:
-    ride = await services.cancel(session, user, ride_id, data.reason if data else None)
+    """``reason_code`` (doc 15) is optional. A driver's cancellation sends the ride back to
+    searching (the response shows it cancelled for them); ``no_show`` answers 409
+    ``no_show_too_early`` (``available_at``) before the wait is over."""
+    ride = await services.cancel(
+        session,
+        user,
+        ride_id,
+        data.reason if data else None,
+        data.reason_code if data else None,
+    )
+    if _left(ride, user):
+        return await events.left_read(session, ride)
     return await _read(session, ride, user)
 
 
@@ -204,7 +227,12 @@ async def list_messages(
     ride_id: uuid.UUID, user: CurrentUser, session: DBSession
 ) -> list[MessageRead]:
     ride = await services.get_for_participant(session, user, ride_id)
-    return [MessageRead.model_validate(m) for m in await services.list_messages(session, ride.id)]
+    # After a reassignment the new driver only sees their own conversation.
+    since = ride.assigned_at if ride.reassign_count else None
+    return [
+        MessageRead.model_validate(m)
+        for m in await services.list_messages(session, ride.id, since=since)
+    ]
 
 
 @router.post("/{ride_id}/messages", response_model=MessageRead, status_code=status.HTTP_201_CREATED)
@@ -288,6 +316,10 @@ async def admin_detail(
         track=await safety.ride_track(session, ride),
         safety_alerts=[
             RideSafetyAlert.model_validate(a) for a in await safety.ride_alerts(session, ride.id)
+        ],
+        cancellations=[
+            CancellationAdminRead.model_validate(c).model_copy(update={"user_name": name})
+            for c, name in await services.cancellations_for(session, ride.id)
         ],
     )
 

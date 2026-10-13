@@ -544,11 +544,19 @@ async def test_cancellation_rules(client, passenger, recorder, admin_headers):
     ride = await _assigned_ride(client, passenger, driver)
     response = await client.post(f"{API}/rides/{ride['id']}/cancel", headers=driver.headers)
     assert response.status_code == 200
+    # Doc 15: for the driver it is cancelled; the passenger goes back to searching.
     assert response.json()["status"] == "cancelled_by_driver"
-    assert recorder.pushed("cancelled_by_driver", passenger.id)
+    assert recorder.pushed("reassigning", passenger.id)
     assert (await client.get(f"{API}/drivers/me/state", headers=driver.headers)).json()[
         "active_ride_id"
     ] is None
+    mine = (await client.get(f"{API}/rides/{ride['id']}", headers=passenger.headers)).json()
+    assert mine["status"] == "searching" and mine["reassign_count"] == 1
+    assert mine["driver"] is None
+    left = (await client.get(f"{API}/rides/{ride['id']}", headers=driver.headers)).json()
+    assert left["status"] == "cancelled_by_driver"
+    response = await client.post(f"{API}/rides/{ride['id']}/cancel", headers=passenger.headers)
+    assert response.json()["status"] == "cancelled_by_passenger"
 
     ride = await _assigned_ride(client, passenger, driver)
     for step in ("arrive", "start"):

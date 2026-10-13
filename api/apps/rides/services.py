@@ -24,17 +24,24 @@ from apps.geo import clients as geo
 from apps.moderation import services as moderation
 from apps.promotions import services as promotions
 from apps.promotions.schemas import PromotionBrief
+from apps.quality import services as quality
+from apps.quality.models import QualityRole
 from apps.rates import services as rates
 from apps.referrals import services as referrals
 from apps.rides import dispatch, events, presence, pricing
 from apps.rides.models import (
     ACTIVE_STATUSES,
     ASSIGNED_STATUSES,
+    DRIVER_REASONS,
+    PASSENGER_REASONS,
+    CancelReason,
+    CancelSide,
     OfferStatus,
     PaymentMethod,
     Rating,
     RatingRole,
     Ride,
+    RideCancellation,
     RideMessage,
     RideOffer,
     RideStatus,
@@ -50,8 +57,10 @@ from apps.rides.schemas import (
 )
 from apps.rides.state import (
     OFFER_GRACE,
+    CancelReasonInvalidError,
     ChatClosedError,
     DriverNotApprovedError,
+    NoShowTooEarlyError,
     OfferExpiredError,
     OutsideServiceAreaError,
     PaymentMethodInvalidError,
@@ -169,6 +178,7 @@ def _check_area(config: AppConfig, *points: tuple[float, float]) -> str:
 
 async def create_quote(session: AsyncSession, user: User, data: QuoteRequest) -> Quote:
     await moderation.ensure_not_suspended(session, user.id)
+    await quality.ensure_not_paused(session, user.id, QualityRole.PASSENGER)
     config = await get_app_config(session)
     if data.vehicle_type not in config.enabled_vehicle_types:
         raise AppError(
@@ -218,6 +228,7 @@ async def create_quote(session: AsyncSession, user: User, data: QuoteRequest) ->
 
 async def create_ride(session: AsyncSession, user: User, data: RideCreate) -> Ride:
     await moderation.ensure_not_suspended(session, user.id)
+    await quality.ensure_not_paused(session, user.id, QualityRole.PASSENGER)
     config = await get_app_config(session)
     if data.payment_method not in {m.value for m in config.payment_methods}:
         raise PaymentMethodInvalidError(
@@ -340,6 +351,7 @@ async def go_online(
 
     profile = await _approved_profile(session, user)
     await moderation.ensure_not_suspended(session, user.id)
+    await quality.ensure_not_paused(session, user.id, QualityRole.DRIVER)
     await subscriptions.ensure_not_overdue(session, user.id)
     config = await get_app_config(session)
     # Needs the documents too: expired ones and the random selfie keep the driver offline.
@@ -446,6 +458,8 @@ async def decline(session: AsyncSession, user: User, ride_id: uuid.UUID) -> None
     await presence.release_offer(user.id, ride.id)
     if ride.status == RideStatus.SEARCHING:
         await dispatch.kick(ride.id)
+    q = (await get_app_config(session)).quality
+    await quality.after_offer_missed(session, user.id, q)
 
 
 _DRIVER_STEPS: dict[RideStatus, tuple[str, str | None]] = {
@@ -548,13 +562,34 @@ async def _credit_promotion(session: AsyncSession, ride: Ride) -> bool:
 
 
 async def _close(
-    session: AsyncSession, ride: Ride, by: User, reason: str | None, notify_ids: list[uuid.UUID]
+    session: AsyncSession,
+    ride: Ride,
+    by: User,
+    reason: str | None,
+    notify_ids: list[uuid.UUID],
+    *,
+    push_event: str | None = None,
+    **push_values: object,
 ) -> Ride:
     """Commits a cancellation already applied to ``ride`` and cleans up offers and presence."""
     now = utcnow()
     ride.cancelled_at = now
     ride.cancel_reason = reason
     ride.cancelled_by_id = by.id
+    open_offers = await _cancel_open_offers(session, ride, now)
+    await session.commit()
+
+    await _after_offers_cancelled(ride, open_offers)
+    await presence.clear_active_ride(ride.driver_id, ride.id)
+    if ride.driver_id is not None:
+        await safety_tasks.ride_ended.kiq(str(ride.id))
+    await events.emit_updated(session, ride)
+    for user_id in notify_ids:
+        await events.push_to(session, user_id, push_event or ride.status.value, ride, **push_values)
+    return ride
+
+
+async def _cancel_open_offers(session: AsyncSession, ride: Ride, now: datetime) -> list[RideOffer]:
     open_offers = list(
         await session.scalars(
             select(RideOffer).where(
@@ -565,36 +600,185 @@ async def _close(
     for offer in open_offers:
         offer.status = OfferStatus.CANCELLED
         offer.responded_at = now
-    await session.commit()
+    return open_offers
 
+
+async def _after_offers_cancelled(ride: Ride, offers: list[RideOffer]) -> None:
     await dispatch.unschedule(ride.id)
-    for offer in open_offers:
+    for offer in offers:
         await presence.release_offer(offer.driver_id, ride.id)
         await events.emit_offer_cancelled(offer.driver_id, ride.id)
-    await presence.clear_active_ride(ride.driver_id, ride.id)
-    if ride.driver_id is not None:
-        await safety_tasks.ride_ended.kiq(str(ride.id))
-    await events.emit_updated(session, ride)
-    for user_id in notify_ids:
-        await events.push_to(session, user_id, ride.status.value, ride)
+
+
+def _log_cancel(
+    session: AsyncSession,
+    ride: Ride,
+    user: User,
+    side: CancelSide,
+    code: CancelReason | None,
+    reason: str | None,
+    *,
+    counted: bool,
+    reassigned: bool = False,
+) -> None:
+    """Call before changing the status: the log keeps the stage it was cancelled from."""
+    session.add(
+        RideCancellation(
+            ride_id=ride.id,
+            user_id=user.id,
+            passenger_id=ride.passenger_id,
+            side=side,
+            reason_code=code,
+            reason=reason,
+            stage=ride.status,
+            counted=counted,
+            reassigned=reassigned,
+        )
+    )
+
+
+async def cancel(
+    session: AsyncSession,
+    user: User,
+    ride_id: uuid.UUID,
+    reason: str | None,
+    code: CancelReason | None = None,
+) -> Ride:
+    """Doc 15. A passenger's cancellation counts unless it is within the grace period after a
+    driver accepts (or the moto did not match, which also opens a report). A driver's
+    cancellation sends the ride back to searching; only ``no_show`` after the wait ends it, and
+    that one counts against the passenger instead."""
+    ride = await lock_ride_or_404(session, ride_id)
+    if user.id == ride.passenger_id:
+        return await _cancel_as_passenger(session, ride, user, reason, code)
+    if user.id == ride.driver_id:
+        return await _cancel_as_driver(session, ride, user, reason, code)
+    if user.id == ride.reassigned_from_driver_id:
+        await session.commit()  # retried cancel: the ride already went to someone else
+        return ride
+    raise RideNotFoundError()
+
+
+async def _cancel_as_passenger(
+    session: AsyncSession, ride: Ride, user: User, reason: str | None, code: CancelReason | None
+) -> Ride:
+    if ride.status == RideStatus.CANCELLED_BY_PASSENGER:
+        await session.commit()  # release the lock; nothing changed
+        return ride
+    if code is not None and code not in PASSENGER_REASONS:
+        raise CancelReasonInvalidError(details={"allowed": sorted(PASSENGER_REASONS)})
+    q = (await get_app_config(session)).quality
+    driver_id = ride.driver_id
+    counted = (
+        ride.assigned_at is not None
+        and (utcnow() - ride.assigned_at).total_seconds() > q.passenger_cancel_grace_s
+        and code != CancelReason.VEHICLE_MISMATCH
+    )
+    _log_cancel(session, ride, user, CancelSide.PASSENGER, code, reason, counted=counted)
+    transition(ride, RideStatus.CANCELLED_BY_PASSENGER)
+    ride.cancel_reason_code = code
+    await _close(session, ride, user, reason, [driver_id] if driver_id else [])
+    if code == CancelReason.VEHICLE_MISMATCH and driver_id is not None:
+        await _report_mismatch(session, user, ride, reason)
     return ride
 
 
-async def cancel(session: AsyncSession, user: User, ride_id: uuid.UUID, reason: str | None) -> Ride:
-    ride = await lock_ride_or_404(session, ride_id)
-    if user.id == ride.passenger_id:
-        target = RideStatus.CANCELLED_BY_PASSENGER
-        other = ride.driver_id
-    elif user.id == ride.driver_id:
-        target = RideStatus.CANCELLED_BY_DRIVER
-        other = ride.passenger_id
-    else:
-        raise RideNotFoundError()
-    if ride.status == target:
-        await session.commit()  # release the lock; nothing changed
+async def _report_mismatch(
+    session: AsyncSession, user: User, ride: Ride, reason: str | None
+) -> None:
+    """ "La moto no coincide" opens the same report as the support form (doc 12 counts them)."""
+    from apps.drivers import checks as driver_checks
+    from apps.moderation.models import ReportCategory
+
+    try:
+        report = await moderation.create_report(
+            session,
+            user,
+            ReportCategory.VEHICLE_MISMATCH,
+            reason or "Canceló el viaje: la moto no coincide.",
+            ride.id,
+        )
+        await session.commit()
+    except AppError:
+        await session.rollback()  # one already open for this ride, or too many open ones
+        return
+    if report.reported_user_id is not None:
+        await driver_checks.after_mismatch_report(session, report.reported_user_id)
+
+
+async def _cancel_as_driver(
+    session: AsyncSession, ride: Ride, user: User, reason: str | None, code: CancelReason | None
+) -> Ride:
+    if code is not None and code not in DRIVER_REASONS:
+        raise CancelReasonInvalidError(details={"allowed": sorted(DRIVER_REASONS)})
+    config = await get_app_config(session)
+    if code == CancelReason.NO_SHOW:
+        return await _no_show(session, ride, user, reason, config)
+    _log_cancel(
+        session,
+        ride,
+        user,
+        CancelSide.DRIVER,
+        code,
+        reason,
+        counted=code != CancelReason.SAFETY_CONCERN,
+        reassigned=True,
+    )
+    # Fails with ride_invalid_transition once the ride started, like before.
+    transition(ride, RideStatus.SEARCHING)
+    now = utcnow()
+    ride.reassigned_from_driver_id = user.id
+    ride.reassign_count = (ride.reassign_count or 0) + 1
+    ride.driver_id = None
+    ride.assigned_at = None
+    ride.arrived_at = None
+    ride.vehicle = None
+    ride.start_pin = None
+    ride.pin_failures = 0
+    ride.search_expires_at = now + timedelta(seconds=config.search_timeout_seconds)
+    await session.commit()
+
+    await presence.clear_active_ride(user.id, ride.id)
+    await dispatch.kick(ride.id)
+    await events.emit_updated(session, ride)
+    await events.emit_left(session, ride, user.id)
+    await events.push_to(session, ride.passenger_id, "reassigning", ride)
+    await quality.after_driver_cancel(session, user.id, config.quality)
+    return ride
+
+
+async def _no_show(
+    session: AsyncSession, ride: Ride, user: User, reason: str | None, config: AppConfig
+) -> Ride:
+    if ride.status == RideStatus.CANCELLED_BY_DRIVER:
+        await session.commit()
         return ride
-    transition(ride, target)
-    return await _close(session, ride, user, reason, [other] if other else [])
+    available = (
+        ride.arrived_at + timedelta(minutes=config.quality.pickup_wait_minutes)
+        if ride.arrived_at is not None
+        else None
+    )
+    if ride.status != RideStatus.DRIVER_ARRIVED or available is None or utcnow() < available:
+        raise NoShowTooEarlyError(
+            details={
+                "status": ride.status.value,
+                "available_at": available.isoformat() if available else None,
+            }
+        )
+    _log_cancel(session, ride, user, CancelSide.DRIVER, CancelReason.NO_SHOW, reason, counted=False)
+    transition(ride, RideStatus.CANCELLED_BY_DRIVER)
+    ride.cancel_reason_code = CancelReason.NO_SHOW
+    await _close(
+        session,
+        ride,
+        user,
+        reason,
+        [ride.passenger_id],
+        push_event="no_show",
+        name=events.first_name(user),
+    )
+    await quality.after_no_show(session, ride.passenger_id, config.quality)
+    return ride
 
 
 async def admin_cancel(session: AsyncSession, admin: User, ride_id: uuid.UUID, reason: str) -> Ride:
@@ -607,12 +791,13 @@ async def admin_cancel(session: AsyncSession, admin: User, ride_id: uuid.UUID, r
 # --- Chat --------------------------------------------------------------------------------------
 
 
-async def list_messages(session: AsyncSession, ride_id: uuid.UUID) -> list[RideMessage]:
-    rows = await session.scalars(
-        select(RideMessage)
-        .where(RideMessage.ride_id == ride_id)
-        .order_by(RideMessage.created_at, RideMessage.id)
-    )
+async def list_messages(
+    session: AsyncSession, ride_id: uuid.UUID, since: datetime | None = None
+) -> list[RideMessage]:
+    stmt = select(RideMessage).where(RideMessage.ride_id == ride_id)
+    if since is not None:
+        stmt = stmt.where(RideMessage.created_at >= since)
+    rows = await session.scalars(stmt.order_by(RideMessage.created_at, RideMessage.id))
     return list(rows)
 
 
@@ -768,6 +953,18 @@ async def offers_for(session: AsyncSession, ride_id: uuid.UUID) -> list[tuple[Ri
         .order_by(RideOffer.created_at)
     )
     return [(offer, name) for offer, name in rows]
+
+
+async def cancellations_for(
+    session: AsyncSession, ride_id: uuid.UUID
+) -> list[tuple[RideCancellation, str]]:
+    rows = await session.execute(
+        select(RideCancellation, User.full_name)
+        .join(User, User.id == RideCancellation.user_id)
+        .where(RideCancellation.ride_id == ride_id)
+        .order_by(RideCancellation.created_at)
+    )
+    return [(c, name) for c, name in rows]
 
 
 async def ratings_for(session: AsyncSession, ride_id: uuid.UUID) -> list[Rating]:

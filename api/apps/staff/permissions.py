@@ -8,6 +8,7 @@ PERMISSIONS: dict[str, tuple[str, ...]] = {
     "reports": ("reports.manage", "help.manage"),
     "drivers": ("drivers.view", "drivers.review", "drivers.suspend"),
     "rides": ("rides.view", "rides.cancel", "live.view"),
+    "quality": ("quality.view", "quality.manage"),
     "safety": ("safety.view", "safety.manage"),
     "promotions": ("promotions.view", "promotions.manage"),
     "rates": ("rates.view", "rates.manage"),

@@ -3,7 +3,7 @@
 import logging
 import uuid
 from collections.abc import Sequence
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import select
@@ -20,7 +20,15 @@ from apps.rates import services as rates
 from apps.rates.schemas import FrozenRates
 from apps.realtime.manager import publish
 from apps.rides import notify, presence
-from apps.rides.models import ASSIGNED_STATUSES, Rating, Ride, RideMessage, RideOffer, RideStatus
+from apps.rides.models import (
+    ASSIGNED_STATUSES,
+    Rating,
+    Ride,
+    RideCancellation,
+    RideMessage,
+    RideOffer,
+    RideStatus,
+)
 from apps.rides.schemas import (
     DriverAdminBrief,
     DriverBrief,
@@ -165,6 +173,7 @@ async def serialize_rides(
     locations = await presence.get_locations(live)
     promos = await _promotions(session, {r.promotion_id for r in rides if r.promotion_id})
     photos = await _passenger_photos(session, rides, users)
+    quality = (await get_app_config(session)).quality
 
     result: list[RideRead] = []
     for ride in rides:
@@ -220,6 +229,18 @@ async def serialize_rides(
             "completed_at": ride.completed_at,
             "cancelled_at": ride.cancelled_at,
             "cancel_reason": ride.cancel_reason,
+            "cancel_reason_code": ride.cancel_reason_code,
+            "reassign_count": ride.reassign_count or 0,
+            "no_show_at": (
+                ride.arrived_at + timedelta(minutes=quality.pickup_wait_minutes)
+                if ride.arrived_at and ride.status == RideStatus.DRIVER_ARRIVED
+                else None
+            ),
+            "cancel_free_until": (
+                ride.assigned_at + timedelta(seconds=quality.passenger_cancel_grace_s)
+                if ride.assigned_at and ride.status in PIN_STATUSES
+                else None
+            ),
             "my_rating": RatingRead.model_validate(mine) if mine else None,
             "pin_required": ride.start_pin is not None,
             "start_pin": _pin_for(ride, viewer_id),
@@ -239,6 +260,7 @@ async def serialize_rides(
                     driver_profile_id=profile.id if profile else None,
                     cancelled_by_id=ride.cancelled_by_id,
                     pin_failures=ride.pin_failures or 0,
+                    reassigned_from_driver_id=ride.reassigned_from_driver_id,
                 )
             )
         else:
@@ -279,6 +301,36 @@ async def emit_updated(session: AsyncSession, ride: Ride) -> None:
             }
         )
         await publish("ride.updated", payload.model_dump(mode="json"), user_ids=[str(user_id)])
+
+
+async def emit_left(session: AsyncSession, ride: Ride, driver_id: uuid.UUID) -> None:
+    """The driver cancelled and the ride went to another one: for them it ended (doc 15)."""
+    payload = await left_read(session, ride)
+    await publish("ride.updated", payload.model_dump(mode="json"), user_ids=[str(driver_id)])
+
+
+async def left_read(session: AsyncSession, ride: Ride) -> RideRead:
+    """How a reassigned ride looks to the driver who cancelled it."""
+    base = await serialize_ride(session, ride)
+    last = await session.scalar(
+        select(RideCancellation)
+        .where(RideCancellation.ride_id == ride.id, RideCancellation.reassigned.is_(True))
+        .order_by(RideCancellation.created_at.desc())
+        .limit(1)
+    )
+    return base.model_copy(
+        update={
+            "status": RideStatus.CANCELLED_BY_DRIVER,
+            "cancelled_at": last.created_at if last else datetime.now(UTC),
+            "cancel_reason": last.reason if last else None,
+            "cancel_reason_code": last.reason_code if last else None,
+            "driver": None,
+            "driver_location": None,
+            "no_show_at": None,
+            "cancel_free_until": None,
+            "start_pin": None,
+        }
+    )
 
 
 async def push_to(
