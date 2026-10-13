@@ -26,16 +26,25 @@ const assignedToMe = computed(() => !!me.value && report.value?.assigned_to?.id 
 const contact = computed(() => (report.value ? ticketContact(report.value) : null))
 const messages = computed(() => report.value?.messages ?? null)
 
-// The answer deadline moves with the clock: re-read it every minute, and the ticket too (the user may answer).
+// The user may answer while the ticket is open: re-read it every few seconds (only in a visible tab, and at
+// once when the tab comes back). The answer deadline moves with the clock: tick it every minute.
+const POLL_MS = 5_000
 const now = ref(Date.now())
-let timer: ReturnType<typeof setInterval> | undefined
+let pollTimer: ReturnType<typeof setInterval> | undefined
+let clockTimer: ReturnType<typeof setInterval> | undefined
+function poll() {
+  if (document.visibilityState === 'visible' && !busy.value && status.value !== 'pending') refresh()
+}
 onMounted(() => {
-  timer = setInterval(() => {
-    now.value = Date.now()
-    if (document.visibilityState === 'visible' && !busy.value) refresh()
-  }, 60_000)
+  pollTimer = setInterval(poll, POLL_MS)
+  clockTimer = setInterval(() => (now.value = Date.now()), 60_000)
+  document.addEventListener('visibilitychange', poll)
 })
-onBeforeUnmount(() => clearInterval(timer))
+onBeforeUnmount(() => {
+  clearInterval(pollTimer)
+  clearInterval(clockTimer)
+  document.removeEventListener('visibilitychange', poll)
+})
 const sla = computed(() => (report.value ? slaState(report.value, now.value) : null))
 
 // Oldest first, like a conversation.
