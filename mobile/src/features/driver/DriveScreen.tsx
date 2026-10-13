@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
 
-import { ChevronDown, CircleX, Flag, HandCoins, MapPin, MessageCircle, Navigation, Power } from '@/components/icons';
+import { ChevronDown, CircleX, Flag, HandCoins, MapPin, MessageCircle, Navigation, Power, ShieldCheck } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { VesLine } from '@/components/Money';
@@ -12,6 +12,10 @@ import { Button, EmptyState, IconButton, ProgressSteps, StatusPill, Txt } from '
 import { Avatar, PAYMENT_ICONS, RatingBadge, RoundAction } from '@/features/ride/components';
 import { CancelSheet } from '@/features/ride/RideSheets';
 import { chatUnread } from '@/features/ride/store';
+import { PinPad } from '@/features/safety/PinPad';
+import { SafetySheet } from '@/features/safety/SafetySheet';
+import { useFirstRideTips } from '@/features/safety/SafetyTips';
+import { SosButton } from '@/features/safety/SosButton';
 import { useFlag } from '@/hooks/useBootstrap';
 import { useUserLocation } from '@/hooks/useLocation';
 import { useActiveRide, useCancelRide, useDriverRideAction, useRide } from '@/hooks/useRides';
@@ -31,6 +35,7 @@ import {
   nextDriverAction,
   wazeNavigationUrl,
 } from '@/lib/ride';
+import { needsPin } from '@/lib/safety';
 import { useStore } from '@/lib/store';
 import type { LatLng } from '@/lib/types';
 import { fonts, radius, space, useTheme } from '@/theme';
@@ -60,11 +65,14 @@ export function DriveScreen() {
   const action = useDriverRideAction();
   const cancel = useCancelRide();
   const [cancelOpen, setCancelOpen] = useState(false);
+  const [pinOpen, setPinOpen] = useState(false);
+  const [safety, setSafety] = useState(false);
   const { position } = useUserLocation();
   const unread = useStore(chatUnread)[rideId ?? ''] ?? 0;
   // The chat can be switched off remotely (doc 10): the button then disappears.
   const chatOn = useFlag('chat');
   const route = useMemo(() => decodePolyline(ride?.polyline), [ride?.polyline]);
+  useFirstRideTips('driver', !!ride && !!nextDriverAction(ride.status));
 
   if (!ride) {
     return (
@@ -106,6 +114,11 @@ export function DriveScreen() {
           onError: (e) => showToast(apiErrorMessage(e), 'danger'),
         },
       );
+    // Doc 11: the passenger's PIN before starting, where the city asks for it.
+    if (next === 'start' && needsPin(ride)) {
+      setPinOpen(true);
+      return;
+    }
     if (next === 'complete') {
       Alert.alert(t('drive.completeConfirmTitle'), t(credit ? 'drive.completeConfirmBodyPromo' : 'drive.completeConfirmBody', {
           fare: collect,
@@ -145,6 +158,7 @@ export function DriveScreen() {
         <View style={styles.topBar}>
           <IconButton icon={ChevronDown} label={t('ride.minimize')} onPress={() => (router.canGoBack() ? router.back() : goHome())} />
           <StatusPill label={t(`ride.status.${ride.status}`)} tone={ride.status === 'driver_arrived' ? 'accent' : 'primary'} dot />
+          {!ended ? <SosButton ride={ride} /> : <View style={{ width: 44 }} />}
         </View>
       }
       footer={
@@ -189,13 +203,15 @@ export function DriveScreen() {
       ) : null}
 
       <View style={[styles.passenger, { backgroundColor: theme.background }]}>
-        <Avatar name={ride.passenger.first_name} size={52} />
+        {/* Doc 11: the passenger's photo, when the city's rule shows it (e.g. at night). */}
+        <Avatar name={ride.passenger.first_name} photoUrl={ride.passenger.photo_url} size={52} />
         <View style={{ flex: 1, gap: 4 }}>
           <Txt variant="subtitle" numberOfLines={1}>
             {ride.passenger.first_name}
           </Txt>
           <RatingBadge rating={ride.passenger.rating} />
         </View>
+        {!ended ? <RoundAction icon={ShieldCheck} label={t('ride.safety')} onPress={() => setSafety(true)} /> : null}
         {!ended && chatOn ? (
           <RoundAction
             icon={MessageCircle}
@@ -234,6 +250,24 @@ export function DriveScreen() {
 
       {canDriverCancel(ride.status) ? (
         <Button title={t('ride.cancel')} variant="danger" size="sm" loading={cancel.isPending} onPress={() => setCancelOpen(true)} />
+      ) : null}
+      <SafetySheet visible={safety} ride={ride} role="driver" onClose={() => setSafety(false)} />
+      {pinOpen ? (
+        <PinPad
+          visible
+        ride={ride}
+        onClose={() => setPinOpen(false)}
+        onSubmit={async (pin) => {
+          await action.mutateAsync({ id: ride.id, action: 'start', pin });
+          confirmHaptic();
+          setPinOpen(false);
+        }}
+        onCancelRide={() => {
+          setPinOpen(false);
+          // iOS shows one modal at a time: let the keypad close first.
+          setTimeout(() => setCancelOpen(true), Platform.OS === 'ios' ? 450 : 50);
+        }}
+        />
       ) : null}
       <CancelSheet
         visible={cancelOpen}

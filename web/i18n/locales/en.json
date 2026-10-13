@@ -226,5 +226,39 @@
     "notFound": "We could not find this page",
     "notFoundBody": "The link may be mistyped or the page no longer exists.",
     "home": "Go home"
+  },
+  "shared": {
+    "metaTitle": "Live ride · Kuulis",
+    "following": "{name}'s ride",
+    "status": {
+      "searching": "Looking for a driver",
+      "driver_assigned": "The driver is on the way to the pickup",
+      "driver_arrived": "The driver is at the pickup",
+      "in_progress": "On the ride",
+      "completed": "Ride finished",
+      "cancelled_by_passenger": "Ride cancelled",
+      "cancelled_by_driver": "Ride cancelled",
+      "cancelled_by_admin": "Ride cancelled",
+      "no_drivers": "No drivers were available"
+    },
+    "eta": "Estimated arrival: {time}",
+    "mapLabel": "Map with the ride's position",
+    "pickup": "Pickup",
+    "dropoff": "Destination",
+    "moto": "Driver",
+    "sosHere": "Last SOS location",
+    "openMaps": "Open in Google Maps",
+    "from": "From",
+    "to": "To",
+    "updated": "Refreshes on its own · last update {time}",
+    "sosTitle": "{name} pressed SOS.",
+    "sosBody": "The Kuulis team has been alerted. If you can, call them or call 911.",
+    "help": "This page stops working when the ride ends.",
+    "endedTitle": "This ride has ended",
+    "endedBody": "The location is no longer shared. Thanks for keeping an eye out.",
+    "invalidTitle": "Invalid link",
+    "invalidBody": "Check the link is complete or ask for a new one.",
+    "failedTitle": "We couldn't load the ride",
+    "failedBody": "Check your connection; we'll keep trying."
   }
 }

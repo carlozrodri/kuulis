@@ -293,19 +293,37 @@
       "remove": "Quitar lugar"
     },
     "contact": {
-      "title": "Contacto de confianza",
-      "subtitle": "Alguien a quien enviarle tu viaje por WhatsApp con un toque.",
+      "title": "Contactos de confianza",
+      "subtitle": "Hasta 5 personas que pueden seguir tus viajes en vivo y recibir tu SOS.",
       "name": "Nombre",
       "namePlaceholder": "Ej. María Pérez",
       "phone": "Teléfono con WhatsApp",
       "phoneHint": "Número venezolano o con código de país",
       "phoneInvalid": "Revisa el número, parece incompleto",
-      "how": "Durante un viaje, el botón Compartir le envía a esta persona los datos del motorizado, la placa y tu destino.",
-      "saved": "Contacto de confianza guardado",
+      "how": "Durante un viaje, Tu seguridad les envía por WhatsApp un enlace para seguir la moto en vivo. Si activas el SOS, te ofrecemos avisarles.",
+      "saved": "Contacto guardado",
+      "add": "Agregar contacto",
+      "edit": "Editar contacto",
+      "full_one": "Ya tienes {{count}} contacto, el máximo.",
+      "full_other": "Ya tienes {{count}} contactos, el máximo.",
       "remove": "Quitar contacto",
-      "removed": "Quitamos tu contacto de confianza",
-      "rowHint": "Comparte tus viajes por WhatsApp",
-      "current": "{{name}} recibe tus viajes"
+      "removeTitle": "¿Quitar a {{name}}?",
+      "removed": "Quitamos el contacto",
+      "rowHint": "Comparte tus viajes en vivo",
+      "current_one": "{{count}} contacto",
+      "current_other": "{{count}} contactos",
+      "auto": {
+        "title": "Compartir mis viajes automáticamente",
+        "off": "No",
+        "always": "Siempre",
+        "night": "De noche",
+        "offShort": "Solo cuando lo envíes",
+        "alwaysShort": "Todos tus viajes",
+        "nightShort": "Viajes de noche",
+        "offHint": "Le envías el viaje cuando quieras desde Tu seguridad.",
+        "alwaysHint": "Al asignarse un motorizado te ofrecemos enviarle el viaje con un toque.",
+        "nightHint": "Entre las 7:00 p. m. y las 6:00 a. m. te ofrecemos enviarle el viaje con un toque."
+      }
     },
     "invite": {
       "section": "Invita y gana",
@@ -590,7 +608,18 @@
     "export_too_soon": "Puedes descargar tus datos una vez al día.",
     "app_update_required": "Necesitas actualizar Kuulis para hacer esto",
     "feature_disabled": "Esta función no está disponible por ahora.",
-    "service_paused": "Por ahora no se pueden pedir viajes en tu zona. Vuelve a intentarlo en un rato."
+    "service_paused": "Por ahora no se pueden pedir viajes en tu zona. Vuelve a intentarlo en un rato.",
+    "pin_invalid": "PIN incorrecto",
+    "pin_attempts_exceeded": "Fallaste el PIN 3 veces. Escribe a soporte o cancela el viaje.",
+    "too_many_contacts": "Puedes tener hasta 5 contactos de confianza",
+    "contact_not_found": "Ese contacto ya no existe",
+    "share_closed": "El viaje ya terminó, no se puede compartir",
+    "share_expired": "Este viaje ya terminó",
+    "share_not_found": "Enlace no encontrado",
+    "sos_closed": "El SOS solo se puede activar durante el viaje o poco después",
+    "alert_not_found": "Esa alerta ya no existe",
+    "alert_closed": "Esa alerta ya se cerró",
+    "no_active_sos": "No tienes un SOS activo"
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -753,8 +782,7 @@
       "title": "Kuulis canceló este viaje",
       "body": "Nuestro equipo de soporte canceló el viaje. Si lo necesitas, puedes pedir otra moto ahora mismo."
     },
-    "reportProblem": "Reportar un problema",
-    "shareWith": "Enviar a {{name}}"
+    "reportProblem": "Reportar un problema"
   },
   "cancel": {
     "title": "¿Por qué cancelas?",
@@ -779,14 +807,109 @@
     "call911Hint": "Emergencias en Venezuela",
     "share": "Compartir mi viaje",
     "shareHint": "Envía los datos del motorizado y tu destino a alguien de confianza",
+    "shareLive": "Compartir viaje en vivo",
+    "shareLiveHint": "Un enlace para seguir la moto en el mapa hasta que termine el viaje",
     "report": "Reportar un problema",
     "reportHint": "Cuéntale al equipo de Kuulis qué pasó",
     "sendContact": "Enviar a {{name}}",
-    "sendContactHint": "Le llega tu viaje por WhatsApp",
-    "addContact": "Agregar contacto de confianza",
-    "addContactHint": "Para enviarle tus viajes con un toque",
-    "whatsapp": "Enviar por WhatsApp",
-    "whatsappHint": "Elige a quién enviárselo"
+    "sendContactHint": "Le llega el enlace del viaje en vivo por WhatsApp",
+    "addContact": "Agregar contactos de confianza",
+    "addContactHint": "Para enviarles tus viajes con un toque",
+    "live": {
+      "message": "Sigue mi viaje en Kuulis en vivo: {{url}}\nMotorizado: {{driver}} · Placa {{plate}}\nVoy a: {{dropoff}}",
+      "sosMessage": "🚨 Activé el SOS en Kuulis y puedo necesitar ayuda. Mira dónde estoy en vivo: {{url}}\nMotorizado: {{driver}} · Placa {{plate}}\nIba a: {{dropoff}}"
+    },
+    "sos": {
+      "short": "SOS",
+      "label": "SOS, emergencia",
+      "holdHint": "Mantén presionado 2 segundos para pedir ayuda",
+      "sent": "Avisamos al equipo de Kuulis con tu ubicación",
+      "sheetTitle": "Avisa a tus contactos",
+      "sheetBody": "Les llega un enlace para ver dónde estás en vivo.",
+      "sendTo": "Avisar a {{name}}",
+      "sendToHint": "Por WhatsApp, con tu ubicación en vivo",
+      "shareOther": "Enviar por otra app",
+      "active": "SOS activo: compartiendo tu ubicación",
+      "notify": "Avisar",
+      "cancel": "Cancelar",
+      "cancelTitle": "¿Cancelar el SOS?",
+      "cancelBody": "Hazlo solo si estás a salvo. Dejaremos de compartir tu ubicación.",
+      "cancelConfirm": "Estoy a salvo",
+      "cancelled": "SOS cancelado"
+    },
+    "pin": {
+      "title": "Tu PIN de viaje",
+      "body": "Dáselo al motorizado al subir. Sin él no puede iniciar el viaje.",
+      "askTitle": "Pídele el PIN a {{name}}",
+      "askBody": "Son 4 números que el pasajero ve en su app. Así confirmas que es la persona correcta.",
+      "wrong": "PIN incorrecto. Revísalo con el pasajero.",
+      "wrongLeft_one": "PIN incorrecto. Te queda {{count}} intento.",
+      "wrongLeft_other": "PIN incorrecto. Te quedan {{count}} intentos.",
+      "locked": "Fallaste el PIN 3 veces. Escribe a soporte o cancela el viaje sin penalidad.",
+      "callSupport": "Escribir a soporte",
+      "supportMessage": "Hola, soy motorizado de Kuulis y el PIN del pasajero no funciona.",
+      "cancelRide": "Cancelar el viaje",
+      "typed": "{{count}} de 4 números",
+      "delete": "Borrar",
+      "confirm": "Iniciar viaje",
+      "attempts": "Tienes 3 intentos"
+    },
+    "checkIn": {
+      "title": "¿Todo bien?",
+      "stop": "El viaje lleva varios minutos detenido.",
+      "deviation": "El viaje se apartó de la ruta prevista.",
+      "overtime": "El viaje está tardando mucho más de lo estimado.",
+      "deadline": "Si no respondes en {{count}} s, avisamos al equipo de Kuulis.",
+      "ok": "Estoy bien",
+      "help": "Necesito ayuda",
+      "thanks": "Gracias, seguimos pendientes",
+      "helpSent": "Avisamos al equipo de Kuulis"
+    },
+    "autoShare": {
+      "title": "¿Compartir tu viaje?",
+      "body": "Tienes activado compartir tus viajes con estos contactos."
+    },
+    "tips": {
+      "open": "Consejos de seguridad",
+      "title": "Viaja seguro",
+      "done": "Entendido",
+      "passenger": {
+        "plate": {
+          "title": "Revisa la placa y la foto",
+          "body": "Antes de subir, confirma que la moto y el motorizado son los de la app."
+        },
+        "pin": {
+          "title": "Da tu PIN solo al subir",
+          "body": "El motorizado lo necesita para iniciar el viaje. Si no te lo pide, no subas."
+        },
+        "share": {
+          "title": "Comparte tu viaje",
+          "body": "Envía el enlace en vivo a alguien de confianza desde Tu seguridad."
+        },
+        "sos": {
+          "title": "SOS siempre a mano",
+          "body": "Mantén presionado SOS 2 segundos: llamamos al 911 y avisamos al equipo de Kuulis."
+        }
+      },
+      "driver": {
+        "helmet": {
+          "title": "Lleva casco para el pasajero",
+          "body": "Es obligatorio y le da confianza a quien viaja contigo."
+        },
+        "pin": {
+          "title": "Pide el PIN antes de arrancar",
+          "body": "Confirma que llevas a la persona correcta: sin PIN no se inicia el viaje."
+        },
+        "share": {
+          "title": "Comparte el viaje",
+          "body": "Tú también puedes enviar el enlace en vivo a alguien de confianza."
+        },
+        "sos": {
+          "title": "SOS siempre a mano",
+          "body": "Mantén presionado SOS 2 segundos: llamamos al 911 y avisamos al equipo de Kuulis."
+        }
+      }
+    }
   },
   "chat": {
     "title": "Chat",

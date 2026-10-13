@@ -32,6 +32,7 @@ import { showToast } from '@/components/Toast';
 import { Button, Card, IconTile, ListRow, Sheet, TAB_BAR_SPACE, Txt, Wordmark } from '@/components/ui';
 import { useDriverProfile } from '@/hooks/useDriver';
 import { useDriverStats, usePassengerStats } from '@/hooks/useRides';
+import { useTrustedContacts } from '@/hooks/useSafety';
 import { apiErrorMessage, SUPPORTED_LOCALES, type Locale } from '@/i18n';
 import { api } from '@/lib/api';
 import { config as appConfig } from '@/lib/config';
@@ -57,6 +58,7 @@ export function ProfileScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { user, signOut, refreshUser } = useAuth();
+  const contactCount = useTrustedContacts(!!user).data?.length ?? 0;
   const { mode: storedMode, setMode } = useMode();
   const mode: AppMode = storedMode ?? 'passenger';
   const preference = useStore(themePreference);
@@ -237,11 +239,7 @@ export function ProfileScreen() {
                 icon={HeartHandshake}
                 iconTone="accent"
                 title={t('profile.contact.title')}
-                subtitle={
-                  user?.trusted_contact_name
-                    ? t('profile.contact.current', { name: user.trusted_contact_name })
-                    : t('profile.contact.rowHint')
-                }
+                subtitle={contactCount ? t('profile.contact.current', { count: contactCount }) : t('profile.contact.rowHint')}
                 divider
                 onPress={() => router.push('/profile/contact')}
               />

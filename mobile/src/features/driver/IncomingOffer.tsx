@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HandCoins, Navigation, Route } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { Txt } from '@/components/ui';
-import { CountdownRing, PAYMENT_ICONS, RatingBadge } from '@/features/ride/components';
+import { Avatar, CountdownRing, PAYMENT_ICONS, RatingBadge } from '@/features/ride/components';
 import { routedRides } from '@/features/ride/store';
 import { useAppConfig } from '@/hooks/useDriver';
 import { useOfferResponse } from '@/hooks/useRides';
@@ -124,6 +124,8 @@ export function IncomingOffer({ offer }: { offer: Offer | null }) {
 
           <View style={styles.card}>
             <View style={styles.passenger}>
+              {/* Doc 11: the passenger's photo when the city's rule shows it (e.g. at night). */}
+              {offer.passenger.photo_url ? <Avatar name={offer.passenger.first_name} photoUrl={offer.passenger.photo_url} size={40} /> : null}
               <Txt variant="subtitle" style={{ color: c.text, flex: 1 }} numberOfLines={1}>
                 {offer.passenger.first_name}
               </Txt>

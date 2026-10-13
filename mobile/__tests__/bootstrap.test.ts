@@ -96,11 +96,11 @@ describe('parseBootstrap', () => {
 });
 
 describe('flags', () => {
-  it('defaults while unknown: existing features on, share_live_link off', () => {
+  it('defaults while unknown: every feature on, share_live_link included', () => {
     expect(flagValue(null, 'chat')).toBe(true);
     expect(flagValue(null, 'promotions')).toBe(true);
     expect(flagValue(null, 'transfers')).toBe(true);
-    expect(flagValue(null, 'share_live_link')).toBe(false);
+    expect(flagValue(null, 'share_live_link')).toBe(true);
     expect(flagValue(parseBootstrap(SAMPLE), 'chat')).toBe(false);
   });
 });

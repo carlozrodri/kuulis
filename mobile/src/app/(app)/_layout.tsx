@@ -5,6 +5,7 @@ import { ConnectionBanner } from '@/components/ConnectionBanner';
 import { ToastHost } from '@/components/Toast';
 import { MaintenanceGate } from '@/features/control/MaintenanceScreen';
 import { DriverController, RideNavigator, RideSync } from '@/features/ride/RideController';
+import { SafetyController } from '@/features/safety/SafetyController';
 import { UpdateGate } from '@/features/update/UpdateGate';
 import { BootstrapSync } from '@/hooks/useBootstrap';
 import { RealtimeProvider } from '@/hooks/useRealtime';
@@ -57,6 +58,8 @@ export default function AppLayout() {
         <RideSync />
         <RideNavigator />
         {mode === 'driver' ? <DriverController /> : null}
+        {/* Trip safety (doc 11): "¿Todo bien?", the open SOS banner and its live position. */}
+        <SafetyController />
         {/* Maintenance (doc 10): covers home and ride requests, never a ride in progress. */}
         <MaintenanceGate />
         {/* Mandatory APK update (doc 09): covers everything above, except during a ride. */}

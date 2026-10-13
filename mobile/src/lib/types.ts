@@ -16,9 +16,6 @@ export interface User {
   /** Rating received as a passenger (older servers omit it). */
   rating_avg?: number | null;
   rating_count?: number;
-  /** Someone to share rides with over WhatsApp (phone in E.164). */
-  trusted_contact_name?: string | null;
-  trusted_contact_phone?: string | null;
   /** Phase 1E: the account suspension in force, null when there is none (older servers omit it). */
   suspension?: Suspension | null;
   /** Doc 07: legal texts this user still has to accept (older servers omit it). */
@@ -251,6 +248,8 @@ export interface RidePassenger {
   id: string;
   first_name: string;
   rating: number | string | null;
+  /** Doc 11: shown to the driver only when the city's safety rule allows it (e.g. at night). */
+  photo_url?: string | null;
 }
 
 export interface RideDriver {
@@ -300,6 +299,9 @@ export interface Ride {
   /** Bs per USD, frozen when the ride was requested. */
   rates?: { bcv: string | null; binance: string | null } | null;
   total_ves?: VesAmount | null;
+  // Doc 11: the driver types the passenger's PIN to start; only the passenger receives `start_pin`.
+  pin_required?: boolean;
+  start_pin?: string | null;
 }
 
 export interface Offer {
@@ -312,7 +314,7 @@ export interface Offer {
   pickup_eta_s: number;
   fare: string;
   payment_method: PaymentMethod;
-  passenger: { first_name: string; rating: number | string | null };
+  passenger: { first_name: string; rating: number | string | null; photo_url?: string | null };
   expires_at: string;
   // Phase 1C (optional): the driver collects `total`; Kuulis credits `discount` on completion.
   discount?: string;
@@ -646,4 +648,38 @@ export interface AppVersionCheck {
   minimum_build: number;
   update_available: boolean;
   update_required: boolean;
+}
+
+// ---- Trip safety (doc 11) ----
+
+/** Up to five; `auto_share` offers to share every ride, only between from/to (Caracas time) when set. */
+export interface TrustedContact {
+  id: string;
+  name: string;
+  phone: string;
+  auto_share: boolean;
+  auto_share_from: string | null;
+  auto_share_to: string | null;
+}
+
+export interface ShareLink {
+  url: string;
+  token: string;
+}
+
+export type SafetyAlertKind = 'sos' | 'stop' | 'deviation' | 'overtime';
+
+/** An open SOS of mine, or a "¿Todo bien?" waiting for my answer. */
+export interface SafetyAlert {
+  id: string;
+  ride_id: string | null;
+  kind: SafetyAlertKind;
+  status: 'checking' | 'open' | 'acknowledged' | 'resolved' | 'dismissed';
+  created_at: string;
+  check_in_deadline?: string | null;
+}
+
+export interface SosResult extends SafetyAlert {
+  share_url: string | null;
+  location_seconds: number;
 }

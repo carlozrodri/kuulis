@@ -293,19 +293,37 @@
       "remove": "Remove place"
     },
     "contact": {
-      "title": "Trusted contact",
-      "subtitle": "Someone you can send your ride to on WhatsApp in one tap.",
+      "title": "Trusted contacts",
+      "subtitle": "Up to 5 people who can follow your rides live and get your SOS.",
       "name": "Name",
-      "namePlaceholder": "e.g. María Pérez",
-      "phone": "WhatsApp phone number",
+      "namePlaceholder": "E.g. María Pérez",
+      "phone": "WhatsApp number",
       "phoneHint": "Venezuelan number or with country code",
       "phoneInvalid": "Check the number, it looks incomplete",
-      "how": "During a ride, the Share button sends this person the driver's details, the plate and your destination.",
-      "saved": "Trusted contact saved",
+      "how": "During a ride, Your safety sends them a WhatsApp link to follow the moto live. If you press SOS, we offer to alert them.",
+      "saved": "Contact saved",
+      "add": "Add contact",
+      "edit": "Edit contact",
+      "full_one": "You already have {{count}} contact, the maximum.",
+      "full_other": "You already have {{count}} contacts, the maximum.",
       "remove": "Remove contact",
-      "removed": "Trusted contact removed",
-      "rowHint": "Share your rides on WhatsApp",
-      "current": "{{name}} gets your rides"
+      "removeTitle": "Remove {{name}}?",
+      "removed": "Contact removed",
+      "rowHint": "Share your rides live",
+      "current_one": "{{count}} contact",
+      "current_other": "{{count}} contacts",
+      "auto": {
+        "title": "Share my rides automatically",
+        "off": "No",
+        "always": "Always",
+        "night": "At night",
+        "offShort": "Only when you send it",
+        "alwaysShort": "Every ride",
+        "nightShort": "Night rides",
+        "offHint": "Send them the ride whenever you want from Your safety.",
+        "alwaysHint": "When a driver is assigned we offer to send them the ride with one tap.",
+        "nightHint": "Between 7:00 p.m. and 6:00 a.m. we offer to send them the ride with one tap."
+      }
     },
     "invite": {
       "section": "Invite and earn",
@@ -590,7 +608,18 @@
     "export_too_soon": "You can download your data once a day.",
     "app_update_required": "You need to update Kuulis to do this",
     "feature_disabled": "This feature isn't available right now.",
-    "service_paused": "Rides can't be requested in your area right now. Try again in a little while."
+    "service_paused": "Rides can't be requested in your area right now. Try again in a little while.",
+    "pin_invalid": "Wrong PIN",
+    "pin_attempts_exceeded": "The PIN failed 3 times. Message support or cancel the ride.",
+    "too_many_contacts": "You can have up to 5 trusted contacts",
+    "contact_not_found": "That contact no longer exists",
+    "share_closed": "The ride is over, it can't be shared",
+    "share_expired": "This ride is over",
+    "share_not_found": "Link not found",
+    "sos_closed": "SOS works only during the ride or shortly after",
+    "alert_not_found": "That alert no longer exists",
+    "alert_closed": "That alert is already closed",
+    "no_active_sos": "You don't have an active SOS"
   },
   "map": {
     "recenter": "Recenter map"
@@ -753,8 +782,7 @@
       "title": "Kuulis cancelled this ride",
       "body": "Our support team cancelled the ride. If you still need it, you can request another moto right now."
     },
-    "reportProblem": "Report a problem",
-    "shareWith": "Send to {{name}}"
+    "reportProblem": "Report a problem"
   },
   "cancel": {
     "title": "Why are you cancelling?",
@@ -779,14 +807,109 @@
     "call911Hint": "Emergencies in Venezuela",
     "share": "Share my ride",
     "shareHint": "Send the driver's details and your destination to someone you trust",
+    "shareLive": "Share ride live",
+    "shareLiveHint": "A link to follow the moto on the map until the ride ends",
     "report": "Report a problem",
     "reportHint": "Tell the Kuulis team what happened",
     "sendContact": "Send to {{name}}",
-    "sendContactHint": "They get your ride on WhatsApp",
-    "addContact": "Add a trusted contact",
-    "addContactHint": "To send them your rides in one tap",
-    "whatsapp": "Send on WhatsApp",
-    "whatsappHint": "Choose who to send it to"
+    "sendContactHint": "They get the live ride link on WhatsApp",
+    "addContact": "Add trusted contacts",
+    "addContactHint": "To send them your rides with one tap",
+    "live": {
+      "message": "Follow my Kuulis ride live: {{url}}\nDriver: {{driver}} · Plate {{plate}}\nGoing to: {{dropoff}}",
+      "sosMessage": "🚨 I pressed SOS on Kuulis and may need help. See where I am live: {{url}}\nDriver: {{driver}} · Plate {{plate}}\nGoing to: {{dropoff}}"
+    },
+    "sos": {
+      "short": "SOS",
+      "label": "SOS, emergency",
+      "holdHint": "Hold for 2 seconds to ask for help",
+      "sent": "We alerted the Kuulis team with your location",
+      "sheetTitle": "Alert your contacts",
+      "sheetBody": "They get a link to see where you are, live.",
+      "sendTo": "Alert {{name}}",
+      "sendToHint": "On WhatsApp, with your live location",
+      "shareOther": "Send with another app",
+      "active": "SOS active: sharing your location",
+      "notify": "Alert",
+      "cancel": "Cancel",
+      "cancelTitle": "Cancel the SOS?",
+      "cancelBody": "Only if you are safe. We will stop sharing your location.",
+      "cancelConfirm": "I'm safe",
+      "cancelled": "SOS cancelled"
+    },
+    "pin": {
+      "title": "Your ride PIN",
+      "body": "Give it to the driver when you get on. Without it the ride can't start.",
+      "askTitle": "Ask {{name}} for the PIN",
+      "askBody": "4 digits the passenger sees in their app. It confirms you have the right person.",
+      "wrong": "Wrong PIN. Check it with the passenger.",
+      "wrongLeft_one": "Wrong PIN. {{count}} try left.",
+      "wrongLeft_other": "Wrong PIN. {{count}} tries left.",
+      "locked": "The PIN failed 3 times. Message support or cancel the ride without penalty.",
+      "callSupport": "Message support",
+      "supportMessage": "Hi, I'm a Kuulis driver and the passenger's PIN doesn't work.",
+      "cancelRide": "Cancel the ride",
+      "typed": "{{count}} of 4 digits",
+      "delete": "Delete",
+      "confirm": "Start ride",
+      "attempts": "You have 3 tries"
+    },
+    "checkIn": {
+      "title": "Everything OK?",
+      "stop": "Your ride has been stopped for a few minutes.",
+      "deviation": "Your ride left the planned route.",
+      "overtime": "Your ride is taking much longer than expected.",
+      "deadline": "If you don't answer in {{count}} s, we alert the Kuulis team.",
+      "ok": "I'm OK",
+      "help": "I need help",
+      "thanks": "Thanks, we'll keep an eye out",
+      "helpSent": "We alerted the Kuulis team"
+    },
+    "autoShare": {
+      "title": "Share your ride?",
+      "body": "You chose to share your rides with these contacts."
+    },
+    "tips": {
+      "open": "Safety tips",
+      "title": "Ride safe",
+      "done": "Got it",
+      "passenger": {
+        "plate": {
+          "title": "Check the plate and photo",
+          "body": "Before getting on, make sure the moto and driver match the app."
+        },
+        "pin": {
+          "title": "Give your PIN only when you get on",
+          "body": "The driver needs it to start the ride. If they don't ask for it, don't get on."
+        },
+        "share": {
+          "title": "Share your ride",
+          "body": "Send the live link to someone you trust from Your safety."
+        },
+        "sos": {
+          "title": "SOS always at hand",
+          "body": "Hold SOS for 2 seconds: we call 911 and alert the Kuulis team."
+        }
+      },
+      "driver": {
+        "helmet": {
+          "title": "Carry a helmet for the passenger",
+          "body": "It is mandatory and puts your passenger at ease."
+        },
+        "pin": {
+          "title": "Ask for the PIN before leaving",
+          "body": "Make sure you have the right person: the ride can't start without the PIN."
+        },
+        "share": {
+          "title": "Share the ride",
+          "body": "You can also send the live link to someone you trust."
+        },
+        "sos": {
+          "title": "SOS always at hand",
+          "body": "Hold SOS for 2 seconds: we call 911 and alert the Kuulis team."
+        }
+      }
+    }
   },
   "chat": {
     "title": "Chat",

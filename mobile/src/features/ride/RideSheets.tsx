@@ -1,15 +1,12 @@
-import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, Share } from 'react-native';
 
-import { CircleHelp, CircleX, Flag, HeartHandshake, MessageCircle, PhoneCall, Share2 } from '@/components/icons';
+import { CircleHelp, CircleX } from '@/components/icons';
 import { Sheet } from '@/components/ui';
-import { useAppLinks } from '@/hooks/useBootstrap';
 import { whatsappUrl } from '@/lib/profile';
 import { CANCEL_REASONS, formatPlate, shortAddress } from '@/lib/ride';
 import type { Ride } from '@/lib/types';
-import { useAuth } from '@/providers/AuthProvider';
 
 /** Re-renders every `interval` ms (clocks, ETAs). */
 export function useNow(interval = 1000) {
@@ -79,61 +76,4 @@ export async function shareRideWhatsApp(ride: Ride, t: Translate, phone?: string
   } catch {
     await shareRide(ride, t);
   }
-}
-
-/** Safety tools: call emergencies, report a problem, share the trip. */
-export function SafetySheet({ visible, ride, onClose }: { visible: boolean; ride: Ride; onClose: () => void }) {
-  const { t } = useTranslation();
-  // Remote emergency number (doc 10), 911 by default.
-  const { emergency } = useAppLinks();
-  const { user } = useAuth();
-  const contact = user?.trusted_contact_phone ? { name: user.trusted_contact_name ?? '', phone: user.trusted_contact_phone } : null;
-  return (
-    <Sheet
-      visible={visible}
-      title={t('safety.title')}
-      subtitle={t('safety.subtitle')}
-      onClose={onClose}
-      options={[
-        {
-          label: t('safety.call911', { number: emergency }),
-          hint: t('safety.call911Hint'),
-          icon: PhoneCall,
-          destructive: true,
-          onPress: () => void Linking.openURL(`tel:${emergency}`).catch(() => undefined),
-        },
-        {
-          label: t('safety.report'),
-          hint: t('safety.reportHint'),
-          icon: Flag,
-          onPress: () => router.push({ pathname: '/report', params: { ride_id: ride.id } }),
-        },
-        contact
-          ? {
-              label: t('safety.sendContact', { name: contact.name }),
-              hint: t('safety.sendContactHint'),
-              icon: HeartHandshake,
-              onPress: () => void shareRideWhatsApp(ride, t, contact.phone),
-            }
-          : {
-              label: t('safety.addContact'),
-              hint: t('safety.addContactHint'),
-              icon: HeartHandshake,
-              onPress: () => router.push('/profile/contact'),
-            },
-        {
-          label: t('safety.whatsapp'),
-          hint: t('safety.whatsappHint'),
-          icon: MessageCircle,
-          onPress: () => void shareRideWhatsApp(ride, t),
-        },
-        {
-          label: t('safety.share'),
-          hint: t('safety.shareHint'),
-          icon: Share2,
-          onPress: () => void shareRide(ride, t),
-        },
-      ]}
-    />
-  );
 }

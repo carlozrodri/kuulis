@@ -271,8 +271,9 @@ export function useCancelRide() {
 export function useDriverRideAction() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, action }: { id: string; action: 'arrive' | 'start' | 'complete' }) =>
-      api<Ride>(`/rides/${id}/${action}`, { method: 'POST' }),
+    // Doc 11: "start" carries the passenger's PIN when the ride requires one.
+    mutationFn: ({ id, action, pin }: { id: string; action: 'arrive' | 'start' | 'complete'; pin?: string }) =>
+      api<Ride>(`/rides/${id}/${action}`, { method: 'POST', body: pin ? { pin } : undefined }),
     onSuccess: (ride) => applyRide(queryClient, ride),
     onError: () => void queryClient.invalidateQueries({ queryKey: rideKeys.all }),
   });

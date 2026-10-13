@@ -55,7 +55,7 @@ export const DEFAULT_FLAGS: Flags = {
   promotions: true,
   transfers: true,
   binance_auto: true,
-  share_live_link: false,
+  share_live_link: true,
 };
 
 /** What the app used before these were remote. */

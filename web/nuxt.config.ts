@@ -63,6 +63,8 @@ export default defineNuxtConfig({
     // Pages that act on a one-time token: never cached, never indexed.
     '/verify-email': { headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } },
     '/reset-password': { headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } },
+    // Live ride links (doc 11): private, change every few seconds.
+    '/v/**': { headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } },
   },
   compatibilityDate: '2026-10-01',
 
