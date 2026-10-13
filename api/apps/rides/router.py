@@ -2,7 +2,7 @@ import uuid
 from datetime import date
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi import APIRouter, Depends, Header, Query, Request, status
 
 from apps.audit.services import audit
 from apps.legal.dependencies import LegalAccepted
@@ -164,8 +164,15 @@ async def complete(ride_id: uuid.UUID, user: CurrentUser, session: DBSession) ->
 @driver_router.post(
     "/online", response_model=DriverState, dependencies=[AppUpToDate, LegalAccepted]
 )
-async def go_online(data: GoOnline, user: CurrentUser, session: DBSession) -> DriverState:
-    return await services.go_online(session, user, data.lat, data.lng)
+async def go_online(
+    data: GoOnline,
+    user: CurrentUser,
+    session: DBSession,
+    device_id: Annotated[str | None, Header(alias="X-Device-Id", max_length=100)] = None,
+) -> DriverState:
+    """403 ``document_expired`` / ``selfie_required`` when the driver must update something
+    first (doc 12)."""
+    return await services.go_online(session, user, data.lat, data.lng, device_id=device_id)
 
 
 @driver_router.post("/offline", response_model=DriverState)

@@ -479,6 +479,10 @@
         "title": "Motorcycle photos",
         "hint": "With the plate visible",
         "hintCount": "At least {{count}}, with the plate visible"
+      },
+      "criminal_record": {
+        "title": "Criminal record certificate",
+        "hint": "Optional, issued in the last 6 months"
       }
     },
     "docState": {
@@ -619,7 +623,20 @@
     "sos_closed": "SOS works only during the ride or shortly after",
     "alert_not_found": "That alert no longer exists",
     "alert_closed": "That alert is already closed",
-    "no_active_sos": "You don't have an active SOS"
+    "no_active_sos": "You don't have an active SOS",
+    "document_expired": "One of your documents expired. Upload the new one to go online.",
+    "selfie_required": "Send a live selfie to go online.",
+    "expiry_required": "Type the document's expiry date.",
+    "document_already_expired": "That document has already expired. Upload a valid one.",
+    "expiry_confirmed": "Our team already confirmed that date. To change it, upload the new document.",
+    "check_files_missing": "Some photos are missing. Take the selfie and the moto photos we asked for.",
+    "check_files_invalid": "A photo isn't valid. Take them again with the camera.",
+    "check_not_requested": "This verification was already sent or is no longer pending.",
+    "check_not_found": "We couldn't find this verification.",
+    "vehicle_change_pending": "You already have a moto change in review.",
+    "vehicle_same_plate": "That's the moto you already use. Type the new moto's plate.",
+    "vehicle_change_not_found": "You don't have a moto change in review.",
+    "document_not_found": "We couldn't find that document. Refresh the screen."
   },
   "map": {
     "recenter": "Recenter map"
@@ -1586,6 +1603,162 @@
     "transfersOff": {
       "title": "Transfers unavailable",
       "body": "Transfers aren't available right now. Your balance is safe; try again later."
+    }
+  },
+  "verification": {
+    "expiresOn": "Expires on {{date}}",
+    "expiredOn": "Expired on {{date}}",
+    "asksExpiry": "we'll ask for its expiry date",
+    "badge": {
+      "expired": "Expired",
+      "today": "Expires today",
+      "tomorrow": "Expires tomorrow",
+      "inDays_one": "Expires in {{count}} day",
+      "inDays_other": "Expires in {{count}} days",
+      "in_review": "In review",
+      "rejected": "Rejected",
+      "optional": "Optional",
+      "missing": "Missing",
+      "missing_expiry": "Date missing",
+      "valid": "Valid",
+      "approved": "Approved"
+    },
+    "expiry": {
+      "title": "When does it expire?",
+      "body": "Type the expiry date exactly as it appears on the document.",
+      "label": "Expiry date",
+      "placeholder": "DD/MM/YYYY",
+      "invalid": "Type a valid date (DD/MM/YYYY)",
+      "past": "That date has passed. Upload a valid document.",
+      "upload": "Upload document",
+      "save": "Save date",
+      "photoReady": "Photo ready",
+      "pdfReady": "File ready",
+      "fileHint": "Find it on the document and type it below."
+    },
+    "optional": {
+      "title": "Optional documents",
+      "hint": "Optional: builds trust with passengers.",
+      "add": "Add"
+    },
+    "myDocs": {
+      "title": "My documents",
+      "subtitle": "Keep them up to date to keep receiving rides. We'll remind you {{days}} days before they expire.",
+      "expiredTitle": "You can't go online",
+      "expiredBody": "One of your documents expired. Upload the new one: you can go online as soon as we approve it.",
+      "expiredPendingTitle": "We're reviewing your document",
+      "expiredPendingBody": "We got the new one. We'll notify you as soon as it's approved so you can go online again.",
+      "missingExpiry": "Add its expiry date so we can remind you in time.",
+      "inReview": "You sent a new one on {{date}}. While we review it you keep using the current one.",
+      "rejected": "We rejected the new one: {{reason}}. Upload another.",
+      "rejectedNoReason": "We rejected the new one. Upload another.",
+      "noExpiry": "Approved, doesn't expire",
+      "update": "Update",
+      "setExpiry": "Add date",
+      "how": "When you upload a new document our team reviews it (usually in under 48 hours) and you keep using the current one meanwhile."
+    },
+    "profile": {
+      "allGood": "All up to date",
+      "attention_one": "{{count}} document needs your attention",
+      "attention_other": "{{count}} documents need your attention"
+    },
+    "banner": {
+      "selfieTitle": "Verification pending",
+      "selfieBody": "Take a live selfie to go online.",
+      "reverificationBody": "Send a selfie and photos of your moto to go online.",
+      "selfieAction": "Verify",
+      "expiredTitle": "Document expired",
+      "expiredBody": "{{docs}}. Upload the new one to go online again.",
+      "expiredPendingTitle": "Reviewing your new document",
+      "expiredPendingBody": "{{docs}}: we'll let you know as soon as it's approved so you can go online.",
+      "see": "View",
+      "missingTitle": "A date is missing",
+      "missingBody": "Tell us when it expires: {{docs}}.",
+      "missingAction": "Add",
+      "expiringBody": "Upload the new one in time so you can keep going online."
+    },
+    "block": {
+      "expiredTitle": "You can't go online yet",
+      "expiredBody": "Expired document: {{docs}}. Upload the new one and you can go online as soon as we approve it.",
+      "expiredBodyGeneric": "One of your documents expired. Upload the new one and you can go online as soon as we approve it.",
+      "expiredAction": "Update documents",
+      "selfieTitle": "Verify it's you",
+      "selfieBody": "Before going online we need a live selfie. It takes less than a minute and you can go online as soon as you send it.",
+      "selfieAction": "Take selfie",
+      "reverificationTitle": "Verify your identity and your moto",
+      "reverificationBody": "We need a live selfie and new photos of your moto. You can go online as soon as you send them.",
+      "reverificationAction": "Verify now",
+      "later": "Not now"
+    },
+    "selfie": {
+      "title": "Verify it's you",
+      "titleMoto": "Verify your identity and your moto",
+      "body": "For everyone's safety, every now and then we ask for a live selfie. It takes less than a minute.",
+      "bodyMoto_one": "We need a live selfie and {{count}} new photo of your moto with the plate visible.",
+      "bodyMoto_other": "We need a live selfie and {{count}} new photos of your moto with the plate visible.",
+      "tips": {
+        "light": {
+          "title": "Find good light",
+          "body": "Face a window or a lamp, with no shadows on your face."
+        },
+        "clear": {
+          "title": "No sunglasses or helmet",
+          "body": "We need to see your whole face, like on your ID."
+        },
+        "center": {
+          "title": "Face centered",
+          "body": "Look at the camera and keep your face inside the oval."
+        }
+      },
+      "take": "Take selfie",
+      "cameraDenied": "Allow camera access in settings. The selfie has to be live, not from the gallery.",
+      "reviewTitle": "Does your face look good?",
+      "reviewBody": "Check that it's sharp, well lit and nothing covers it.",
+      "previewA11y": "Your selfie",
+      "retake": "Retake selfie",
+      "motoTitle": "Photos of your moto",
+      "motoHint": "With the camera, right now, with the plate visible.",
+      "motoTake": "Take a photo of the moto",
+      "photosMissing_one": "{{count}} photo of your moto missing",
+      "photosMissing_other": "{{count}} photos of your moto missing",
+      "send": "Send",
+      "uploading": "Uploading {{done}} of {{total}}…",
+      "privacy": "Only our verification team sees these photos, to compare them with your ID and your registration.",
+      "sentTitle": "Done, it's in review",
+      "sentBody": "You can go online now. Our team will review your selfie in the next few hours.",
+      "sentBodyMoto": "You can go online now. Our team will review your selfie and the photos of your moto in the next few hours.",
+      "sentNotify": "We'll notify you if we need anything else.",
+      "connectNow": "Go online now",
+      "nothingTitle": "No pending verifications",
+      "nothingBody": "We'll let you know when we need a new selfie."
+    },
+    "vehicle": {
+      "title": "Change moto",
+      "subtitle": "Register your new moto ({{year}} or newer). While we review it you keep working with the current one.",
+      "current": "Current moto",
+      "inUse": "In use",
+      "new": "New moto",
+      "newData": "New moto details",
+      "registrationHint": "New moto's registration",
+      "registrationSub": "Photo or PDF, readable and valid",
+      "registrationMissing": "Upload the new moto's registration card",
+      "change": "Change",
+      "expiryHint": "The expiry date shown on the registration card.",
+      "photosMissing_one": "Add at least {{count}} photo",
+      "photosMissing_other": "Add at least {{count}} photos",
+      "submit": "Send for review",
+      "sent": "We sent your new moto for review",
+      "how": "We review the change in under 48 hours. Once approved, your rides will use the new moto and we'll let you know.",
+      "pendingTitle": "Your new moto is in review",
+      "pendingBody": "You keep working with your current moto until we approve it.",
+      "pendingBodyDate": "You sent it on {{date}}. You keep working with your current moto until we approve it.",
+      "pendingNotice": "We'll notify you when we finish reviewing it.",
+      "pendingRow": "{{moto}} in review",
+      "pendingRowHint": "You keep using this moto until we approve it",
+      "cancel": "Cancel change",
+      "cancelTitle": "Cancel the moto change?",
+      "cancelBody": "You'll keep your current moto. To change it later you'll have to send everything again.",
+      "cancelled": "You cancelled the moto change"
     }
   }
 }

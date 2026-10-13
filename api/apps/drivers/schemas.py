@@ -4,7 +4,16 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from apps.drivers.models import DocumentKind, DocumentStatus, DriverStatus, VehicleType
+from apps.drivers.models import (
+    CheckKind,
+    CheckStatus,
+    DocumentKind,
+    DocumentStatus,
+    DriverStatus,
+    MarkKind,
+    VehicleStatus,
+    VehicleType,
+)
 from apps.users.schemas import UserRead
 
 # Same list as /files/presign-upload: photos and PDF scans.
@@ -91,6 +100,7 @@ class VehicleRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
+    status: VehicleStatus = VehicleStatus.ACTIVE
     type: VehicleType
     brand: str
     model: str
@@ -106,9 +116,25 @@ class DocumentPresignRequest(BaseModel):
     size: int = Field(gt=0)
 
 
+def _expiry(value: date | None) -> date | None:
+    if value is not None and (value.year < 2000 or value.year > 2100):
+        raise ValueError("invalid expiry date")
+    return value
+
+
 class DocumentRegister(BaseModel):
     kind: DocumentKind
     key: str = Field(min_length=1, max_length=512)
+    # License, medical certificate and registration (doc 12); a verifier confirms it.
+    expires_on: date | None = None
+
+    _check_expiry = field_validator("expires_on")(classmethod(lambda cls, v: _expiry(v)))
+
+
+class ExpiryUpdate(BaseModel):
+    expires_on: date
+
+    _check_expiry = field_validator("expires_on")(classmethod(lambda cls, v: _expiry(v)))
 
 
 class DocumentRead(BaseModel):
@@ -119,12 +145,166 @@ class DocumentRead(BaseModel):
     status: DocumentStatus
     content_type: str
     rejection_reason: str | None
+    expires_on: date | None = None
+    expiry_confirmed: bool = False
     created_at: datetime
 
 
 class DocumentAdminRead(DocumentRead):
     reviewed_at: datetime | None
+    superseded_by_id: uuid.UUID | None = None
     download_url: str | None = None
+
+
+# --- Ongoing verification (doc 12) --------------------------------------------------------------
+
+
+class DocumentAlert(BaseModel):
+    kind: DocumentKind
+    expires_on: date
+    days_left: int  # negative: expired
+    renewal_pending: bool
+
+
+class VerificationState(BaseModel):
+    """What the driver app shows on the dashboard and why going online is refused."""
+
+    expired: list[DocumentKind]
+    expiring: list[DocumentAlert]
+    # Approved before doc 12, without a date: the driver is asked to type it.
+    missing_expiry: list[DocumentKind]
+    required_check_id: uuid.UUID | None
+    required_check_kind: CheckKind | None
+    can_go_online: bool
+
+
+class CheckFile(BaseModel):
+    kind: DocumentKind
+    key: str = Field(min_length=1, max_length=512)
+
+
+class CheckPresignRequest(BaseModel):
+    kind: DocumentKind
+    filename: str = Field(min_length=1, max_length=255)
+    content_type: str = Field(pattern=r"^[\w.+-]+/[\w.+-]+$", max_length=100)
+    size: int = Field(gt=0)
+
+    @field_validator("kind")
+    @classmethod
+    def _kind(cls, value: DocumentKind) -> DocumentKind:
+        allowed = {
+            DocumentKind.SELFIE,
+            DocumentKind.VEHICLE_PHOTO,
+            DocumentKind.VEHICLE_REGISTRATION,
+        }
+        if value not in allowed:
+            raise ValueError("only selfie, vehicle_photo or vehicle_registration")
+        return value
+
+
+class CheckSubmit(BaseModel):
+    files: list[CheckFile] = Field(min_length=1, max_length=12)
+
+
+class CheckFileRead(BaseModel):
+    kind: DocumentKind
+    content_type: str
+    download_url: str | None = None
+
+
+class DriverCheckRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    kind: CheckKind
+    status: CheckStatus
+    reason: str
+    document_id: uuid.UUID | None
+    vehicle_id: uuid.UUID | None
+    requested_at: datetime
+    submitted_at: datetime | None
+    reviewed_at: datetime | None
+    result_reason: str | None
+
+
+class StaffBrief(BaseModel):
+    id: uuid.UUID
+    full_name: str
+    email: str
+
+
+class DriverBrief(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    full_name: str
+    email: str
+    status: DriverStatus
+    plate: str | None
+
+
+class DriverCheckAdminRead(DriverCheckRead):
+    driver: DriverBrief
+    assigned_to: StaffBrief | None = None
+    reviewed_by: StaffBrief | None = None
+    files: list[CheckFileRead] = []
+    # Detail only: the approved selfie and cédula to compare with, the document being renewed
+    # and the one in use, and the new moto.
+    references: list["DocumentAdminRead"] = []
+    document: "DocumentAdminRead | None" = None
+    vehicle: VehicleRead | None = None
+    expires_on: date | None = None  # what the driver typed for a renewal or a new registration
+
+
+class CheckReview(BaseModel):
+    status: CheckStatus
+    reason: str | None = Field(default=None, max_length=1000)
+    expires_on: date | None = None
+
+    _check_expiry = field_validator("expires_on")(classmethod(lambda cls, v: _expiry(v)))
+
+    @field_validator("status")
+    @classmethod
+    def _decided(cls, value: CheckStatus) -> CheckStatus:
+        if value not in (CheckStatus.APPROVED, CheckStatus.REJECTED):
+            raise ValueError("status must be approved or rejected")
+        return value
+
+    @model_validator(mode="after")
+    def _reason_when_rejected(self) -> "CheckReview":
+        self.reason = (self.reason or "").strip() or None
+        if self.status == CheckStatus.REJECTED and not self.reason:
+            raise ValueError("reason is required to reject")
+        return self
+
+
+class AssignRequest(BaseModel):
+    user_id: uuid.UUID | None = None
+
+
+class InductionRequest(BaseModel):
+    done: bool
+
+
+class VehicleChange(BaseModel):
+    vehicle: VehicleWrite
+    registration_key: str = Field(min_length=1, max_length=512)
+    registration_expires_on: date
+    photo_keys: list[str] = Field(min_length=1, max_length=10)
+
+    _check_expiry = field_validator("registration_expires_on")(
+        classmethod(lambda cls, v: _expiry(v))
+    )
+
+
+class Duplicate(BaseModel):
+    kind: MarkKind
+    user_id: uuid.UUID
+    name: str
+    email: str | None  # None once the account was erased
+    driver_id: uuid.UUID | None
+    driver_status: DriverStatus | None
+    deleted: bool
+    suspended: bool
 
 
 class Requirements(BaseModel):
@@ -155,13 +335,19 @@ class DriverProfileRead(BaseModel):
     rating_count: int = 0
     created_at: datetime
     vehicle: VehicleRead | None
+    pending_vehicle: VehicleRead | None = None
     documents: list[DocumentRead]
     requirements: Requirements
+    verification: VerificationState | None = None
+    checks: list[DriverCheckRead] = []  # open ones for the driver; every one for the admin
+    induction_completed_at: datetime | None = None
 
 
 class DriverAdminRead(DriverProfileRead):
     user: UserRead
     documents: list[DocumentAdminRead]  # type: ignore[assignment]
+    assigned_to: StaffBrief | None = None
+    duplicates: list[Duplicate] = []
 
 
 class ReasonRequest(BaseModel):
@@ -179,6 +365,10 @@ class ReasonRequest(BaseModel):
 class DocumentReview(BaseModel):
     status: DocumentStatus
     reason: str | None = Field(default=None, max_length=1000)
+    # Confirms or corrects the expiry the driver typed (doc 12).
+    expires_on: date | None = None
+
+    _check_expiry = field_validator("expires_on")(classmethod(lambda cls, v: _expiry(v)))
 
     @field_validator("status")
     @classmethod

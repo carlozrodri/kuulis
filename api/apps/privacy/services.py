@@ -131,7 +131,13 @@ def _money(value: Any) -> str | None:
 async def export_data(session: AsyncSession, user: User) -> dict[str, Any]:
     """Everything Kuulis keeps about ``user``, readable by a person. Ratings received go without
     their author, and reports only those the user filed."""
-    from apps.drivers.models import DriverDocument, DriverProfile, Vehicle
+    from apps.drivers.models import (
+        DriverCheck,
+        DriverDocument,
+        DriverProfile,
+        Vehicle,
+        VehicleStatus,
+    )
     from apps.legal.models import LegalAcceptance
     from apps.moderation.models import Report
     from apps.places.models import SavedPlace
@@ -155,7 +161,11 @@ async def export_data(session: AsyncSession, user: User) -> dict[str, Any]:
     }
     profile = await session.scalar(select(DriverProfile).where(DriverProfile.user_id == user.id))
     if profile is not None:
-        vehicle = await session.scalar(select(Vehicle).where(Vehicle.driver_id == profile.id))
+        vehicle = await session.scalar(
+            select(Vehicle).where(
+                Vehicle.driver_id == profile.id, Vehicle.status == VehicleStatus.ACTIVE
+            )
+        )
         documents = await session.scalars(
             select(DriverDocument).where(DriverDocument.driver_id == profile.id)
         )
@@ -176,8 +186,19 @@ async def export_data(session: AsyncSession, user: User) -> dict[str, Any]:
             if vehicle
             else None,
             "documents": [
-                {"kind": d.kind.value, "status": d.status.value, "uploaded_at": d.created_at}
+                {
+                    "kind": d.kind.value,
+                    "status": d.status.value,
+                    "uploaded_at": d.created_at,
+                    "expires_on": d.expires_on,
+                }
                 for d in documents
+            ],
+            "checks": [
+                {"kind": c.kind.value, "status": c.status.value, "date": c.requested_at}
+                for c in await session.scalars(
+                    select(DriverCheck).where(DriverCheck.driver_id == profile.id)
+                )
             ],
         }
     contacts = await session.scalars(

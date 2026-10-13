@@ -73,7 +73,9 @@ export type DocumentKind =
   | "medical_certificate"
   | "vehicle_registration"
   | "selfie"
-  | "vehicle_photo";
+  | "vehicle_photo"
+  // Doc 12: optional "certificado de antecedentes penales".
+  | "criminal_record";
 
 export type DocumentStatus = "pending" | "approved" | "rejected";
 
@@ -90,10 +92,28 @@ export interface AppConfig extends RideConfig {
   enabled_vehicle_types: VehicleType[];
   driver_required_documents: DocumentKind[];
   vehicle_photo_min_count: number;
+  /** Doc 12 (older servers omit it; see DEFAULT_VERIFICATION in lib/verification.ts). */
+  verification?: VerificationConfig;
 }
+
+/** Ongoing driver verification settings (doc 12), from GET /config/public. */
+export interface VerificationConfig {
+  /** Kinds that carry an expiry date (license, medical certificate, registration). */
+  expiring_documents: DocumentKind[];
+  /** Kinds the driver may add without being asked (criminal record certificate). */
+  optional_documents: DocumentKind[];
+  /** "Expires in N days" notices; the largest is the dashboard's warning window. */
+  expiry_notice_days: number[];
+  /** Random live selfie about this often when going online (0: never). */
+  selfie_every_days: number;
+}
+
+/** Doc 12: a moto change waits as `pending` while the `active` one keeps working. */
+export type VehicleStatus = "active" | "pending" | "retired";
 
 export interface Vehicle {
   id: string;
+  status?: VehicleStatus;
   type: VehicleType;
   brand: string;
   model: string;
@@ -108,7 +128,68 @@ export interface DriverDocument {
   status: DocumentStatus;
   content_type: string;
   rejection_reason: string | null;
+  /** Doc 12: "YYYY-MM-DD" for expiring kinds; null when unknown (approved before doc 12). */
+  expires_on?: string | null;
+  /** A verifier checked the date; until then the driver can still correct it. */
+  expiry_confirmed?: boolean;
   created_at: string;
+}
+
+// ── Doc 12: ongoing verification ──
+
+export type CheckKind = "selfie" | "reverification" | "document_renewal" | "vehicle_change";
+
+export type CheckStatus = "requested" | "pending" | "approved" | "rejected" | "cancelled";
+
+/** A document that expires within the warning window (or already did: negative `days_left`). */
+export interface DocumentAlert {
+  kind: DocumentKind;
+  expires_on: string;
+  days_left: number;
+  renewal_pending: boolean;
+}
+
+/** What blocks going online and what the dashboard warns about (computed by the API). */
+export interface VerificationState {
+  expired: DocumentKind[];
+  expiring: DocumentAlert[];
+  missing_expiry: DocumentKind[];
+  required_check_id: string | null;
+  required_check_kind: "selfie" | "reverification" | null;
+  can_go_online: boolean;
+}
+
+/** An open check: photos asked for (`requested`) or waiting for a verifier (`pending`). */
+export interface DriverCheck {
+  id: string;
+  kind: CheckKind;
+  status: CheckStatus;
+  reason: string;
+  document_id: string | null;
+  vehicle_id: string | null;
+  requested_at: string;
+  submitted_at: string | null;
+  reviewed_at: string | null;
+  result_reason: string | null;
+}
+
+/** `details` of a 403 document_expired. */
+export interface DocumentExpiredDetails {
+  kinds: DocumentKind[];
+}
+
+/** `details` of a 403 selfie_required. */
+export interface SelfieRequiredDetails {
+  check_id: string;
+  kind: "selfie" | "reverification" | null;
+}
+
+/** POST /drivers/me/vehicles: the new moto, its registration and photos (keys from checks/presign). */
+export interface VehicleChangeInput {
+  vehicle: VehicleInput;
+  registration_key: string;
+  registration_expires_on: string;
+  photo_keys: string[];
 }
 
 export interface DriverRequirements {
@@ -141,6 +222,13 @@ export interface DriverProfile {
   vehicle: Vehicle | null;
   documents: DriverDocument[];
   requirements: DriverRequirements;
+  // Doc 12 (older servers omit them).
+  /** A moto change under review; `vehicle` stays the one in use. */
+  pending_vehicle?: Vehicle | null;
+  verification?: VerificationState | null;
+  /** Open checks only. */
+  checks?: DriverCheck[];
+  induction_completed_at?: string | null;
 }
 
 export interface DriverPersonalInput {

@@ -196,6 +196,11 @@ async def set_binance_pay_id(session: AsyncSession, user: User, pay_id: str) -> 
     except IntegrityError as exc:
         await session.rollback()
         raise BinancePayIdTakenError() from exc
+    from apps.drivers import verification
+    from apps.drivers.models import MarkKind
+
+    # Kept after the account is erased: a new account with this ID shows as a duplicate (doc 12).
+    await verification.record_marks(session, user.id, {MarkKind.BINANCE_PAY_ID: pay_id})
     return wallet
 
 

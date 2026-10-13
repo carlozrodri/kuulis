@@ -114,3 +114,9 @@ export { default as ExternalLink } from 'lucide-react-native/icons/external-link
 export { default as Delete } from 'lucide-react-native/icons/delete';
 export { default as Lightbulb } from 'lucide-react-native/icons/lightbulb';
 export { default as HardHat } from 'lucide-react-native/icons/hard-hat';
+export { default as Glasses } from 'lucide-react-native/icons/glasses';
+export { default as CalendarX } from 'lucide-react-native/icons/calendar-x';
+export { default as FileClock } from 'lucide-react-native/icons/file-clock';
+export { default as RefreshCw } from 'lucide-react-native/icons/refresh-cw';
+export { default as ArrowLeftRight } from 'lucide-react-native/icons/arrow-left-right';
+export { default as UserRoundCheck } from 'lucide-react-native/icons/user-round-check';

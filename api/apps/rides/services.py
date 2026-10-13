@@ -332,11 +332,19 @@ async def driver_state(session: AsyncSession, user: User) -> DriverState:
     )
 
 
-async def go_online(session: AsyncSession, user: User, lat: float, lng: float) -> DriverState:
+async def go_online(
+    session: AsyncSession, user: User, lat: float, lng: float, device_id: str | None = None
+) -> DriverState:
+    from apps.drivers import services as drivers
+    from apps.drivers import verification
+
     profile = await _approved_profile(session, user)
     await moderation.ensure_not_suspended(session, user.id)
     await subscriptions.ensure_not_overdue(session, user.id)
     config = await get_app_config(session)
+    # Needs the documents too: expired ones and the random selfie keep the driver offline.
+    full = await drivers.get_or_404(session, profile.id)
+    await verification.ensure_can_go_online(session, full, config, device_id)
     vehicle = profile.vehicle
     assert vehicle is not None
     if vehicle.type not in config.enabled_vehicle_types:

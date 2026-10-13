@@ -76,5 +76,62 @@ inicial ya existe; falta mantenerla en el tiempo y hacer la revisión más rápi
 06 (rol `verificador` y auditoría de cada acceso a documentos).
 
 ## Preguntas para Carlos
-1. ¿Frecuencia de la selfie al azar? Recomendado: una vez por semana por motorizado, al conectarse.
-2. ¿Pedir certificado de antecedentes penales como documento opcional? Recomendado: opcional al lanzar.
+1. **Decidido (recomendado):** una selfie en vivo más o menos una vez por semana por motorizado, en un momento
+   al azar entre 3,5 y 10,5 días, al conectarse. Se cambia en Ajustes → Verificación (`selfie_every_days`;
+   0 la apaga).
+2. **Decidido (recomendado):** el certificado de antecedentes penales es un documento opcional al lanzar
+   (`verification.optional_documents`); se vuelve obligatorio agregándolo a los documentos requeridos.
+
+
+## Cómo quedó (2026-10-13)
+### API (`api/apps/drivers`: `verification.py`, `checks.py`, `tasks.py`)
+- **Vencimientos:** `driver_documents.expires_on` y `expiry_confirmed` (el verificador confirma o corrige la
+  fecha al aprobar). Vencen por defecto licencia, certificado médico y carnet de circulación
+  (`verification.expiring_documents`). Un documento vencido hace que `POST /drivers/me/online` responda 403
+  `document_expired` (`details.kinds`) hasta que se apruebe el nuevo. Los aprobados antes de este cambio sin
+  fecha no bloquean: la app le pide al motorizado que la indique (`PATCH /drivers/me/documents/{id}`).
+- **Renovaciones:** un motorizado aprobado o suspendido sube el documento nuevo por el mismo camino del
+  registro (con fecha obligatoria). El viejo sigue en uso; el nuevo entra a la cola como `document_renewal` y al
+  aprobarse reemplaza al anterior (`superseded_by_id`, queda como historial en el admin).
+- **Avisos:** tarea diaria a las 08:00 de Caracas con lock (`driver_expirations`, latido en Sistema): avisos a
+  30, 7 y 1 día y el día que vence (una vez por paso); al vencer lo desconecta si no está en un viaje.
+- **Selfie en vivo:** `driver_profiles.selfie_due_at` se fija al azar alrededor de `selfie_every_days` (7). Al
+  conectarse después de esa hora se crea la verificación y responde 403 `selfie_required` (`details.check_id`);
+  la app manda la selfie (`POST /drivers/me/checks/presign` y `/checks/{id}/submit`) y puede trabajar mientras
+  espera revisión. Rechazarla suspende el perfil y abre un reporte urgente.
+- **Reverificación por reportes:** `mismatch_reports` (2) reportes `vehicle_mismatch` en `report_window_days`
+  (30) piden selfie y fotos nuevas de la moto; el equipo también puede pedirla desde la ficha.
+- **Cambio de moto:** `vehicles.status` (`active`, `pending`, `retired`); `POST /drivers/me/vehicles` con datos,
+  carnet (con vencimiento) y fotos. Sigue con la moto actual hasta la aprobación; al aprobar, la nueva pasa a
+  usarse en ofertas y viajes y la vieja queda retirada (su placa se puede registrar de nuevo por otra persona).
+- **Duplicados:** tabla `identity_marks` con un hash con clave (HMAC con `SECRET_KEY`) de cédula, RIF, placa,
+  teléfono, Binance Pay ID y dispositivo (`X-Device-Id` de la app). Se conserva al borrar la cuenta, así que una
+  cuenta nueva con los mismos datos aparece en la ficha de ambas. La migración carga los datos existentes.
+- **Inducción:** con `induction_required` no se puede aprobar sin marcar "Inducción completada".
+- Certificado de antecedentes penales (`criminal_record`) como documento opcional.
+- Auditoría nueva: `driver.check_view`, `driver.check_review`, `driver.check_assign`, `driver.assign`,
+  `driver.induction`, `driver.reverify`.
+
+### Admin
+- **Reverificaciones** (Motorizados → Reverificaciones): cola separada, la más vieja primero, con filtros y
+  "Tomar". Revisión con lo enviado al lado de la selfie y la cédula aprobadas (o el documento en uso, o la moto
+  actual), zoom y rotación, checklist por tipo que debe estar completo para aprobar, motivos predefinidos,
+  fecha de vencimiento y atajos (1-9 marcar, A aprobar, R rechazar, +/- zoom, O rotar, ←/→ imagen, N siguiente).
+- **Ficha del motorizado:** alerta de duplicados, vencimientos con insignias, historial de documentos
+  reemplazados, línea de tiempo de verificaciones, asignar verificador, inducción y "Pedir reverificación".
+- **Portada:** reverificaciones pendientes y documentos que vencen esta semana. **Ajustes → Verificación de
+  motorizados** con todo lo configurable.
+
+### App
+- Registro: fecha de vencimiento al subir licencia, certificado médico y carnet; antecedentes como opcional.
+- **Mis documentos** (Perfil y aviso del inicio): insignias "Vence en N días", "Vencido", "Falta la fecha",
+  "En revisión" y botón "Actualizar".
+- Aviso en el inicio del motorizado y, si no lo deja conectarse, una hoja con el paso directo (actualizar el
+  documento o tomar la selfie) en vez de un error.
+- **Selfie en vivo** con guía de encuadre y luz, solo cámara frontal; en la reverificación también fotos de la
+  moto. **Perfil → Tu moto → Cambiar de moto** con estado "En revisión" y opción de cancelar.
+- Todo va como OTA (sin dependencias nativas nuevas).
+
+### Pendiente
+- Medir con un verificador real que una revisión completa toma menos de 2 minutos.
+- La comparación facial automática queda para más adelante (opcional en el documento).

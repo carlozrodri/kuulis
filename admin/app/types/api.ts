@@ -79,6 +79,7 @@ export type DocumentKind
     | 'vehicle_registration'
     | 'selfie'
     | 'vehicle_photo'
+    | 'criminal_record'
 export type DocumentStatus = 'pending' | 'approved' | 'rejected'
 export type VehicleType = 'moto' | 'car'
 
@@ -91,11 +92,14 @@ export const DOCUMENT_KINDS: DocumentKind[] = [
   'vehicle_registration',
   'selfie',
   'vehicle_photo',
+  'criminal_record',
 ]
 export const VEHICLE_TYPES: VehicleType[] = ['moto', 'car']
 
 export interface Vehicle {
   id: string
+  /** Doc 12: a moto change waits as `pending` while the active one keeps working. */
+  status?: VehicleStatus
   type: VehicleType
   brand: string
   model: string
@@ -113,6 +117,13 @@ export interface DriverDocument {
   created_at: string
   /** Signed, short-lived URL. Only present on the admin detail endpoint. */
   download_url?: string | null
+  // ---- Doc 12 ----
+  expires_on?: Day | null
+  /** A verifier confirmed the date the driver typed. */
+  expiry_confirmed?: boolean
+  reviewed_at?: string | null
+  /** Replaced by a newer file (admin detail only): shown under "Historial". */
+  superseded_by_id?: string | null
 }
 
 export interface DriverRequirements {
@@ -140,6 +151,11 @@ export interface DriverProfile {
   vehicle: Vehicle | null
   documents: DriverDocument[]
   requirements: DriverRequirements
+  // ---- Doc 12. Optional so the panel still loads against an older API. ----
+  pending_vehicle?: Vehicle | null
+  verification?: VerificationState | null
+  checks?: DriverCheck[]
+  induction_completed_at?: string | null
 }
 
 /** Shape returned by GET /admin/drivers (items) and GET /admin/drivers/{id}. */
@@ -148,6 +164,101 @@ export interface AdminDriver extends DriverProfile {
   /** Phase 1B: average rating received as a driver (decimal string or number) and how many ratings. */
   rating_avg?: number | string | null
   rating_count?: number | null
+  assigned_to?: StaffBrief | null
+  duplicates?: DriverDuplicate[]
+}
+
+// ---- Ongoing driver verification (doc 12) ----
+
+export type VehicleStatus = 'active' | 'pending' | 'retired'
+export type CheckKind = 'selfie' | 'reverification' | 'document_renewal' | 'vehicle_change'
+export const CHECK_KINDS: CheckKind[] = ['selfie', 'reverification', 'document_renewal', 'vehicle_change']
+export type CheckStatus = 'requested' | 'pending' | 'approved' | 'rejected' | 'cancelled'
+export const CHECK_STATUSES: CheckStatus[] = ['pending', 'requested', 'approved', 'rejected', 'cancelled']
+export type MarkKind = 'national_id' | 'rif' | 'plate' | 'phone' | 'binance_pay_id' | 'device'
+
+export interface DocumentAlert {
+  kind: DocumentKind
+  expires_on: Day
+  /** Negative once expired. */
+  days_left: number
+  renewal_pending: boolean
+}
+
+export interface VerificationState {
+  expired: DocumentKind[]
+  expiring: DocumentAlert[]
+  /** Approved before doc 12 without a date: the driver is asked to type it. */
+  missing_expiry: DocumentKind[]
+  required_check_id: string | null
+  required_check_kind: 'selfie' | 'reverification' | null
+  can_go_online: boolean
+}
+
+export interface DriverCheck {
+  id: string
+  kind: CheckKind
+  status: CheckStatus
+  /** Why it was asked: random, reports, team, driver. */
+  reason: string
+  document_id: string | null
+  vehicle_id: string | null
+  requested_at: string
+  submitted_at: string | null
+  reviewed_at: string | null
+  result_reason: string | null
+}
+
+export interface StaffBrief {
+  id: string
+  full_name: string
+  email: string
+}
+
+export interface CheckFile {
+  kind: DocumentKind
+  content_type: string
+  /** Detail only. */
+  download_url?: string | null
+}
+
+/** GET /admin/drivers/checks items and GET /admin/drivers/checks/{id}. */
+export interface DriverCheckAdmin extends DriverCheck {
+  driver: { id: string, user_id: string, full_name: string, email: string, status: DriverStatus, plate: string | null }
+  assigned_to: StaffBrief | null
+  reviewed_by: StaffBrief | null
+  files: CheckFile[]
+  /** Detail only: approved selfie and cédula, the document in use for a renewal, current moto photos. */
+  references: DriverDocument[]
+  /** The renewal file. */
+  document: DriverDocument | null
+  /** The new moto. */
+  vehicle: Vehicle | null
+  /** What the driver typed for a renewal or a new registration. */
+  expires_on: Day | null
+}
+
+export interface DriverDuplicate {
+  kind: MarkKind
+  user_id: string
+  name: string
+  /** null once the account was erased. */
+  email: string | null
+  driver_id: string | null
+  driver_status: DriverStatus | null
+  deleted: boolean
+  suspended: boolean
+}
+
+export interface VerificationSettings {
+  expiring_documents: DocumentKind[]
+  optional_documents: DocumentKind[]
+  expiry_notice_days: number[]
+  /** 0 = no random selfie. */
+  selfie_every_days: number
+  mismatch_reports: number
+  report_window_days: number
+  induction_required: boolean
 }
 
 export interface AppConfig {
@@ -190,6 +301,8 @@ export interface AppConfig {
   location_intervals?: LocationIntervals
   // ---- Trip safety (doc 11). ----
   safety?: SafetySettings
+  // ---- Ongoing driver verification (doc 12). ----
+  verification?: VerificationSettings
 }
 
 // ---- Phase 1B: rides (docs/api/phase-1b.md) ----
@@ -930,6 +1043,9 @@ export interface Overview {
   overdue_drivers: number
   stale_rates: RateSource[]
   open_alerts?: number
+  /** Doc 12: selfies, renewals and moto changes waiting for a verifier. */
+  pending_reverifications?: number
+  documents_expiring_week?: number
 }
 
 // ---- Monitoring (GET /admin/system/health) ----------------------------------------------------

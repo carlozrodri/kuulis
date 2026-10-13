@@ -30,7 +30,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from apps.config.schemas import AppConfig
 from apps.config.services import get_app_config
 from apps.control.services import notice
-from apps.drivers.models import DriverProfile, DriverStatus, Vehicle, VehicleType
+from apps.drivers.models import DriverProfile, DriverStatus, Vehicle, VehicleStatus, VehicleType
 from apps.geo.clients import estimate_route
 from apps.moderation import services as moderation
 from apps.monitoring import stats
@@ -103,7 +103,10 @@ async def _eligible(
     approved = set(
         await session.scalars(
             select(DriverProfile.user_id)
-            .join(Vehicle, Vehicle.driver_id == DriverProfile.id)
+            .join(
+                Vehicle,
+                (Vehicle.driver_id == DriverProfile.id) & (Vehicle.status == VehicleStatus.ACTIVE),
+            )
             .join(User, User.id == DriverProfile.user_id)
             .where(
                 DriverProfile.user_id.in_(ids),

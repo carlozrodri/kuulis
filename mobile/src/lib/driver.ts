@@ -10,7 +10,16 @@ import type {
   DriverProfile,
   DriverStatus,
   VehicleType,
+  VerificationConfig,
 } from './types';
+
+/** Doc 12 defaults (api/apps/config/schemas.py VerificationSettings), for servers that omit them. */
+export const DEFAULT_VERIFICATION: VerificationConfig = {
+  expiring_documents: ['drivers_license', 'medical_certificate', 'vehicle_registration'],
+  optional_documents: ['criminal_record'],
+  expiry_notice_days: [30, 7, 1],
+  selfie_every_days: 7,
+};
 
 /** Defaults from docs/api/phase-1a.md, used until GET /config/public answers. */
 export const DEFAULT_APP_CONFIG: AppConfig = {
@@ -27,6 +36,7 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
     'vehicle_photo',
   ],
   vehicle_photo_min_count: 2,
+  verification: DEFAULT_VERIFICATION,
 };
 
 export const MULTI_FILE_KINDS: readonly DocumentKind[] = ['vehicle_photo'];

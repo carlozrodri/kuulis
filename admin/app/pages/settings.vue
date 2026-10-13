@@ -88,6 +88,20 @@ function reset() {
 }
 
 const isRequired = (kind: DocumentKind) => form.driver_required_documents.includes(kind)
+
+// ---- Ongoing driver verification (doc 12) ------------------------------------------------------
+
+const paperDocumentItems = computed(() => PAPER_DOCUMENTS.map(k => ({ label: t(`drivers.kinds.${k}`), value: k })))
+// Typed as "30, 7, 1"; the form keeps the parsed numbers (invalid text keeps the save disabled).
+const noticeText = ref(form.verification.expiry_notice_days.join(', '))
+watch(() => form.verification.expiry_notice_days, (days) => {
+  if (JSON.stringify(parseNoticeDays(noticeText.value)) !== JSON.stringify(days)) noticeText.value = days.join(', ')
+})
+const noticeInvalid = computed(() => parseNoticeDays(noticeText.value) === null)
+watch(noticeText, (text) => {
+  const days = parseNoticeDays(text)
+  if (days) form.verification.expiry_notice_days = days
+})
 const isEnabled = (type: VehicleType) => form.enabled_vehicle_types.includes(type)
 
 // ---- Surge rules ----------------------------------------------------------------------------
@@ -1045,6 +1059,74 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           </div>
         </UCard>
 
+        <!-- Doc 12: ongoing driver verification -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.verification.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.verification.help') }}
+            </p>
+          </template>
+          <div class="space-y-6">
+            <UFormField
+              :label="t('settings.verification.expiring')"
+              :help="t('settings.verification.expiringHelp')"
+            >
+              <UCheckboxGroup
+                v-model="form.verification.expiring_documents"
+                :items="paperDocumentItems"
+                :disabled="readOnly"
+                :ui="{ fieldset: 'grid gap-3 sm:grid-cols-2' }"
+              />
+            </UFormField>
+            <UFormField
+              :label="t('settings.verification.optional')"
+              :help="t('settings.verification.optionalHelp')"
+            >
+              <UCheckboxGroup
+                v-model="form.verification.optional_documents"
+                :items="paperDocumentItems"
+                :disabled="readOnly"
+                :ui="{ fieldset: 'grid gap-3 sm:grid-cols-2' }"
+              />
+            </UFormField>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <UFormField
+                :label="t('settings.verification.noticeDays')"
+                :help="t('settings.verification.noticeDaysHelp', { max: NOTICE_DAYS_MAX })"
+                :error="noticeInvalid ? t('settings.verification.noticeDaysInvalid') : undefined"
+              >
+                <UInput
+                  v-model="noticeText"
+                  placeholder="30, 7, 1"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+              <UFormField
+                v-for="key in VERIFICATION_NUMBERS"
+                :key="key"
+                :label="t(`settings.verification.numbers.${key}`)"
+                :help="key === 'selfie_every_days' ? t('settings.verification.selfieHelp') : t('settings.safety.range', { min: VERIFICATION_LIMITS[key][0], max: VERIFICATION_LIMITS[key][1] })"
+              >
+                <UInputNumber
+                  v-model="form.verification[key]"
+                  :min="VERIFICATION_LIMITS[key][0]"
+                  :max="VERIFICATION_LIMITS[key][1]"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+            </div>
+            <USwitch
+              v-model="form.verification.induction_required"
+              :label="t('settings.verification.induction')"
+              :description="t('settings.verification.inductionHelp')"
+              :disabled="readOnly"
+            />
+          </div>
+        </UCard>
+
         <UAlert
           v-if="!readOnly && dirty && issues.length"
           color="error"
@@ -1071,7 +1153,7 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           <UButton
             type="submit"
             :loading="saving"
-            :disabled="!dirty || issues.length > 0"
+            :disabled="!dirty || issues.length > 0 || noticeInvalid"
             :label="t('common.save')"
           />
           <UButton

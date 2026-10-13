@@ -77,6 +77,9 @@ construir. Las preguntas de cada documento están en su sección final.
   contactos de confianza con compartir automático, SOS con ubicación cada 5 s,
   recorrido guardado, detección de paradas, desvíos y demoras con "¿Todo bien?", centro de seguridad en el
   admin y consejos. Sin guardia por ahora (decisión de Carlos): el SOS va al 911 y a los contactos.
+- **12** hecho (2026-10-13): vencimientos con avisos y bloqueo, renovaciones, selfie en vivo al azar (semanal),
+  reverificación por reportes, cambio de moto con revisión, duplicados por hash (incluye cuentas borradas),
+  cola de reverificaciones con revisión rápida en el admin e inducción opcional. Antecedentes penales opcional.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

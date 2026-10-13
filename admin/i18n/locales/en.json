@@ -26,7 +26,8 @@
     "versions": "Versions",
     "appStatus": "App status",
     "flags": "Features",
-    "announcements": "Announcements"
+    "announcements": "Announcements",
+    "driverChecks": "Re-verifications"
   },
   "auth": {
     "title": "Admin sign in",
@@ -60,7 +61,9 @@
       "driverApplications": "Driver applications to review: {n}",
       "pendingTopUps": "Pending top-ups: {n}",
       "unmatchedTopUps": "Unmatched payments: {n}",
-      "overdueDrivers": "Drivers blocked by an overdue fee: {n}"
+      "overdueDrivers": "Drivers blocked by an overdue fee: {n}",
+      "pendingReverifications": "Re-verifications to review: {n}",
+      "documentsExpiringWeek": "Documents expiring this week: {n}"
     },
     "metrics": {
       "title": "Metrics",
@@ -346,7 +349,29 @@
     "update_exists": "That export is already published in that channel",
     "update_not_current": "That update is no longer active; reload the page",
     "updates_signing_disabled": "Update signing is not configured in this environment.",
-    "flag_not_found": "That feature does not exist"
+    "flag_not_found": "That feature does not exist",
+    "document_expired": "The driver has expired documents",
+    "selfie_required": "The driver must send a verification selfie",
+    "expiry_required": "Type the expiry date to approve",
+    "document_already_expired": "The expiry date is in the past",
+    "expiry_confirmed": "The expiry date was already confirmed",
+    "check_not_found": "Re-verification not found",
+    "check_not_pending": "This re-verification is no longer waiting for review",
+    "check_not_requested": "This re-verification is no longer waiting for photos",
+    "check_files_missing": "Photos are missing from the re-verification",
+    "check_files_invalid": "The re-verification files are not valid",
+    "induction_required": "Mark the induction as completed before approving the driver",
+    "not_staff": "Only team members can be assigned",
+    "vehicle_change_not_found": "The moto change is no longer pending",
+    "vehicle_change_pending": "A moto change is already under review",
+    "vehicle_same_plate": "The new moto has the same plate as the current one",
+    "plate_taken": "That plate is already registered on another account",
+    "vehicle_too_old": "The moto does not meet the minimum year",
+    "vehicle_type_not_enabled": "That vehicle type is not enabled",
+    "document_not_found": "Document not found",
+    "driver_invalid_status": "The driver's status does not allow this action",
+    "driver_invalid_transition": "The driver does not allow that status change",
+    "driver_documents_rejected": "Some documents are rejected: reject the application instead"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -397,7 +422,8 @@
       "medical_certificate": "Medical certificate",
       "vehicle_registration": "Vehicle registration",
       "selfie": "Selfie",
-      "vehicle_photo": "Vehicle photo"
+      "vehicle_photo": "Vehicle photo",
+      "criminal_record": "Criminal record certificate"
     },
     "actions": {
       "approve": "Approve",
@@ -486,7 +512,9 @@
       "onlineSeconds": "Location without a ride: between {min} and {max} seconds.",
       "onRideSeconds": "Location on a ride: between {min} and {max} seconds.",
       "nightHours": "Night hours must be HH:MM and different",
-      "safetyNumber": "A safety value is out of range ({min}–{max})"
+      "safetyNumber": "A safety value is out of range ({min}–{max})",
+      "noticeDays": "Expiry notices: up to {count} values between 1 and {max} days",
+      "verificationNumber": "Driver verification: values must be between {min} and {max}"
     },
     "fares": {
       "title": "Fares",
@@ -627,6 +655,25 @@
       "range": "Between {min} and {max}",
       "sosTeam": "On-call team for SOS",
       "sosTeamHelp": "On: every SOS goes to Telegram and rings in the Safety center. Off: the SOS calls 911 and alerts the trusted contacts; only the record stays here."
+    },
+    "verification": {
+      "title": "Driver verification",
+      "help": "Expiring documents, random selfie, re-verification after reports and induction.",
+      "expiring": "Documents with an expiry date",
+      "expiringHelp": "The driver types the date and a verifier confirms it. Once expired, they cannot go online until the new one is approved.",
+      "optional": "Optional documents",
+      "optionalHelp": "The driver may upload them without being asked (for example, the criminal record certificate).",
+      "noticeDays": "Notices before expiry (days)",
+      "noticeDaysHelp": "Comma separated, for example 30, 7, 1 (at most {max} days).",
+      "noticeDaysInvalid": "Type only numbers separated by commas",
+      "numbers": {
+        "selfie_every_days": "Random selfie every (days)",
+        "mismatch_reports": "\"Not the moto\" reports to re-verify",
+        "report_window_days": "Within (days)"
+      },
+      "selfieHelp": "When going online, on a random day. 0 = no random selfie.",
+      "induction": "Induction required to approve",
+      "inductionHelp": "Before approving a driver, \"Induction completed\" must be marked on their profile (talk or video)."
     }
   },
   "paymentMethods": {
@@ -1454,7 +1501,8 @@
       "monitoring": "Monitoring",
       "rates": "Rates",
       "binance": "Binance Pay",
-      "privacy_retention": "Data retention"
+      "privacy_retention": "Data retention",
+      "driver_expirations": "Driver document expiry"
     },
     "dashboardAlert": "There are {count} open system alerts",
     "dashboardAlertHelp": "A service or background loop has problems.",
@@ -1547,7 +1595,13 @@
         "reinstate": "Reinstated a driver",
         "reject": "Rejected a driver",
         "suspend": "Suspended a driver",
-        "view": "Viewed profile and documents"
+        "view": "Viewed profile and documents",
+        "check_view": "Viewed a re-verification",
+        "check_review": "Reviewed a re-verification",
+        "check_assign": "Assigned a re-verification",
+        "assign": "Assigned a driver application",
+        "induction": "Marked the induction",
+        "reverify": "Asked for a re-verification"
       },
       "fee_schedule": {
         "create": "Created a fee schedule"
@@ -1658,7 +1712,8 @@
       "app_release": "App version",
       "app_update": "JavaScript update",
       "feature_flag": "Feature",
-      "announcement": "Announcement"
+      "announcement": "Announcement",
+      "driver_check": "Re-verification"
     }
   },
   "team": {
@@ -2190,5 +2245,202 @@
       "passenger_ok": "The passenger said they were OK"
     },
     "pick": "Pick an alert to see its details."
+  },
+  "verification": {
+    "kind": "Type",
+    "allKinds": "All types",
+    "kinds": {
+      "selfie": "Verification selfie",
+      "reverification": "Re-verification (selfie and moto)",
+      "document_renewal": "Renewed document",
+      "vehicle_change": "Moto change"
+    },
+    "status": "Status",
+    "statuses": {
+      "pending": "To review",
+      "requested": "Waiting for photos",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "why": {
+      "title": "Reason",
+      "random": "Random selfie",
+      "reports": "Passenger reports",
+      "team": "Asked by the team",
+      "driver": "Sent by the driver"
+    },
+    "assignee": {
+      "all": "All",
+      "mine": "Mine",
+      "unassigned": "Unassigned"
+    },
+    "assignedTo": "Assigned to",
+    "me": "Me",
+    "unassigned": "Unassigned",
+    "take": "Take",
+    "release": "Release",
+    "driver": "Driver",
+    "sentAt": "Sent",
+    "requestedAt": "Requested",
+    "notSentYet": "Not sent yet",
+    "reviewedBy": "Reviewed by",
+    "currentPlate": "Current plate",
+    "newApplications": "New applications",
+    "queueHelp": "Selfies, renewed documents and moto changes of already approved drivers, oldest first. New applications are under Drivers.",
+    "empty": "No re-verifications match these filters.",
+    "total": "{n} re-verifications",
+    "nextCheck": "Next",
+    "approve": "Approve",
+    "reject": "Reject",
+    "expiresOn": "Expiry date",
+    "expiresOnHelp": "Confirm it or correct it with the one on the document.",
+    "expiryIssues": {
+      "required": "Type the expiry date",
+      "past": "The date is in the past"
+    },
+    "pendingVehicle": "Moto change under review",
+    "openCheck": "Review",
+    "history": "History ({n})",
+    "replaced": "Replaced",
+    "reasonPlaceholder": "Tell the driver what to fix",
+    "toast": {
+      "assigned": "Assigned to you",
+      "unassigned": "Assignment removed",
+      "approved": "Re-verification approved",
+      "rejected": "Re-verification rejected"
+    },
+    "viewer": {
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "rotate": "Rotate",
+      "reset": "Reset",
+      "noPreview": "This file cannot be shown here"
+    },
+    "review": {
+      "sent": "What they sent",
+      "references": "Approved reference",
+      "waitingPhotos": "The driver has not sent the photos yet.",
+      "noFiles": "No files.",
+      "noReferences": "No approved documents to compare with.",
+      "newVehicle": "New moto",
+      "suspendWarning": "If you reject it, the driver's profile is suspended right away and an urgent report is opened.",
+      "suspendConfirmTitle": "Rejecting suspends the driver",
+      "rejectAndSuspend": "Reject and suspend",
+      "rejectTitle": "Reject: {kind}",
+      "approveHint": "Tick the whole checklist (and the expiry date when needed) to approve.",
+      "readOnly": "Your role can view but not review."
+    },
+    "documentReview": {
+      "title": "Review {kind}",
+      "backToChecklist": "Back to the checklist"
+    },
+    "checklist": {
+      "title": "Checklist",
+      "legible": "Fully readable and sharp",
+      "clearPhoto": "Clear photo, no filters or cropping",
+      "nameMatches": "The name matches the driver's",
+      "numberMatches": "The number matches the registered ID",
+      "valid": "Valid and the date matches the document",
+      "live": "Live photo (not a photo of a photo or a screen)",
+      "faceMatchesSelfie": "The face matches the approved selfie",
+      "faceMatchesId": "The face matches the ID card photo",
+      "plateMatches": "The plate matches",
+      "vehicleMatches": "Brand, model and color match"
+    },
+    "reasonLabels": {
+      "blurry": "Blurry or unreadable",
+      "incomplete": "Incomplete or cropped",
+      "wrongDocument": "Not the requested document",
+      "nameMismatch": "Name does not match",
+      "numberMismatch": "Number does not match",
+      "expired": "Expired",
+      "dateMismatch": "Wrong date",
+      "faceMismatch": "Face does not match",
+      "notLive": "Not a live photo",
+      "plateMismatch": "Plate does not match",
+      "vehicleMismatch": "Moto does not match",
+      "other": "Other"
+    },
+    "reasons": {
+      "blurry": "The photo is blurry or unreadable. Take a sharp photo with good light and no glare.",
+      "incomplete": "The document is incomplete or cropped. Take a photo where it is fully visible.",
+      "wrongDocument": "The file is not the requested document. Upload the right one.",
+      "nameMismatch": "The name on the document does not match your account.",
+      "numberMismatch": "The document number does not match your registered ID.",
+      "expired": "The document is expired. Upload a valid one.",
+      "dateMismatch": "The expiry date you typed does not match the document.",
+      "faceMismatch": "The face in the selfie does not match your ID card and approved selfie.",
+      "notLive": "The selfie must be live with the front camera, not a photo of a photo or a screen.",
+      "plateMismatch": "The plate in the photos does not match the registered one.",
+      "vehicleMismatch": "The moto in the photos does not match the registered one (brand, model or color)."
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "help": "Click an image so zoom, rotation and the arrows act on it.",
+      "tick": "Tick a checklist item",
+      "approve": "Approve",
+      "reject": "Reject",
+      "zoomIn": "Zoom in / out",
+      "rotate": "Rotate",
+      "reset": "Reset zoom and rotation",
+      "next": "Previous / next image",
+      "nextCheck": "Next re-verification"
+    },
+    "duplicates": {
+      "title": "Possible duplicate: {n} matches with other accounts",
+      "help": "This data appears on other accounts (including deleted or suspended ones). Check before approving.",
+      "erased": "deleted account",
+      "deleted": "Deleted",
+      "suspended": "Suspended",
+      "kinds": {
+        "national_id": "ID card",
+        "rif": "RIF",
+        "plate": "Plate",
+        "phone": "Phone",
+        "binance_pay_id": "Binance Pay ID",
+        "device": "Device"
+      }
+    },
+    "card": {
+      "title": "Verification",
+      "reviewer": "Verifier",
+      "canGoOnline": "Can go online",
+      "blocked": "Cannot go online",
+      "expired": "Expired: {kind}",
+      "missingExpiry": "No date: {kind}",
+      "requiredCheck": "Pending: {kind}"
+    },
+    "induction": {
+      "label": "Induction completed",
+      "help": "Mark it when the driver completes the induction talk or video.",
+      "doneAt": "Completed on {date}",
+      "done": "Induction marked as completed",
+      "undone": "Induction unmarked",
+      "missing": "The induction is not marked yet: it is required to approve."
+    },
+    "reverify": {
+      "button": "Ask for re-verification",
+      "title": "Ask for a re-verification?",
+      "help": "The driver cannot go online until they send a live selfie and new moto photos. They will get a notification.",
+      "confirm": "Ask for re-verification",
+      "sent": "Re-verification requested"
+    },
+    "timeline": {
+      "title": "Verification timeline",
+      "empty": "No verifications yet.",
+      "reviewed": "reviewed {date}"
+    },
+    "expiry": {
+      "column": "Expiry",
+      "until": "Expires on {date}",
+      "expired": "Expired",
+      "today": "Expires today",
+      "soon": "Expires in {n} days",
+      "valid": "Valid",
+      "noDate": "No date",
+      "unconfirmed": "To confirm",
+      "confirm": "Confirm date"
+    }
   }
 }

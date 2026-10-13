@@ -1,4 +1,4 @@
-import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, PaymentMethod, RateSource, SafetySettings, ServiceArea, VehicleType } from '~/types/api'
+import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, PaymentMethod, RateSource, SafetySettings, ServiceArea, VehicleType, VerificationSettings } from '~/types/api'
 import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/types/api'
 
 /** Editable copy of AppConfig: decimals as numbers so they bind to numeric inputs. */
@@ -37,6 +37,7 @@ export interface SettingsForm {
   app_links: AppLinks
   location_intervals: LocationIntervals
   safety: SafetySettings
+  verification: VerificationSettings
 }
 
 export const FARE_FIELDS = ['base', 'per_km', 'per_minute', 'minimum'] as const
@@ -79,6 +80,25 @@ export const SAFETY_LIMITS = {
   check_in_seconds: [30, 900],
   sos_location_seconds: [2, 60],
 } as const
+/** Doc 12 limits (same as the API validation). */
+export const VERIFICATION_LIMITS = {
+  selfie_every_days: [0, 90],
+  mismatch_reports: [1, 20],
+  report_window_days: [1, 365],
+} as const
+export type VerificationNumber = keyof typeof VERIFICATION_LIMITS
+export const VERIFICATION_NUMBERS = Object.keys(VERIFICATION_LIMITS) as VerificationNumber[]
+export const NOTICE_DAYS_MAX = 120
+export const NOTICE_DAYS_COUNT = 5
+/** Selfie and moto photos are taken on the spot: they never expire nor are optional. */
+export const PAPER_DOCUMENTS: DocumentKind[] = DOCUMENT_KINDS.filter(k => k !== 'selfie' && k !== 'vehicle_photo')
+
+/** "30, 7, 1" → [30, 7, 1]; null when something is not a whole number. */
+export function parseNoticeDays(text: string): number[] | null {
+  const parts = text.split(/[\s,;]+/).filter(Boolean)
+  if (!parts.every(p => /^\d+$/.test(p))) return null
+  return parts.map(Number)
+}
 export type SafetyNumber = keyof typeof SAFETY_LIMITS
 export const SAFETY_NUMBERS = Object.keys(SAFETY_LIMITS) as SafetyNumber[]
 
@@ -88,7 +108,7 @@ export function defaultSettings(): SettingsForm {
     driver_min_age: 21,
     vehicle_min_year: { moto: 2013, car: 1993 },
     enabled_vehicle_types: ['moto'],
-    driver_required_documents: [...DOCUMENT_KINDS],
+    driver_required_documents: DOCUMENT_KINDS.filter(k => k !== 'criminal_record'),
     vehicle_photo_min_count: 2,
     fares: {
       moto: { base: 0.8, per_km: 0.35, per_minute: 0.05, minimum: 1.5 },
@@ -130,6 +150,15 @@ export function defaultSettings(): SettingsForm {
       check_in_seconds: 120,
       sos_location_seconds: 5,
       sos_team_alert: false,
+    },
+    verification: {
+      expiring_documents: ['drivers_license', 'medical_certificate', 'vehicle_registration'],
+      optional_documents: ['criminal_record'],
+      expiry_notice_days: [30, 7, 1],
+      selfie_every_days: 7,
+      mismatch_reports: 2,
+      report_window_days: 30,
+      induction_required: false,
     },
   }
 }
@@ -198,6 +227,13 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
       on_ride_seconds: num(config.location_intervals?.on_ride_seconds, d.location_intervals.on_ride_seconds),
     },
     safety: { ...d.safety, ...config.safety, pin_areas: [...(config.safety?.pin_areas ?? d.safety.pin_areas)] },
+    verification: {
+      ...d.verification,
+      ...config.verification,
+      expiring_documents: [...(config.verification?.expiring_documents ?? d.verification.expiring_documents)],
+      optional_documents: [...(config.verification?.optional_documents ?? d.verification.optional_documents)],
+      expiry_notice_days: [...(config.verification?.expiry_notice_days ?? d.verification.expiry_notice_days)],
+    },
   }
 }
 
@@ -261,6 +297,13 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
       // In the order of the cities list, and only cities that still exist.
       pin_areas: form.service_areas.map(a => a.name.trim()).filter(name => form.safety.pin_areas.includes(name)),
       overtime_factor: Math.round(Number(form.safety.overtime_factor) * 10) / 10,
+    },
+    verification: {
+      ...form.verification,
+      expiring_documents: DOCUMENT_KINDS.filter(k => form.verification.expiring_documents.includes(k)),
+      optional_documents: DOCUMENT_KINDS.filter(k => form.verification.optional_documents.includes(k)),
+      // The API keeps them unique and from the earliest notice to the last one.
+      expiry_notice_days: [...new Set(form.verification.expiry_notice_days.map(Number))].sort((a, b) => b - a),
     },
   }
 }
@@ -368,6 +411,14 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
     const [min, max] = SAFETY_LIMITS[key]
     const value = Number(form.safety[key])
     if (!(Number.isFinite(value) && value >= min && value <= max)) issues.push({ key: 'safetyNumber', params: { min, max } })
+  }
+  const notice = form.verification.expiry_notice_days
+  if (notice.length > NOTICE_DAYS_COUNT || notice.some(d => !between(Number(d), 1, NOTICE_DAYS_MAX))) {
+    issues.push({ key: 'noticeDays', params: { max: NOTICE_DAYS_MAX, count: NOTICE_DAYS_COUNT } })
+  }
+  for (const key of VERIFICATION_NUMBERS) {
+    const [min, max] = VERIFICATION_LIMITS[key]
+    if (!between(Number(form.verification[key]), min, max)) issues.push({ key: 'verificationNumber', params: { min, max } })
   }
   return issues
 }

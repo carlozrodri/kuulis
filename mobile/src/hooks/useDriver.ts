@@ -2,8 +2,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { ApiError, api } from '@/lib/api';
 import { DEFAULT_APP_CONFIG } from '@/lib/driver';
-import type { AppConfig, DocumentKind, DriverPersonalInput, DriverProfile, VehicleInput } from '@/lib/types';
-import { type LocalFile, uploadDriverDocument } from '@/lib/upload';
+import type {
+  AppConfig,
+  DocumentKind,
+  DriverCheck,
+  DriverPersonalInput,
+  DriverProfile,
+  VehicleInput,
+} from '@/lib/types';
+import { type CheckFileKind, type LocalFile, uploadCheckFile, uploadDriverDocument } from '@/lib/upload';
 
 export const DRIVER_QUERY_KEY = ['drivers', 'me'] as const;
 export const CONFIG_QUERY_KEY = ['config', 'public'] as const;
@@ -60,7 +67,87 @@ export const useSaveVehicle = () =>
   useProfileMutation((input: VehicleInput) => api<DriverProfile>('/drivers/me/vehicle', { method: 'PUT', body: input }));
 
 export const useUploadDocument = () =>
-  useProfileMutation(({ kind, file }: { kind: DocumentKind; file: LocalFile }) => uploadDriverDocument(kind, file));
+  useProfileMutation(({ kind, file, expiresOn }: { kind: DocumentKind; file: LocalFile; expiresOn?: string | null }) =>
+    uploadDriverDocument(kind, file, expiresOn),
+  );
+
+/** Doc 12: the expiry of an approved document that has none ("Indicar fecha"). */
+export const useSetDocumentExpiry = () =>
+  useProfileMutation(({ id, expiresOn }: { id: string; expiresOn: string }) =>
+    api<DriverProfile>(`/drivers/me/documents/${id}`, { method: 'PATCH', body: { expires_on: expiresOn } }),
+  );
+
+/** Uploads files one by one, reporting "n of total" so long uploads on mobile data show progress. */
+async function uploadAll(
+  files: { kind: CheckFileKind; file: LocalFile }[],
+  onProgress?: (done: number, total: number) => void,
+) {
+  const keys: { kind: CheckFileKind; key: string }[] = [];
+  onProgress?.(0, files.length);
+  for (const { kind, file } of files) {
+    keys.push({ kind, key: await uploadCheckFile(kind, file) });
+    onProgress?.(keys.length, files.length);
+  }
+  return keys;
+}
+
+/** Doc 12: sends the live selfie (and moto photos for a re-verification) asked for; going online works right after. */
+export function useSubmitCheck() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      checkId,
+      files,
+      onProgress,
+    }: {
+      checkId: string;
+      files: { kind: CheckFileKind; file: LocalFile }[];
+      onProgress?: (done: number, total: number) => void;
+    }) => {
+      const keys = await uploadAll(files, onProgress);
+      return api<DriverCheck>(`/drivers/me/checks/${checkId}/submit`, { method: 'POST', body: { files: keys } });
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: DRIVER_QUERY_KEY }),
+  });
+}
+
+/** Doc 12: a new moto for review; the current one keeps working until it is approved. */
+export const useChangeVehicle = () =>
+  useProfileMutation(
+    async ({
+      vehicle,
+      registration,
+      expiresOn,
+      photos,
+      onProgress,
+    }: {
+      vehicle: VehicleInput;
+      registration: LocalFile;
+      expiresOn: string;
+      photos: LocalFile[];
+      onProgress?: (done: number, total: number) => void;
+    }) => {
+      const keys = await uploadAll(
+        [
+          { kind: 'vehicle_registration', file: registration },
+          ...photos.map((file) => ({ kind: 'vehicle_photo' as const, file })),
+        ],
+        onProgress,
+      );
+      return api<DriverProfile>('/drivers/me/vehicles', {
+        method: 'POST',
+        body: {
+          vehicle,
+          registration_key: keys[0].key,
+          registration_expires_on: expiresOn,
+          photo_keys: keys.slice(1).map((item) => item.key),
+        },
+      });
+    },
+  );
+
+export const useCancelVehicleChange = () =>
+  useProfileMutation(() => api<DriverProfile>('/drivers/me/vehicles/pending', { method: 'DELETE' }));
 
 export const useDeleteDocument = () =>
   useProfileMutation((id: string) => api<DriverProfile>(`/drivers/me/documents/${id}`, { method: 'DELETE' }));

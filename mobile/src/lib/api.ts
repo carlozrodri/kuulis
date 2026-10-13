@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 
 import { APP_VERSION_HEADERS } from './appVersion';
 import { config } from './config';
+import { deviceHeaders } from './deviceId';
 import { secureStorage } from './storage';
 import type { TokenPair } from './types';
 
@@ -9,9 +10,14 @@ const ACCESS_KEY = 'kuulis.access_token';
 const REFRESH_KEY = 'kuulis.refresh_token';
 /**
  * X-Client-Platform lets the API label this device in the session list (Perfil → Sesiones activas); the
- * X-App-* headers say which build is talking (doc 09: builds in use, mandatory updates).
+ * X-App-* headers say which build is talking (doc 09: builds in use, mandatory updates). X-Device-Id (doc 12,
+ * added per request in `clientHeaders`) helps spot one phone behind several driver accounts.
  */
 const CLIENT_HEADERS = { 'X-Client-Platform': Platform.OS, ...APP_VERSION_HEADERS };
+
+async function clientHeaders(): Promise<Record<string, string>> {
+  return { ...CLIENT_HEADERS, ...(await deviceHeaders().catch(() => ({}))) };
+}
 
 export class ApiError extends Error {
   constructor(
@@ -87,7 +93,7 @@ export async function refreshTokens(): Promise<boolean> {
     if (!refreshToken) return false;
     const response = await fetch(`${config.apiUrl}/auth/refresh`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...CLIENT_HEADERS },
+      headers: { 'Content-Type': 'application/json', ...(await clientHeaders()) },
       body: JSON.stringify({ refresh_token: refreshToken }),
     });
     if (!response.ok) {
@@ -123,7 +129,7 @@ export async function api<T>(path: string, options: RequestOptions = {}, retried
     headers: {
       Accept: 'application/json',
       'Accept-Language': currentLocale,
-      ...CLIENT_HEADERS,
+      ...(await clientHeaders()),
       ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
       ...(auth && accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...(headers as Record<string, string> | undefined),

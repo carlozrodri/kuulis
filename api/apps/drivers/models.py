@@ -3,8 +3,23 @@ import uuid
 from datetime import date, datetime
 from decimal import Decimal
 
-from sqlalchemy import Date, DateTime, Enum, ForeignKey, Integer, Numeric, String, Text, text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import (
+    Boolean,
+    Date,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Index,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    UniqueConstraint,
+    and_,
+    text,
+)
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import Mapped, foreign, mapped_column, relationship
 
 from apps.users.models import User
 from kuulis.core.models import BaseModel
@@ -47,16 +62,64 @@ class DocumentKind(enum.StrEnum):
     VEHICLE_REGISTRATION = "vehicle_registration"  # carnet de circulación
     SELFIE = "selfie"
     VEHICLE_PHOTO = "vehicle_photo"  # several allowed
+    CRIMINAL_RECORD = "criminal_record"  # certificado de antecedentes (optional, doc 12)
 
 
 # Kinds that can have several files at once; the rest replace the previous file.
 MULTI_FILE_KINDS = frozenset({DocumentKind.VEHICLE_PHOTO})
 
 
+# Photos taken on the spot: never a PDF.
+PHOTO_KINDS = frozenset({DocumentKind.SELFIE, DocumentKind.VEHICLE_PHOTO})
+# What an approved driver may renew on their own (selfie and moto photos go through checks).
+RENEWABLE_KINDS = frozenset(
+    {
+        DocumentKind.ID_CARD,
+        DocumentKind.RIF,
+        DocumentKind.DRIVERS_LICENSE,
+        DocumentKind.MEDICAL_CERTIFICATE,
+        DocumentKind.VEHICLE_REGISTRATION,
+        DocumentKind.CRIMINAL_RECORD,
+    }
+)
+
+
 class DocumentStatus(enum.StrEnum):
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
+
+
+class VehicleStatus(enum.StrEnum):
+    ACTIVE = "active"  # the one used for rides
+    PENDING = (
+        "pending"  # a moto change waiting for review; the driver keeps working with the active
+    )
+    RETIRED = "retired"
+
+
+class CheckKind(enum.StrEnum):
+    """Re-verifications of an approved driver (doc 12)."""
+
+    SELFIE = "selfie"  # random live selfie
+    REVERIFICATION = "reverification"  # selfie + new moto photos (reports or the team asked)
+    DOCUMENT_RENEWAL = "document_renewal"  # a new file for a document (expired or about to)
+    VEHICLE_CHANGE = "vehicle_change"
+
+
+# Checks that keep the driver offline until they send the photos.
+BLOCKING_CHECKS = frozenset({CheckKind.SELFIE, CheckKind.REVERIFICATION})
+
+
+class CheckStatus(enum.StrEnum):
+    REQUESTED = "requested"  # waiting for the driver's photos
+    PENDING = "pending"  # sent, waiting for a verifier
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    CANCELLED = "cancelled"
+
+
+OPEN_CHECK_STATUSES = frozenset({CheckStatus.REQUESTED, CheckStatus.PENDING})
 
 
 class DriverProfile(BaseModel):
@@ -91,10 +154,35 @@ class DriverProfile(BaseModel):
     rating_sum: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     rating_count: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     rating_avg: Mapped[Decimal | None] = mapped_column(Numeric(3, 2))
+    # Doc 12: when the next live selfie is asked (on going online), induction and who reviews.
+    selfie_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    induction_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    induction_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL")
+    )
+    assigned_to_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL")
+    )
 
     user: Mapped[User] = relationship(foreign_keys=[user_id], lazy="raise")
+    # The moto in use. Changes go through ``pending_vehicle`` (a new row) and a review.
     vehicle: Mapped["Vehicle | None"] = relationship(
-        back_populates="driver", cascade="all, delete-orphan", uselist=False, lazy="raise"
+        primaryjoin=lambda: and_(
+            foreign(Vehicle.driver_id) == DriverProfile.id,
+            Vehicle.status == VehicleStatus.ACTIVE,
+        ),
+        uselist=False,
+        viewonly=True,
+        lazy="raise",
+    )
+    pending_vehicle: Mapped["Vehicle | None"] = relationship(
+        primaryjoin=lambda: and_(
+            foreign(Vehicle.driver_id) == DriverProfile.id,
+            Vehicle.status == VehicleStatus.PENDING,
+        ),
+        uselist=False,
+        viewonly=True,
+        lazy="raise",
     )
     documents: Mapped[list["DriverDocument"]] = relationship(
         back_populates="driver",
@@ -106,19 +194,39 @@ class DriverProfile(BaseModel):
 
 class Vehicle(BaseModel):
     __tablename__ = "vehicles"
+    __table_args__ = (
+        # One moto in use and one change under review per driver; a plate belongs to one live moto
+        # (a retired one can be sold and registered again by someone else).
+        Index(
+            "uq_vehicles_driver_status",
+            "driver_id",
+            "status",
+            unique=True,
+            postgresql_where=text("status IN ('active', 'pending')"),
+        ),
+        Index(
+            "uq_vehicles_plate_live",
+            "plate",
+            unique=True,
+            postgresql_where=text("status IN ('active', 'pending')"),
+        ),
+    )
 
     driver_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("driver_profiles.id", ondelete="CASCADE"), unique=True
+        ForeignKey("driver_profiles.id", ondelete="CASCADE"), index=True
+    )
+    status: Mapped[VehicleStatus] = mapped_column(
+        _enum(VehicleStatus, "vehicle_status"),
+        default=VehicleStatus.ACTIVE,
+        server_default=VehicleStatus.ACTIVE.value,
     )
     type: Mapped[VehicleType] = mapped_column(_enum(VehicleType, "vehicle_type"))
     brand: Mapped[str] = mapped_column(String(50))
     model: Mapped[str] = mapped_column(String(50))
     year: Mapped[int] = mapped_column(Integer)
     # Normalized: uppercase, no spaces or dashes (see services.normalize_plate).
-    plate: Mapped[str] = mapped_column(String(12), unique=True)
+    plate: Mapped[str] = mapped_column(String(12))
     color: Mapped[str] = mapped_column(String(30))
-
-    driver: Mapped[DriverProfile] = relationship(back_populates="vehicle", lazy="raise")
 
 
 class DriverDocument(BaseModel):
@@ -140,5 +248,78 @@ class DriverDocument(BaseModel):
         ForeignKey("users.id", ondelete="SET NULL")
     )
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Doc 12: expiry of the license, medical certificate and registration. The driver types it;
+    # a verifier confirms it (``expiry_confirmed``) when approving.
+    expires_on: Mapped[date | None] = mapped_column(Date)
+    expiry_confirmed: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=text("false")
+    )
+    # Smallest "expires in N days" notice already sent (30, 7, 1; 0 = the expiry notice).
+    expiry_notice_days: Mapped[int | None] = mapped_column(Integer)
+    # A renewal or a moto change replaced this file; it stays as history.
+    superseded_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("driver_documents.id", ondelete="SET NULL")
+    )
 
     driver: Mapped[DriverProfile] = relationship(back_populates="documents", lazy="raise")
+
+
+class DriverCheck(BaseModel):
+    """A re-verification of an approved driver: live selfie, moto photos, a renewed document or a
+    moto change. Files live in private S3 under ``drivers/<user_id>/checks/``."""
+
+    __tablename__ = "driver_checks"
+    __table_args__ = (Index("ix_driver_checks_status_created", "status", "created_at"),)
+
+    driver_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("driver_profiles.id", ondelete="CASCADE"), index=True
+    )
+    kind: Mapped[CheckKind] = mapped_column(_enum(CheckKind, "driver_check_kind"))
+    status: Mapped[CheckStatus] = mapped_column(
+        _enum(CheckStatus, "driver_check_status"), default=CheckStatus.REQUESTED
+    )
+    # Why it was asked: random, reports, team, expiry, driver.
+    reason: Mapped[str] = mapped_column(String(20), default="driver")
+    # [{"kind": "selfie", "key": "...", "content_type": "image/jpeg"}, ...]
+    files: Mapped[list[dict]] = mapped_column(JSONB, default=list)
+    document_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("driver_documents.id", ondelete="SET NULL")
+    )
+    vehicle_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("vehicles.id", ondelete="SET NULL")
+    )
+    requested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    assigned_to_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL")
+    )
+    reviewed_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL")
+    )
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    result_reason: Mapped[str | None] = mapped_column(Text)
+
+
+class MarkKind(enum.StrEnum):
+    NATIONAL_ID = "national_id"
+    RIF = "rif"
+    PLATE = "plate"
+    PHONE = "phone"
+    BINANCE_PAY_ID = "binance_pay_id"
+    DEVICE = "device"
+
+
+class IdentityMark(BaseModel):
+    """A keyed hash of something that identifies a person or a moto (cédula, plate, phone,
+    device...). Kept when the account is erased, so a new account with the same data shows up as a
+    duplicate (doc 12) without storing the value itself."""
+
+    __tablename__ = "identity_marks"
+    __table_args__ = (
+        UniqueConstraint("user_id", "kind", "value_hash", name="uq_identity_marks_user_value"),
+        Index("ix_identity_marks_kind_hash", "kind", "value_hash"),
+    )
+
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    kind: Mapped[MarkKind] = mapped_column(_enum(MarkKind, "identity_mark_kind"))
+    value_hash: Mapped[str] = mapped_column(String(64))
