@@ -436,8 +436,10 @@ async def list_reports(
     stmt = select(Report)
     if waiting_on:
         stmt = stmt.where(Report.waiting_on == waiting_on, Report.status.in_(OPEN_STATUSES))
-    if assigned_to_id:
+    if assigned_to_id:  # "Mis tickets": the open ones unless a status is asked for
         stmt = stmt.where(Report.assigned_to_id == assigned_to_id)
+        if not status:
+            stmt = stmt.where(Report.status.in_(OPEN_STATUSES))
     if unassigned:
         stmt = stmt.where(Report.assigned_to_id.is_(None), Report.status.in_(OPEN_STATUSES))
     if tag:

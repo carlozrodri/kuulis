@@ -14,7 +14,7 @@
     "topUps": "Top-ups",
     "transfers": "Transfers",
     "subscriptions": "Subscriptions",
-    "reports": "Reports",
+    "reports": "Support",
     "finance": "Finance",
     "system": "System",
     "audit": "Audit log",
@@ -27,7 +27,10 @@
     "appStatus": "App status",
     "flags": "Features",
     "announcements": "Announcements",
-    "driverChecks": "Re-verifications"
+    "driverChecks": "Re-verifications",
+    "cannedReplies": "Saved replies",
+    "supportMetrics": "Support metrics",
+    "help": "Help center"
   },
   "auth": {
     "title": "Admin sign in",
@@ -163,7 +166,7 @@
         "suspend_long": "Suspend longer than 7 days or indefinitely"
       },
       "reports": {
-        "manage": "Handle reports"
+        "manage": "Handle support and reports"
       },
       "drivers": {
         "view": "View drivers and documents",
@@ -231,6 +234,9 @@
       "announcements": {
         "view": "See announcements",
         "manage": "Create, edit and delete announcements"
+      },
+      "help": {
+        "manage": "Help center"
       }
     }
   },
@@ -371,7 +377,12 @@
     "document_not_found": "Document not found",
     "driver_invalid_status": "The driver's status does not allow this action",
     "driver_invalid_transition": "The driver does not allow that status change",
-    "driver_documents_rejected": "Some documents are rejected: reject the application instead"
+    "driver_documents_rejected": "Some documents are rejected: reject the application instead",
+    "help_slug_taken": "An article with that slug already exists in this language",
+    "help_article_not_found": "The article does not exist",
+    "attachment_invalid": "A photo is not valid; remove it and upload it again",
+    "file_type_not_allowed": "That file type is not allowed",
+    "file_too_large": "The file is too large"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -514,7 +525,9 @@
       "nightHours": "Night hours must be HH:MM and different",
       "safetyNumber": "A safety value is out of range ({min}–{max})",
       "noticeDays": "Expiry notices: up to {count} values between 1 and {max} days",
-      "verificationNumber": "Driver verification: values must be between {min} and {max}"
+      "verificationNumber": "Driver verification: values must be between {min} and {max}",
+      "supportNumber": "Support: values must be between {min} and {max}",
+      "supportPromise": "Support: the response promise has at most {max} characters"
     },
     "fares": {
       "title": "Fares",
@@ -674,6 +687,31 @@
       "selfieHelp": "When going online, on a random day. 0 = no random selfie.",
       "induction": "Induction required to approve",
       "inductionHelp": "Before approving a driver, \"Induction completed\" must be marked on their profile (talk or video)."
+    },
+    "support": {
+      "title": "Support",
+      "help": "Response times, auto-close, ticket assignment and lost items.",
+      "numbers": {
+        "sla_urgent_minutes": "Answer urgent tickets within (minutes)",
+        "sla_normal_hours": "Answer normal tickets within (hours)",
+        "auto_close_days": "Auto-close (days)",
+        "lost_item_days": "Lost item request window (days)",
+        "lost_item_chat_hours": "Hand-over chat (hours)"
+      },
+      "numbersHelp": {
+        "sla_urgent_minutes": "Deadline for the team's answer; then it shows as “Overdue”. Between {min} and {max}.",
+        "sla_normal_hours": "Deadline for the team's answer; then it shows as “Overdue”. Between {min} and {max}.",
+        "auto_close_days": "A ticket waiting on the user closes after these days. Between {min} and {max}.",
+        "lost_item_days": "Days after the ride the passenger can ask for it. Between {min} and {max}.",
+        "lost_item_chat_hours": "The chat with the driver stays open after “I have it”. Between {min} and {max}."
+      },
+      "promise": {
+        "es": "Response promise (Spanish)",
+        "en": "Response promise (English)"
+      },
+      "promiseHelp": "What the app and the website show when writing. Empty = hidden. At most {max} characters.",
+      "autoAssign": "Assign tickets automatically",
+      "autoAssignHelp": "Each new ticket goes to the staff member with support permission and the fewest open tickets."
     }
   },
   "paymentMethods": {
@@ -1275,13 +1313,13 @@
     "willNotEnd": "It does not end on its own: it has to be lifted manually."
   },
   "reports": {
-    "title": "Reports",
+    "title": "Support tickets",
     "seeAll": "See all",
-    "none": "No reports.",
-    "empty": "No reports match these filters",
-    "total": "{n} reports",
+    "none": "No tickets.",
+    "empty": "No tickets match these filters",
+    "total": "{n} tickets",
     "search": "Search by name or email",
-    "allStatuses": "All",
+    "allStatuses": "All statuses",
     "allCategories": "All categories",
     "allPriorities": "All priorities",
     "urgentOpen": "Urgent open: {n}",
@@ -1349,10 +1387,10 @@
       "app_issue": "app malfunction",
       "other": "other reason"
     },
-    "detailTitle": "Report · {category}",
+    "detailTitle": "Ticket · {category}",
     "resolutionSent": "Answer sent to the reporter",
     "manage": "Handling",
-    "resolveHint": "When you resolve or dismiss, the reporter gets a notification with your answer.",
+    "resolveHint": "When you resolve or dismiss, your answer is sent as a message and the person is asked to rate the support.",
     "rideTitle": "Ride",
     "openRide": "Open ride",
     "noRide": "General report, no ride attached.",
@@ -1377,13 +1415,13 @@
     },
     "toast": {
       "priority": "Priority updated",
-      "inReview": "Report in review",
-      "open": "Report open again",
-      "assigned": "Report assigned to you",
+      "inReview": "Ticket in review",
+      "open": "Ticket open again",
+      "assigned": "Ticket assigned to you",
       "unassigned": "Assignment removed",
-      "reopened": "Report reopened",
-      "resolved": "Report resolved",
-      "dismissed": "Report dismissed"
+      "reopened": "Ticket reopened",
+      "resolved": "Ticket resolved",
+      "dismissed": "Ticket dismissed"
     },
     "notes": {
       "title": "Internal notes",
@@ -1396,12 +1434,12 @@
       "help": "Notes are not sent to anyone."
     },
     "resolve": {
-      "resolvedTitle": "Resolve report",
-      "dismissedTitle": "Dismiss report",
+      "resolvedTitle": "Resolve ticket",
+      "dismissedTitle": "Dismiss ticket",
       "resolvedHelp": "Closes the report as handled.",
       "dismissedHelp": "Closes the report without action (not applicable or not enough information).",
       "visible": "{name} will see this text",
-      "visibleHelp": "The answer is sent as a notification to the reporter and stays visible on their report. Do not include internal notes or the other person's details.",
+      "visibleHelp": "The answer stays in the conversation and the person is notified (by email if they wrote from the website), then they can rate the support. Do not include internal notes or the other person's data.",
       "resolution": "Answer for the reporter",
       "resolutionHelp": "{min} to {max} characters.",
       "resolvedConfirm": "Resolve and notify",
@@ -2442,5 +2480,204 @@
       "unconfirmed": "To confirm",
       "confirm": "Confirm date"
     }
+  },
+  "support": {
+    "views": {
+      "waiting_staff": "Waiting on team",
+      "waiting_user": "Waiting on user",
+      "mine": "My tickets",
+      "unassigned": "Unassigned",
+      "overdue": "Overdue",
+      "all": "All"
+    },
+    "allSources": "All sources",
+    "source": "Source",
+    "sources": {
+      "app": "App",
+      "help": "Help center",
+      "lost_item": "Lost item",
+      "web": "Web"
+    },
+    "allTags": "All tags",
+    "tags": "Tags",
+    "waiting": "Waiting",
+    "waitingOn": {
+      "staff": "Waiting on team",
+      "user": "Waiting on user"
+    },
+    "overdue": "Overdue",
+    "dueIn": "Due {when}",
+    "web": "Web",
+    "messagesCount": "{n} messages",
+    "csatShort": "{n}/5",
+    "firstResponse": "First response",
+    "noResponseYet": "Not answered yet",
+    "fromArticle": "Wrote from the article “{title}”",
+    "lostItem": {
+      "waiting": "Lost item: waiting for the driver's answer",
+      "has_it": "Lost item: the driver has it",
+      "not_found": "Lost item: the driver did not find it",
+      "answeredAt": "Answered on {when}",
+      "chatOpen": "The ride chat stays open until {when}",
+      "chatClosed": "The ride chat closed on {when}"
+    },
+    "csatTitle": "Support rating: {n}/5",
+    "csatNoComment": "No comment",
+    "thread": {
+      "title": "Conversation",
+      "empty": "No messages yet.",
+      "openPhoto": "Open photo {n}",
+      "photo": "Photo {n}",
+      "photoTitle": "Attached photo"
+    },
+    "closedHint": "The ticket is closed. Reopen it to answer.",
+    "contactName": "Name",
+    "contactEmail": "Email",
+    "webHelp": "Wrote from the website form without an account: the answer reaches them by email.",
+    "tagPlaceholder": "Add tag…",
+    "tagSuggestions": "Suggested:",
+    "saveTags": "Save tags",
+    "toast": {
+      "tags": "Tags saved"
+    },
+    "composer": {
+      "toPush": "{name} gets a notification in the app",
+      "toEmail": "{name} gets the answer by email",
+      "canned": "Saved replies",
+      "cannedSearch": "Search replies…",
+      "cannedEmpty": "No saved replies",
+      "placeholder": "Write your answer…",
+      "label": "Answer",
+      "usingCanned": "Using “{title}”",
+      "tooManyPhotos": "At most {n} photos per message",
+      "onlyImages": "Photos only (JPG, PNG, WebP or HEIC)",
+      "removePhoto": "Remove photo",
+      "then": {
+        "wait_user": "Wait for the user",
+        "resolve": "Resolve",
+        "keep": "Leave as is"
+      },
+      "thenLabel": "After sending",
+      "addPhoto": "Photo",
+      "send": "Send",
+      "sendResolve": "Send and resolve",
+      "sent": "Answer sent",
+      "sentResolved": "Answer sent and ticket resolved",
+      "hint": "{'{nombre}'} and {'{viaje}'} are replaced when sent. Ctrl + Enter sends."
+    }
+  },
+  "canned": {
+    "allLocales": "All",
+    "locales": {
+      "es": "Spanish",
+      "en": "English"
+    },
+    "title": "Title",
+    "locale": "Language",
+    "action": "On send",
+    "uses": "Uses",
+    "updated": "Updated",
+    "new": "New reply",
+    "edit": "Edit reply",
+    "delete": "Delete",
+    "search": "Search by title, text or tag",
+    "help": "Texts the team inserts when answering a ticket. The action decides what happens to the ticket after sending it.",
+    "empty": "No saved replies",
+    "body": "Text",
+    "bodyHelp": "{'{nombre}'} is replaced by the person's name and {'{viaje}'} by the ride's date and code.",
+    "actions": {
+      "none": "Leave as is",
+      "wait_user": "Wait for the user",
+      "resolve": "Resolve the ticket"
+    },
+    "actionsHelp": {
+      "none": "The ticket keeps its status.",
+      "wait_user": "The ticket waits for the user's answer.",
+      "resolve": "The ticket is closed as resolved with this message."
+    },
+    "tagsHelp": "Added to the ticket when this reply is used.",
+    "deleteTitle": "Delete saved reply",
+    "deleteHelp": "“{title}” will no longer be available to the team.",
+    "toast": {
+      "created": "Saved reply created",
+      "updated": "Saved reply updated",
+      "deleted": "Saved reply deleted"
+    }
+  },
+  "supportMetrics": {
+    "lastDays": "Last {n} days",
+    "period": "Period",
+    "created": "Tickets created",
+    "resolved": "Resolved",
+    "resolvedHint": "{n} resolved",
+    "firstResponse": "First response",
+    "resolution": "Resolution",
+    "average": "Average",
+    "csat": "Satisfaction (CSAT)",
+    "csatCount": "{n} ratings",
+    "waitingStaff": "Waiting on team",
+    "overdueOpen": "Overdue open",
+    "now": "Now",
+    "ticketsByDay": "Tickets per day",
+    "byAgent": "By agent",
+    "agent": "Agent",
+    "noAgents": "No data in this period"
+  },
+  "help": {
+    "allTopics": "All topics",
+    "topics": {
+      "account": "Account",
+      "rides": "Rides",
+      "payments": "Paying the driver",
+      "wallet": "Wallet and fee",
+      "safety": "Safety",
+      "documents": "Documents",
+      "app": "App problems"
+    },
+    "audiences": {
+      "all": "Everyone",
+      "passenger": "Passengers",
+      "driver": "Drivers"
+    },
+    "topic": "Topic",
+    "title": "Title",
+    "published": "Published",
+    "views": "Views",
+    "helpful": "Was it helpful?",
+    "helpfulCounts": "{yes} yes · {no} no",
+    "updated": "Updated",
+    "new": "New article",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search titles and texts",
+    "empty": "No articles match these filters",
+    "positionShort": "Position {n}",
+    "deleteTitle": "Delete article",
+    "deleteHelp": "“{title}” will no longer show in the app and on the website. This cannot be undone.",
+    "toast": {
+      "published": "Article published",
+      "hidden": "Article hidden",
+      "deleted": "Article deleted",
+      "created": "Article created",
+      "updated": "Article saved"
+    },
+    "translate": "Translate ({locale})",
+    "notFound": "We could not find this article.",
+    "body": "Text (Markdown)",
+    "bodyHelp": "Headings with #, lists with - or 1., **bold** and [links](https://…).",
+    "write": "Write",
+    "preview": "Preview",
+    "untitled": "Untitled",
+    "previewEmpty": "The preview shows up as you type.",
+    "publishedHelp": "Only published articles show in the app and on the website.",
+    "slug": "Identifier (slug)",
+    "slugHelp": "Lower case, digits and dashes. Translations share the same slug.",
+    "slugInvalid": "Only a-z, 0-9 and dashes, no spaces",
+    "locale": "Language",
+    "audience": "For",
+    "audienceHelp": "Passengers see “Everyone” and “Passengers”; drivers see “Everyone” and “Drivers”.",
+    "position": "Position",
+    "positionHelp": "Order within the topic (lowest first).",
+    "stats": "Statistics"
   }
 }

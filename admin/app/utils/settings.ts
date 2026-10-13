@@ -1,4 +1,4 @@
-import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, PaymentMethod, RateSource, SafetySettings, ServiceArea, VehicleType, VerificationSettings } from '~/types/api'
+import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, PaymentMethod, RateSource, SafetySettings, ServiceArea, SupportSettings, VehicleType, VerificationSettings } from '~/types/api'
 import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/types/api'
 
 /** Editable copy of AppConfig: decimals as numbers so they bind to numeric inputs. */
@@ -38,6 +38,7 @@ export interface SettingsForm {
   location_intervals: LocationIntervals
   safety: SafetySettings
   verification: VerificationSettings
+  support: SupportSettings
 }
 
 export const FARE_FIELDS = ['base', 'per_km', 'per_minute', 'minimum'] as const
@@ -88,6 +89,17 @@ export const VERIFICATION_LIMITS = {
 } as const
 export type VerificationNumber = keyof typeof VERIFICATION_LIMITS
 export const VERIFICATION_NUMBERS = Object.keys(VERIFICATION_LIMITS) as VerificationNumber[]
+/** Doc 13: support limits (same as the API validation). */
+export const SUPPORT_LIMITS = {
+  sla_urgent_minutes: [1, 1440],
+  sla_normal_hours: [1, 336],
+  auto_close_days: [1, 60],
+  lost_item_days: [1, 30],
+  lost_item_chat_hours: [1, 336],
+} as const
+export type SupportNumber = keyof typeof SUPPORT_LIMITS
+export const SUPPORT_NUMBERS = Object.keys(SUPPORT_LIMITS) as SupportNumber[]
+export const PROMISE_MAX = 120
 export const NOTICE_DAYS_MAX = 120
 export const NOTICE_DAYS_COUNT = 5
 /** Selfie and moto photos are taken on the spot: they never expire nor are optional. */
@@ -159,6 +171,16 @@ export function defaultSettings(): SettingsForm {
       mismatch_reports: 2,
       report_window_days: 30,
       induction_required: false,
+    },
+    support: {
+      sla_urgent_minutes: 15,
+      sla_normal_hours: 24,
+      response_promise_es: 'Respondemos en menos de 24 horas.',
+      response_promise_en: 'We answer within 24 hours.',
+      auto_close_days: 7,
+      auto_assign: false,
+      lost_item_days: 7,
+      lost_item_chat_hours: 72,
     },
   }
 }
@@ -234,6 +256,7 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
       optional_documents: [...(config.verification?.optional_documents ?? d.verification.optional_documents)],
       expiry_notice_days: [...(config.verification?.expiry_notice_days ?? d.verification.expiry_notice_days)],
     },
+    support: { ...d.support, ...config.support },
   }
 }
 
@@ -304,6 +327,11 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
       optional_documents: DOCUMENT_KINDS.filter(k => form.verification.optional_documents.includes(k)),
       // The API keeps them unique and from the earliest notice to the last one.
       expiry_notice_days: [...new Set(form.verification.expiry_notice_days.map(Number))].sort((a, b) => b - a),
+    },
+    support: {
+      ...form.support,
+      response_promise_es: form.support.response_promise_es.trim(),
+      response_promise_en: form.support.response_promise_en.trim(),
     },
   }
 }
@@ -419,6 +447,13 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
   for (const key of VERIFICATION_NUMBERS) {
     const [min, max] = VERIFICATION_LIMITS[key]
     if (!between(Number(form.verification[key]), min, max)) issues.push({ key: 'verificationNumber', params: { min, max } })
+  }
+  for (const key of SUPPORT_NUMBERS) {
+    const [min, max] = SUPPORT_LIMITS[key]
+    if (!between(Number(form.support[key]), min, max)) issues.push({ key: 'supportNumber', params: { min, max } })
+  }
+  if ([form.support.response_promise_es, form.support.response_promise_en].some(text => text.trim().length > PROMISE_MAX)) {
+    issues.push({ key: 'supportPromise', params: { max: PROMISE_MAX } })
   }
   return issues
 }

@@ -56,7 +56,7 @@ const actionItems = computed<ActionItem[]>(() => {
   const o = overview.value
   if (!o) return []
   const items: ActionItem[] = [
-    { key: 'urgent', label: t('dashboard.actions.urgentReports', { n: o.urgent_reports }), count: o.urgent_reports, icon: 'i-lucide-siren', to: { path: '/reports', query: { priority: 'urgent' } }, tone: 'error' },
+    { key: 'urgent', label: t('dashboard.actions.urgentReports', { n: o.urgent_reports }), count: o.urgent_reports, icon: 'i-lucide-siren', to: { path: '/reports', query: { view: 'all', status: 'open', priority: 'urgent' } }, tone: 'error' },
     { key: 'reports', label: t('dashboard.actions.openReports', { n: o.open_reports }), count: o.open_reports, icon: 'i-lucide-flag', to: '/reports', tone: 'warning' },
     { key: 'applications', label: t('dashboard.actions.driverApplications', { n: o.pending_driver_applications }), count: o.pending_driver_applications, icon: 'i-lucide-id-card', to: { path: '/drivers', query: { status: 'pending_review' } }, tone: 'info' },
     { key: 'reverifications', label: t('dashboard.actions.pendingReverifications', { n: o.pending_reverifications ?? 0 }), count: o.pending_reverifications ?? 0, icon: 'i-lucide-scan-face', to: '/drivers/checks', tone: 'info' },

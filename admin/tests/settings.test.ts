@@ -28,3 +28,19 @@ describe('app links and location intervals (doc 10)', () => {
     expect(changedSettings(settingsToPayload(form), original)).toEqual({ location_intervals: { online_seconds: 15, on_ride_seconds: 4 } })
   })
 })
+
+describe('support settings (doc 13)', () => {
+  it('fills defaults and validates ranges', () => {
+    const form = settingsFromConfig({ ...settingsToPayload(defaultSettings()), support: undefined } as unknown as AppConfig)
+    expect(form.support.sla_normal_hours).toBe(24)
+    form.support.sla_urgent_minutes = 0
+    form.support.response_promise_es = 'x'.repeat(121)
+    expect(keys(form)).toEqual(['supportNumber', 'supportPromise'])
+  })
+
+  it('trims the promise texts', () => {
+    const form = defaultSettings()
+    form.support.response_promise_en = '  Soon.  '
+    expect(settingsToPayload(form).support.response_promise_en).toBe('Soon.')
+  })
+})

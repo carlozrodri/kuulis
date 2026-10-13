@@ -6,14 +6,16 @@ const auth = useAuth()
 const config = useRuntimeConfig()
 const route = useRoute()
 
-// Open reports badge (urgent ones in red), refreshed every minute and on navigation.
+// Support badge: tickets waiting on the team (open ones on an older API), red when an urgent one is open.
+// Refreshed every minute and on navigation.
 const reportCounts = useReportCounts()
 const reportsBadge = computed(() => {
   const counts = reportCounts.counts.value
-  if (!counts?.open) return undefined
+  const waiting = counts?.waiting_staff ?? counts?.open
+  if (!counts || !waiting) return undefined
   const urgent = counts.urgent_open > 0
   return {
-    label: String(counts.open),
+    label: String(waiting),
     color: urgent ? 'error' as const : 'neutral' as const,
     variant: urgent ? 'solid' as const : 'subtle' as const,
     ...(urgent ? { title: t('reports.urgentOpen', { n: counts.urgent_open }) } : {}),

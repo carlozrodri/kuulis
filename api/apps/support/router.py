@@ -226,6 +226,13 @@ async def admin_articles(
     return [_admin_article(a) for a in await services.admin_articles(session, locale, topic, q)]
 
 
+@admin_router.get("/help/articles/{article_id}", response_model=HelpArticleAdminRead)
+async def admin_article(
+    article_id: uuid.UUID, _: Can("help.manage"), session: DBSession
+) -> HelpArticleAdminRead:
+    return _admin_article(await services.get_article(session, article_id))
+
+
 @admin_router.post(
     "/help/articles",
     dependencies=[audit("help.create", "help_article")],
