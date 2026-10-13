@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
+import type { NavEntry } from '~/utils/nav'
 
 const { t, locale, locales, setLocale } = useI18n()
 const auth = useAuth()
@@ -56,15 +57,71 @@ onMounted(() => {
 onBeforeUnmount(() => clearInterval(countsTimer))
 watch(() => route.path, refreshCounts)
 
-const links = computed<NavigationMenuItem[]>(() =>
-  NAV.filter(entry => navAllowed(entry, auth.isAdmin.value, auth.can)).map(entry => ({
-    label: t(`nav.${entry.key}`),
+type NavBadge = { label: string, color: 'error' | 'warning' | 'neutral', variant: 'solid' | 'subtle', title?: string }
+const badges = computed<Record<string, NavBadge | undefined>>(() => ({
+  reports: reportsBadge.value,
+  approvals: approvalsBadge.value,
+  safety: safetyBadge.value,
+}))
+
+// A folded section carries its pages' counts, coloured by the most urgent one, so an SOS still shows.
+const SEVERITY = { neutral: 0, warning: 1, error: 2 } as const
+function sectionBadge(entries: NavEntry[]): NavBadge | undefined {
+  const found = entries.map(e => badges.value[e.key]).filter((b): b is NavBadge => !!b)
+  if (!found.length) return undefined
+  const worst = found.reduce((a, b) => (SEVERITY[b.color] > SEVERITY[a.color] ? b : a))
+  const total = found.reduce((sum, b) => sum + Number(b.label), 0)
+  return { label: String(total), color: worst.color, variant: worst.color === 'neutral' ? 'subtle' : 'solid' }
+}
+
+const tree = computed(() => navTree(auth.isAdmin.value, auth.can))
+const activeEntry = computed(() => activeNavEntry(route.path))
+
+// Open sections are remembered per browser; the section of the page in view always opens.
+const OPEN_KEY = 'kuulis.admin.nav.open'
+const openSections = ref<string[]>([])
+onMounted(() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(OPEN_KEY) ?? '[]')
+    if (Array.isArray(saved)) openSections.value = [...new Set([...openSections.value, ...saved.map(String)])]
+  }
+  catch { /* storage blocked or corrupt: start folded */ }
+})
+function setOpenSections(value: string[] | string | undefined) {
+  openSections.value = Array.isArray(value) ? value : value ? [value] : []
+  try {
+    localStorage.setItem(OPEN_KEY, JSON.stringify(openSections.value))
+  }
+  catch { /* not persisted */ }
+}
+watch(() => activeEntry.value?.group, (group) => {
+  if (group && !openSections.value.includes(group)) openSections.value = [...openSections.value, group]
+}, { immediate: true })
+
+function entryItem(entry: NavEntry, inSection: boolean): NavigationMenuItem {
+  return {
+    label: t(inSection && entry.shortLabel ? entry.shortLabel : `nav.${entry.key}`),
     icon: entry.icon,
     to: entry.to,
-    ...(entry.key === 'reports' ? { badge: reportsBadge.value } : {}),
-    ...(entry.key === 'approvals' ? { badge: approvalsBadge.value } : {}),
-    ...(entry.key === 'safety' ? { badge: safetyBadge.value } : {}),
-  })),
+    active: activeEntry.value?.key === entry.key,
+    badge: badges.value[entry.key],
+  }
+}
+
+const links = computed<NavigationMenuItem[]>(() =>
+  tree.value.map((node) => {
+    if (node.kind === 'entry') return entryItem(node.entry, false)
+    const open = openSections.value.includes(node.key)
+    return {
+      label: t(`navGroups.${node.key}`),
+      icon: node.icon,
+      value: node.key,
+      type: 'trigger' as const,
+      active: node.entries.some(e => e.key === activeEntry.value?.key),
+      badge: open ? undefined : sectionBadge(node.entries),
+      children: node.entries.map(entry => entryItem(entry, true)),
+    }
+  }),
 )
 
 const localeItems = computed(() =>
@@ -77,6 +134,9 @@ const localeItems = computed(() =>
     <UDashboardSidebar
       collapsible
       resizable
+      :default-size="18"
+      :min-size="14"
+      :max-size="25"
     >
       <template #header="{ collapsed }">
         <div class="flex items-center gap-2 font-semibold">
@@ -101,6 +161,10 @@ const localeItems = computed(() =>
           :items="links"
           orientation="vertical"
           :collapsed="collapsed"
+          :model-value="openSections"
+          popover
+          tooltip
+          @update:model-value="setOpenSections"
         />
       </template>
 
