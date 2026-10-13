@@ -121,7 +121,7 @@ export function SuspendedPanel({
         variant="secondary"
         size={driver ? "lg" : "md"}
         icon={LifeBuoy}
-        onPress={() => router.push("/reports")}
+        onPress={() => router.push("/help")}
       />
     </View>
   );

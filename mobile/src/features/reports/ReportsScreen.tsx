@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
-  Linking,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -15,9 +14,7 @@ import {
   ChevronRight,
   CircleX,
   Flag,
-  Mail,
-  MessageCircle,
-  PhoneCall,
+  MessagesSquare,
   Route,
 } from "@/components/icons";
 import {
@@ -25,38 +22,35 @@ import {
   Card,
   EmptyState,
   IconTile,
-  ListRow,
   Skeleton,
+  StatusPill,
   Txt,
 } from "@/components/ui";
 import { FlowHeader } from "@/features/wallet/components";
-import { useAppLinks } from "@/hooks/useBootstrap";
 import { useMyReports } from "@/hooks/useReports";
 import { apiErrorMessage } from "@/i18n";
-import { supportWhatsappUrl } from "@/lib/bootstrap";
 import { isUrgentCategory } from "@/lib/reports";
+import { conversationState, isUnread, lastActivity } from "@/lib/support";
 import type { Report } from "@/lib/types";
 import { radius, space, useTheme } from "@/theme";
 
-import { CATEGORY_ICONS, callEmergency, ReportStatusPill } from "./components";
+import { CATEGORY_ICONS, ReportStatusPill } from "./components";
 
-/** Leaves to where it was opened from (profile, suspension panel), else home. */
+/** Leaves to where it was opened from (help, a notification), else the help home. */
 function leave() {
   if (router.canGoBack()) router.back();
-  else router.replace("/");
+  else router.replace("/help");
 }
 
-/** "Ayuda y reportes": report a problem, 911, and "Mis reportes" with their status. */
+/**
+ * "Mis conversaciones" (doc 13; it was "Mis reportes"): start a new one and follow each conversation with the
+ * team: an unread dot when the team wrote, "Te respondimos" when they wait for the user.
+ */
 export function ReportsScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const reports = useMyReports();
-  // Remote settings (doc 10): emergency number (911 by default) and support contacts when configured.
-  const links = useAppLinks();
-  const emergency = links.emergency;
-  const whatsapp = supportWhatsappUrl(links.support_whatsapp);
-  const email = links.support_email;
   const items = reports.data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
@@ -118,40 +112,6 @@ export function ReportsScreen() {
                 {t("reports.rideHint")}
               </Txt>
             </View>
-            <Card style={{ paddingVertical: space.xxs }}>
-              <ListRow
-                icon={PhoneCall}
-                iconTone="danger"
-                title={t("reports.emergency")}
-                subtitle={t("reports.emergencyHint", { number: emergency })}
-                onPress={callEmergency}
-              />
-            </Card>
-            {whatsapp || email ? (
-              <Card style={{ paddingVertical: space.xxs }}>
-                {whatsapp ? (
-                  <ListRow
-                    icon={MessageCircle}
-                    iconTone="success"
-                    title={t("reports.support.whatsapp")}
-                    subtitle={t("reports.support.whatsappHint")}
-                    divider={!!email}
-                    onPress={() => void Linking.openURL(whatsapp).catch(() => undefined)}
-                  />
-                ) : null}
-                {email ? (
-                  <ListRow
-                    icon={Mail}
-                    iconTone="neutral"
-                    title={t("reports.support.email")}
-                    subtitle={email}
-                    onPress={() =>
-                      void Linking.openURL(`mailto:${email}`).catch(() => undefined)
-                    }
-                  />
-                ) : null}
-              </Card>
-            ) : null}
             <Txt
               variant="overline"
               color="muted"
@@ -191,7 +151,7 @@ export function ReportsScreen() {
             </View>
           ) : (
             <EmptyState
-              icon={Flag}
+              icon={MessagesSquare}
               title={t("reports.empty")}
               body={t("reports.emptyBody")}
             />
@@ -206,17 +166,21 @@ function ReportRow({ report }: { report: Report }) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const urgent = isUrgentCategory(report.category);
+  const unread = isUnread(report);
+  const state = conversationState(report);
   const category = t(`report.category.${report.category}.title`);
-  const status = t(`reports.status.${report.status}`);
-  const date = new Date(report.created_at).toLocaleDateString(i18n.language, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+  const status =
+    state === "closed"
+      ? t(`reports.status.${report.status}`)
+      : t(`reports.state.${state}`);
+  const date = new Date(lastActivity(report)).toLocaleDateString(
+    i18n.language,
+    { day: "numeric", month: "short", year: "numeric" },
+  );
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={t("reports.itemA11y", { category, status, date })}
+      accessibilityLabel={`${unread ? `${t("reports.unreadA11y")}. ` : ""}${t("reports.itemA11y", { category, status, date })}`}
       onPress={() =>
         router.push({ pathname: "/reports/[id]", params: { id: report.id } })
       }
@@ -229,11 +193,21 @@ function ReportRow({ report }: { report: Report }) {
         },
       ]}
     >
-      <IconTile
-        icon={CATEGORY_ICONS[report.category]}
-        tone={urgent ? "danger" : "primary"}
-        size={44}
-      />
+      <View>
+        <IconTile
+          icon={CATEGORY_ICONS[report.category]}
+          tone={urgent ? "danger" : "primary"}
+          size={44}
+        />
+        {unread ? (
+          <View
+            style={[
+              styles.unreadDot,
+              { backgroundColor: theme.danger, borderColor: theme.surface },
+            ]}
+          />
+        ) : null}
+      </View>
       <View style={{ flex: 1, gap: 4 }}>
         <Txt variant="bodyStrong" numberOfLines={1}>
           {category}
@@ -242,7 +216,15 @@ function ReportRow({ report }: { report: Report }) {
           {date} ·{" "}
           {report.ride_id ? t("reports.aboutRide") : t("reports.general")}
         </Txt>
-        <ReportStatusPill status={report.status} />
+        {state === "closed" ? (
+          <ReportStatusPill status={report.status} />
+        ) : (
+          <StatusPill
+            label={status}
+            tone={state === "replied" ? "primary" : "info"}
+            dot
+          />
+        )}
       </View>
       <ChevronRight size={20} color={theme.muted} strokeWidth={2.2} />
     </Pressable>
@@ -263,6 +245,15 @@ const styles = StyleSheet.create({
     borderRadius: radius.tile,
     paddingHorizontal: space.md,
     paddingVertical: space.sm,
+  },
+  unreadDot: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 2,
   },
   row: {
     flexDirection: "row",

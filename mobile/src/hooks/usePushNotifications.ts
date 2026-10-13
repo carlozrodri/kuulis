@@ -13,8 +13,9 @@ import { isSubscriptionNotification, isWalletNotification, refreshSubscription, 
 import { api } from '@/lib/api';
 import { config } from '@/lib/config';
 import i18n from '@/i18n';
-import { isAccountNotification, isReportNotification, reportIdOf } from '@/lib/reports';
+import { isAccountNotification, isReportNotification } from '@/lib/reports';
 import { alertIdOf, checkInAnswerOf, isSafetyNotification, SAFETY_CATEGORY } from '@/lib/safety';
+import { supportHrefOf } from '@/lib/support';
 import { verificationHrefOf } from '@/lib/verification';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -85,11 +86,12 @@ export function usePushNotifications(enabled: boolean) {
       const data = r.notification.request.content.data;
       handle(data);
       answerFrom(r);
-      // Tapping a report push opens that report.
-      const reportId = isReportNotification(data) ? reportIdOf(data) : null;
-      if (reportId) router.push({ pathname: '/reports/[id]', params: { id: reportId } });
+      // Doc 13: a support answer opens the conversation (also the older "report" pushes); a lost item push
+      // opens the ride's lost item screen (the driver answers "Lo tengo / No lo tengo" there).
+      const support = supportHrefOf(data);
+      if (support) router.push(support);
       // Doc 12: "Verifica tu identidad" opens the live selfie; expiring documents open Mis documentos.
-      const verification = verificationHrefOf(data);
+      const verification = support ? null : verificationHrefOf(data);
       if (verification) router.push(verification);
     });
     // A button pressed while the app was closed: the response is waiting here.

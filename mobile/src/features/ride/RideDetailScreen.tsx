@@ -1,16 +1,19 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { ChevronLeft, Flag, Star } from '@/components/icons';
+import { Backpack, Banknote, ChevronLeft, CircleEllipsis, LifeBuoy, MessageCircle, Star, UserX } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { DiscountNote, VesLine } from '@/components/Money';
-import { Button, IconButton, StatusPill, Txt } from '@/components/ui';
-import { useRide } from '@/hooks/useRides';
+import { Button, IconButton, type SheetOption, Sheet, StatusPill, Txt } from '@/components/ui';
+import { useAppConfig } from '@/hooks/useDriver';
+import { useLostItem, useRide } from '@/hooks/useRides';
 import { amountToPay, hasDiscount } from '@/lib/money';
 import { decodePolyline, formatDistance, formatDuration, formatFare, isActiveStatus, rideRole } from '@/lib/ride';
+import { lostItemState, type RideHelpOption, rideHelpOptions } from '@/lib/support';
+import type { LostItem, Ride } from '@/lib/types';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
 import { space, useTheme } from '@/theme';
@@ -18,7 +21,10 @@ import { space, useTheme } from '@/theme';
 import { Avatar, PAYMENT_ICONS, PlaceRows, RatingBadge } from './components';
 import { STATUS_TONE } from './HistoryScreen';
 
-/** A past ride from the history: route, price, the other person and my rating. */
+/**
+ * A past ride from the history: route, price, the other person and my rating. Doc 13: "Necesito ayuda con
+ * este viaje" opens the guided flows (lost item, different fare, no show, other) and a lost item shows here.
+ */
 export function RideDetailScreen() {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
@@ -27,6 +33,9 @@ export function RideDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: ride } = useRide(id);
   const route = useMemo(() => decodePolyline(ride?.polyline), [ride?.polyline]);
+  const { config } = useAppConfig();
+  const [helpOpen, setHelpOpen] = useState(false);
+  const lostItem = useLostItem(id, ride?.status === 'completed' && !!ride?.driver);
 
   if (!ride) {
     return (
@@ -124,15 +133,23 @@ export function RideDetailScreen() {
           onPress={() => router.replace({ pathname: role === 'driver' ? '/drive' : '/ride', params: { id: ride.id } })}
         />
       ) : null}
+      {lostItem.data ? <LostItemCard item={lostItem.data} ride={ride} role={role} /> : null}
       {ride.driver ? (
         // Only rides that had a driver can be reported (409 ride_without_driver otherwise).
         <Button
-          title={t('ride.reportProblem')}
+          title={t('rideHelp.button')}
           variant="secondary"
-          icon={Flag}
-          onPress={() => router.push({ pathname: '/report', params: { ride_id: ride.id } })}
+          icon={LifeBuoy}
+          onPress={() => setHelpOpen(true)}
         />
       ) : null}
+      <Sheet
+        visible={helpOpen}
+        title={t('rideHelp.title')}
+        subtitle={t('rideHelp.subtitle')}
+        options={rideHelpOptions(ride, role, config).map((option) => helpOption(option, ride, role, t, !!lostItem.data))}
+        onClose={() => setHelpOpen(false)}
+      />
       {ride.cancel_reason ? (
         <Txt variant="caption" color="muted">
           {t('cancel.reasonLabel', {
@@ -145,7 +162,85 @@ export function RideDetailScreen() {
   );
 }
 
+const HELP_ICONS = { lost_item: Backpack, fare: Banknote, no_show: UserX, other: CircleEllipsis } as const;
+
+function helpOption(
+  option: RideHelpOption,
+  ride: Ride,
+  role: 'passenger' | 'driver',
+  t: (key: string, options?: Record<string, unknown>) => string,
+  lostItemAsked: boolean,
+): SheetOption {
+  const report = (category?: 'fare' | 'no_show') =>
+    router.push({ pathname: '/report', params: category ? { ride_id: ride.id, category, direct: '1' } : { ride_id: ride.id } });
+  switch (option) {
+    case 'lost_item':
+      return {
+        label: t('rideHelp.lostItem'),
+        hint: lostItemAsked ? t('rideHelp.lostItemAsked') : t('rideHelp.lostItemHint'),
+        icon: HELP_ICONS.lost_item,
+        onPress: () => router.push({ pathname: '/ride/lost-item', params: { id: ride.id } }),
+      };
+    case 'fare':
+      return {
+        label: t('rideHelp.fare'),
+        hint: t('rideHelp.fareHint', { fare: formatFare(amountToPay(ride)) }),
+        icon: HELP_ICONS.fare,
+        onPress: () => report('fare'),
+      };
+    case 'no_show':
+      return {
+        label: role === 'passenger' ? t('rideHelp.noShowDriver') : t('rideHelp.noShowPassenger'),
+        hint: t('rideHelp.noShowHint'),
+        icon: HELP_ICONS.no_show,
+        onPress: () => report('no_show'),
+      };
+    default:
+      return { label: t('rideHelp.other'), hint: t('rideHelp.otherHint'), icon: HELP_ICONS.other, onPress: () => report() };
+  }
+}
+
+/** The lost item asked about this ride: its state, the chat while it is open, the driver's answer. */
+function LostItemCard({ item, ride, role }: { item: LostItem; ride: Ride; role: 'passenger' | 'driver' }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const state = lostItemState(item);
+  const open = () => router.push({ pathname: '/ride/lost-item', params: { id: ride.id } });
+  const name = (role === 'passenger' ? ride.driver?.first_name : ride.passenger?.first_name) ?? '';
+  return (
+    <View style={[styles.lostItem, { backgroundColor: theme.background }]}>
+      <View style={styles.priceRow}>
+        <Backpack size={20} color={theme.primary} strokeWidth={2.2} />
+        <Txt variant="bodyStrong" style={{ flex: 1 }}>
+          {role === 'driver' && state === 'waiting' ? t('lostItem.driver.title') : t(`lostItem.state.${state}.title`, { name })}
+        </Txt>
+      </View>
+      <Txt variant="caption" color="muted" numberOfLines={2}>
+        {item.description}
+      </Txt>
+      {state === 'chat' ? (
+        <Button
+          title={t('lostItem.openChatShort')}
+          size="sm"
+          icon={MessageCircle}
+          style={{ alignSelf: 'flex-start' }}
+          onPress={() => router.push({ pathname: '/ride/chat', params: { id: ride.id } })}
+        />
+      ) : (
+        <Button
+          title={role === 'driver' && state === 'waiting' ? t('lostItem.driver.answer') : t('lostItem.view')}
+          size="sm"
+          variant={role === 'driver' && state === 'waiting' ? 'primary' : 'secondary'}
+          style={{ alignSelf: 'flex-start' }}
+          onPress={open}
+        />
+      )}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  lostItem: { gap: space.xs, borderRadius: 16, padding: space.md },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderRadius: 16, padding: space.md },
   priceBox: { gap: 4, borderRadius: 16, padding: space.md },

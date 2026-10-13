@@ -18,6 +18,7 @@ import { isSubscriptionNotification, isWalletNotification, refreshSubscription, 
 import { refreshTokens, tokens } from '@/lib/api';
 import { config } from '@/lib/config';
 import { isAccountNotification, isReportNotification } from '@/lib/reports';
+import { isLostItemNotification } from '@/lib/support';
 import { useAuth } from '@/providers/AuthProvider';
 
 export type RealtimeStatus = 'connecting' | 'open' | 'closed';
@@ -110,6 +111,8 @@ export function RealtimeProvider({ enabled, children }: PropsWithChildren<{ enab
             void queryClient.invalidateQueries({ queryKey: rideKeys.driverState });
           }
           if (isReportNotification(message.data)) refreshReports(queryClient);
+          // Doc 13: the driver answered (or was asked) about a lost item.
+          if (isLostItemNotification(message.data)) void queryClient.invalidateQueries({ queryKey: ['rides', 'lost-item'] });
         }
         listenersRef.current.get(message.event)?.forEach((handler) => {
           try {

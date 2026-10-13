@@ -80,6 +80,9 @@ construir. Las preguntas de cada documento están en su sección final.
 - **12** hecho (2026-10-13): vencimientos con avisos y bloqueo, renovaciones, selfie en vivo al azar (semanal),
   reverificación por reportes, cambio de moto con revisión, duplicados por hash (incluye cuentas borradas),
   cola de reverificaciones con revisión rápida en el admin e inducción opcional. Antecedentes penales opcional.
+- **13** hecho (2026-10-13): conversación en cada reporte con fotos, push y CSAT; tiempos de respuesta con
+  alerta y cierre automático; respuestas guardadas, etiquetas y métricas; centro de ayuda en app y web;
+  objeto perdido con chat temporal; contacto sin cuenta desde la web. Abierto: quién atiende y en qué horario.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

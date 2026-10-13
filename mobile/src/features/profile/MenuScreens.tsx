@@ -170,7 +170,7 @@ export function SettingsScreen() {
       </Section>
       <Section title={t('profile.menu.helpLegal')}>
         <Card style={{ paddingVertical: space.xxs }}>
-          <ListRow icon={LifeBuoy} title={t('profile.help')} subtitle={t('profile.helpHint')} divider onPress={() => router.push('/reports')} />
+          <ListRow icon={LifeBuoy} title={t('profile.help')} subtitle={t('profile.helpHint')} divider onPress={() => router.push('/help')} />
           <ListRow
             icon={ScrollText}
             iconTone="neutral"

@@ -125,8 +125,8 @@
     "language": "Language",
     "version": "Version",
     "mode": "App mode",
-    "help": "Help and reports",
-    "helpHint": "Report a problem and follow your reports",
+    "help": "Help",
+    "helpHint": "FAQs and your conversations with support",
     "noName": "Your profile",
     "verifiedShort": "Verified",
     "since": "Since {{date}}",
@@ -647,7 +647,16 @@
     "vehicle_change_pending": "You already have a moto change in review.",
     "vehicle_same_plate": "That's the moto you already use. Type the new moto's plate.",
     "vehicle_change_not_found": "You don't have a moto change in review.",
-    "document_not_found": "We couldn't find that document. Refresh the screen."
+    "document_not_found": "We couldn't find that document. Refresh the screen.",
+    "report_closed": "This conversation is closed. Start a new one if you need help.",
+    "report_not_closed": "You can rate it once we close the conversation.",
+    "csat_already_given": "You already rated this conversation.",
+    "attachment_invalid": "We couldn't attach that photo. Choose another one.",
+    "help_article_not_found": "That article is no longer available.",
+    "lost_item_not_found": "There is no lost item on this ride.",
+    "lost_item_exists": "You already reported an item on this ride.",
+    "lost_item_too_late": "It's too late to let the driver know. Write to us and we'll help.",
+    "lost_item_answered": "You already answered about this item."
   },
   "map": {
     "recenter": "Recenter map"
@@ -1365,7 +1374,7 @@
     "sentTitle": "We got your report",
     "sentBody": "The Kuulis team will review it and we'll let you know when we have an answer.",
     "sentBodyUrgent": "We're treating it as urgent. If you are in danger right now, call {{number}}.",
-    "viewReport": "View my report",
+    "viewReport": "View the conversation",
     "alreadyOpen": {
       "title": "You already reported this ride",
       "body": "Your report is still open and the team is on it. You can check its status.",
@@ -1379,19 +1388,23 @@
       "title": "This ride can't be reported",
       "general": "Make a general report"
     },
-    "noDriver": "This ride never had a driver assigned. If something went wrong, make a general report."
+    "noDriver": "This ride never had a driver assigned. If something went wrong, make a general report.",
+    "fare": {
+      "title": "Price set by the app",
+      "body": "This is the price the app set when you requested the ride. Tell us how much you were charged or paid and what happened."
+    }
   },
   "reports": {
-    "title": "Help and reports",
-    "subtitle": "Tell us if something went wrong and follow the team's answer here.",
-    "new": "Report a problem",
-    "newHint": "About the app, a lost item or anything else",
-    "rideHint": "For a ride, open it in Your rides and tap “Report a problem”.",
+    "title": "My conversations",
+    "subtitle": "Write to the Kuulis team and follow their answers here.",
+    "new": "New conversation",
+    "newHint": "Tell us what happened: the app, a charge, a lost item…",
+    "rideHint": "For a ride, open it in Your rides and tap “I need help with this ride”.",
     "emergency": "Are you in danger?",
     "emergencyHint": "Call {{number}}, Venezuela's emergency line",
-    "mine": "My reports",
-    "empty": "No reports yet",
-    "emptyBody": "If something goes wrong on a ride or in the app, tell us and we'll sort it out.",
+    "mine": "Your conversations",
+    "empty": "No conversations yet",
+    "emptyBody": "If something goes wrong on a ride or in the app, write to us and we'll fix it.",
     "aboutRide": "About a ride",
     "general": "General report",
     "itemA11y": "{{category}}. {{status}}. {{date}}",
@@ -1401,7 +1414,7 @@
       "resolved": "Resolved",
       "dismissed": "Closed"
     },
-    "detailTitle": "Your report",
+    "detailTitle": "Your conversation",
     "sentOn": "Sent on {{date}}",
     "priority": "Priority",
     "youWrote": "What you told us",
@@ -1429,6 +1442,11 @@
       "whatsapp": "Message us on WhatsApp",
       "whatsappHint": "Kuulis support",
       "email": "Send us an email"
+    },
+    "unreadA11y": "New answer",
+    "state": {
+      "replied": "We answered you",
+      "waiting": "Waiting for the team"
     }
   },
   "suspension": {
@@ -1770,6 +1788,151 @@
       "cancelTitle": "Cancel the moto change?",
       "cancelBody": "You'll keep your current moto. To change it later you'll have to send everything again.",
       "cancelled": "You cancelled the moto change"
+    }
+  },
+  "help": {
+    "title": "Help",
+    "subtitle": "Find quick answers or write to us.",
+    "searchLabel": "Search help",
+    "searchPlaceholder": "E.g. change my email, pay the fee",
+    "results": "Results",
+    "noResults": "We found nothing about “{{query}}”",
+    "noResultsBody": "Try other words or write to us and we'll help.",
+    "contact": "Contact support",
+    "contactHint": "Opens a message to the team with this article as context",
+    "topics": "Topics",
+    "articleCount_one": "{{count}} article",
+    "articleCount_other": "{{count}} articles",
+    "noArticles": "No articles here yet.",
+    "contactSection": "Talk to us",
+    "unread_one": "You have {{count}} new answer",
+    "unread_other": "You have {{count}} new answers",
+    "conversationsHint": "Your messages with the team and their answers",
+    "rideHint": "Was it on a ride? Open it in Your rides and tap “I need help with this ride”.",
+    "openArticleHint": "Opens the article",
+    "notFound": "Didn't find what you were looking for?",
+    "updated": "Updated on {{date}}",
+    "stillNeed": "Still need help?",
+    "topic": {
+      "account": "Account",
+      "rides": "Rides",
+      "payments": "Paying the driver",
+      "wallet": "Wallet and fee",
+      "safety": "Safety",
+      "documents": "Documents",
+      "app": "App problems"
+    },
+    "helpful": {
+      "question": "Was this article helpful?",
+      "yes": "Yes",
+      "no": "No",
+      "thanksYes": "Great! Thanks for letting us know.",
+      "thanksNo": "Thanks for letting us know. If you still need it, write to us and we'll help."
+    }
+  },
+  "support": {
+    "photos": {
+      "label": "Photos (optional, up to {{max}})",
+      "add": "Attach photo",
+      "title": "Attach a photo",
+      "subtitle": "You can send up to {{max}} photos per message.",
+      "camera": "Take photo",
+      "library": "Choose from gallery",
+      "remove": "Remove photo {{n}}",
+      "max": "You can attach up to {{max}} photos.",
+      "cameraDenied": "Allow camera access in settings or pick a photo from your gallery."
+    },
+    "thread": {
+      "empty": "No messages yet",
+      "you": "You",
+      "staff": "Kuulis team",
+      "staffNamed": "{{name}} · Kuulis team",
+      "photos_one": "{{count}} photo",
+      "photos_other": "{{count}} photos",
+      "openPhoto": "Open photo {{n}}",
+      "placeholder": "Write your answer",
+      "send": "Send message",
+      "closed": "This conversation is closed.",
+      "newConversation": "Start a new conversation"
+    },
+    "csat": {
+      "title": "How did we do?",
+      "body": "Your rating helps us improve support.",
+      "star_one": "{{count}} star",
+      "star_other": "{{count}} stars",
+      "comment": "Tell us more (optional)",
+      "submit": "Send rating",
+      "thanks": "Thanks for your rating!",
+      "given": "You rated our support {{score}} out of 5. Thanks!"
+    }
+  },
+  "rideHelp": {
+    "button": "I need help with this ride",
+    "title": "How can we help?",
+    "subtitle": "Choose what happened on this ride.",
+    "lostItem": "I forgot something",
+    "lostItemHint": "We let the driver know so they can give it back",
+    "lostItemAsked": "See the driver's answer",
+    "fare": "I was charged a different amount",
+    "fareHint": "The app set {{fare}} for this ride",
+    "noShowDriver": "The driver didn't show up",
+    "noShowPassenger": "The passenger didn't show up",
+    "noShowHint": "We review what happened and the cancellation",
+    "other": "Another problem",
+    "otherHint": "Safety, behavior, the vehicle or something else"
+  },
+  "lostItem": {
+    "title": "Lost item",
+    "driverTitle": "Lost item",
+    "noneDriver": "Nobody has asked about an item on this ride.",
+    "tooLateTitle": "It's too late to let the driver know",
+    "tooLate": "Write to us and we'll help you look for it.",
+    "formTitle": "What did you forget?",
+    "formBody": "We'll let {{name}} know. If they have it, you can arrange the hand-over in the ride chat.",
+    "label": "Describe the item",
+    "placeholder": "E.g. a black phone with a blue case, on the back seat",
+    "minHint": "Write at least {{min}} characters",
+    "tooLong": "{{max}} characters at most",
+    "submit": "Let the driver know",
+    "privacy": "We don't share your phone number: you talk in the Kuulis chat.",
+    "youWrote": "What you described",
+    "openChat": "Message {{name}}",
+    "openChatShort": "Open the chat",
+    "openConversation": "See my conversation with support",
+    "view": "See details",
+    "chatBanner": "Chat open for the lost item until {{until}}.",
+    "chatBannerShort": "Chat open for the lost item.",
+    "state": {
+      "waiting": {
+        "title": "We let {{name}} know",
+        "body": "We'll tell you as soon as they answer whether they have it."
+      },
+      "chat": {
+        "title": "{{name}} has it!",
+        "body": "Arrange the hand-over in the chat. It's open until {{until}}."
+      },
+      "has_it": {
+        "title": "{{name}} has it",
+        "body": "The chat has closed. If you haven't got it back yet, write to us and we'll help."
+      },
+      "not_found": {
+        "title": "{{name}} didn't find it",
+        "body": "Sorry. If you think it stayed on the motorbike, write to us and we'll look into it."
+      }
+    },
+    "driver": {
+      "title": "A passenger forgot something",
+      "theyWrote": "What they described",
+      "ask": "Check your motorbike and bags. Do you have it?",
+      "hasIt": "I have it",
+      "notFound": "I don't have it",
+      "answer": "Answer",
+      "openChat": "Message the passenger",
+      "answered": {
+        "chat": "You answered that you have it. Arrange the hand-over in the chat until {{until}}.",
+        "has_it": "You answered that you have it. The chat has closed.",
+        "not_found": "You answered that you don't have it. Thanks for checking."
+      }
     }
   }
 }

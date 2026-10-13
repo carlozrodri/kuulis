@@ -1,6 +1,7 @@
 /**
  * Legal texts (doc 07): kinds, who accepts what, and a small Markdown parser for the texts the API
- * serves (headings, paragraphs, lists, quotes and tables, with **bold**). Pure, so it is unit tested.
+ * serves (headings, paragraphs, lists, quotes and tables, with **bold** and [links](…)). The help center
+ * (doc 13) renders its articles with it too. Pure, so it is unit tested.
  */
 
 export type LegalKind = 'terms' | 'privacy' | 'community' | 'driver_terms' | 'wallet';
@@ -25,8 +26,8 @@ export type LegalDocument = {
 
 export type LegalSummary = Omit<LegalDocument, 'body_md'>;
 
-/** A run of text, bold or not. */
-export type Span = { text: string; bold: boolean };
+/** A run of text, bold or not; `href` when it is a link (help articles, doc 13). */
+export type Span = { text: string; bold: boolean; href?: string };
 
 export type Block =
   | { type: 'heading'; level: 2 | 3; spans: Span[] }
@@ -35,13 +36,34 @@ export type Block =
   | { type: 'list'; ordered: boolean; items: Span[][] }
   | { type: 'table'; header: Span[][]; rows: Span[][][] };
 
-export function parseInline(text: string): Span[] {
-  const spans: Span[] = [];
+function parseBold(text: string, spans: Span[]) {
   text.split(/(\*\*[^*]+\*\*)/).forEach((part) => {
     if (!part) return;
     const bold = part.startsWith('**') && part.endsWith('**') && part.length > 4;
     spans.push({ text: bold ? part.slice(2, -2) : part, bold });
   });
+}
+
+const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+
+/** **bold** and [links](https://…) inside a line. A link written in bold (**[a](b)**) stays a link. */
+export function parseInline(text: string): Span[] {
+  const spans: Span[] = [];
+  let last = 0;
+  for (const match of text.matchAll(LINK)) {
+    const start = match.index ?? 0;
+    let before = text.slice(last, start);
+    let bold = false;
+    // **[text](url)**: drop the markers around the link.
+    if (before.endsWith('**') && text.slice(start + match[0].length).startsWith('**')) {
+      before = before.slice(0, -2);
+      bold = true;
+    }
+    parseBold(before, spans);
+    spans.push({ text: match[1].replace(/\*\*/g, ''), bold: bold || /^\*\*.*\*\*$/.test(match[1]), href: match[2] });
+    last = start + match[0].length + (bold ? 2 : 0);
+  }
+  parseBold(text.slice(last), spans);
   return spans;
 }
 

@@ -120,3 +120,10 @@ export { default as FileClock } from 'lucide-react-native/icons/file-clock';
 export { default as RefreshCw } from 'lucide-react-native/icons/refresh-cw';
 export { default as ArrowLeftRight } from 'lucide-react-native/icons/arrow-left-right';
 export { default as UserRoundCheck } from 'lucide-react-native/icons/user-round-check';
+// Doc 13: help center and support conversations.
+export { default as ThumbsUp } from 'lucide-react-native/icons/thumbs-up';
+export { default as ThumbsDown } from 'lucide-react-native/icons/thumbs-down';
+export { default as Paperclip } from 'lucide-react-native/icons/paperclip';
+export { default as MessagesSquare } from 'lucide-react-native/icons/messages-square';
+export { default as BookOpen } from 'lucide-react-native/icons/book-open';
+export { default as PackageSearch } from 'lucide-react-native/icons/package-search';

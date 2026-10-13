@@ -3,7 +3,13 @@ import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BackHandler, StyleSheet, TextInput, View } from "react-native";
 
-import { ChevronLeft, CircleCheck, Flag, X } from "@/components/icons";
+import {
+  ChevronLeft,
+  CircleCheck,
+  Flag,
+  Paperclip,
+  X,
+} from "@/components/icons";
 import {
   Button,
   IconButton,
@@ -19,6 +25,9 @@ import { useRide } from "@/hooks/useRides";
 import { apiErrorMessage } from "@/i18n";
 import { ApiError } from "@/lib/api";
 import { confirmHaptic, selectionHaptic } from "@/lib/feedback";
+import { amountToPay } from "@/lib/money";
+import { formatFare } from "@/lib/ride";
+import { MAX_ATTACHMENTS } from "@/lib/support";
 import {
   DESCRIPTION_MAX,
   DESCRIPTION_MIN,
@@ -39,6 +48,11 @@ import {
   RideContextCard,
   UrgentNote,
 } from "./components";
+import {
+  PhotoStrip,
+  uploadErrorMessage,
+  usePhotoAttachments,
+} from "./PhotoAttachments";
 
 type Step = "category" | "details" | "sent";
 
@@ -56,7 +70,9 @@ function leave() {
 
 /**
  * "Reportar un problema": pick a category (all of them about a ride, only general ones otherwise), describe
- * what happened, and send (POST /reports). Safety and harassment point to 911.
+ * what happened, add photos if useful, and send (POST /reports). Safety and harassment point to 911.
+ * Doc 13: `help_article_id` comes from "Contactar a soporte" in an article; `direct=1` with a category (the
+ * guided flows of a ride: fare, no show) starts at the description.
  */
 export function ReportScreen() {
   const { t, i18n } = useTranslation();
@@ -65,7 +81,12 @@ export function ReportScreen() {
   const params = useLocalSearchParams<{
     ride_id?: string;
     category?: string;
+    help_article_id?: string;
+    direct?: string;
   }>();
+  const helpArticleId = params.help_article_id || undefined;
+  const photos = usePhotoAttachments();
+  const [uploading, setUploading] = useState(false);
   const [rideId, setRideId] = useState<string | undefined>(
     params.ride_id || undefined,
   );
@@ -77,7 +98,9 @@ export function ReportScreen() {
     isReportCategory(params.category) && categories.includes(params.category)
       ? params.category
       : null;
-  const [step, setStep] = useState<Step>("category");
+  const [step, setStep] = useState<Step>(
+    initial && params.direct === "1" ? "details" : "category",
+  );
   const [category, setCategory] = useState<ReportCategory | null>(initial);
   const [description, setDescription] = useState("");
   const [touched, setTouched] = useState(false);
@@ -125,15 +148,29 @@ export function ReportScreen() {
   const problem = descriptionProblem(description);
   const length = descriptionLength(description);
 
-  const submit = () => {
+  const submit = async () => {
     setTouched(true);
-    if (!category || problem) return;
+    if (!category || problem || uploading) return;
     setError(null);
+    let attachments: string[] = [];
+    if (photos.photos.length) {
+      setUploading(true);
+      try {
+        attachments = await photos.upload();
+      } catch (e) {
+        setError({ kind: "other", message: uploadErrorMessage(e, t) });
+        return;
+      } finally {
+        setUploading(false);
+      }
+    }
     create.mutate(
       {
         category,
         description: description.trim(),
         ...(rideId ? { ride_id: rideId } : {}),
+        ...(attachments.length ? { attachments } : {}),
+        ...(helpArticleId ? { help_article_id: helpArticleId } : {}),
       },
       {
         onSuccess: (report) => {
@@ -342,12 +379,13 @@ export function ReportScreen() {
         <Button
           title={t("report.submit")}
           icon={Flag}
-          loading={create.isPending}
+          loading={create.isPending || uploading}
           disabled={!category || (touched && !!problem)}
-          onPress={submit}
+          onPress={() => void submit()}
         />
       }
     >
+      {photos.sheet}
       <View style={{ gap: space.xxs, marginBottom: space.md }}>
         <Txt variant="title" accessibilityRole="header">
           {t("report.detailsTitle")}
@@ -386,6 +424,25 @@ export function ReportScreen() {
         {urgent ? <UrgentNote /> : null}
 
         {rideId ? <RideContextCard ride={ride.data} /> : null}
+
+        {category === "fare" && ride.data ? (
+          <View style={[styles.fare, { backgroundColor: theme.surface }]}>
+            <Txt variant="overline" color="muted">
+              {t("report.fare.title")}
+            </Txt>
+            <View style={styles.fareRow}>
+              <Txt style={{ flex: 1 }}>
+                {t(`payment.${ride.data.payment_method}`)}
+              </Txt>
+              <Txt variant="heading" tabular>
+                {formatFare(amountToPay(ride.data))}
+              </Txt>
+            </View>
+            <Txt variant="caption" color="muted">
+              {t("report.fare.body")}
+            </Txt>
+          </View>
+        ) : null}
 
         {error ? (
           <SubmitErrorNotice error={error} onGeneral={makeGeneral} />
@@ -447,6 +504,27 @@ export function ReportScreen() {
               </Txt>
             </View>
           </View>
+        </View>
+
+        <View style={{ gap: space.xs }}>
+          <Txt variant="label" color="muted">
+            {t("support.photos.label", { max: MAX_ATTACHMENTS })}
+          </Txt>
+          <PhotoStrip
+            photos={photos.photos}
+            onRemove={photos.remove}
+            disabled={uploading || create.isPending}
+          />
+          {!photos.full ? (
+            <Button
+              title={t("support.photos.add")}
+              variant="secondary"
+              size="sm"
+              icon={Paperclip}
+              style={{ alignSelf: "flex-start" }}
+              onPress={photos.open}
+            />
+          ) : null}
         </View>
       </View>
     </Screen>
@@ -546,6 +624,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 22,
   },
+  fare: { borderRadius: radius.card, padding: space.md, gap: space.xs },
+  fareRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
   counterRow: {
     flexDirection: "row",
     alignItems: "flex-start",
