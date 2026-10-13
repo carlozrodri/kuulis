@@ -356,6 +356,20 @@
       "close": "Cerrar",
       "closed": "Sesión cerrada",
       "unknownDevice": "Dispositivo desconocido"
+    },
+    "menu": {
+      "title": "Ajustes y ayuda",
+      "settings": "Cuenta y preferencias",
+      "settingsHint": "Tus datos, contraseña, idioma y apariencia",
+      "security": "Seguridad y privacidad",
+      "securityHint": "Contactos de confianza, sesiones y tus datos",
+      "sessions": "Sesiones",
+      "privacy": "Privacidad",
+      "legalHint": "Términos, privacidad y normas de la comunidad",
+      "frequentCount_one": "{{count}} lugar al que vas seguido",
+      "frequentCount_other": "{{count}} lugares a los que vas seguido",
+      "paymentHint": "Elige cómo pagas normalmente",
+      "inviteHint": "Comparte tu código o usa el de quien te invitó"
     }
   },
   "driver": {

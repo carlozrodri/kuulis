@@ -26,7 +26,7 @@ import { pendingTotal, subscriptionState } from '@/lib/wallet';
 import { radius, space, useTheme } from '@/theme';
 
 import { Section } from './components';
-import { InviteCard, RedeemSection } from './ReferralCard';
+import { RedeemSection } from './ReferralCard';
 
 const isActiveDriver = (driver: Driver | null | undefined) =>
   driver?.status === 'approved' || driver?.status === 'suspended';
@@ -104,8 +104,8 @@ export function DriverProfile({
 
       <Section title={t('profile.driver.account')}>
         <SubscriptionRow />
-        <DocumentsRow driver={driver!} />
         <Card style={{ paddingVertical: space.xxs }}>
+          <DocumentsRow driver={driver!} />
           <ListRow
             icon={TrendingUp}
             title={t('profile.driver.earnings')}
@@ -114,15 +114,18 @@ export function DriverProfile({
                 ? t('profile.driver.earningsHint', { amount: formatFare(stats.month.earnings), rides: t('stats.rides', { count: stats.month.rides }) })
                 : null
             }
+            divider
             onPress={() => router.push('/rides')}
+          />
+          <ListRow
+            icon={Gift}
+            iconTone="accent"
+            title={t('profile.invite.section')}
+            subtitle={t('profile.menu.inviteHint')}
+            onPress={() => router.push('/profile/invite')}
           />
         </Card>
       </Section>
-
-      <Section title={t('profile.invite.section')}>
-        <InviteCard />
-      </Section>
-      <RedeemSection />
     </>
   );
 }
@@ -220,7 +223,6 @@ function SubscriptionRow() {
 /** Doc 12: "Mis documentos" with what needs attention (expired, expiring, missing date, rejected renewal). */
 function DocumentsRow({ driver }: { driver: Driver }) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const { config } = useAppConfig();
   const items = myDocuments(driver, config);
   const attention = needsAttention(items);
@@ -235,25 +237,21 @@ function DocumentsRow({ driver }: { driver: Driver }) {
         : t('verification.profile.attention', { count: attention });
 
   return (
-    <Card
-      onPress={() => router.push('/driver/my-documents')}
+    <ListRow
+      icon={FileText}
+      iconTone={tone}
+      title={t('verification.myDocs.title')}
+      subtitle={label}
+      right={attention ? <StatusPill label={String(attention)} tone={tone} /> : undefined}
+      divider
       accessibilityLabel={`${t('verification.myDocs.title')}: ${label}`}
-      style={styles.docs}>
-      <IconTile icon={FileText} tone={tone} />
-      <View style={{ flex: 1, gap: 2 }}>
-        <Txt variant="bodyStrong">{t('verification.myDocs.title')}</Txt>
-        <Txt variant="caption" color={tone === 'danger' ? 'danger' : tone === 'warning' ? 'warning' : 'muted'}>
-          {label}
-        </Txt>
-      </View>
-      <ChevronRight size={20} color={theme.muted} strokeWidth={2.2} />
-    </Card>
+      onPress={() => router.push('/driver/my-documents')}
+    />
   );
 }
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  docs: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   vehicle: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   balance: {
     flexDirection: 'row',
