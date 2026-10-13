@@ -125,9 +125,52 @@ Lo que **no** hizo falta: PgBouncer (Postgres nunca pasó de unas pocas conexion
 | `RATE_LIMIT_REFRESH` | 3000/min por IP | CGNAT. |
 | Hilos de CPU | Más de 8 si el host lo permite | Es el límite medido. |
 
+## Límite sin más CPU (13-10-2026)
+
+Objetivo: ver cuánto más aguanta QA con los mismos 8 hilos. Tras un reinicio, Proxmox le asignó otros hilos
+(cpuset `0,4,8,9,13,15,17,19`): dos son gemelos de un mismo núcleo (8 y 9) y dos son núcleos de eficiencia
+(17 y 19). Con hilos así, cada uno rinde menos que un núcleo de rendimiento entero.
+
+| Prueba | Carga | req/s | GPS/s | p95 | CPU | Resultado |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2× | 1200 motorizados, 3000 navegando | colapso | — | > 10 s | 100 % | Pool de Redis agotado (`MaxConnectionsError`), sockets cortados |
+| 1,5× (PR #39) | 900 motorizados | ~255 tope | 225 | 7,9 s | 100 % | Falla |
+| 1,5× (PR #40) | igual | ~265 tope | 225 | 7,2 s | 100 % | Falla; +3–5 % |
+
+Capacidad actual: **1× (~220 req/s + 150 GPS/s) pasa; el tope está en ~260 req/s + 225 GPS/s**.
+
+Cambios aplicados (en qa):
+
+| Cambio | Efecto medido en local (1 proceso) | PR |
+| --- | --- | --- |
+| Pool de Redis bloqueante (espera hasta 5 s en vez de fallar) | Sin 500 por `MaxConnectionsError` | #39 |
+| Sin `pool_pre_ping` | −0,45 ms por petición (~10 %); reiniciando Postgres bajo carga fallan las mismas peticiones (16) con y sin él | #39 |
+| Totales HTTP de monitoreo escritos una vez por segundo | −0,2 ms por petición | #39 |
+| Routers más usados primero (FastAPI recorre las rutas en orden) + test de que ninguna ruta tapa a otra | −20 a −30 % en las llamadas de la app | #40 |
+| Sin `Result.tuples()` (aviso de SQLAlchemy en cada `/users/me`) | −2 % en `/users/me` | #40 |
+
+Por qué en QA se nota poco: medido por contenedor durante la meseta de 1,5×, de ~9,3 núcleos ocupados la API
+usa ~4,9, Redis 0,16 y la ejecución de consultas de Postgres ~0,1. **Los otros ~4,2 núcleos son de otros
+procesos** (worker, Traefik con ~3000 WebSockets, conexiones de Postgres, Docker/Coolify) y aún no están
+desglosados. Hasta saber cuál es, abaratar la API rinde poco.
+
+Hallazgos que necesitan decisión de Carlos:
+
+- **FastAPI ≥ 0.137** anida los routers y busca la ruta de forma lineal y cara (hasta ~1 ms por petición). Por
+  el mismo cambio, slowapi no encuentra el endpoint y **`RATE_LIMIT_DEFAULT` (120/min) nunca se aplica**; los
+  límites con decorador sí. Fijar `fastapi<0.137` arregla las dos cosas, pero activa ese límite global (su
+  coste de CPU anula el ahorro del enrutado, salvo que se optimice el middleware).
+- **Proxmox**: fijar los 8 hilos de QA en 8 núcleos de rendimiento distintos (sin gemelos ni núcleos E). No es
+  más CPU y debería dar bastante más capacidad.
+
+Siguiente paso para exprimir más: medir el worker y Traefik por separado (cgroup de cada contenedor) en una
+prueba a 1,5×. Y, como palanca grande, juntar en una sola llamada lo que la app pide al abrirse
+(`/users/me`, viaje activo, viaje por calificar, no leídas): hoy son 5 peticiones autenticadas por apertura.
+
 ## Estado de QA tras la prueba
 
-Datos sintéticos borrados (`loadtest-clean`: 5607 usuarios y 101 283 viajes). Variables de prueba quitadas
+Datos sintéticos borrados (`loadtest-clean`: 5607 usuarios y 101 283 viajes; el 13-10, tras las pruebas de
+límite, otra vez: 6207 usuarios y 101 143 viajes). Variables de prueba quitadas
 (`LOADTEST_PASSWORD`, `RATE_LIMIT_AUTH`, pool, `EXPO_PUSH_URL` del worker) y `WEB_CONCURRENCY` de vuelta a 4;
 tareas programadas usadas para lanzar comandos borradas. El runner `kuulis-loadtest` (en "pc grande",
 `kuulis-carga.top8.uk`) se queda para repetir la prueba; ver `loadtest/README.md`.
