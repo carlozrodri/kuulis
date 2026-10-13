@@ -4,6 +4,7 @@ account is erased (``apps.users.services.erase_due``) and the retention rules.
 Retention (``apply_retention``, run by ``apps.privacy.tasks`` once a day):
 - chat messages: 180 days, unless the ride has a report;
 - planned route of a ride: 180 days, unless the ride has a report;
+- real path of a ride (doc 11): 180 days, unless the ride has a report or a safety alert;
 - rejected driver documents: 30 days after the review (file included);
 - inbox notifications: 90 days;
 - exports: the file is deleted when its link expires (24 h).
@@ -136,6 +137,7 @@ async def export_data(session: AsyncSession, user: User) -> dict[str, Any]:
     from apps.places.models import SavedPlace
     from apps.referrals.models import Referral
     from apps.rides.models import Rating, Ride
+    from apps.safety.models import TrustedContact
     from apps.subscriptions.models import Charge
     from apps.wallet.models import TopUp, Wallet, WalletEntry
 
@@ -148,11 +150,6 @@ async def export_data(session: AsyncSession, user: User) -> dict[str, Any]:
             "created_at": user.created_at.isoformat(),
             "last_login_at": user.last_login_at.isoformat() if user.last_login_at else None,
             "email_verified": user.is_verified,
-            "trusted_contact": (
-                {"name": user.trusted_contact_name, "phone": user.trusted_contact_phone}
-                if user.trusted_contact_phone
-                else None
-            ),
             "referral_code": user.referral_code,
         },
     }
@@ -183,6 +180,14 @@ async def export_data(session: AsyncSession, user: User) -> dict[str, Any]:
                 for d in documents
             ],
         }
+    contacts = await session.scalars(
+        select(TrustedContact)
+        .where(TrustedContact.user_id == user.id)
+        .order_by(TrustedContact.created_at)
+    )
+    data["trusted_contacts"] = [
+        {"name": c.name, "phone": c.phone, "auto_share": c.auto_share} for c in contacts
+    ]
     places = await session.scalars(select(SavedPlace).where(SavedPlace.user_id == user.id))
     data["saved_places"] = [
         {"kind": p.kind.value, "label": p.label, "address": p.address, "lat": p.lat, "lng": p.lng}
@@ -415,6 +420,15 @@ async def apply_retention(session: AsyncSession, now: datetime | None = None) ->
         )
         .values(polyline=None)
     )
+    from apps.safety.models import RideTrack, SafetyAlert
+
+    tracks = await session.execute(
+        delete(RideTrack).where(
+            RideTrack.created_at < now - timedelta(days=ROUTE_DAYS),
+            ~exists().where(Report.ride_id == RideTrack.ride_id),
+            ~exists().where(SafetyAlert.ride_id == RideTrack.ride_id),
+        )
+    )
     old_documents = (
         DriverDocument.status == DocumentStatus.REJECTED,
         func.coalesce(DriverDocument.reviewed_at, DriverDocument.updated_at)
@@ -443,6 +457,7 @@ async def apply_retention(session: AsyncSession, now: datetime | None = None) ->
     return {
         "chat_messages": chats.rowcount or 0,
         "routes": routes.rowcount or 0,
+        "tracks": tracks.rowcount or 0,
         "rejected_documents": documents,
         "notifications": notifications.rowcount or 0,
         "exports": len(expired),

@@ -8,6 +8,7 @@
     "settings": "Settings",
     "rides": "Rides",
     "live": "Live",
+    "safety": "Safety",
     "rates": "Rates",
     "promotions": "Promotions",
     "topUps": "Top-ups",
@@ -483,7 +484,9 @@
       "termsUrl": "The terms link must start with https:// (up to 300 characters).",
       "privacyUrl": "The privacy link must start with https:// (up to 300 characters).",
       "onlineSeconds": "Location without a ride: between {min} and {max} seconds.",
-      "onRideSeconds": "Location on a ride: between {min} and {max} seconds."
+      "onRideSeconds": "Location on a ride: between {min} and {max} seconds.",
+      "nightHours": "Night hours must be HH:MM and different",
+      "safetyNumber": "A safety value is out of range ({min}–{max})"
     },
     "fares": {
       "title": "Fares",
@@ -597,6 +600,33 @@
       "onlineSeconds": "Online, no ride (seconds)",
       "onRideSeconds": "On a ride (seconds)",
       "secondsRange": "Between {min} and {max} seconds."
+    },
+    "safety": {
+      "title": "Trip safety",
+      "help": "Start PIN, passenger photo and the rules that ask \"Is everything OK?\" before alerting the team.",
+      "pinAreas": "Cities with a start PIN",
+      "pinAreasHelp": "The driver types the passenger's code to start the ride.",
+      "passengerPhoto": "Passenger photo for the driver",
+      "photo": {
+        "off": "Never",
+        "night": "Only at night",
+        "always": "Always"
+      },
+      "nightStart": "Night from",
+      "nightEnd": "Night until",
+      "anomalies": "Anomalies",
+      "anomaliesHelp": "During the ride: a long stop away from the destination, leaving the route, or taking far longer than estimated.",
+      "numbers": {
+        "stop_minutes": "Stop (minutes)",
+        "deviation_m": "Off route (metres)",
+        "deviation_minutes": "Off route for (minutes)",
+        "overtime_factor": "Maximum length (× estimate)",
+        "check_in_seconds": "Time to answer (s)",
+        "sos_location_seconds": "Location during SOS (s)"
+      },
+      "range": "Between {min} and {max}",
+      "sosTeam": "On-call team for SOS",
+      "sosTeamHelp": "On: every SOS goes to Telegram and rings in the Safety center. Off: the SOS calls 911 and alerts the trusted contacts; only the record stays here."
     }
   },
   "paymentMethods": {
@@ -720,7 +750,14 @@
     "promotion": "Promotion",
     "totalVes": "Total in Bs ({source})",
     "frozenRate": "Rate {rate} when requested",
-    "pays": "Pays {amount}"
+    "pays": "Pays {amount}",
+    "safety": {
+      "title": "Safety",
+      "track": "Real path ({n} points)",
+      "pinOk": "Start PIN required, no wrong tries",
+      "pinFailures": "Wrong PIN {n} times",
+      "open": "Open"
+    }
   },
   "live": {
     "activeRides": "Rides ({n})",
@@ -2087,5 +2124,71 @@
     "deleted": "Announcement deleted",
     "deleteTitle": "Delete the announcement?",
     "deleteBody": "“{title}” stops showing in the app and its reach numbers are lost. If you only want it to end, edit its end date."
+  },
+  "safety": {
+    "help": "SOS alerts and ride anomalies. An SOS arrives at once with a sound; an anomaly arrives only if nobody answered \"I'm OK\" or someone asked for help.",
+    "sound": "Sound",
+    "testSound": "Test sound",
+    "filters": {
+      "active": "Active",
+      "checking": "Asking",
+      "closed": "Closed"
+    },
+    "empty": {
+      "active": "No active alerts.",
+      "checking": "No ride is waiting for an \"Is everything OK?\".",
+      "closed": "No closed alerts yet."
+    },
+    "kinds": {
+      "sos": "SOS",
+      "stop": "Long stop",
+      "deviation": "Off route",
+      "overtime": "Ride too long"
+    },
+    "statuses": {
+      "checking": "Asking",
+      "open": "Open",
+      "acknowledged": "Handling",
+      "resolved": "Resolved",
+      "dismissed": "Was OK"
+    },
+    "reasons": {
+      "help": "asked for help",
+      "no_answer": "nobody answered"
+    },
+    "roles": {
+      "passenger": "Passenger",
+      "driver": "Driver"
+    },
+    "answers": {
+      "ok": "I'm OK",
+      "help": "I need help",
+      "none": "no answer"
+    },
+    "answer": "Answer",
+    "vehicle": "Motorbike",
+    "position": "Last position",
+    "handledBy": "handled by {name}",
+    "justNow": "just now",
+    "minutesAgo": "{n} min ago",
+    "acknowledge": "Handling",
+    "acknowledged": "Marked as handling",
+    "resolve": "Close alert",
+    "resolveTitle": "Close the alert",
+    "resolved": "Alert closed",
+    "notes": "Notes",
+    "saveNotes": "Save notes",
+    "notesSaved": "Notes saved",
+    "outcome": "Outcome",
+    "outcomes": {
+      "assisted": "Helped",
+      "emergency_services": "Emergency services called",
+      "false_alarm": "False alarm",
+      "no_answer": "No answer",
+      "other": "Other",
+      "cancelled_by_user": "Cancelled by whoever raised it",
+      "passenger_ok": "The passenger said they were OK"
+    },
+    "pick": "Pick an alert to see its details."
   }
 }

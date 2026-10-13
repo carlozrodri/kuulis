@@ -13,7 +13,7 @@ from apps.rides.models import OfferStatus, Ride, RideOffer, RideStatus
 from apps.rides.pricing import CARACAS_TZ, compute_fare
 from apps.rides.state import utcnow
 from apps.users.models import User
-from conftest import _login, _make_user
+from conftest import _login, _make_user, ride_step
 from kuulis.core.db import SessionLocal
 
 from .conftest import (
@@ -61,7 +61,7 @@ async def _assigned_ride(client, passenger, driver) -> dict:
 async def _completed_ride(client, passenger, driver) -> dict:
     ride = await _assigned_ride(client, passenger, driver)
     for step in ("arrive", "start", "complete"):
-        response = await client.post(f"{API}/rides/{ride['id']}/{step}", headers=driver.headers)
+        response = await ride_step(client, ride["id"], step, driver.headers)
         assert response.status_code == 200, response.text
     return response.json()
 
@@ -197,7 +197,7 @@ async def test_full_ride_flow(client, passenger, recorder):
     assert len(offers) == 1 and recorder.of("ride.offer", driver.id) == offers
     offer = offers[0]
     assert offer["ride_id"] == ride_id and offer["fare"] == ride["fare"]
-    assert offer["passenger"] == {"first_name": "Ana", "rating": None}
+    assert offer["passenger"] == {"first_name": "Ana", "rating": None, "photo_url": None}
     assert 0 < offer["pickup_distance_m"] < 300
     assert recorder.pushed("offer", driver.id)
 
@@ -265,7 +265,7 @@ async def test_full_ride_flow(client, passenger, recorder):
         ("start", "in_progress"),
         ("complete", "completed"),
     ):
-        response = await client.post(f"{API}/rides/{ride_id}/{step}", headers=driver.headers)
+        response = await ride_step(client, ride_id, step, driver.headers)
         assert response.status_code == 200, response.text
         assert response.json()["status"] == status
     again = await client.post(f"{API}/rides/{ride_id}/complete", headers=driver.headers)
@@ -552,7 +552,7 @@ async def test_cancellation_rules(client, passenger, recorder, admin_headers):
 
     ride = await _assigned_ride(client, passenger, driver)
     for step in ("arrive", "start"):
-        await client.post(f"{API}/rides/{ride['id']}/{step}", headers=driver.headers)
+        await ride_step(client, ride["id"], step, driver.headers)
     for who in (passenger, driver):
         response = await client.post(f"{API}/rides/{ride['id']}/cancel", headers=who.headers)
         assert response.status_code == 409

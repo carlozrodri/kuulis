@@ -201,7 +201,7 @@ export function useBootstrap() {
   return useStore(bootstrapStore);
 }
 
-/** Is this feature on? Defaults while unknown: chat, promotions and transfers on; share_live_link off. */
+/** Is this feature on? Defaults while unknown: every feature on (doc 11 turned share_live_link on). */
 export function useFlag(key: FlagKey): boolean {
   return flagValue(useStore(bootstrapStore).data, key);
 }

@@ -188,6 +188,8 @@ export interface AppConfig {
   // ---- Remote control (doc 10). Maintenance and city pauses are edited on /app-status, not here. ----
   app_links?: AppLinks
   location_intervals?: LocationIntervals
+  // ---- Trip safety (doc 11). ----
+  safety?: SafetySettings
 }
 
 // ---- Phase 1B: rides (docs/api/phase-1b.md) ----
@@ -356,6 +358,13 @@ export interface AdminRide extends Ride {
   messages?: RideMessage[]
   ratings?: RideRating[]
   offers?: RideOffer[]
+  // ---- Doc 11. ----
+  pin_required?: boolean
+  /** Wrong start PINs the driver typed (3 lock the start). */
+  pin_failures?: number
+  /** Real path of the driver: [lat, lng, unix seconds]. Empty until the ride ends. */
+  track?: [number, number, number][]
+  safety_alerts?: RideSafetyAlert[]
 }
 
 /** GET /admin/drivers/online. */
@@ -1276,4 +1285,90 @@ export interface AppLinks {
 export interface LocationIntervals {
   online_seconds: number
   on_ride_seconds: number
+}
+
+// ---- Trip safety (doc 11) ----
+
+export type PassengerPhotoMode = 'off' | 'night' | 'always'
+
+export interface SafetySettings {
+  pin_areas: string[]
+  passenger_photo: PassengerPhotoMode
+  night_start: string
+  night_end: string
+  stop_minutes: number
+  deviation_m: number
+  deviation_minutes: number
+  overtime_factor: number
+  check_in_seconds: number
+  sos_location_seconds: number
+  /** Someone on call answers SOS: Telegram and the admin alarm (off by default). */
+  sos_team_alert: boolean
+}
+
+export type AlertKind = 'sos' | 'stop' | 'deviation' | 'overtime'
+export const ALERT_KINDS: AlertKind[] = ['sos', 'stop', 'deviation', 'overtime']
+export type AlertStatus = 'checking' | 'open' | 'acknowledged' | 'resolved' | 'dismissed'
+export type AlertOutcome = 'false_alarm' | 'assisted' | 'emergency_services' | 'no_answer' | 'other'
+export const ALERT_OUTCOMES: AlertOutcome[] = ['assisted', 'emergency_services', 'false_alarm', 'no_answer', 'other']
+
+export interface RideSafetyAlert {
+  id: string
+  kind: AlertKind
+  status: AlertStatus
+  user_id: string
+  lat: number | null
+  lng: number | null
+  details: Record<string, unknown>
+  created_at: string
+  resolved_at: string | null
+  outcome: string | null
+}
+
+export interface AlertParty {
+  id: string
+  name: string
+  email: string
+  /** Drivers only. */
+  phone: string | null
+  role: 'passenger' | 'driver'
+}
+
+/** GET /admin/safety/alerts items. */
+export interface SafetyAlert {
+  id: string
+  ride_id: string | null
+  ride_status: RideStatus | null
+  kind: AlertKind
+  status: AlertStatus
+  raised_by: AlertParty | null
+  passenger: AlertParty | null
+  driver: AlertParty | null
+  vehicle: { brand: string, model: string, color: string, plate: string } | null
+  lat: number | null
+  lng: number | null
+  location_at: string | null
+  driver_location: DriverLocation | null
+  pickup: Place | null
+  dropoff: Place | null
+  polyline: string | null
+  details: Record<string, unknown>
+  /** user id -> "ok" | "help" (answers to "¿Todo bien?"). */
+  answers: Record<string, 'ok' | 'help'>
+  check_in_deadline: string | null
+  escalated_at: string | null
+  acknowledged_at: string | null
+  handled_by_id: string | null
+  handled_by_name: string | null
+  notes: string
+  outcome: string | null
+  created_at: string
+  resolved_at: string | null
+}
+
+/** GET /admin/safety/summary: polled for the menu badge and the alarm. */
+export interface SafetySummary {
+  open: number
+  acknowledged: number
+  latest_id: string | null
 }

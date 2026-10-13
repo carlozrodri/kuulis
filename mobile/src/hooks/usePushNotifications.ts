@@ -8,10 +8,13 @@ import { Platform } from 'react-native';
 import { DRIVER_QUERY_KEY, isDriverNotification } from '@/hooks/useDriver';
 import { refreshReports } from '@/hooks/useReports';
 import { rideKeys } from '@/hooks/useRides';
+import { answerCheckIn, refreshAlerts } from '@/hooks/useSafety';
 import { isSubscriptionNotification, isWalletNotification, refreshSubscription, refreshWallet } from '@/hooks/useWallet';
 import { api } from '@/lib/api';
 import { config } from '@/lib/config';
+import i18n from '@/i18n';
 import { isAccountNotification, isReportNotification, reportIdOf } from '@/lib/reports';
+import { alertIdOf, checkInAnswerOf, isSafetyNotification, SAFETY_CATEGORY } from '@/lib/safety';
 import { useAuth } from '@/providers/AuthProvider';
 
 Notifications.setNotificationHandler({
@@ -64,15 +67,33 @@ export function usePushNotifications(enabled: boolean) {
         void queryClient.invalidateQueries({ queryKey: rideKeys.driverState });
       }
       if (isReportNotification(data)) refreshReports(queryClient);
+      // "¿Todo bien?" (doc 11): the app shows the question too.
+      if (isSafetyNotification(data)) refreshAlerts(queryClient);
+    };
+    // The "Estoy bien" / "Necesito ayuda" buttons of a check-in push answer without going through the modal.
+    const answerFrom = (r: Notifications.NotificationResponse) => {
+      const answer = checkInAnswerOf(r.actionIdentifier);
+      const alertId = alertIdOf(r.notification.request.content.data);
+      if (!answer || !alertId) return;
+      void answerCheckIn(alertId, answer)
+        .catch(() => undefined)
+        .finally(() => refreshAlerts(queryClient));
     };
     const received = Notifications.addNotificationReceivedListener((n) => handle(n.request.content.data));
     const opened = Notifications.addNotificationResponseReceivedListener((r) => {
       const data = r.notification.request.content.data;
       handle(data);
+      answerFrom(r);
       // Tapping a report push opens that report.
       const reportId = isReportNotification(data) ? reportIdOf(data) : null;
       if (reportId) router.push({ pathname: '/reports/[id]', params: { id: reportId } });
     });
+    // A button pressed while the app was closed: the response is waiting here.
+    void Notifications.getLastNotificationResponseAsync()
+      .then((r) => {
+        if (r) answerFrom(r);
+      })
+      .catch(() => undefined);
     return () => {
       received.remove();
       opened.remove();
@@ -89,6 +110,12 @@ export function usePushNotifications(enabled: boolean) {
           importance: Notifications.AndroidImportance.DEFAULT,
         });
       }
+      // Doc 11: action buttons of the "¿Todo bien?" push. "Estoy bien" answers in the background; asking for
+      // help opens the app so the person can also call the emergency number.
+      await Notifications.setNotificationCategoryAsync(SAFETY_CATEGORY, [
+        { identifier: 'ok', buttonTitle: i18n.t('safety.checkIn.ok'), options: { opensAppToForeground: false } },
+        { identifier: 'help', buttonTitle: i18n.t('safety.checkIn.help'), options: { opensAppToForeground: true } },
+      ]).catch(() => undefined);
       let { status } = await Notifications.getPermissionsAsync();
       if (status !== 'granted') status = (await Notifications.requestPermissionsAsync()).status;
       if (status !== 'granted') return;

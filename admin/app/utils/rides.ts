@@ -35,6 +35,8 @@ export const MAP_COLORS = {
   driverFree: '#16a34a',
   driverBusy: '#d97706',
   serviceArea: '#0e7c5a',
+  /** Doc 11: the driver's real path. */
+  track: '#7c3aed',
 }
 
 export function isActiveRide(status: string): boolean {

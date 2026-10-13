@@ -226,5 +226,39 @@
     "notFound": "No encontramos esta página",
     "notFoundBody": "Puede que el enlace esté mal escrito o que la página ya no exista.",
     "home": "Ir al inicio"
+  },
+  "shared": {
+    "metaTitle": "Viaje en vivo · Kuulis",
+    "following": "Viaje de {name}",
+    "status": {
+      "searching": "Buscando motorizado",
+      "driver_assigned": "El motorizado va a buscarle",
+      "driver_arrived": "El motorizado llegó al punto de encuentro",
+      "in_progress": "En viaje",
+      "completed": "Viaje terminado",
+      "cancelled_by_passenger": "Viaje cancelado",
+      "cancelled_by_driver": "Viaje cancelado",
+      "cancelled_by_admin": "Viaje cancelado",
+      "no_drivers": "No hubo motorizados disponibles"
+    },
+    "eta": "Llegada estimada: {time}",
+    "mapLabel": "Mapa con la posición del viaje",
+    "pickup": "Punto de encuentro",
+    "dropoff": "Destino",
+    "moto": "Motorizado",
+    "sosHere": "Última ubicación del SOS",
+    "openMaps": "Ver en Google Maps",
+    "from": "Desde",
+    "to": "Hasta",
+    "updated": "Se actualiza solo · última vez a las {time}",
+    "sosTitle": "{name} activó el SOS.",
+    "sosBody": "Si puedes, llámale ya o llama al 911 y comparte esta ubicación.",
+    "help": "Esta página deja de funcionar cuando termina el viaje.",
+    "endedTitle": "Este viaje terminó",
+    "endedBody": "Ya no se comparte la ubicación. Gracias por estar pendiente.",
+    "invalidTitle": "Enlace no válido",
+    "invalidBody": "Revisa que el enlace esté completo o pide uno nuevo.",
+    "failedTitle": "No pudimos cargar el viaje",
+    "failedBody": "Revisa tu conexión; seguiremos intentando."
   }
 }

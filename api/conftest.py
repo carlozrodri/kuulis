@@ -6,7 +6,7 @@ from collections.abc import AsyncIterator
 
 import pytest
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import text
+from sqlalchemy import select, text
 
 from apps.staff.models import StaffRole
 from apps.staff.permissions import ALL_PERMISSIONS
@@ -113,3 +113,15 @@ async def admin_headers(client: AsyncClient) -> dict[str, str]:
 async def staff_headers(client: AsyncClient) -> dict[str, str]:
     await _make_user("staff@example.com", Role.STAFF)
     return await _login(client, "staff@example.com")
+
+
+async def ride_step(client: AsyncClient, ride_id: str, step: str, headers: dict[str, str]):
+    """POST /rides/{id}/{step} as the driver, typing the passenger's PIN to start (doc 11)."""
+    body = None
+    if step == "start":
+        from apps.rides.models import Ride
+
+        async with SessionLocal() as session:
+            pin = await session.scalar(select(Ride.start_pin).where(Ride.id == ride_id))
+        body = {"pin": pin} if pin else None
+    return await client.post(f"/api/v1/rides/{ride_id}/{step}", json=body, headers=headers)

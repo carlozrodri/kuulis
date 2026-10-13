@@ -25,14 +25,17 @@ import {
   formatFare,
   secondsSince,
 } from '@/lib/ride';
-import { firstName } from '@/lib/profile';
 import { useStore } from '@/lib/store';
 import type { Ride } from '@/lib/types';
-import { useAuth } from '@/providers/AuthProvider';
+import { AutoShareSheet } from '@/features/safety/AutoShareSheet';
+import { PinCard } from '@/features/safety/PinCard';
+import { SafetySheet, useRideShare } from '@/features/safety/SafetySheet';
+import { useFirstRideTips } from '@/features/safety/SafetyTips';
+import { SosButton } from '@/features/safety/SosButton';
 import { radius, space, useTheme } from '@/theme';
 
 import { Avatar, PAYMENT_ICONS, PlaceRows, PlateBadge, PulsingRings, RatingBadge, RoundAction } from './components';
-import { CancelSheet, SafetySheet, shareRideWhatsApp, useNow } from './RideSheets';
+import { CancelSheet, useNow } from './RideSheets';
 import { chatUnread, routedRides } from './store';
 
 const goHome = () => router.dismissTo('/');
@@ -84,8 +87,10 @@ export function RideScreen() {
         </RideMap>
       )}
       topBar={
-        <View style={{ flexDirection: 'row' }}>
+        <View style={styles.topBar}>
           <IconButton icon={ChevronDown} label={t('ride.minimize')} onPress={() => (router.canGoBack() ? router.back() : goHome())} />
+          {/* Doc 11: SOS always in reach while there is a driver. */}
+          {onTheWay(ride.status) ? <SosButton ride={ride} /> : null}
         </View>
       }>
       <RideSheet ride={ride} />
@@ -100,6 +105,9 @@ function SearchingOverlay({ insets }: { insets: MapInsets }) {
     </View>
   );
 }
+
+const onTheWay = (status: Ride['status']) =>
+  status === 'driver_assigned' || status === 'driver_arrived' || status === 'in_progress';
 
 function RideSheet({ ride }: { ride: Ride }) {
   switch (ride.status) {
@@ -194,7 +202,8 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
   const chatOn = useFlag('chat');
   const cancel = useCancelFlow(ride);
   const [safety, setSafety] = useState(false);
-  const { user } = useAuth();
+  const share = useRideShare(ride);
+  useFirstRideTips('passenger', true);
   const driver = ride.driver;
   const vehicle = driver?.vehicle;
   const name = driver?.first_name ?? t('ride.yourDriver');
@@ -226,6 +235,7 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
         <Txt color="muted">{subtitle}</Txt>
       </View>
       <ProgressSteps total={4} current={ride.status === 'driver_assigned' ? 2 : ride.status === 'driver_arrived' ? 3 : 4} />
+      {ride.start_pin && ride.status !== 'in_progress' ? <PinCard pin={ride.start_pin} /> : null}
 
       <View style={[styles.driverCard, { backgroundColor: theme.background }]}>
         <Avatar name={driver?.first_name} photoUrl={driver?.photo_url} size={60} />
@@ -254,11 +264,7 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
             onPress={() => router.push({ pathname: '/ride/chat', params: { id: ride.id } })}
           />
         ) : null}
-        <RoundAction
-          icon={Share2}
-          label={user?.trusted_contact_name ? t('ride.shareWith', { name: firstName(user.trusted_contact_name) }) : t('ride.share')}
-          onPress={() => void shareRideWhatsApp(ride, t, user?.trusted_contact_phone)}
-        />
+        <RoundAction icon={Share2} label={t('ride.share')} onPress={() => share(null, true)} />
         <RoundAction icon={ShieldCheck} label={t('ride.safety')} onPress={() => setSafety(true)} />
       </View>
 
@@ -268,7 +274,8 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
         <Button title={t('ride.cancel')} variant="danger" size="sm" loading={cancel.pending} onPress={cancel.open} />
       ) : null}
       {cancel.sheet}
-      <SafetySheet visible={safety} ride={ride} onClose={() => setSafety(false)} />
+      <SafetySheet visible={safety} ride={ride} role="passenger" onClose={() => setSafety(false)} />
+      <AutoShareSheet ride={ride} />
     </>
   );
 }
@@ -330,6 +337,7 @@ function EndedSheet({ ride }: { ride: Ride }) {
 }
 
 const styles = StyleSheet.create({
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.lg, gap: space.md },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
   fareBox: { gap: 4, borderRadius: radius.tile, padding: space.md },

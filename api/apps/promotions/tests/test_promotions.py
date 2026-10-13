@@ -13,7 +13,7 @@ from apps.rides.tests.conftest import (
     go_online,
     make_driver,
 )
-from conftest import _login, _make_user
+from conftest import _login, _make_user, ride_step
 from kuulis.core.db import SessionLocal
 
 API = "/api/v1"
@@ -62,7 +62,7 @@ async def _complete(client, driver, ride_id: str) -> dict:
     response = await client.post(f"{API}/rides/{ride_id}/accept", headers=driver.headers)
     assert response.status_code == 200, response.text
     for step in ("arrive", "start", "complete"):
-        response = await client.post(f"{API}/rides/{ride_id}/{step}", headers=driver.headers)
+        response = await ride_step(client, ride_id, step, driver.headers)
         assert response.status_code == 200, response.text
     return response.json()
 

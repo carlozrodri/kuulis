@@ -23,6 +23,7 @@ from apps.users import services as users
 from apps.users.models import User
 from apps.wallet import services as wallet
 from apps.wallet.models import EntryKind, TopUp, TopUpMethod, TopUpStatus, Wallet
+from conftest import ride_step
 from kuulis.core import storage
 from kuulis.core.db import SessionLocal
 from kuulis.models import metadata
@@ -51,7 +52,7 @@ async def _completed_ride(client, passenger, driver) -> str:
         headers=passenger.headers,
     )
     for step in ("arrive", "start", "complete"):
-        response = await client.post(f"{API}/rides/{ride_id}/{step}", headers=driver.headers)
+        response = await ride_step(client, ride_id, step, driver.headers)
         assert response.status_code == 200, response.text
     rated = await client.post(
         f"{API}/rides/{ride_id}/rating",
@@ -102,11 +103,12 @@ async def test_deletion_waits_for_open_reports_and_fees(client, passenger, recor
 async def test_an_erased_account_leaves_no_personal_data(client, passenger, recorder, monkeypatch):
     driver = await make_driver(client, "luis@example.com", "Luis Gómez")
     await _completed_ride(client, passenger, driver)
-    await client.patch(
-        f"{API}/users/me",
-        json={"trusted_contact_name": "Mamá Carmen", "trusted_contact_phone": "+584149876543"},
+    contact = await client.post(
+        f"{API}/users/me/trusted-contacts",
+        json={"name": "Mamá Carmen", "phone": "+584149876543"},
         headers=passenger.headers,
     )
+    assert contact.status_code == 201, contact.text
     await client.post(
         f"{API}/users/me/places",
         json={"kind": "home", "address": "Calle Los Mangos 12", "lat": 10.5, "lng": -66.8},
@@ -313,6 +315,7 @@ async def test_retention(client, passenger, recorder, monkeypatch):
     assert result == {
         "chat_messages": 1,
         "routes": 1,
+        "tracks": 0,
         "rejected_documents": 1,
         "notifications": 1,
         "exports": 1,

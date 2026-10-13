@@ -25,7 +25,7 @@ FLAGS: dict[str, Flag] = {
     "promotions": Flag(True, "Promociones y códigos de descuento al cotizar"),
     "transfers": Flag(True, "Transferencias de saldo entre usuarios"),
     "binance_auto": Flag(True, "Acreditación automática de recargas por Binance Pay"),
-    "share_live_link": Flag(False, "Compartir el viaje en vivo con un enlace"),
+    "share_live_link": Flag(True, "Compartir el viaje en vivo con un enlace"),
 }
 
 

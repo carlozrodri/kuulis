@@ -24,6 +24,22 @@ const approvalCount = useApprovalCount()
 const approvalsBadge = computed(() =>
   approvalCount.pending.value ? { label: String(approvalCount.pending.value), color: 'warning' as const, variant: 'solid' as const } : undefined,
 )
+// Safety center (doc 11): polled every few seconds; a new open alert rings and shows in red.
+const safety = useSafetySummary()
+const safetyBadge = computed(() => {
+  const s = safety.summary.value
+  const total = (s?.open ?? 0) + (s?.acknowledged ?? 0)
+  if (!total) return undefined
+  return { label: String(total), color: s?.open ? 'error' as const : 'warning' as const, variant: 'solid' as const }
+})
+let safetyTimer: ReturnType<typeof setInterval> | undefined
+onMounted(() => {
+  safety.refresh()
+  // Keeps polling in a background tab too: the team must hear an SOS while working elsewhere.
+  safetyTimer = setInterval(safety.refresh, SAFETY_POLL_MS)
+})
+onBeforeUnmount(() => clearInterval(safetyTimer))
+
 function refreshCounts() {
   reportCounts.refresh()
   approvalCount.refresh()
@@ -45,6 +61,7 @@ const links = computed<NavigationMenuItem[]>(() =>
     to: entry.to,
     ...(entry.key === 'reports' ? { badge: reportsBadge.value } : {}),
     ...(entry.key === 'approvals' ? { badge: approvalsBadge.value } : {}),
+    ...(entry.key === 'safety' ? { badge: safetyBadge.value } : {}),
   })),
 )
 

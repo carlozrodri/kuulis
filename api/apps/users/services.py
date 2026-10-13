@@ -94,14 +94,6 @@ async def update_me(user: User, data: UserUpdateMe) -> User:
         changes["avatar_key"] = key
         if key is not None and key != user.avatar_key:
             await metadata.schedule(key)
-    for field in ("trusted_contact_name", "trusted_contact_phone"):
-        if field in changes:
-            changes[field] = (changes[field] or "").strip() or None
-    if "trusted_contact_name" in changes or "trusted_contact_phone" in changes:
-        name = changes.get("trusted_contact_name", user.trusted_contact_name)
-        phone = changes.get("trusted_contact_phone", user.trusted_contact_phone)
-        if (name is None) != (phone is None):
-            raise AppError("Name and phone go together", code="trusted_contact_incomplete")
     for field, value in changes.items():
         setattr(user, field, value)
     return user
@@ -246,6 +238,7 @@ async def erase_due(session: AsyncSession, now: datetime | None = None, limit: i
     from apps.notifications.models import Device, Notification
     from apps.places.models import SavedPlace
     from apps.privacy import services as privacy
+    from apps.safety.models import TrustedContact
 
     now = now or datetime.now(UTC)
     cutoff = now - timedelta(days=settings.ACCOUNT_DELETION_GRACE_DAYS)
@@ -291,15 +284,13 @@ async def erase_due(session: AsyncSession, now: datetime | None = None, limit: i
             select(func.count(Suspension.id)).where(Suspension.user_id == user.id)
         )
         keys += await privacy.scrub(session, user, was_suspended=bool(suspended))
-        for model in (SocialAccount, Device, Notification, SavedPlace):
+        for model in (SocialAccount, Device, Notification, SavedPlace, TrustedContact):
             await session.execute(delete(model).where(model.user_id == user.id))
         user.email = f"deleted-{tag}@deleted.invalid"
         user.full_name = ""
         user.hashed_password = None
         user.avatar_key = None
         user.referral_code = None
-        user.trusted_contact_name = None
-        user.trusted_contact_phone = None
         user.deleted_at = now
         await session.commit()
         # After the commit: a storage hiccup leaves orphan files, never a half-erased account.

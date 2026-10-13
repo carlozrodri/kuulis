@@ -111,3 +111,6 @@ export { default as Cog } from 'lucide-react-native/icons/cog';
 export { default as CirclePause } from 'lucide-react-native/icons/circle-pause';
 export { default as Megaphone } from 'lucide-react-native/icons/megaphone';
 export { default as ExternalLink } from 'lucide-react-native/icons/external-link';
+export { default as Delete } from 'lucide-react-native/icons/delete';
+export { default as Lightbulb } from 'lucide-react-native/icons/lightbulb';
+export { default as HardHat } from 'lucide-react-native/icons/hard-hat';

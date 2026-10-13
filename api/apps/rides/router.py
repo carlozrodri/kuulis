@@ -29,8 +29,11 @@ from apps.rides.schemas import (
     RideAdminRead,
     RideCreate,
     RideRead,
+    RideSafetyAlert,
+    StartRequest,
 )
 from apps.rides.state import RideNotFoundError
+from apps.safety import services as safety
 from apps.users.dependencies import Can, CurrentUser, DBSession
 from apps.users.models import User
 from kuulis.core.pagination import Page, PageParams, page_params
@@ -141,8 +144,14 @@ async def arrive(ride_id: uuid.UUID, user: CurrentUser, session: DBSession) -> R
 
 
 @router.post("/{ride_id}/start", response_model=RideRead)
-async def start(ride_id: uuid.UUID, user: CurrentUser, session: DBSession) -> RideRead:
-    ride = await services.driver_step(session, user, ride_id, RideStatus.IN_PROGRESS)
+async def start(
+    ride_id: uuid.UUID, user: CurrentUser, session: DBSession, data: StartRequest | None = None
+) -> RideRead:
+    """``{"pin": "1234"}`` when ``pin_required``: 400 ``pin_invalid`` (``attempts_left``), then
+    429 ``pin_attempts_exceeded`` after three wrong codes."""
+    ride = await services.driver_step(
+        session, user, ride_id, RideStatus.IN_PROGRESS, data.pin if data else None
+    )
     return await _read(session, ride, user)
 
 
@@ -269,6 +278,10 @@ async def admin_detail(
             RatingAdminRead.model_validate(r) for r in await services.ratings_for(session, ride.id)
         ],
         offers=offers,
+        track=await safety.ride_track(session, ride),
+        safety_alerts=[
+            RideSafetyAlert.model_validate(a) for a in await safety.ride_alerts(session, ride.id)
+        ],
     )
 
 

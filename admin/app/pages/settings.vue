@@ -966,6 +966,85 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           </div>
         </UCard>
 
+        <!-- Doc 11: trip safety -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.safety.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.safety.help') }}
+            </p>
+          </template>
+          <div class="space-y-6">
+            <USwitch
+              v-model="form.safety.sos_team_alert"
+              :label="t('settings.safety.sosTeam')"
+              :description="t('settings.safety.sosTeamHelp')"
+              :disabled="readOnly"
+            />
+            <UFormField
+              :label="t('settings.safety.pinAreas')"
+              :help="t('settings.safety.pinAreasHelp')"
+            >
+              <UCheckboxGroup
+                v-model="form.safety.pin_areas"
+                :items="form.service_areas.filter(a => a.name.trim()).map(a => ({ label: a.name, value: a.name.trim() }))"
+                orientation="horizontal"
+                :disabled="readOnly"
+              />
+            </UFormField>
+            <div class="grid gap-4 sm:grid-cols-3">
+              <UFormField :label="t('settings.safety.passengerPhoto')">
+                <USelect
+                  v-model="form.safety.passenger_photo"
+                  :items="(['off', 'night', 'always'] as const).map(value => ({ label: t(`settings.safety.photo.${value}`), value }))"
+                  class="w-full"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+              <UFormField :label="t('settings.safety.nightStart')">
+                <UInput
+                  v-model="form.safety.night_start"
+                  type="time"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+              <UFormField :label="t('settings.safety.nightEnd')">
+                <UInput
+                  v-model="form.safety.night_end"
+                  type="time"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium">
+                {{ t('settings.safety.anomalies') }}
+              </h3>
+              <p class="mb-3 text-sm text-(--ui-text-muted)">
+                {{ t('settings.safety.anomaliesHelp') }}
+              </p>
+              <div class="grid gap-4 sm:grid-cols-3">
+                <UFormField
+                  v-for="key in SAFETY_NUMBERS"
+                  :key="key"
+                  :label="t(`settings.safety.numbers.${key}`)"
+                  :help="t('settings.safety.range', { min: SAFETY_LIMITS[key][0], max: SAFETY_LIMITS[key][1] })"
+                >
+                  <UInputNumber
+                    v-model="form.safety[key]"
+                    :min="SAFETY_LIMITS[key][0]"
+                    :max="SAFETY_LIMITS[key][1]"
+                    :step="key === 'overtime_factor' ? 0.1 : 1"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+              </div>
+            </div>
+          </div>
+        </UCard>
+
         <UAlert
           v-if="!readOnly && dirty && issues.length"
           color="error"
