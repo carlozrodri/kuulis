@@ -34,6 +34,19 @@
     "campaigns": "Campañas",
     "emailTemplates": "Plantillas de email"
   },
+  "navGroups": {
+    "operations": "Operación",
+    "people": "Usuarios",
+    "support": "Soporte",
+    "money": "Finanzas",
+    "messaging": "Comunicación",
+    "platform": "App y sistema",
+    "administration": "Administración"
+  },
+  "navShort": {
+    "reports": "Conversaciones",
+    "finance": "Resumen"
+  },
   "auth": {
     "title": "Acceso administrador",
     "email": "Correo",

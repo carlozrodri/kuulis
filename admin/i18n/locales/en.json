@@ -34,6 +34,19 @@
     "campaigns": "Campaigns",
     "emailTemplates": "Email templates"
   },
+  "navGroups": {
+    "operations": "Operations",
+    "people": "People",
+    "support": "Support",
+    "money": "Finance",
+    "messaging": "Messaging",
+    "platform": "App and system",
+    "administration": "Administration"
+  },
+  "navShort": {
+    "reports": "Conversations",
+    "finance": "Overview"
+  },
   "auth": {
     "title": "Admin sign in",
     "email": "Email",
