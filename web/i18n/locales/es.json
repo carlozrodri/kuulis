@@ -7,7 +7,9 @@
     "legal": "Legal",
     "language": "Change language to English",
     "menu": "Menú",
-    "getApp": "Descargar la app"
+    "getApp": "Descargar la app",
+    "help": "Ayuda",
+    "contact": "Contacto"
   },
   "footer": {
     "tagline": "Viajes en moto en Venezuela. Sin comisión por viaje.",
@@ -260,5 +262,88 @@
     "invalidBody": "Revisa que el enlace esté completo o pide uno nuevo.",
     "failedTitle": "No pudimos cargar el viaje",
     "failedBody": "Revisa tu conexión; seguiremos intentando."
+  },
+  "help": {
+    "metaTitle": "Centro de ayuda · Kuulis",
+    "metaDescription": "Respuestas a las preguntas más comunes sobre tu cuenta, los viajes, los pagos al motorizado, la billetera, la seguridad y los documentos en Kuulis.",
+    "eyebrow": "Ayuda",
+    "title": "¿En qué te ayudamos?",
+    "lead": "Busca tu pregunta o elige un tema. Si no encuentras la respuesta, escríbenos.",
+    "search": "Buscar en la ayuda",
+    "searchPlaceholder": "Ej.: olvidé mi contraseña",
+    "searchButton": "Buscar",
+    "clear": "Borrar búsqueda",
+    "audience": {
+      "label": "Ver artículos para",
+      "all": "Todos",
+      "passenger": "Pasajeros",
+      "driver": "Motorizados"
+    },
+    "topics": {
+      "account": "Cuenta",
+      "rides": "Viajes",
+      "payments": "Pagos al motorizado",
+      "wallet": "Billetera y cuota",
+      "safety": "Seguridad",
+      "documents": "Documentos",
+      "app": "Problemas con la app"
+    },
+    "topicsLabel": "Temas",
+    "results": "Resultados para «{q}»",
+    "noResults": "No encontramos artículos para «{q}». Prueba con otras palabras o escríbenos.",
+    "empty": "Pronto vas a encontrar aquí respuestas a las preguntas más comunes. Mientras tanto, escríbenos.",
+    "loadFailed": "No pudimos cargar los artículos. Revisa tu conexión e intenta de nuevo.",
+    "contactTitle": "¿No encuentras lo que buscas?",
+    "contactBody": "Escríbenos y te respondemos por email.",
+    "contactButton": "Escríbenos",
+    "whatsapp": "Escríbenos por WhatsApp",
+    "back": "Centro de ayuda",
+    "updated": "Actualizado el {date}",
+    "helpful": "¿Te ayudó este artículo?",
+    "yes": "Sí",
+    "no": "No",
+    "thanks": "¡Gracias! Nos sirve para mejorar la ayuda.",
+    "sorry": "Gracias por decírnoslo. Vamos a mejorar este artículo.",
+    "feedbackFailed": "No pudimos guardar tu respuesta. Intenta de nuevo.",
+    "stillTitle": "¿Sigues con dudas?",
+    "stillBody": "Escríbenos y te ayudamos.",
+    "stillButton": "Escríbenos"
+  },
+  "contact": {
+    "metaTitle": "Contacto · Kuulis",
+    "metaDescription": "Escríbele al equipo de Kuulis, aunque no puedas entrar a tu cuenta. Te respondemos por email.",
+    "eyebrow": "Contacto",
+    "title": "Escríbenos",
+    "lead": "¿No puedes entrar a tu cuenta o tienes otra consulta? Cuéntanos y te respondemos por email.",
+    "inApp": "Si puedes entrar a la app, escríbenos desde Perfil → Ayuda: así vemos tu cuenta y tus viajes.",
+    "name": "Tu nombre",
+    "email": "Tu email",
+    "emailHint": "Aquí te enviaremos la respuesta.",
+    "category": "¿Sobre qué es?",
+    "categories": {
+      "app_issue": "No puedo entrar a mi cuenta",
+      "other": "Otra consulta"
+    },
+    "message": "Tu mensaje",
+    "messageHint": "Cuéntanos qué pasó. Si es sobre tu cuenta, incluye el teléfono o el email con que te registraste. Nunca te pediremos tu contraseña.",
+    "count": "{n} / {max}",
+    "send": "Enviar mensaje",
+    "verifying": "Verificando que eres una persona…",
+    "sending": "Enviando…",
+    "errors": {
+      "name": "Escribe tu nombre (al menos 2 letras).",
+      "email": "Escribe un email válido.",
+      "message": "Escribe al menos 10 caracteres.",
+      "invalid": "Revisa los datos del formulario e intenta de nuevo.",
+      "captcha": "No pudimos verificar el envío. Intenta de nuevo.",
+      "limited": "Recibimos muchos mensajes desde tu conexión. Intenta de nuevo más tarde."
+    },
+    "doneTitle": "¡Mensaje enviado!",
+    "doneBody": "Recibimos tu mensaje. Te responderemos por email a {email}.",
+    "doneSpam": "Si no ves la respuesta, revisa la carpeta de spam o correo no deseado.",
+    "another": "Enviar otro mensaje",
+    "helpLink": "Mientras tanto, mira el centro de ayuda",
+    "other": "Otras formas de contactarnos",
+    "privacy": "Usamos estos datos solo para responderte. Lee nuestra"
   }
 }

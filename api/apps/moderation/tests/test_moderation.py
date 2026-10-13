@@ -94,6 +94,9 @@ async def test_report_about_a_ride(client, staff_headers, passenger):
         "open": 2,
         "in_review": 0,
         "urgent_open": 1,
+        "waiting_staff": 2,
+        "overdue": 0,
+        "mine": 0,
     }
     assert listing["items"][0]["id"] == urgent.json()["id"]  # urgent first
     assert listing["items"][1]["reported"]["email"] == "luis@example.com"

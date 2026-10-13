@@ -38,6 +38,10 @@ from apps.staff.router import public_router as staff_public_router
 from apps.staff.router import router as staff_router
 from apps.subscriptions.router import admin_router as subscriptions_admin_router
 from apps.subscriptions.router import router as subscriptions_router
+from apps.support.router import admin_router as support_admin_router
+from apps.support.router import help_router as support_help_router
+from apps.support.router import lost_router as support_lost_router
+from apps.support.router import public_router as support_public_router
 from apps.updates.router import router as updates_router
 from apps.users.router import router as users_router
 from apps.wallet.router import admin_router as wallet_admin_router
@@ -78,6 +82,10 @@ api_v1.include_router(subscriptions_router)
 api_v1.include_router(subscriptions_admin_router)
 api_v1.include_router(moderation_router)
 api_v1.include_router(moderation_admin_router)
+api_v1.include_router(support_help_router)
+api_v1.include_router(support_lost_router)
+api_v1.include_router(support_public_router)
+api_v1.include_router(support_admin_router)
 api_v1.include_router(analytics_router)
 api_v1.include_router(audit_router)
 api_v1.include_router(approvals_router)

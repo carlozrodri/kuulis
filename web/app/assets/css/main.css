@@ -217,7 +217,9 @@ p {
   font-size: 0.95rem;
 }
 
-.field input {
+.field input,
+.field select,
+.field textarea {
   width: 100%;
   min-height: 52px;
   padding: 0 16px;
@@ -229,7 +231,16 @@ p {
   font-weight: 500;
 }
 
-.field input:focus {
+.field textarea {
+  min-height: 140px;
+  padding: 14px 16px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
   outline: none;
   border-color: var(--primary);
 }

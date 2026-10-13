@@ -2,7 +2,8 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, String, Text, text
+from sqlalchemy import DateTime, Enum, ForeignKey, Index, SmallInteger, String, Text, text
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column
 
 from kuulis.core.models import BaseModel
@@ -51,6 +52,26 @@ class ReporterRole(enum.StrEnum):
     DRIVER = "driver"
 
 
+class ReportSource(enum.StrEnum):
+    APP = "app"  # "Reportar un problema" in the app
+    HELP = "help"  # "Contactar" from a help article
+    LOST_ITEM = "lost_item"  # the lost item flow (doc 13)
+    WEB = "web"  # the public contact form, maybe without an account
+
+
+class WaitingOn(enum.StrEnum):
+    """Whose turn it is in an open ticket."""
+
+    STAFF = "staff"
+    USER = "user"
+
+
+class AuthorKind(enum.StrEnum):
+    USER = "user"
+    STAFF = "staff"
+    SYSTEM = "system"  # automatic lines: closed for inactivity, the driver has the lost item...
+
+
 class NoteKind(enum.StrEnum):
     NOTE = "note"  # written by staff
     STATUS = "status"  # status, priority or assignee changes
@@ -58,9 +79,14 @@ class NoteKind(enum.StrEnum):
 
 
 class Report(BaseModel):
+    """A support ticket (doc 13): a report about a ride or a general question, with a conversation
+    between the user and the team. ``reporter_id`` is empty for the web form without an account,
+    which answers by email (``contact_email``)."""
+
     __tablename__ = "reports"
     __table_args__ = (
         Index("ix_reports_status_created", "status", "created_at"),
+        Index("ix_reports_waiting_sla", "waiting_on", "sla_due_at"),
         # One open report per ride and reporter.
         Index(
             "uq_reports_open_ride_reporter",
@@ -71,7 +97,7 @@ class Report(BaseModel):
         ),
     )
 
-    reporter_id: Mapped[uuid.UUID] = mapped_column(
+    reporter_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
     reported_user_id: Mapped[uuid.UUID | None] = mapped_column(
@@ -96,6 +122,46 @@ class Report(BaseModel):
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     resolved_by_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL")
+    )
+    # --- Conversation and support (doc 13) ---
+    source: Mapped[ReportSource] = mapped_column(
+        _enum(ReportSource, "report_source"), default=ReportSource.APP, server_default="app"
+    )
+    waiting_on: Mapped[WaitingOn | None] = mapped_column(_enum(WaitingOn, "report_waiting_on"))
+    waiting_since: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    first_response_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # When the team should have answered; cleared while the ticket waits on the user.
+    sla_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    sla_alerted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_message_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # The team's last message and when the user last opened the conversation: "new reply" badge.
+    last_staff_message_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    user_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    tags: Mapped[list[str]] = mapped_column(ARRAY(String(40)), default=list, server_default="{}")
+    csat: Mapped[int | None] = mapped_column(SmallInteger)
+    csat_comment: Mapped[str | None] = mapped_column(String(500))
+    csat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    contact_email: Mapped[str | None] = mapped_column(String(320))
+    contact_name: Mapped[str | None] = mapped_column(String(120))
+    locale: Mapped[str] = mapped_column(String(5), default="es", server_default="es")
+    help_article_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("help_articles.id", ondelete="SET NULL")
+    )
+
+
+class ReportMessage(BaseModel):
+    """One message of a ticket's conversation, seen by the user (internal notes stay in
+    ``report_notes``). Attachments are storage keys (photos)."""
+
+    __tablename__ = "report_messages"
+    __table_args__ = (Index("ix_report_messages_report_created", "report_id", "created_at"),)
+
+    report_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"))
+    author_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    author_kind: Mapped[AuthorKind] = mapped_column(_enum(AuthorKind, "report_author_kind"))
+    body: Mapped[str] = mapped_column(Text)
+    attachments: Mapped[list[str]] = mapped_column(
+        ARRAY(String(512)), default=list, server_default="{}"
     )
 
 
