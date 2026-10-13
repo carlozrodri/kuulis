@@ -41,7 +41,9 @@ paginación con límite máximo de 100, broadcast de notificaciones en lotes de 
 ## Cómo crecer (en orden)
 1. Subir `WEB_CONCURRENCY` (≈ 1 por hilo de CPU: más procesos que hilos no ayuda porque la API está limitada
    por CPU) y ajustar el pool para no pasar de `max_connections`. Dar más hilos al servidor es lo más barato:
-   con 8 hilos aguanta ~220 req/s; la capacidad crece casi lineal con los hilos mientras Postgres siga ocioso.
+   con 8 hilos aguanta ~220 req/s y el tope está en ~260 req/s + 225 GPS/s (1,5×, ver informe-carga.md);
+   la capacidad crece casi lineal con los hilos mientras Postgres siga ocioso. Fijar los hilos en núcleos
+   de rendimiento distintos (sin gemelos HT ni núcleos E) rinde más con el mismo número de hilos.
 2. Añadir un segundo servidor en Coolify y repartir API/worker; Redis pub/sub y Redis rate limit ya lo permiten.
 3. Poner **PgBouncer** delante de Postgres cuando haya más de ~150 conexiones, o subir `max_connections`.
 4. Separar el worker de push/broadcast en su propia cola si los envíos masivos compiten con emails.
