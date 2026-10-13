@@ -1,3 +1,4 @@
+import hashlib
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select, update
@@ -378,14 +379,16 @@ async def test_public_contact_form(client, staff_headers, monkeypatch):
         "challenge": challenge["challenge"],
         "nonce": nonce,
     }
-    wrong = await client.post(f"{API}/public/contact", json={**body, "nonce": "x"})
-    if (
-        services.leading_zero_bits(
-            __import__("hashlib").sha256(f"{challenge['challenge']}:x".encode()).digest()
+    bad = next(
+        n
+        for n in (f"bad{i}" for i in range(100))
+        if services.leading_zero_bits(
+            hashlib.sha256(f"{challenge['challenge']}:{n}".encode()).digest()
         )
         < 6
-    ):
-        assert wrong.status_code == 400 and wrong.json()["error"]["code"] == "captcha_invalid"
+    )
+    wrong = await client.post(f"{API}/public/contact", json={**body, "nonce": bad})
+    assert wrong.status_code == 400 and wrong.json()["error"]["code"] == "captcha_invalid"
     sent = await client.post(f"{API}/public/contact", json=body)
     assert sent.status_code == 202, sent.text
     reused = await client.post(f"{API}/public/contact", json=body)
