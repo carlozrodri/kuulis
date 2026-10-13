@@ -12,6 +12,7 @@ import { Button, Card, IconTile, Notice, Sheet, Skeleton, StatusPill, Txt } from
 import { SuspendedPanel } from '@/features/account/SuspendedPanel';
 import { AnnouncementBanners } from '@/features/control/AnnouncementBanners';
 import { ServicePausedPanel } from '@/features/control/ServicePausedPanel';
+import { PausePanel } from '@/features/quality/PausePanel';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
 import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { useWalletFormat } from '@/features/wallet/format';
@@ -19,6 +20,7 @@ import { EarningsCard, goToTopUp } from '@/features/wallet/SubscriptionCard';
 import { useBootstrap } from '@/hooks/useBootstrap';
 import { DRIVER_QUERY_KEY, useDriverProfile } from '@/hooks/useDriver';
 import { getFreshPosition, requestLocationPermission, useUserLocation } from '@/hooks/useLocation';
+import { rememberPauseFromError, useDriverQuality, useQualityPause } from '@/hooks/useQuality';
 import { useActiveRide, useDriverState, useGoOffline, useGoOnline } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
 import { isSubscriptionOverdue, refreshSubscription, useSubscription, useWallet } from '@/hooks/useWallet';
@@ -109,6 +111,11 @@ export function DriverDashboard() {
   // offline by the server when their ride ends (driver.paused).
   const pausedNotice = serviceNotice(useBootstrap().data);
   const paused = !!pausedNotice && !online && !suspended;
+  // Doc 15: a temporary pause for too many cancellations or declined offers (the server takes the driver
+  // offline). The quality panel tells after a restart; going online refused or `quality.paused` right away.
+  useDriverQuality();
+  const qualityPause = useQualityPause('driver');
+  const qualityPaused = !!qualityPause && !online && !suspended;
 
   // Android keeps sharing the position with the app minimized: Google Play requires saying so, and the
   // driver's explicit OK is recorded once (doc 07).
@@ -149,6 +156,11 @@ export function DriverDashboard() {
     } catch (error) {
       if (handleSuspended(error)) {
         // 403 account_suspended: the suspension panel replaces the button.
+        heavyHaptic();
+        return;
+      }
+      if (rememberPauseFromError('driver', error)) {
+        // 403 temporarily_paused: the pause panel shows the countdown.
         heavyHaptic();
         return;
       }
@@ -216,6 +228,8 @@ export function DriverDashboard() {
         <>
           {suspended && suspension ? (
             <SuspendedPanel suspension={suspension} variant="driver" />
+          ) : qualityPaused && qualityPause ? (
+            <PausePanel pause={qualityPause} variant="driver" />
           ) : paused && pausedNotice ? (
             <ServicePausedPanel notice={pausedNotice} variant="driver" />
           ) : blocked && !online ? (
@@ -268,8 +282,8 @@ export function DriverDashboard() {
               size="lg"
               icon={Power}
               loading={locating || goOnline.isPending}
-              disabled={paused}
-              accessibilityHint={paused ? t('control.pause.driverHint') : undefined}
+              disabled={paused || qualityPaused}
+              accessibilityHint={qualityPaused ? t('quality.pause.driverBody') : paused ? t('control.pause.driverHint') : undefined}
               onPress={() => void connect()}
             />
           )}

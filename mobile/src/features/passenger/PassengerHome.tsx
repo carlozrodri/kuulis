@@ -10,12 +10,14 @@ import { Button, Card, IconTile, ListRow, Notice, Txt, Wordmark } from '@/compon
 import { SuspendedPanel } from '@/features/account/SuspendedPanel';
 import { AnnouncementBanners } from '@/features/control/AnnouncementBanners';
 import { ServicePausedPanel } from '@/features/control/ServicePausedPanel';
+import { PausePanel } from '@/features/quality/PausePanel';
 import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
 import { rideDraft, setDraftPlace } from '@/features/ride/store';
 import { useCurrentPickup } from '@/features/ride/useCurrentPickup';
 import { useBootstrap } from '@/hooks/useBootstrap';
 import { useUserLocation } from '@/hooks/useLocation';
+import { useQualityPause } from '@/hooks/useQuality';
 import { useActiveRide, useRideHistory } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
 import { api } from '@/lib/api';
@@ -65,6 +67,8 @@ export function PassengerHome() {
   const recents = useRecentDestinations();
   const { suspension } = useSuspension();
   const paused = pauseNotice(useBootstrap().data);
+  // Doc 15: paused for not showing up at pickups (learned from a refused request or `quality.paused`).
+  const qualityPause = useQualityPause('passenger');
   useCurrentPickup();
 
   useEffect(() => {
@@ -113,6 +117,8 @@ export function PassengerHome() {
       ) : suspension ? (
         // Suspended: no ride requests (the API answers 403 account_suspended); a ride in progress still shows.
         <SuspendedPanel suspension={suspension} variant="passenger" />
+      ) : qualityPause ? (
+        <PausePanel pause={qualityPause} variant="passenger" />
       ) : paused ? (
         // New rides paused in this city (doc 10): the reason replaces "¿A dónde vamos?".
         <ServicePausedPanel notice={paused} variant="passenger" />
@@ -137,7 +143,7 @@ export function PassengerHome() {
 
       {permission !== 'granted' && !suspension ? <LocationPrompt /> : null}
 
-      {!activeRide && !suspension && !paused && recents.length ? (
+      {!activeRide && !suspension && !qualityPause && !paused && recents.length ? (
         <View>
           {recents.map((place, index) => (
             <ListRow

@@ -71,7 +71,8 @@ export function campaignNotificationId(payload: unknown): string | null {
 export const needsPendingRating = (payload: unknown) =>
   notificationType(payload) === 'ride' && notificationEvent(payload) === 'completed';
 
-const PASSENGER_RIDE_EVENTS = new Set(['assigned', 'arrived', 'cancelled_by_driver', 'no_drivers']);
+// Doc 15: "reassigning" (the driver cancelled, looking for another) and "no_show" are passenger events too.
+const PASSENGER_RIDE_EVENTS = new Set(['assigned', 'arrived', 'cancelled_by_driver', 'no_drivers', 'reassigning', 'no_show']);
 const DRIVER_RIDE_EVENTS = new Set(['offer', 'cancelled_by_passenger']);
 const FEE_TO_PAY = new Set(['fee_pending', 'fee_due_soon', 'fee_overdue']);
 
@@ -137,6 +138,11 @@ export function hrefForNotification(payload: unknown, context: NotificationConte
         ? { kind: 'route', href: { pathname: '/drive', params: { id: rideId } } }
         : { kind: 'route', href: { pathname: '/ride', params: { id: rideId } } };
     }
+    case 'quality': {
+      // Doc 15: a pause or a warning about the rates. Drivers see "Mi calidad"; a paused passenger, home.
+      const role = str(fields, 'role') ?? context.role;
+      return role === 'driver' ? { kind: 'route', href: '/driver/quality', mode: 'driver' } : { kind: 'route', href: '/' };
+    }
     case 'driver_status':
     case 'driver_document':
       // Driver home shows the application or the documents that need something.
@@ -161,6 +167,7 @@ export type NotificationKind =
   | 'account'
   | 'documents'
   | 'referral'
+  | 'quality'
   | 'general';
 
 export function notificationKind(payload: unknown, category?: string | null): NotificationKind {
@@ -173,6 +180,7 @@ export function notificationKind(payload: unknown, category?: string | null): No
   if (type?.startsWith('subscription')) return 'subscription';
   if (type?.startsWith('driver_')) return 'documents';
   if (type === 'referral') return 'referral';
+  if (type === 'quality') return 'quality';
   if (type?.startsWith('account')) return 'account';
   return 'general';
 }

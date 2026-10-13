@@ -7,6 +7,7 @@ import {
   Bike,
   ChevronRight,
   FileText,
+  Gauge,
   Gift,
   Hourglass,
   LockKeyhole,
@@ -18,7 +19,9 @@ import { Button, Card, IconTile, ListRow, Skeleton, StatusPill, type Tone, Txt }
 import { PlateBadge } from '@/features/ride/components';
 import { useWalletFormat } from '@/features/wallet/format';
 import { useAppConfig } from '@/hooks/useDriver';
+import { useDriverQuality, useQualityPause } from '@/hooks/useQuality';
 import { useSubscription, useWallet } from '@/hooks/useWallet';
+import { formatPercent, LEVEL_TONE } from '@/lib/quality';
 import { formatFare } from '@/lib/ride';
 import type { DriverProfile as Driver, DriverStats } from '@/lib/types';
 import { documentBadge, myDocuments, needsAttention } from '@/lib/verification';
@@ -117,6 +120,7 @@ export function DriverProfile({
             divider
             onPress={() => router.push('/rides')}
           />
+          <QualityRow />
           <ListRow
             icon={Gift}
             iconTone="accent"
@@ -127,6 +131,30 @@ export function DriverProfile({
         </Card>
       </Section>
     </>
+  );
+}
+
+/** Doc 15: "Mi calidad", with the acceptance and cancellation rates at a glance. */
+function QualityRow() {
+  const { t } = useTranslation();
+  const quality = useDriverQuality().data;
+  const pause = useQualityPause('driver');
+  const tone: Tone = pause ? 'warning' : quality ? LEVEL_TONE[quality.level] : 'primary';
+  const subtitle = pause
+    ? t('quality.profile.paused')
+    : quality
+      ? t('quality.profile.hint', { acceptance: formatPercent(quality.acceptance_rate), cancellation: formatPercent(quality.cancel_rate) })
+      : t('quality.profile.hintLoading');
+  return (
+    <ListRow
+      icon={Gauge}
+      iconTone={tone}
+      title={t('quality.title')}
+      subtitle={subtitle}
+      right={quality && quality.level !== 'ok' ? <StatusPill label={t(`quality.level.${quality.level}.pill`)} tone={tone} /> : undefined}
+      divider
+      onPress={() => router.push('/driver/quality')}
+    />
   );
 }
 

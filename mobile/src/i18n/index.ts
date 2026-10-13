@@ -4,6 +4,8 @@ import { initReactI18next } from 'react-i18next';
 
 import { ApiError, setApiLocale } from '@/lib/api';
 import { formatEta, localize, type Notice, parseNotice } from '@/lib/bootstrap';
+import { pauseFromError } from '@/lib/quality';
+import { suspensionEnd } from '@/lib/suspension';
 import en from './locales/en.json';
 import es from './locales/es.json';
 
@@ -43,6 +45,16 @@ export function noticeText(notice: Notice, language: string = i18n.language): st
   return eta ? `${message} ${i18n.t('control.etaSentence', { time: eta })}` : message;
 }
 
+/** When a quality pause ends (doc 15): "hasta las 3:45 p. m." today, else "hasta el 15 de octubre a las 3:45 p. m.". */
+export function pauseUntilText(until: string, language: string = i18n.language, now: Date = new Date()): string {
+  const end = suspensionEnd({ until }, now);
+  if (end.kind === 'indefinite') return '';
+  const time = end.date.toLocaleTimeString(language, { hour: 'numeric', minute: '2-digit' });
+  if (end.sameDay) return i18n.t('quality.pause.untilToday', { time });
+  const date = end.date.toLocaleDateString(language, { day: 'numeric', month: 'long' });
+  return i18n.t('quality.pause.untilDate', { date, time });
+}
+
 /**
  * Human message for any error thrown by `api()`. The API does not localize messages, so we translate by
  * error code (with `details` such as {min_year} as interpolation values), falling back to its message.
@@ -52,6 +64,10 @@ export function apiErrorMessage(error: unknown): string {
     if (error.code === 'service_paused') {
       const notice = parseNotice(error.details);
       if (notice) return noticeText(notice);
+    }
+    if (error.code === 'temporarily_paused') {
+      const pause = pauseFromError(error);
+      return pause ? i18n.t('errors.temporarily_paused', { until: pauseUntilText(pause.until) }) : i18n.t('quality.pause.generic');
     }
     if (i18n.exists(`errors.${error.code}`)) {
       const values = error.details && typeof error.details === 'object' && !Array.isArray(error.details) ? error.details : {};

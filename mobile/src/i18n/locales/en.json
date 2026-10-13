@@ -706,7 +706,10 @@
     "lost_item_not_found": "There is no lost item on this ride.",
     "lost_item_exists": "You already reported an item on this ride.",
     "lost_item_too_late": "It's too late to let the driver know. Write to us and we'll help.",
-    "lost_item_answered": "You already answered about this item."
+    "lost_item_answered": "You already answered about this item.",
+    "temporarily_paused": "Your account is paused {{until}}.",
+    "no_show_too_early": "The waiting time isn't over yet.",
+    "cancel_reason_invalid": "That reason doesn't apply to this ride. Pick another one."
   },
   "map": {
     "recenter": "Recenter map"
@@ -863,29 +866,72 @@
       "arrived": "Your driver is at the pickup point",
       "driverCancelled": "Your driver cancelled the ride",
       "noDrivers": "No drivers available",
-      "adminCancelled": "The Kuulis team cancelled the ride"
+      "adminCancelled": "The Kuulis team cancelled the ride",
+      "reassigning": "Your driver cancelled. Finding another driver…",
+      "noShow": "Your driver waited and you didn't come"
     },
     "adminCancelled": {
       "title": "Kuulis cancelled this ride",
       "body": "Our support team cancelled the ride. If you still need it, you can request another moto right now."
     },
-    "reportProblem": "Report a problem"
+    "reportProblem": "Report a problem",
+    "reassigning": {
+      "title": "Finding another driver",
+      "notice": "Your driver cancelled. Finding another driver…",
+      "body": "Your ride is still on, same price. We'll let you know as soon as another driver accepts."
+    },
+    "waiting": {
+      "label": "Your driver is waiting",
+      "a11y": "Your driver is waiting: {{time}}",
+      "over": "The waiting time is over. Head to the pickup point or the ride may be cancelled."
+    },
+    "noShow": {
+      "title": "Your driver waited and you didn't come",
+      "body": "The ride was cancelled because you didn't reach the pickup point in time.",
+      "warning": "If it happens several times, your account may be paused for a while.",
+      "retry": "Request another ride"
+    }
   },
   "cancel": {
     "title": "Why are you cancelling?",
-    "subtitlePassenger": "Your answer helps us improve.",
-    "subtitleDriver": "Cancelling often affects your reputation. Tell us what happened.",
     "reasonLabel": "Cancellation reason: {{reason}}",
     "reason": {
       "wait_too_long": "The wait is too long",
       "driver_not_moving": "The driver isn't moving",
-      "changed_plans": "My plans changed",
-      "wrong_pickup": "The pickup point is wrong",
+      "changed_plans": "I changed my plans",
+      "wrong_pickup": "I entered the wrong address",
       "passenger_no_show": "The passenger didn't show up",
       "unsafe_location": "The area isn't safe",
       "vehicle_problem": "Problem with the motorcycle",
-      "other": "Other reason"
-    }
+      "other": "Other reason",
+      "driver_late": "It took too long",
+      "driver_asked": "The driver asked me to cancel",
+      "vehicle_mismatch": "The motorcycle doesn't match",
+      "wrong_address": "Wrong address",
+      "no_helmet": "Passenger has no helmet",
+      "safety_concern": "I don't feel safe",
+      "no_show": "Passenger didn't show up"
+    },
+    "searchingTitle": "Cancel the search?",
+    "subtitle": {
+      "passenger": "Your answer helps us improve the service.",
+      "searching": "If you like, tell us why.",
+      "driver": "Pick the reason. We will find the passenger another driver right away."
+    },
+    "hint": {
+      "vehicle_mismatch": "We open a report to look into it. It doesn't count against you.",
+      "safety_concern": "It doesn't count toward your cancellation rate."
+    },
+    "details": "Tell us more (optional)",
+    "detailsOther": "What happened? (optional)",
+    "detailsPlaceholder": "Type here…",
+    "countsWarning": "Cancelling many times can pause your account.",
+    "freeFor": "You can cancel without it counting for {{time}}",
+    "driverNote": "Cancelling counts toward your cancellation rate. If you cancel often you will get fewer rides.",
+    "pickReason": "Pick a reason to continue",
+    "keepSearching": "Keep searching",
+    "keepRide": "Keep the ride",
+    "keepDriving": "Back to the ride"
   },
   "safety": {
     "title": "Your safety",
@@ -1108,6 +1154,22 @@
       "creditedToast": "Kuulis credited {{discount}} to your wallet for the promotion",
       "creditedTitle": "+ {{discount}} in your wallet",
       "creditedBody": "The passenger used the {{name}} promotion and paid you {{total}}. Kuulis refunds you the discount."
+    },
+    "cancel": {
+      "done": "Ride cancelled. We're finding the passenger another driver."
+    },
+    "wait": {
+      "label": "Waiting for the passenger",
+      "a11y": "You have been waiting {{time}} for the passenger",
+      "hint": "Let them know in the chat that you arrived.",
+      "left": "You can mark “No-show” in {{time}}",
+      "over": "If {{name}} doesn't show up, you can mark it as a no-show."
+    },
+    "noShow": {
+      "button": "No-show",
+      "confirmTitle": "{{name}} didn't show up?",
+      "confirmBody": "The ride is cancelled and doesn't count toward your cancellation rate.",
+      "done": "Done. The ride was cancelled and doesn't count against you."
     }
   },
   "money": {
@@ -1983,6 +2045,105 @@
         "has_it": "You answered that you have it. The chat has closed.",
         "not_found": "You answered that you don't have it. Thanks for checking."
       }
+    }
+  },
+  "quality": {
+    "title": "My quality",
+    "subtitle": "Your numbers for the last {{days}} days and how they are calculated.",
+    "subtitleLoading": "Your acceptance and cancellation rates and your rating.",
+    "level": {
+      "ok": {
+        "pill": "All good",
+        "title": "You're doing great",
+        "body": "You get rides as usual. Keep accepting and completing your rides."
+      },
+      "warn": {
+        "pill": "Heads up",
+        "title": "Watch your cancellations",
+        "body": "You cancel more than {{warn}} of the rides you accept. At {{low}} you will get fewer rides."
+      },
+      "low_priority": {
+        "pill": "Fewer rides",
+        "title": "You're getting fewer rides",
+        "body": "For now rides go to other drivers first. Once you are below {{low}} things go back to normal."
+      },
+      "review": {
+        "pill": "Under review",
+        "title": "Your account is under review",
+        "body": "Our team will review your account. If you have questions, write to us from Help and reports."
+      }
+    },
+    "reasonsLabel": "Because of:",
+    "reason": {
+      "cancel_rate": "Cancellations",
+      "rating": "Rating",
+      "no_shows": "No-shows"
+    },
+    "metric": {
+      "acceptance": "Acceptance",
+      "acceptanceDetail_one": "{{accepted}} of {{count}} offer",
+      "acceptanceDetail_other": "{{accepted}} of {{count}} offers",
+      "cancellation": "Cancellation",
+      "cancellationDetail_one": "{{cancels}} of {{count}} accepted ride",
+      "cancellationDetail_other": "{{cancels}} of {{count}} accepted rides",
+      "rating": "Rating",
+      "ratingDetail_one": "{{count}} rating",
+      "ratingDetail_other": "{{count}} ratings",
+      "noRatings": "No ratings yet",
+      "rides": "Rides",
+      "ridesDetail_one": "{{count}} completed",
+      "ridesDetail_other": "{{count}} completed"
+    },
+    "meter": {
+      "title": "Your cancellation rate",
+      "a11y": "Cancellation rate {{rate}}. We warn you from {{warn}} and from {{low}} you get fewer rides.",
+      "legend": "From {{warn}} we warn you; from {{low}} you get fewer rides.",
+      "notYet": "We measure it from {{min}} accepted rides. You have {{count}}."
+    },
+    "rules": {
+      "title": "How it works",
+      "cancelTitle": "Cancellations",
+      "cancelBody": "If you cancel more than {{warn}} of the rides you accept in {{days}} days we warn you; from {{low}} you get fewer rides and from {{review}} we review your account. We start measuring after {{min}} accepted rides.",
+      "pauseTitle": "Automatic disconnections",
+      "pause": {
+        "both": "If you decline {{declines}} offers in a row or cancel {{cancels}} rides within an hour, we disconnect you for {{minutes}} minutes.",
+        "declines": "If you decline {{declines}} offers in a row, we disconnect you for {{minutes}} minutes.",
+        "cancels": "If you cancel {{cancels}} rides within an hour, we disconnect you for {{minutes}} minutes.",
+        "none": "For now nobody is disconnected automatically."
+      },
+      "waitTitle": "Waiting at the pickup",
+      "waitBody": "When you arrive, wait {{minutes}} minutes for the passenger. If they don't show up, tap “No-show”: the ride is cancelled and doesn't count against you.",
+      "ratingTitle": "Rating",
+      "ratingBody": "If your average drops below {{min}} (with at least {{count}} ratings) we review your account.",
+      "safetyTitle": "Your safety first",
+      "safetyBody": "Cancelling with “I don't feel safe” doesn't count toward your rate. We find the passenger another driver."
+    },
+    "pause": {
+      "driverTitle": "Temporary pause",
+      "driverBody": "We disconnected you for a moment so passengers don't have to wait.",
+      "countdownLabel": "You can go online in",
+      "countdownA11y": "We disconnected you for a moment so passengers don't have to wait. You can go online in {{time}}",
+      "passengerTitle": "Your account is paused",
+      "passengerBody": "You can't request rides for now.",
+      "untilLabel": "You can request again",
+      "passengerHint": "When the pause ends you can request rides as usual.",
+      "why": "Why",
+      "reason": {
+        "cancel_burst": "You cancelled several rides in a short time.",
+        "decline_streak": "You declined several offers in a row.",
+        "no_shows": "Several drivers waited for you and you didn't come to the pickup point."
+      },
+      "seeQuality": "See my quality",
+      "untilToday": "until {{time}}",
+      "untilDate": "until {{date}} at {{time}}",
+      "generic": "Your account is paused for a moment. Please try again later.",
+      "toast": "You were disconnected for a moment. Home shows when you can go back online.",
+      "liftedToast": "You can go online again."
+    },
+    "profile": {
+      "hint": "Acceptance {{acceptance}} · Cancellation {{cancellation}}",
+      "hintLoading": "Your rates and how to improve them",
+      "paused": "Paused: you can go online soon"
     }
   }
 }

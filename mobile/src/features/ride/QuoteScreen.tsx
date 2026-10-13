@@ -12,8 +12,10 @@ import { showToast } from '@/components/Toast';
 import { Button, Card, IconButton, Notice, Skeleton, Txt } from '@/components/ui';
 import { SuspendedPanel } from '@/features/account/SuspendedPanel';
 import { ServicePausedPanel } from '@/features/control/ServicePausedPanel';
+import { PausePanel } from '@/features/quality/PausePanel';
 import { useBootstrap, useFlag } from '@/hooks/useBootstrap';
 import { useAppConfig } from '@/hooks/useDriver';
+import { rememberPauseFromError, useQualityPause } from '@/hooks/useQuality';
 import { fetchQuote, quoteKey, rideKeys, useQuote, useRequestRide } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
 import { apiErrorMessage } from '@/i18n';
@@ -21,6 +23,7 @@ import { ApiError } from '@/lib/api';
 import { confirmHaptic, selectionHaptic } from '@/lib/feedback';
 import { pauseNotice } from '@/lib/bootstrap';
 import { amountToPay, hasDiscount, normalizePromoCode, promotionInvalidReason } from '@/lib/money';
+import { activePause, pauseFromError } from '@/lib/quality';
 import {
   decodePolyline,
   DEFAULT_PAYMENT_METHODS,
@@ -56,7 +59,9 @@ export function QuoteScreen() {
   const paused = pauseNotice(useBootstrap().data);
   const promotionsOn = useFlag('promotions');
   const promoCode = promotionsOn ? draft.promoCode : null;
-  const quote = useQuote(draft.pickup, draft.dropoff, 'moto', promoCode, !paused);
+  // Doc 15: a passenger paused for no-shows cannot request rides until the pause ends.
+  const qualityPause = useQualityPause('passenger');
+  const quote = useQuote(draft.pickup, draft.dropoff, 'moto', promoCode, !paused && !qualityPause);
   const request = useRequestRide();
   const [now, setNow] = useState(() => Date.now());
   const { suspension, handleError: handleSuspended } = useSuspension();
@@ -113,6 +118,11 @@ export function QuoteScreen() {
     handleSuspended(quote.error);
   }, [quote.error, handleSuspended]);
 
+  // 403 temporarily_paused on the quote: remembered so home shows the pause too.
+  useEffect(() => {
+    rememberPauseFromError('passenger', quote.error);
+  }, [quote.error]);
+
   const route = useMemo(() => decodePolyline(quote.data?.polyline), [quote.data?.polyline]);
 
   const submit = async () => {
@@ -127,6 +137,7 @@ export function QuoteScreen() {
       router.replace({ pathname: '/ride', params: { id: ride.id } });
     } catch (error) {
       if (handleSuspended(error)) return;
+      if (rememberPauseFromError('passenger', error)) return;
       if (error instanceof ApiError) {
         if (error.code === 'quote_expired') {
           await quote.refetch();
@@ -158,6 +169,8 @@ export function QuoteScreen() {
   const outside = quoteError instanceof ApiError && quoteError.code === 'outside_service_area';
   // Suspended accounts cannot request rides: the suspension replaces the price and the request button.
   const suspendedBy = suspension ?? suspensionFromError(quoteError) ?? suspensionFromError(request.error);
+  const pausedBy = qualityPause ?? activePause(pauseFromError(quoteError));
+  const blocked = !!suspendedBy || !!pausedBy || !!paused;
 
   return (
     <MapSheetLayout
@@ -178,7 +191,7 @@ export function QuoteScreen() {
         </View>
       }
       footer={
-        suspendedBy || paused ? (
+        blocked ? (
           <Button title={t('ride.backHome')} variant="secondary" onPress={() => router.dismissTo('/')} />
         ) : quoteError ? (
           <Button title={t('quote.changeDestination')} variant="secondary" onPress={() => router.back()} />
@@ -203,6 +216,8 @@ export function QuoteScreen() {
 
       {suspendedBy ? (
         <SuspendedPanel suspension={suspendedBy} variant="passenger" />
+      ) : pausedBy ? (
+        <PausePanel pause={pausedBy} variant="passenger" />
       ) : paused ? (
         <ServicePausedPanel notice={paused} variant="passenger" />
       ) : quoteError ? (
@@ -283,7 +298,7 @@ export function QuoteScreen() {
         </Card>
       )}
 
-      {!quoteError && !suspendedBy && !paused && quote.data ? (
+      {!quoteError && !blocked && quote.data ? (
         <>
           {discounted || draft.promoCode ? (
             <PromotionBanner
@@ -302,7 +317,7 @@ export function QuoteScreen() {
         </>
       ) : null}
 
-      {!quoteError && !suspendedBy && !paused ? (
+      {!quoteError && !blocked ? (
         <View style={{ gap: space.xs }}>
           <Txt variant="overline" color="muted">
             {t('ride.paymentMethod')}

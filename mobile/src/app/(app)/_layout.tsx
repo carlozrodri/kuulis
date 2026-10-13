@@ -9,6 +9,7 @@ import { DriverController, RideNavigator, RideSync } from '@/features/ride/RideC
 import { SafetyController } from '@/features/safety/SafetyController';
 import { UpdateGate } from '@/features/update/UpdateGate';
 import { BootstrapSync } from '@/hooks/useBootstrap';
+import { QualitySync } from '@/hooks/useQuality';
 import { RealtimeProvider } from '@/hooks/useRealtime';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
@@ -67,6 +68,8 @@ export default function AppLayout() {
         {/* Remote control (doc 10): maintenance, city pauses, feature flags, banners and remote settings. */}
         <BootstrapSync />
         <RideSync />
+        {/* Doc 15: temporary pauses for quality (quality.paused) and "Mi calidad" refreshes. */}
+        <QualitySync />
         <RideNavigator />
         {/* Doc 14: tapping a push (also the one that started the app) opens its screen. */}
         <NotificationOpener />

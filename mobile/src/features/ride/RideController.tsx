@@ -25,7 +25,7 @@ import { api } from '@/lib/api';
 import { setBackgroundLocation } from '@/lib/backgroundLocation';
 import { locationIntervalMs } from '@/lib/bootstrap';
 import { confirmHaptic, heavyHaptic, preloadRideSounds, tick } from '@/lib/feedback';
-import { isActiveStatus, rideRole, rideRoleStrict } from '@/lib/ride';
+import { isActiveStatus, isNoShow, isReassigning, rideRole, rideRoleStrict } from '@/lib/ride';
 import type { DriverLocationEvent, DriverState, Offer, Ride, RideMessage } from '@/lib/types';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
@@ -75,7 +75,11 @@ export function RideSync() {
     if (before === ride.status) return;
     const role = rideRole(ride, user?.id, modeRef.current ?? 'passenger');
     if (role === 'passenger') {
-      if (ride.status === 'driver_assigned') {
+      if (isReassigning(ride)) {
+        // Doc 15: the driver cancelled; the same ride is already looking for another one.
+        heavyHaptic();
+        showToast(t('ride.toast.reassigning'), 'danger');
+      } else if (ride.status === 'driver_assigned') {
         confirmHaptic();
         showToast(t('ride.toast.assigned', { name: ride.driver?.first_name ?? '' }), 'success');
       } else if (ride.status === 'driver_arrived') {
@@ -83,7 +87,7 @@ export function RideSync() {
         showToast(t('ride.toast.arrived'), 'success');
       } else if (ride.status === 'cancelled_by_driver') {
         heavyHaptic();
-        showToast(t('ride.toast.driverCancelled'), 'danger');
+        showToast(isNoShow(ride) ? t('ride.toast.noShow') : t('ride.toast.driverCancelled'), 'danger');
       } else if (ride.status === 'cancelled_by_admin') {
         heavyHaptic();
         showToast(t('ride.toast.adminCancelled'), 'danger');

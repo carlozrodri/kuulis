@@ -4,6 +4,7 @@ import { routedRides } from '@/features/ride/store';
 import { ApiError, api } from '@/lib/api';
 import { isActiveStatus, isTerminalStatus, mergeRide } from '@/lib/ride';
 import type {
+  CancelRideInput,
   DriverState,
   DriverStats,
   GeoResult,
@@ -310,8 +311,12 @@ export async function requestAgain(ride: Ride, attempt = 0): Promise<Ride> {
 export function useCancelRide() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
-      api<Ride>(`/rides/${id}/cancel`, { method: 'POST', body: reason ? { reason } : {} }),
+    // Doc 15: `reason_code` from the cancel sheet, `reason` the optional free text.
+    mutationFn: ({ id, reason_code, reason }: { id: string } & CancelRideInput) =>
+      api<Ride>(`/rides/${id}/cancel`, {
+        method: 'POST',
+        body: { ...(reason_code ? { reason_code } : {}), ...(reason?.trim() ? { reason: reason.trim() } : {}) },
+      }),
     onSuccess: (ride) => applyRide(queryClient, ride),
     onError: () => void queryClient.invalidateQueries({ queryKey: rideKeys.all }),
   });

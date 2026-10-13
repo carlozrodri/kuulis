@@ -150,10 +150,15 @@ export function RideDetailScreen() {
         options={rideHelpOptions(ride, role, config).map((option) => helpOption(option, ride, role, t, !!lostItem.data))}
         onClose={() => setHelpOpen(false)}
       />
-      {ride.cancel_reason ? (
+      {ride.cancel_reason_code || ride.cancel_reason ? (
         <Txt variant="caption" color="muted">
           {t('cancel.reasonLabel', {
-            reason: t(`cancel.reason.${ride.cancel_reason}`, { defaultValue: ride.cancel_reason }),
+            // Doc 15: the code says why; older rides kept a code (or free text) in `cancel_reason`.
+            reason: ride.cancel_reason_code
+              ? [t(`cancel.reason.${ride.cancel_reason_code}`, { defaultValue: ride.cancel_reason_code }), ride.cancel_reason]
+                  .filter(Boolean)
+                  .join(': ')
+              : t(`cancel.reason.${ride.cancel_reason}`, { defaultValue: ride.cancel_reason }),
           })}
         </Txt>
       ) : null}

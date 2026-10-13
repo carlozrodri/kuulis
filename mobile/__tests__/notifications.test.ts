@@ -75,6 +75,28 @@ describe('hrefForNotification: rides', () => {
   });
 });
 
+describe('hrefForNotification: quality (doc 15)', () => {
+  it('opens Mi calidad for drivers and home for a paused passenger', () => {
+    expect(hrefForNotification({ type: 'quality', event: 'paused', role: 'driver' }, passenger)).toEqual(
+      route('/driver/quality', 'driver'),
+    );
+    expect(hrefForNotification({ type: 'quality', event: 'warn', role: 'driver' }, driver)).toEqual(route('/driver/quality', 'driver'));
+    expect(hrefForNotification({ type: 'quality', event: 'paused', role: 'passenger' }, driver)).toEqual(route('/'));
+    // Without a role: the mode decides.
+    expect(hrefForNotification({ type: 'quality' }, driver)).toEqual(route('/driver/quality', 'driver'));
+    expect(hrefForNotification({ type: 'quality' }, passenger)).toEqual(route('/'));
+    expect(notificationKind({ type: 'quality', event: 'low_priority' })).toBe('quality');
+  });
+
+  it('opens the passenger ride screen when the driver cancelled or the passenger did not show up', () => {
+    for (const event of ['reassigning', 'no_show']) {
+      expect(hrefForNotification({ type: 'ride', event, ride_id: 'r1' }, driver)).toEqual(
+        route({ pathname: '/ride', params: { id: 'r1' } }),
+      );
+    }
+  });
+});
+
 describe('hrefForNotification: account and money', () => {
   it('routes wallet pushes to the wallet', () => {
     for (const event of ['top_up_credited', 'top_up_rejected', 'transfer_received', 'adjustment', 'promo_credit']) {

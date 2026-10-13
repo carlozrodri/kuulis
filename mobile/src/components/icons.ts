@@ -127,3 +127,5 @@ export { default as Paperclip } from 'lucide-react-native/icons/paperclip';
 export { default as MessagesSquare } from 'lucide-react-native/icons/messages-square';
 export { default as BookOpen } from 'lucide-react-native/icons/book-open';
 export { default as PackageSearch } from 'lucide-react-native/icons/package-search';
+export { default as Timer } from 'lucide-react-native/icons/timer';
+export { default as Percent } from 'lucide-react-native/icons/percent';
