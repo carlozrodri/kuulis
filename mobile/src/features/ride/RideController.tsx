@@ -151,8 +151,10 @@ export function RideNavigator() {
     };
 
     if (pending.data) {
-      // "¿Algo salió mal? Repórtalo" opens the report flow on top of the rating; it comes back to it.
-      if (pathname !== '/ride/rate' && !pathname.startsWith('/report')) go('/ride/rate');
+      // "¿Algo salió mal? Repórtalo", help, a lost item and its chat open on top of the rating; they
+      // come back to it.
+      const help = ['/report', '/help', '/ride/lost-item', '/ride/chat'].some((p) => pathname.startsWith(p));
+      if (pathname !== '/ride/rate' && !help) go('/ride/rate');
       return;
     }
     const ride = active.data;

@@ -214,6 +214,26 @@ class SafetySettings(BaseModel):
         return now >= start or now < end
 
 
+class SupportSettings(BaseModel):
+    """Support tickets (doc 13): response times, auto-close and how new tickets are assigned."""
+
+    # Time to the team's answer, measured while the ticket waits on the team. Overdue tickets
+    # are flagged in the admin; urgent ones also alert the team (03).
+    sla_urgent_minutes: int = Field(default=15, ge=1, le=24 * 60)
+    sla_normal_hours: int = Field(default=24, ge=1, le=24 * 14)
+    # What the app and the web promise ("Respondemos en menos de 24 h"); empty hides it.
+    response_promise_es: str = Field(default="Respondemos en menos de 24 horas.", max_length=120)
+    response_promise_en: str = Field(default="We answer within 24 hours.", max_length=120)
+    # A ticket waiting on the user this many days is closed (the user can still reply then).
+    auto_close_days: int = Field(default=7, ge=1, le=60)
+    # New tickets go to the staff member with support permission and the fewest open tickets.
+    auto_assign: bool = False
+    # Lost items: the passenger can ask up to this many days after the ride; the chat with the
+    # driver stays open this many hours after "Lo tengo".
+    lost_item_days: int = Field(default=7, ge=1, le=30)
+    lost_item_chat_hours: int = Field(default=72, ge=1, le=24 * 14)
+
+
 class VerificationSettings(BaseModel):
     """Ongoing driver verification (doc 12): expiring documents, the random live selfie,
     re-verification after reports and the optional induction."""
@@ -350,6 +370,9 @@ class AppConfig(BaseModel):
     # --- Driver verification (doc 12) -----------------------------------------------------------
     verification: VerificationSettings = Field(default_factory=VerificationSettings)
 
+    # --- Support (doc 13) -------------------------------------------------------------------------
+    support: SupportSettings = Field(default_factory=SupportSettings)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -422,6 +445,7 @@ class AppConfigUpdate(BaseModel):
     location_intervals: LocationIntervals | None = None
     safety: SafetySettings | None = None
     verification: VerificationSettings | None = None
+    support: SupportSettings | None = None
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

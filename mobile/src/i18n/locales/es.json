@@ -125,8 +125,8 @@
     "language": "Idioma",
     "version": "Versión",
     "mode": "Modo de uso",
-    "help": "Ayuda y reportes",
-    "helpHint": "Reporta un problema y sigue tus reportes",
+    "help": "Ayuda",
+    "helpHint": "Preguntas frecuentes y tus conversaciones con soporte",
     "noName": "Tu perfil",
     "verifiedShort": "Verificado",
     "since": "Desde {{date}}",
@@ -647,7 +647,16 @@
     "vehicle_change_pending": "Ya tienes un cambio de moto en revisión.",
     "vehicle_same_plate": "Esa es la moto que ya usas. Escribe la placa de la moto nueva.",
     "vehicle_change_not_found": "No tienes un cambio de moto en revisión.",
-    "document_not_found": "No encontramos ese documento. Actualiza la pantalla."
+    "document_not_found": "No encontramos ese documento. Actualiza la pantalla.",
+    "report_closed": "Esta conversación está cerrada. Inicia una nueva si necesitas ayuda.",
+    "report_not_closed": "Podrás calificar cuando cerremos la conversación.",
+    "csat_already_given": "Ya calificaste esta conversación.",
+    "attachment_invalid": "No pudimos adjuntar esa foto. Elige otra.",
+    "help_article_not_found": "Ese artículo ya no está disponible.",
+    "lost_item_not_found": "No hay un objeto olvidado en este viaje.",
+    "lost_item_exists": "Ya avisaste por un objeto en este viaje.",
+    "lost_item_too_late": "Ya pasó el tiempo para avisar al motorizado. Escríbenos y te ayudamos.",
+    "lost_item_answered": "Ya respondiste por este objeto."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -1365,7 +1374,7 @@
     "sentTitle": "Recibimos tu reporte",
     "sentBody": "El equipo de Kuulis lo va a revisar y te avisaremos cuando tengamos una respuesta.",
     "sentBodyUrgent": "Lo estamos tratando como urgente. Si estás en peligro ahora mismo, llama al {{number}}.",
-    "viewReport": "Ver mi reporte",
+    "viewReport": "Ver la conversación",
     "alreadyOpen": {
       "title": "Ya reportaste este viaje",
       "body": "Tu reporte sigue abierto y el equipo lo está atendiendo. Puedes ver su estado.",
@@ -1379,19 +1388,23 @@
       "title": "No se puede reportar este viaje",
       "general": "Hacer un reporte general"
     },
-    "noDriver": "Este viaje no tuvo motorizado asignado. Si algo falló, haz un reporte general."
+    "noDriver": "Este viaje no tuvo motorizado asignado. Si algo falló, haz un reporte general.",
+    "fare": {
+      "title": "Precio fijado por la app",
+      "body": "Es el precio que la app fijó al pedir el viaje. Cuéntanos cuánto te cobraron o pagaste y qué pasó."
+    }
   },
   "reports": {
-    "title": "Ayuda y reportes",
-    "subtitle": "Cuéntanos si algo salió mal y sigue aquí la respuesta del equipo.",
-    "new": "Reportar un problema",
-    "newHint": "De la app, un objeto olvidado u otra cosa",
-    "rideHint": "Para un viaje, ábrelo en Tus viajes y toca «Reportar un problema».",
+    "title": "Mis conversaciones",
+    "subtitle": "Escríbele al equipo de Kuulis y sigue aquí sus respuestas.",
+    "new": "Nueva conversación",
+    "newHint": "Cuéntanos qué pasó: la app, un cobro, un objeto olvidado…",
+    "rideHint": "Para un viaje, ábrelo en Tus viajes y toca «Necesito ayuda con este viaje».",
     "emergency": "¿Estás en peligro?",
     "emergencyHint": "Llama al {{number}}, la línea de emergencias de Venezuela",
-    "mine": "Mis reportes",
-    "empty": "Aún no tienes reportes",
-    "emptyBody": "Si algo sale mal en un viaje o en la app, cuéntanos y lo resolvemos.",
+    "mine": "Tus conversaciones",
+    "empty": "Aún no tienes conversaciones",
+    "emptyBody": "Si algo sale mal en un viaje o en la app, escríbenos y lo resolvemos.",
     "aboutRide": "Sobre un viaje",
     "general": "Reporte general",
     "itemA11y": "{{category}}. {{status}}. {{date}}",
@@ -1401,7 +1414,7 @@
       "resolved": "Resuelto",
       "dismissed": "Cerrado"
     },
-    "detailTitle": "Tu reporte",
+    "detailTitle": "Tu conversación",
     "sentOn": "Enviado el {{date}}",
     "priority": "Prioritario",
     "youWrote": "Lo que nos contaste",
@@ -1429,6 +1442,11 @@
       "whatsapp": "Escríbenos por WhatsApp",
       "whatsappHint": "Soporte de Kuulis",
       "email": "Escríbenos un correo"
+    },
+    "unreadA11y": "Respuesta nueva",
+    "state": {
+      "replied": "Te respondimos",
+      "waiting": "Esperando respuesta del equipo"
     }
   },
   "suspension": {
@@ -1770,6 +1788,151 @@
       "cancelTitle": "¿Cancelar el cambio de moto?",
       "cancelBody": "Seguirás con tu moto actual. Si quieres cambiarla después, tendrás que enviar todo de nuevo.",
       "cancelled": "Cancelaste el cambio de moto"
+    }
+  },
+  "help": {
+    "title": "Ayuda",
+    "subtitle": "Encuentra respuestas rápidas o escríbenos.",
+    "searchLabel": "Buscar en la ayuda",
+    "searchPlaceholder": "Ej.: cambiar mi correo, pagar la cuota",
+    "results": "Resultados",
+    "noResults": "No encontramos nada sobre «{{query}}»",
+    "noResultsBody": "Prueba con otras palabras o escríbenos y te ayudamos.",
+    "contact": "Contactar a soporte",
+    "contactHint": "Abre un mensaje al equipo con este artículo como contexto",
+    "topics": "Temas",
+    "articleCount_one": "{{count}} artículo",
+    "articleCount_other": "{{count}} artículos",
+    "noArticles": "Todavía no hay artículos aquí.",
+    "contactSection": "Habla con nosotros",
+    "unread_one": "Tienes {{count}} respuesta nueva",
+    "unread_other": "Tienes {{count}} respuestas nuevas",
+    "conversationsHint": "Tus mensajes con el equipo y sus respuestas",
+    "rideHint": "¿Fue en un viaje? Ábrelo en Tus viajes y toca «Necesito ayuda con este viaje».",
+    "openArticleHint": "Abre el artículo",
+    "notFound": "¿No encontraste lo que buscabas?",
+    "updated": "Actualizado el {{date}}",
+    "stillNeed": "¿Aún necesitas ayuda?",
+    "topic": {
+      "account": "Cuenta",
+      "rides": "Viajes",
+      "payments": "Pagos al motorizado",
+      "wallet": "Billetera y cuota",
+      "safety": "Seguridad",
+      "documents": "Documentos",
+      "app": "Problemas con la app"
+    },
+    "helpful": {
+      "question": "¿Te ayudó este artículo?",
+      "yes": "Sí",
+      "no": "No",
+      "thanksYes": "¡Qué bien! Gracias por contarnos.",
+      "thanksNo": "Gracias por contarnos. Si aún lo necesitas, escríbenos y te ayudamos."
+    }
+  },
+  "support": {
+    "photos": {
+      "label": "Fotos (opcional, hasta {{max}})",
+      "add": "Adjuntar foto",
+      "title": "Adjuntar una foto",
+      "subtitle": "Puedes enviar hasta {{max}} fotos por mensaje.",
+      "camera": "Tomar foto",
+      "library": "Elegir de la galería",
+      "remove": "Quitar la foto {{n}}",
+      "max": "Puedes adjuntar hasta {{max}} fotos.",
+      "cameraDenied": "Permite el acceso a la cámara en los ajustes o elige una foto de tu galería."
+    },
+    "thread": {
+      "empty": "Aún no hay mensajes",
+      "you": "Tú",
+      "staff": "Equipo Kuulis",
+      "staffNamed": "{{name}} · Equipo Kuulis",
+      "photos_one": "{{count}} foto",
+      "photos_other": "{{count}} fotos",
+      "openPhoto": "Abrir la foto {{n}}",
+      "placeholder": "Escribe tu respuesta",
+      "send": "Enviar mensaje",
+      "closed": "Esta conversación está cerrada.",
+      "newConversation": "Iniciar una nueva conversación"
+    },
+    "csat": {
+      "title": "¿Cómo te atendimos?",
+      "body": "Tu calificación nos ayuda a mejorar el soporte.",
+      "star_one": "{{count}} estrella",
+      "star_other": "{{count}} estrellas",
+      "comment": "Cuéntanos más (opcional)",
+      "submit": "Enviar calificación",
+      "thanks": "¡Gracias por tu calificación!",
+      "given": "Calificaste la atención con {{score}} de 5. ¡Gracias!"
+    }
+  },
+  "rideHelp": {
+    "button": "Necesito ayuda con este viaje",
+    "title": "¿Con qué te ayudamos?",
+    "subtitle": "Elige lo que pasó en este viaje.",
+    "lostItem": "Olvidé un objeto",
+    "lostItemHint": "Le avisamos al motorizado para que te lo devuelva",
+    "lostItemAsked": "Mira la respuesta del motorizado",
+    "fare": "Me cobraron distinto",
+    "fareHint": "La app fijó {{fare}} para este viaje",
+    "noShowDriver": "El motorizado no llegó",
+    "noShowPassenger": "El pasajero no se presentó",
+    "noShowHint": "Revisamos lo que pasó y la cancelación",
+    "other": "Otro problema",
+    "otherHint": "Seguridad, trato, el vehículo u otra cosa"
+  },
+  "lostItem": {
+    "title": "Objeto olvidado",
+    "driverTitle": "Objeto olvidado",
+    "noneDriver": "Nadie ha preguntado por un objeto en este viaje.",
+    "tooLateTitle": "Ya pasó el tiempo para avisar al motorizado",
+    "tooLate": "Escríbenos y te ayudamos a buscarlo.",
+    "formTitle": "¿Qué olvidaste?",
+    "formBody": "Le avisaremos a {{name}}. Si lo tiene, podrán coordinar la entrega por el chat del viaje.",
+    "label": "Describe el objeto",
+    "placeholder": "Ej.: un teléfono negro con forro azul, en el asiento de atrás",
+    "minHint": "Escribe al menos {{min}} caracteres",
+    "tooLong": "Máximo {{max}} caracteres",
+    "submit": "Avisar al motorizado",
+    "privacy": "No compartimos tu teléfono: hablan por el chat de Kuulis.",
+    "youWrote": "Lo que describiste",
+    "openChat": "Escribirle a {{name}}",
+    "openChatShort": "Abrir el chat",
+    "openConversation": "Ver mi conversación con soporte",
+    "view": "Ver detalles",
+    "chatBanner": "Chat abierto por el objeto olvidado hasta el {{until}}.",
+    "chatBannerShort": "Chat abierto por el objeto olvidado.",
+    "state": {
+      "waiting": {
+        "title": "Le avisamos a {{name}}",
+        "body": "Te diremos en cuanto responda si lo tiene."
+      },
+      "chat": {
+        "title": "¡{{name}} lo tiene!",
+        "body": "Coordinen la entrega por el chat. Está abierto hasta el {{until}}."
+      },
+      "has_it": {
+        "title": "{{name}} lo tiene",
+        "body": "El chat ya se cerró. Si aún no lo recuperas, escríbenos y te ayudamos."
+      },
+      "not_found": {
+        "title": "{{name}} no lo encontró",
+        "body": "Lo sentimos. Si crees que se quedó en la moto, escríbenos y lo revisamos."
+      }
+    },
+    "driver": {
+      "title": "Un pasajero olvidó algo",
+      "theyWrote": "Lo que describió",
+      "ask": "Revisa tu moto y tus bolsos. ¿Lo tienes?",
+      "hasIt": "Lo tengo",
+      "notFound": "No lo tengo",
+      "answer": "Responder",
+      "openChat": "Escribirle al pasajero",
+      "answered": {
+        "chat": "Respondiste que lo tienes. Coordinen la entrega por el chat hasta el {{until}}.",
+        "has_it": "Respondiste que lo tienes. El chat ya se cerró.",
+        "not_found": "Respondiste que no lo tienes. Gracias por revisar."
+      }
     }
   }
 }

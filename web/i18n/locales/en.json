@@ -7,7 +7,9 @@
     "legal": "Legal",
     "language": "Cambiar el idioma a español",
     "menu": "Menu",
-    "getApp": "Get the app"
+    "getApp": "Get the app",
+    "help": "Help",
+    "contact": "Contact"
   },
   "footer": {
     "tagline": "Motorbike rides in Venezuela. No commission per ride.",
@@ -260,5 +262,88 @@
     "invalidBody": "Check the link is complete or ask for a new one.",
     "failedTitle": "We couldn't load the ride",
     "failedBody": "Check your connection; we'll keep trying."
+  },
+  "help": {
+    "metaTitle": "Help center · Kuulis",
+    "metaDescription": "Answers to the most common questions about your account, rides, paying your driver, the wallet, safety and documents on Kuulis.",
+    "eyebrow": "Help",
+    "title": "How can we help?",
+    "lead": "Search for your question or pick a topic. If you can't find the answer, write to us.",
+    "search": "Search the help center",
+    "searchPlaceholder": "E.g. I forgot my password",
+    "searchButton": "Search",
+    "clear": "Clear search",
+    "audience": {
+      "label": "Show articles for",
+      "all": "Everyone",
+      "passenger": "Riders",
+      "driver": "Drivers"
+    },
+    "topics": {
+      "account": "Account",
+      "rides": "Rides",
+      "payments": "Paying your driver",
+      "wallet": "Wallet and monthly fee",
+      "safety": "Safety",
+      "documents": "Documents",
+      "app": "Problems with the app"
+    },
+    "topicsLabel": "Topics",
+    "results": "Results for “{q}”",
+    "noResults": "We found no articles for “{q}”. Try other words or write to us.",
+    "empty": "Answers to the most common questions will be here soon. Meanwhile, write to us.",
+    "loadFailed": "We could not load the articles. Check your connection and try again.",
+    "contactTitle": "Can't find what you need?",
+    "contactBody": "Write to us and we'll answer by email.",
+    "contactButton": "Write to us",
+    "whatsapp": "Message us on WhatsApp",
+    "back": "Help center",
+    "updated": "Updated {date}",
+    "helpful": "Was this article helpful?",
+    "yes": "Yes",
+    "no": "No",
+    "thanks": "Thanks! This helps us improve.",
+    "sorry": "Thanks for telling us. We'll improve this article.",
+    "feedbackFailed": "We could not save your answer. Please try again.",
+    "stillTitle": "Still have questions?",
+    "stillBody": "Write to us and we'll help.",
+    "stillButton": "Write to us"
+  },
+  "contact": {
+    "metaTitle": "Contact · Kuulis",
+    "metaDescription": "Write to the Kuulis team, even if you can't sign in to your account. We answer by email.",
+    "eyebrow": "Contact",
+    "title": "Write to us",
+    "lead": "Can't sign in to your account or have another question? Tell us and we'll answer by email.",
+    "inApp": "If you can open the app, write to us from Profile → Help: that way we see your account and rides.",
+    "name": "Your name",
+    "email": "Your email",
+    "emailHint": "We'll send the answer here.",
+    "category": "What is it about?",
+    "categories": {
+      "app_issue": "I can't sign in to my account",
+      "other": "Something else"
+    },
+    "message": "Your message",
+    "messageHint": "Tell us what happened. If it's about your account, include the phone or email you signed up with. We will never ask for your password.",
+    "count": "{n} / {max}",
+    "send": "Send message",
+    "verifying": "Checking that you are a person…",
+    "sending": "Sending…",
+    "errors": {
+      "name": "Enter your name (at least 2 letters).",
+      "email": "Enter a valid email.",
+      "message": "Write at least 10 characters.",
+      "invalid": "Check the form and try again.",
+      "captcha": "We could not verify your message. Please try again.",
+      "limited": "We got many messages from your connection. Please try again later."
+    },
+    "doneTitle": "Message sent!",
+    "doneBody": "We got your message. We'll answer by email at {email}.",
+    "doneSpam": "If you don't see our answer, check your spam or junk folder.",
+    "another": "Send another message",
+    "helpLink": "Meanwhile, browse the help center",
+    "other": "Other ways to reach us",
+    "privacy": "We only use this data to answer you. Read our"
   }
 }

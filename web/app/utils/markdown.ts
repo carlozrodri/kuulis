@@ -1,10 +1,14 @@
 /**
  * Small Markdown parser for the legal texts the API serves (headings, paragraphs, lists, quotes and
- * tables, with **bold**). Same rules as the mobile app (mobile/src/lib/legal.ts). Pure, unit tested.
+ * tables, with **bold**). Same rules as the mobile app (mobile/src/lib/legal.ts). Help articles (doc 13)
+ * also use [links](https://…): only http(s), mailto: and site paths ("/contacto") become links.
+ * Pure, unit tested.
  */
 
-/** A run of text, bold or not. */
-export type Span = { text: string, bold: boolean }
+/** A run of text, bold or not, and a link when `href` is set. */
+export type Span = { text: string, bold: boolean, href?: string }
+
+const SAFE_HREF = /^(https?:\/\/|mailto:|\/(?!\/))/i
 
 export type Block
   = | { type: 'heading', level: 2 | 3, spans: Span[] }
@@ -15,8 +19,16 @@ export type Block
 
 export function parseInline(text: string): Span[] {
   const spans: Span[] = []
-  text.split(/(\*\*[^*]+\*\*)/).forEach((part) => {
+  text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)\s]+\))/).forEach((part) => {
     if (!part) return
+    const link = /^\[([^\]]+)\]\(([^)\s]+)\)$/.exec(part)
+    if (link) {
+      const [, label = '', href = ''] = link
+      const bold = label.startsWith('**') && label.endsWith('**') && label.length > 4
+      const shown = bold ? label.slice(2, -2) : label
+      spans.push(SAFE_HREF.test(href) ? { text: shown, bold, href } : { text: shown, bold })
+      return
+    }
     const bold = part.startsWith('**') && part.endsWith('**') && part.length > 4
     spans.push({ text: bold ? part.slice(2, -2) : part, bold })
   })

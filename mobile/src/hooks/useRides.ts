@@ -7,6 +7,7 @@ import type {
   DriverState,
   DriverStats,
   GeoResult,
+  LostItem,
   Offer,
   Page,
   PassengerStats,
@@ -24,6 +25,8 @@ export const rideKeys = {
   pendingRating: ['rides', 'pending-rating'] as const,
   detail: (id: string) => ['rides', 'detail', id] as const,
   messages: (id: string) => ['rides', 'messages', id] as const,
+  // Under 'rides' so ride pushes (lost item ones carry a ride_id) refresh it.
+  lostItem: (id: string) => ['rides', 'lost-item', id] as const,
   history: (role: 'passenger' | 'driver') => ['rides', 'history', role] as const,
   // Under 'rides' so every ride re-sync also refreshes the driver's earnings.
   driverStats: ['rides', 'driver-stats'] as const,
@@ -121,12 +124,58 @@ export function useRide(id: string | undefined) {
   });
 }
 
-export function useRideMessages(id: string | undefined) {
+/** `poll`: after the ride (lost item chat, doc 13) the socket may not deliver messages, so re-read them. */
+export function useRideMessages(id: string | undefined, poll = false) {
   return useQuery({
     queryKey: rideKeys.messages(id ?? ''),
     queryFn: () => api<RideMessage[]>(`/rides/${id}/messages`),
     enabled: !!id,
     staleTime: 30_000,
+    refetchInterval: poll ? 15_000 : false,
+  });
+}
+
+// ── Doc 13: lost item ──
+
+/** GET /rides/{id}/lost-item; null when nobody asked (404 lost_item_not_found). */
+export function useLostItem(rideId: string | undefined, enabled = true) {
+  return useQuery({
+    queryKey: rideKeys.lostItem(rideId ?? ''),
+    queryFn: async () => {
+      try {
+        return await api<LostItem>(`/rides/${rideId}/lost-item`);
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 404) return null;
+        throw error;
+      }
+    },
+    enabled: enabled && !!rideId,
+    staleTime: 15_000,
+    retry: (count, error) => count < 2 && !(error instanceof ApiError && error.status < 500),
+  });
+}
+
+/** POST /rides/{id}/lost-item (the passenger): opens a ticket and asks the driver. */
+export function useCreateLostItem(rideId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (description: string) =>
+      api<LostItem>(`/rides/${rideId}/lost-item`, { method: 'POST', body: { description } }),
+    onSuccess: (item) => {
+      queryClient.setQueryData(rideKeys.lostItem(rideId), item);
+      void queryClient.invalidateQueries({ queryKey: ['reports'] });
+    },
+  });
+}
+
+/** POST /rides/{id}/lost-item/answer (the driver): "Lo tengo" / "No lo tengo". */
+export function useAnswerLostItem(rideId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (hasIt: boolean) =>
+      api<LostItem>(`/rides/${rideId}/lost-item/answer`, { method: 'POST', body: { has_it: hasIt } }),
+    onSuccess: (item) => queryClient.setQueryData(rideKeys.lostItem(rideId), item),
+    onError: () => void queryClient.invalidateQueries({ queryKey: rideKeys.lostItem(rideId) }),
   });
 }
 

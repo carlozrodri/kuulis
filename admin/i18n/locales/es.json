@@ -14,7 +14,7 @@
     "topUps": "Recargas",
     "transfers": "Transferencias",
     "subscriptions": "Suscripciones",
-    "reports": "Reportes",
+    "reports": "Soporte",
     "finance": "Finanzas",
     "system": "Sistema",
     "audit": "Auditoría",
@@ -27,7 +27,10 @@
     "appStatus": "Estado de la app",
     "flags": "Funciones",
     "announcements": "Anuncios",
-    "driverChecks": "Reverificaciones"
+    "driverChecks": "Reverificaciones",
+    "cannedReplies": "Respuestas guardadas",
+    "supportMetrics": "Métricas de soporte",
+    "help": "Centro de ayuda"
   },
   "auth": {
     "title": "Acceso administrador",
@@ -163,7 +166,7 @@
         "suspend_long": "Suspender más de 7 días o sin fecha"
       },
       "reports": {
-        "manage": "Atender reportes"
+        "manage": "Atender soporte y reportes"
       },
       "drivers": {
         "view": "Ver motorizados y documentos",
@@ -231,6 +234,9 @@
       "announcements": {
         "view": "Ver los anuncios",
         "manage": "Crear, editar y borrar anuncios"
+      },
+      "help": {
+        "manage": "Centro de ayuda"
       }
     }
   },
@@ -371,7 +377,12 @@
     "document_not_found": "Documento no encontrado",
     "driver_invalid_status": "El motorizado no está en un estado que permita esta acción",
     "driver_invalid_transition": "El motorizado no admite ese cambio de estado",
-    "driver_documents_rejected": "Hay documentos rechazados: rechaza la solicitud en su lugar"
+    "driver_documents_rejected": "Hay documentos rechazados: rechaza la solicitud en su lugar",
+    "help_slug_taken": "Ya existe un artículo con ese slug en este idioma",
+    "help_article_not_found": "El artículo no existe",
+    "attachment_invalid": "Una foto no es válida; quítala y súbela de nuevo",
+    "file_type_not_allowed": "Ese tipo de archivo no está permitido",
+    "file_too_large": "El archivo es demasiado grande"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -514,7 +525,9 @@
       "nightHours": "Las horas de noche deben ser HH:MM y distintas",
       "safetyNumber": "Un valor de seguridad está fuera de rango ({min}–{max})",
       "noticeDays": "Avisos de vencimiento: hasta {count} valores entre 1 y {max} días",
-      "verificationNumber": "Verificación de motorizados: los valores deben estar entre {min} y {max}"
+      "verificationNumber": "Verificación de motorizados: los valores deben estar entre {min} y {max}",
+      "supportNumber": "Soporte: los valores deben estar entre {min} y {max}",
+      "supportPromise": "Soporte: la promesa de respuesta tiene máximo {max} caracteres"
     },
     "fares": {
       "title": "Tarifas",
@@ -674,6 +687,31 @@
       "selfieHelp": "Al conectarse, en un día al azar. 0 = sin selfie al azar.",
       "induction": "Inducción obligatoria para aprobar",
       "inductionHelp": "Antes de aprobar a un motorizado hay que marcar «Inducción completada» en su ficha (charla o video)."
+    },
+    "support": {
+      "title": "Soporte",
+      "help": "Tiempos de respuesta, cierre automático, asignación de tickets y objetos olvidados.",
+      "numbers": {
+        "sla_urgent_minutes": "Respuesta a urgentes (minutos)",
+        "sla_normal_hours": "Respuesta a normales (horas)",
+        "auto_close_days": "Cierre automático (días)",
+        "lost_item_days": "Plazo para pedir un objeto (días)",
+        "lost_item_chat_hours": "Chat para entregar el objeto (horas)"
+      },
+      "numbersHelp": {
+        "sla_urgent_minutes": "Plazo para la respuesta del equipo; luego se marca «Vencido». Entre {min} y {max}.",
+        "sla_normal_hours": "Plazo para la respuesta del equipo; luego se marca «Vencido». Entre {min} y {max}.",
+        "auto_close_days": "Un ticket que espera al usuario se cierra tras estos días. Entre {min} y {max}.",
+        "lost_item_days": "Días después del viaje en que el pasajero puede pedirlo. Entre {min} y {max}.",
+        "lost_item_chat_hours": "El chat con el motorizado sigue abierto tras «Lo tengo». Entre {min} y {max}."
+      },
+      "promise": {
+        "es": "Promesa de respuesta (español)",
+        "en": "Promesa de respuesta (inglés)"
+      },
+      "promiseHelp": "Lo que muestran la app y la web al escribir. Vacío = no se muestra. Máximo {max} caracteres.",
+      "autoAssign": "Asignar tickets automáticamente",
+      "autoAssignHelp": "Cada ticket nuevo va a la persona del equipo con permiso de soporte que tenga menos tickets abiertos."
     }
   },
   "paymentMethods": {
@@ -1275,13 +1313,13 @@
     "willNotEnd": "No termina sola: hay que levantarla a mano."
   },
   "reports": {
-    "title": "Reportes",
+    "title": "Tickets de soporte",
     "seeAll": "Ver todos",
-    "none": "Sin reportes.",
-    "empty": "No hay reportes con estos filtros",
-    "total": "{n} reportes",
+    "none": "Sin tickets.",
+    "empty": "No hay tickets con estos filtros",
+    "total": "{n} tickets",
     "search": "Buscar por nombre o correo",
-    "allStatuses": "Todos",
+    "allStatuses": "Todos los estados",
     "allCategories": "Todas las categorías",
     "allPriorities": "Todas las prioridades",
     "urgentOpen": "Urgentes abiertos: {n}",
@@ -1349,10 +1387,10 @@
       "app_issue": "falla de la app",
       "other": "otro motivo"
     },
-    "detailTitle": "Reporte · {category}",
+    "detailTitle": "Ticket · {category}",
     "resolutionSent": "Respuesta enviada a quien reportó",
     "manage": "Gestión",
-    "resolveHint": "Al resolver o descartar, quien reportó recibe una notificación con tu respuesta.",
+    "resolveHint": "Al resolver o descartar, tu respuesta se envía como mensaje y se pide a la persona calificar la atención.",
     "rideTitle": "Viaje",
     "openRide": "Ver viaje",
     "noRide": "Reporte general, sin viaje asociado.",
@@ -1377,13 +1415,13 @@
     },
     "toast": {
       "priority": "Prioridad actualizada",
-      "inReview": "Reporte en revisión",
-      "open": "Reporte abierto de nuevo",
-      "assigned": "Reporte asignado a ti",
+      "inReview": "Ticket en revisión",
+      "open": "Ticket abierto de nuevo",
+      "assigned": "Ticket asignado a ti",
       "unassigned": "Asignación quitada",
-      "reopened": "Reporte reabierto",
-      "resolved": "Reporte resuelto",
-      "dismissed": "Reporte descartado"
+      "reopened": "Ticket reabierto",
+      "resolved": "Ticket resuelto",
+      "dismissed": "Ticket descartado"
     },
     "notes": {
       "title": "Notas internas",
@@ -1396,12 +1434,12 @@
       "help": "Las notas no se envían a nadie."
     },
     "resolve": {
-      "resolvedTitle": "Resolver reporte",
-      "dismissedTitle": "Descartar reporte",
+      "resolvedTitle": "Resolver ticket",
+      "dismissedTitle": "Descartar ticket",
       "resolvedHelp": "Cierra el reporte como atendido.",
       "dismissedHelp": "Cierra el reporte sin medidas (no procede o no hay suficiente información).",
       "visible": "{name} verá este texto",
-      "visibleHelp": "La respuesta se envía como notificación a quien reportó y queda visible en su reporte. No incluyas notas internas ni datos de la otra persona.",
+      "visibleHelp": "La respuesta queda en la conversación y se notifica a la persona (por correo si escribió desde la web), que luego puede calificar la atención. No incluyas notas internas ni datos de la otra persona.",
       "resolution": "Respuesta para quien reportó",
       "resolutionHelp": "Entre {min} y {max} caracteres.",
       "resolvedConfirm": "Resolver y notificar",
@@ -2442,5 +2480,204 @@
       "unconfirmed": "Por confirmar",
       "confirm": "Confirmar fecha"
     }
+  },
+  "support": {
+    "views": {
+      "waiting_staff": "Esperando al equipo",
+      "waiting_user": "Esperando al usuario",
+      "mine": "Mis tickets",
+      "unassigned": "Sin asignar",
+      "overdue": "Vencidos",
+      "all": "Todos"
+    },
+    "allSources": "Todos los orígenes",
+    "source": "Origen",
+    "sources": {
+      "app": "App",
+      "help": "Centro de ayuda",
+      "lost_item": "Objeto olvidado",
+      "web": "Web"
+    },
+    "allTags": "Todas las etiquetas",
+    "tags": "Etiquetas",
+    "waiting": "Espera",
+    "waitingOn": {
+      "staff": "Esperando al equipo",
+      "user": "Esperando al usuario"
+    },
+    "overdue": "Vencido",
+    "dueIn": "Vence {when}",
+    "web": "Web",
+    "messagesCount": "{n} mensajes",
+    "csatShort": "{n}/5",
+    "firstResponse": "Primera respuesta",
+    "noResponseYet": "Sin responder",
+    "fromArticle": "Escribió desde el artículo «{title}»",
+    "lostItem": {
+      "waiting": "Objeto olvidado: esperando la respuesta del motorizado",
+      "has_it": "Objeto olvidado: el motorizado lo tiene",
+      "not_found": "Objeto olvidado: el motorizado no lo encontró",
+      "answeredAt": "Respondió el {when}",
+      "chatOpen": "El chat del viaje sigue abierto hasta el {when}",
+      "chatClosed": "El chat del viaje cerró el {when}"
+    },
+    "csatTitle": "Calificación de la atención: {n}/5",
+    "csatNoComment": "Sin comentario",
+    "thread": {
+      "title": "Conversación",
+      "empty": "Todavía no hay mensajes.",
+      "openPhoto": "Abrir foto {n}",
+      "photo": "Foto {n}",
+      "photoTitle": "Foto adjunta"
+    },
+    "closedHint": "El ticket está cerrado. Reábrelo para responder.",
+    "contactName": "Nombre",
+    "contactEmail": "Correo",
+    "webHelp": "Escribió desde el formulario de la web, sin cuenta: la respuesta le llega por correo.",
+    "tagPlaceholder": "Agregar etiqueta…",
+    "tagSuggestions": "Sugeridas:",
+    "saveTags": "Guardar etiquetas",
+    "toast": {
+      "tags": "Etiquetas guardadas"
+    },
+    "composer": {
+      "toPush": "{name} recibe una notificación en la app",
+      "toEmail": "{name} recibe la respuesta por correo",
+      "canned": "Respuestas guardadas",
+      "cannedSearch": "Buscar respuesta…",
+      "cannedEmpty": "No hay respuestas guardadas",
+      "placeholder": "Escribe tu respuesta…",
+      "label": "Respuesta",
+      "usingCanned": "Usando «{title}»",
+      "tooManyPhotos": "Máximo {n} fotos por mensaje",
+      "onlyImages": "Solo fotos (JPG, PNG, WebP o HEIC)",
+      "removePhoto": "Quitar foto",
+      "then": {
+        "wait_user": "Esperar al usuario",
+        "resolve": "Resolver",
+        "keep": "Dejar como está"
+      },
+      "thenLabel": "Después de enviar",
+      "addPhoto": "Foto",
+      "send": "Enviar",
+      "sendResolve": "Enviar y resolver",
+      "sent": "Respuesta enviada",
+      "sentResolved": "Respuesta enviada y ticket resuelto",
+      "hint": "{'{nombre}'} y {'{viaje}'} se reemplazan al enviar. Ctrl + Enter envía."
+    }
+  },
+  "canned": {
+    "allLocales": "Todos",
+    "locales": {
+      "es": "Español",
+      "en": "Inglés"
+    },
+    "title": "Título",
+    "locale": "Idioma",
+    "action": "Al enviar",
+    "uses": "Usos",
+    "updated": "Actualizada",
+    "new": "Nueva respuesta",
+    "edit": "Editar respuesta",
+    "delete": "Eliminar",
+    "search": "Buscar por título, texto o etiqueta",
+    "help": "Textos que el equipo inserta al responder un ticket. La acción decide qué pasa con el ticket después de enviarla.",
+    "empty": "No hay respuestas guardadas",
+    "body": "Texto",
+    "bodyHelp": "{'{nombre}'} se reemplaza por el nombre de la persona y {'{viaje}'} por la fecha y el código del viaje.",
+    "actions": {
+      "none": "Dejar como está",
+      "wait_user": "Esperar al usuario",
+      "resolve": "Resolver el ticket"
+    },
+    "actionsHelp": {
+      "none": "El ticket no cambia de estado.",
+      "wait_user": "El ticket queda esperando la respuesta del usuario.",
+      "resolve": "El ticket se cierra como resuelto con este mensaje."
+    },
+    "tagsHelp": "Se agregan al ticket al usar esta respuesta.",
+    "deleteTitle": "Eliminar respuesta guardada",
+    "deleteHelp": "«{title}» dejará de estar disponible para el equipo.",
+    "toast": {
+      "created": "Respuesta guardada creada",
+      "updated": "Respuesta guardada actualizada",
+      "deleted": "Respuesta guardada eliminada"
+    }
+  },
+  "supportMetrics": {
+    "lastDays": "Últimos {n} días",
+    "period": "Periodo",
+    "created": "Tickets creados",
+    "resolved": "Resueltos",
+    "resolvedHint": "{n} resueltos",
+    "firstResponse": "Primera respuesta",
+    "resolution": "Resolución",
+    "average": "Promedio",
+    "csat": "Satisfacción (CSAT)",
+    "csatCount": "{n} calificaciones",
+    "waitingStaff": "Esperando al equipo",
+    "overdueOpen": "Vencidos abiertos",
+    "now": "Ahora",
+    "ticketsByDay": "Tickets por día",
+    "byAgent": "Por agente",
+    "agent": "Agente",
+    "noAgents": "Sin datos en el periodo"
+  },
+  "help": {
+    "allTopics": "Todos los temas",
+    "topics": {
+      "account": "Cuenta",
+      "rides": "Viajes",
+      "payments": "Pagos al motorizado",
+      "wallet": "Billetera y cuota",
+      "safety": "Seguridad",
+      "documents": "Documentos",
+      "app": "Problemas con la app"
+    },
+    "audiences": {
+      "all": "Todos",
+      "passenger": "Pasajeros",
+      "driver": "Motorizados"
+    },
+    "topic": "Tema",
+    "title": "Título",
+    "published": "Publicado",
+    "views": "Vistas",
+    "helpful": "¿Te ayudó?",
+    "helpfulCounts": "{yes} sí · {no} no",
+    "updated": "Actualizado",
+    "new": "Nuevo artículo",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "search": "Buscar en títulos y textos",
+    "empty": "No hay artículos con estos filtros",
+    "positionShort": "Posición {n}",
+    "deleteTitle": "Eliminar artículo",
+    "deleteHelp": "«{title}» dejará de verse en la app y en la web. No se puede deshacer.",
+    "toast": {
+      "published": "Artículo publicado",
+      "hidden": "Artículo oculto",
+      "deleted": "Artículo eliminado",
+      "created": "Artículo creado",
+      "updated": "Artículo guardado"
+    },
+    "translate": "Traducir ({locale})",
+    "notFound": "No encontramos este artículo.",
+    "body": "Texto (Markdown)",
+    "bodyHelp": "Títulos con #, listas con - o 1., **negrita** y [enlaces](https://…).",
+    "write": "Escribir",
+    "preview": "Vista previa",
+    "untitled": "Sin título",
+    "previewEmpty": "La vista previa aparece al escribir.",
+    "publishedHelp": "Solo los artículos publicados se ven en la app y en la web.",
+    "slug": "Identificador (slug)",
+    "slugHelp": "Minúsculas, números y guiones. Las traducciones comparten el mismo slug.",
+    "slugInvalid": "Solo a-z, 0-9 y guiones, sin espacios",
+    "locale": "Idioma",
+    "audience": "Para",
+    "audienceHelp": "Los pasajeros ven los de «Todos» y «Pasajeros»; los motorizados, los de «Todos» y «Motorizados».",
+    "position": "Posición",
+    "positionHelp": "Orden dentro del tema (menor primero).",
+    "stats": "Estadísticas"
   }
 }

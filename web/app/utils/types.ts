@@ -51,3 +51,38 @@ export interface AppRelease {
 export interface VersionCheck {
   latest: AppRelease | null
 }
+
+/** Help center (doc 13): topics in the order the site lists them. */
+export const HELP_TOPICS = ['account', 'rides', 'payments', 'wallet', 'safety', 'documents', 'app'] as const
+export type HelpTopic = typeof HELP_TOPICS[number]
+export type HelpAudience = 'all' | 'passenger' | 'driver'
+
+export interface HelpArticleSummary {
+  id: string
+  slug: string
+  locale: string
+  topic: HelpTopic
+  audience: HelpAudience
+  title: string
+  excerpt: string
+  position: number
+  updated_at: string
+}
+
+export interface HelpArticle extends HelpArticleSummary {
+  body_md: string
+}
+
+/** The parts of GET /config/public the website reads (the rest is for the apps). */
+export interface PublicConfig {
+  app_links?: { support_whatsapp?: string, support_email?: string }
+  support?: { response_promise_es?: string, response_promise_en?: string }
+}
+
+export interface ContactChallenge {
+  challenge: string
+  difficulty: number
+  expires_in: number
+}
+
+export type ContactCategory = 'app_issue' | 'other'

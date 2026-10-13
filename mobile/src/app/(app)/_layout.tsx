@@ -17,7 +17,7 @@ export const unstable_settings = { initialRouteName: '(tabs)' };
 
 /**
  * Signed-in area: the tabs plus full-screen flows pushed over them (driver onboarding, ride screens, wallet
- * top-ups, transfers and fees, reports, profile editing).
+ * top-ups, transfers and fees, help and support conversations, profile editing).
  * Owns the realtime socket and the ride state machinery shared by every screen.
  */
 export default function AppLayout() {
@@ -36,6 +36,7 @@ export default function AppLayout() {
           <Stack.Screen name="ride/index" />
           <Stack.Screen name="ride/chat" />
           <Stack.Screen name="ride/detail" />
+          <Stack.Screen name="ride/lost-item" />
           {/* Rating is mandatory: no swipe back. */}
           <Stack.Screen name="ride/rate" options={{ gestureEnabled: false, animation: 'slide_from_bottom' }} />
           <Stack.Screen name="drive" />
@@ -45,6 +46,9 @@ export default function AppLayout() {
           <Stack.Screen name="report" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="reports/index" />
           <Stack.Screen name="reports/[id]" />
+          <Stack.Screen name="help/index" />
+          <Stack.Screen name="help/topic/[topic]" />
+          <Stack.Screen name="help/article/[slug]" />
           <Stack.Screen name="profile/edit" />
           <Stack.Screen name="profile/password" />
           <Stack.Screen name="profile/place" options={{ animation: 'slide_from_bottom' }} />

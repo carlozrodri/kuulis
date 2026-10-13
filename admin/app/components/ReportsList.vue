@@ -20,7 +20,7 @@ const { data, status, error } = useAsyncData(
 )
 
 const items = computed(() => data.value?.items ?? [])
-const inboxLink = computed(() => ({ path: '/reports', query: { status: 'all', ...filter.value } }))
+const inboxLink = computed(() => ({ path: '/reports', query: { view: 'all', status: 'all', ...filter.value } }))
 
 /** For a user's list: whether they reported or were reported. */
 function side(report: ReportAdminRead): 'reporter' | 'reported' | null {
@@ -101,7 +101,7 @@ function side(report: ReportAdminRead): 'reporter' | 'reported' | null {
               </UBadge>
             </span>
             <span class="block truncate text-xs text-(--ui-text-muted)">
-              {{ report.reporter?.name || report.reporter?.email }}
+              {{ ticketContact(report).name }}
               <template v-if="report.reported"> → {{ report.reported.name || report.reported.email }}</template>
               · {{ formatDate(report.created_at, locale) }}
             </span>

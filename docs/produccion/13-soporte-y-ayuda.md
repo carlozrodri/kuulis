@@ -85,4 +85,49 @@ guardadas y flujos guiados (objeto perdido, cobro incorrecto).
 
 ## Preguntas para Carlos
 1. ¿Quién atenderá el soporte al inicio y en qué horario? Define los SLA visibles al usuario.
-2. ¿Número de WhatsApp de soporte? Recomendado: uno dedicado, configurable.
+   **Abierta.** Mientras tanto: SLA interno urgente 15 min y normal 24 h, y la promesa visible "Respondemos en
+   menos de 24 horas" (editable en Ajustes → Soporte).
+2. ¿Número de WhatsApp de soporte? Recomendado: uno dedicado, configurable. **Decidido** (recomendado):
+   configurable en Ajustes (`app_links.support_whatsapp`); el botón aparece solo cuando hay número.
+
+## Cómo quedó (2026-10-13)
+### API (`api/apps/support`, conversación en `apps/moderation`)
+- **Conversación en cada reporte:** `report_messages` (usuario, equipo o sistema, con hasta 4 fotos). La
+  descripción es el primer mensaje; la migración convierte los reportes existentes (descripción y resolución).
+  `reports` suma `waiting_on`, `sla_due_at`, `first_response_at`, `tags`, `csat`, `source`, `contact_email`,
+  `user_seen_at` (punto de "nueva respuesta"). Cada respuesta del equipo manda push (`type: support`) o email
+  para tickets de la web. Responder un ticket resuelto hace menos de `auto_close_days` (7) lo reabre.
+- **Tiempos de respuesta:** urgente 15 min, normal 24 h (`support.*`). Vencidos marcados en el admin; los
+  urgentes vencidos avisan una vez por Telegram (03). Un ticket que espera al usuario 7 días se cierra solo con
+  un mensaje y se puede seguir respondiendo. Tarea `support_sla` cada minuto con latido en Sistema.
+- **Equipo:** respuestas guardadas con `{nombre}` y `{viaje}`, que funcionan como macros (responder + esperar
+  al usuario o resolver + etiquetas); filtros esperando al equipo / al usuario, mis tickets, sin asignar,
+  vencidos, etiqueta y origen; asignación automática opcional (`support.auto_assign`) al de menos tickets;
+  métricas (`/admin/support/metrics`); CSAT de 1 a 5 al cerrar.
+- **Centro de ayuda:** `help_articles` por idioma, tema y público (pasajero/motorizado), con vistas y "¿Te
+  ayudó?". Permiso nuevo `help.manage` (lo tiene el rol Soporte). La migración carga 9 artículos iniciales en
+  español e inglés.
+- **Objeto perdido:** `POST /rides/{id}/lost-item` (hasta `lost_item_days`, 7) abre ticket y avisa al
+  motorizado; "Lo tengo" reabre el chat del viaje por `lost_item_chat_hours` (72) sin compartir teléfonos.
+- **Contacto sin cuenta:** `POST /public/contact` con prueba de trabajo propia (sin terceros, dificultad 16
+  bits, un solo uso) y respuesta por email con `reply_to` al correo de soporte.
+- Auditoría nueva: `report.message`, `canned.*`, `help.*`.
+
+### Admin
+- "Soporte" con colas, contadores, SLA, etiquetas, origen y CSAT; ficha como conversación con compositor
+  (respuestas guardadas, fotos, qué hacer después de enviar), etiquetas, contexto del artículo y del objeto
+  perdido. Páginas Respuestas guardadas, Métricas de soporte y Centro de ayuda (editor Markdown con vista
+  previa). Bloque Soporte en Ajustes.
+
+### App
+- Ajustes → Ayuda: buscador, temas, artículos con "¿Te ayudó?", Mis conversaciones con punto de no leído,
+  WhatsApp y email cuando están configurados. Hilo de cada reporte con fotos y calificación al cerrar.
+- Detalle del viaje → "Necesito ayuda con este viaje": olvidé un objeto, me cobraron distinto, no llegó / no se
+  presentó y otro problema. El motorizado responde "Lo tengo / No lo tengo" y el chat se abre tras el viaje.
+
+### Web
+- `/ayuda`, `/ayuda/{slug}` y `/contacto` (formulario con la verificación propia), enlazados en el menú.
+
+### Pendiente
+- Quién atiende y en qué horario (pregunta 1).
+- Botones "Lo tengo / No lo tengo" en la propia notificación (hoy están en la pantalla que abre).

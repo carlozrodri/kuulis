@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell } from '@/components/icons';
 import { Button, Card, EmptyState, Skeleton, TAB_BAR_SPACE, Txt } from '@/components/ui';
 import { api } from '@/lib/api';
-import { isReportNotification, reportIdOf } from '@/lib/reports';
+import { supportHrefOf } from '@/lib/support';
 import type { AppNotification, Page } from '@/lib/types';
 import { verificationHrefOf } from '@/lib/verification';
 import { radius, space, useTheme } from '@/theme';
@@ -71,8 +71,8 @@ export default function NotificationsScreen() {
         }
         renderItem={({ item }) => {
           const unread = !item.read_at;
-          // A report answer opens that report.
-          const reportId = isReportNotification(item.data) ? reportIdOf(item.data) : null;
+          // Doc 13: a support answer opens the conversation; a lost item opens the ride's lost item screen.
+          const support = supportHrefOf(item.data);
           // Doc 12: a selfie request or an expiring document opens where it is solved.
           const verification = verificationHrefOf(item.data);
           return (
@@ -81,7 +81,7 @@ export default function NotificationsScreen() {
               accessibilityLabel={`${unread ? `${t('notifications.unread')}. ` : ''}${item.title}. ${item.body ?? ''}`}
               onPress={() => {
                 if (unread) markRead.mutate(item.id);
-                if (reportId) router.push({ pathname: '/reports/[id]', params: { id: reportId } });
+                if (support) router.push(support);
                 else if (verification) router.push(verification);
               }}>
               <Card style={[styles.item, { opacity: unread ? 1 : 0.7 }]}>

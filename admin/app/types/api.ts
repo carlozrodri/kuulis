@@ -303,6 +303,8 @@ export interface AppConfig {
   safety?: SafetySettings
   // ---- Ongoing driver verification (doc 12). ----
   verification?: VerificationSettings
+  // ---- Support (doc 13). ----
+  support?: SupportSettings
 }
 
 // ---- Phase 1B: rides (docs/api/phase-1b.md) ----
@@ -862,18 +864,206 @@ export interface Report {
   resolved_at: string | null
 }
 
+// ---- Support (doc 13): tickets are reports with a conversation ----
+
+/** web = public contact form on the website, maybe without an account. */
+export type ReportSource = 'app' | 'help' | 'lost_item' | 'web'
+export const REPORT_SOURCES: ReportSource[] = ['app', 'help', 'lost_item', 'web']
+/** null once the ticket is closed. */
+export type WaitingOn = 'staff' | 'user'
+/** system = automatic lines (e.g. "closed for inactivity"). */
+export type AuthorKind = 'user' | 'staff' | 'system'
+
 /** GET /admin/reports items. */
 export interface ReportAdminRead extends Report {
-  reporter: UserBrief
+  /** null for a web contact without an account: use contact_name / contact_email. */
+  reporter: UserBrief | null
   reported: UserBrief | null
   assigned_to: UserBrief | null
   notes_count: number
+  // ---- Doc 13. Optional so the inbox still loads against an older API. ----
+  source?: ReportSource
+  waiting_on?: WaitingOn | null
+  waiting_since?: string | null
+  first_response_at?: string | null
+  sla_due_at?: string | null
+  overdue?: boolean
+  last_message_at?: string | null
+  tags?: string[]
+  csat?: number | null
+  csat_comment?: string | null
+  contact_email?: string | null
+  contact_name?: string | null
+  messages_count?: number
 }
 
 export interface ReportCounts {
   open: number
   in_review: number
   urgent_open: number
+  /** Doc 13. */
+  waiting_staff?: number
+  overdue?: number
+  mine?: number
+}
+
+export interface MessageAttachment {
+  key: string
+  /** Short-lived download link. */
+  url: string
+}
+
+/** A line of the ticket conversation (oldest first; the first one is the description). */
+export interface ReportMessageAdminRead {
+  id: string
+  author_kind: AuthorKind
+  /** Staff first name; null for the user and system lines. */
+  author_name: string | null
+  mine: boolean
+  body: string
+  attachments: MessageAttachment[]
+  created_at: string
+  author: UserBrief | null
+}
+
+export type LostItemAnswer = 'has_it' | 'not_found'
+
+export interface LostItemRead {
+  id: string
+  ride_id: string
+  description: string
+  answer: LostItemAnswer | null
+  answered_at: string | null
+  chat_until: string | null
+  chat_open: boolean
+  report_id: string | null
+  created_at: string
+}
+
+/** What the ticket does after the team's answer. */
+export type ReplyThen = 'wait_user' | 'resolve' | 'keep'
+export const REPLY_THEN: ReplyThen[] = ['wait_user', 'resolve', 'keep']
+
+/** POST /admin/reports/{id}/messages body. */
+export interface ReportReplyInput {
+  body: string
+  attachments?: string[]
+  canned_response_id?: string
+  then: ReplyThen
+  add_tags?: string[]
+}
+
+export interface TagCount {
+  tag: string
+  count: number
+}
+
+export type CannedAction = 'none' | 'wait_user' | 'resolve'
+export const CANNED_ACTIONS: CannedAction[] = ['none', 'wait_user', 'resolve']
+
+/** A saved reply. `{nombre}` and `{viaje}` are filled in when sent. */
+export interface CannedResponse {
+  id: string
+  title: string
+  body: string
+  locale: string
+  action: CannedAction
+  tags: string[]
+  uses: number
+  created_at: string
+  updated_at: string
+}
+
+export interface CannedInput {
+  title: string
+  body: string
+  locale: string
+  action: CannedAction
+  tags: string[]
+}
+
+export interface SupportMetricsDay {
+  date: Day
+  created: number
+  resolved: number
+}
+
+export interface SupportAgentMetrics {
+  user: UserBrief
+  resolved: number
+  first_response_minutes_avg: number | null
+  csat_avg: number | null
+}
+
+/** GET /admin/support/metrics?days=30 (averages null when there is no data). */
+export interface SupportMetrics {
+  days: SupportMetricsDay[]
+  first_response_minutes_avg: number | null
+  resolution_hours_avg: number | null
+  csat_avg: number | null
+  csat_count: number
+  overdue_open: number
+  waiting_staff: number
+  by_agent: SupportAgentMetrics[]
+}
+
+/** config.support (doc 13). */
+export interface SupportSettings {
+  sla_urgent_minutes: number
+  sla_normal_hours: number
+  response_promise_es: string
+  response_promise_en: string
+  auto_close_days: number
+  auto_assign: boolean
+  lost_item_days: number
+  lost_item_chat_hours: number
+}
+
+/** POST /files/presign-upload response: PUT the bytes to upload_url with these headers, then send the key. */
+export interface PresignedUpload {
+  key: string
+  upload_url: string
+  method?: 'PUT'
+  headers: Record<string, string>
+  expires_in?: number
+}
+
+// ---- Help center (doc 13) ----
+
+export type HelpTopic = 'account' | 'rides' | 'payments' | 'wallet' | 'safety' | 'documents' | 'app'
+export const HELP_TOPICS: HelpTopic[] = ['account', 'rides', 'payments', 'wallet', 'safety', 'documents', 'app']
+export type HelpAudience = 'all' | 'passenger' | 'driver'
+export const HELP_AUDIENCES: HelpAudience[] = ['all', 'passenger', 'driver']
+export const HELP_LOCALES = ['es', 'en'] as const
+export type HelpLocale = typeof HELP_LOCALES[number]
+
+/** GET /admin/help/articles items. */
+export interface HelpArticleAdmin {
+  id: string
+  slug: string
+  locale: string
+  topic: HelpTopic
+  audience: HelpAudience
+  title: string
+  excerpt: string
+  position: number
+  updated_at: string
+  body_md: string
+  published: boolean
+  views: number
+  helpful_yes: number
+  helpful_no: number
+}
+
+export interface HelpArticleInput {
+  slug: string
+  locale: string
+  topic: HelpTopic
+  audience: HelpAudience
+  title: string
+  body_md: string
+  published: boolean
+  position: number
 }
 
 /** GET /admin/reports: a page plus counts for the whole inbox. */
@@ -912,7 +1102,12 @@ export interface ReportAdminDetail extends ReportAdminRead {
   ride: AdminRideRead | null
   notes: ReportNote[]
   reported_summary: PersonSummary | null
-  reporter_summary: PersonSummary
+  /** null for a web contact without an account. */
+  reporter_summary: PersonSummary | null
+  // ---- Doc 13 ----
+  messages?: ReportMessageAdminRead[]
+  help_article?: { id: string, slug: string, title: string } | null
+  lost_item?: LostItemRead | null
 }
 
 /** RideAdminRead (list shape of /admin/rides): the ride plus flat names of both parties. */
@@ -929,6 +1124,8 @@ export interface ReportUpdate {
   status?: 'open' | 'in_review'
   priority?: ReportPriority
   assigned_to_id?: string | null
+  /** Doc 13: replaces the ticket's tags. */
+  tags?: string[]
 }
 
 // ---- Finance ----

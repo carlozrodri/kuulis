@@ -1,29 +1,62 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshControl, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  KeyboardAvoidingView,
+  Linking,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Check, CircleX, MessageCircle } from "@/components/icons";
+import {
+  ChevronLeft,
+  CircleX,
+  Lock,
+  MessagesSquare,
+  Paperclip,
+  Send,
+  Star,
+} from "@/components/icons";
+import { showToast } from "@/components/Toast";
 import {
   Button,
   EmptyState,
+  IconButton,
   IconTile,
-  Screen,
   Skeleton,
   StatusPill,
   Txt,
 } from "@/components/ui";
-import { FlowHeader } from "@/features/wallet/components";
-import { useReport } from "@/hooks/useReports";
+import { useAppConfig } from "@/hooks/useDriver";
+import {
+  useRateReport,
+  useReport,
+  useReportMessages,
+  useSendReportMessage,
+} from "@/hooks/useReports";
 import { useRide } from "@/hooks/useRides";
 import { apiErrorMessage } from "@/i18n";
+import { ApiError } from "@/lib/api";
+import { confirmHaptic, selectionHaptic } from "@/lib/feedback";
+import { isUrgentCategory } from "@/lib/reports";
 import {
-  isOpenReport,
-  isUrgentCategory,
-  reportTimeline,
-  type TimelineStep,
-} from "@/lib/reports";
-import type { Report } from "@/lib/types";
-import { radius, space, useTheme } from "@/theme";
+  canRate,
+  canReply,
+  conversationState,
+  CSAT_COMMENT_MAX,
+  MESSAGE_MAX,
+  messageProblem,
+  responsePromise,
+} from "@/lib/support";
+import type { Report, ReportMessage } from "@/lib/types";
+import { fonts, radius, space, useTheme } from "@/theme";
 
 import {
   CATEGORY_ICONS,
@@ -31,291 +64,580 @@ import {
   RideContextCard,
   UrgentNote,
 } from "./components";
+import {
+  PhotoStrip,
+  uploadErrorMessage,
+  usePhotoAttachments,
+} from "./PhotoAttachments";
 
 function leave() {
   if (router.canGoBack()) router.back();
   else router.replace("/reports");
 }
 
-/** One report: what was sent, its status timeline and the team's answer. */
+/**
+ * One conversation with the team (doc 13): the thread (the first message is what the user reported), a reply
+ * box with up to 4 photos while it can take replies, and the 1–5 rating once it is closed.
+ */
 export function ReportDetailScreen() {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const report = useReport(id);
-  const ride = useRide(report.data?.ride_id ?? undefined);
   const data = report.data;
+  const messages = useReportMessages(id, data);
+  const ride = useRide(data?.ride_id ?? undefined);
+  const { config } = useAppConfig();
+  const listRef = useRef<FlatList<ReportMessage>>(null);
+  const count = useRef(0);
 
-  const formatDateTime = (value: string) =>
-    new Date(value).toLocaleString(i18n.language, {
-      day: "numeric",
-      month: "long",
-      hour: "numeric",
-      minute: "2-digit",
-    });
+  // Back on screen (from the notification, another app): read the thread again.
+  const refetchReport = report.refetch;
+  const refetchMessages = messages.refetch;
+  useFocusEffect(
+    useCallback(() => {
+      void refetchReport();
+      void refetchMessages();
+    }, [refetchReport, refetchMessages]),
+  );
 
-  const refresh = (
-    <RefreshControl
-      refreshing={report.isRefetching}
-      onRefresh={() => void report.refetch()}
-      tintColor={theme.primary}
-    />
+  const header = (
+    <View
+      style={[
+        styles.header,
+        {
+          paddingTop: insets.top + space.xs,
+          backgroundColor: theme.surface,
+          borderBottomColor: theme.border,
+        },
+      ]}
+    >
+      <IconButton
+        icon={ChevronLeft}
+        label={t("common.back")}
+        tone="plain"
+        onPress={leave}
+      />
+      {data ? (
+        <IconTile
+          icon={CATEGORY_ICONS[data.category]}
+          tone={isUrgentCategory(data.category) ? "danger" : "primary"}
+          size={40}
+        />
+      ) : null}
+      <View style={{ flex: 1 }}>
+        <Txt variant="subtitle" numberOfLines={1} accessibilityRole="header">
+          {data
+            ? t(`report.category.${data.category}.title`)
+            : t("reports.detailTitle")}
+        </Txt>
+        {data ? <HeaderStatus report={data} /> : null}
+      </View>
+    </View>
   );
 
   if (!data) {
     return (
-      <Screen
-        refreshControl={refresh}
-        header={<FlowHeader title={t("reports.detailTitle")} onBack={leave} />}
-      >
-        {report.isError ? (
-          <View>
-            <EmptyState
-              icon={CircleX}
-              title={t("common.error")}
-              body={apiErrorMessage(report.error)}
-            />
-            <Button
-              title={t("common.retry")}
-              variant="secondary"
-              onPress={() => void report.refetch()}
-            />
-          </View>
-        ) : (
-          <View style={{ gap: space.sm }}>
-            <Skeleton height={72} radius={radius.card} />
-            <Skeleton height={120} radius={radius.card} />
-            <Skeleton height={160} radius={radius.card} />
-          </View>
-        )}
-      </Screen>
+      <View style={{ flex: 1, backgroundColor: theme.background }}>
+        {header}
+        <View style={{ padding: space.lg, gap: space.sm }}>
+          {report.isError ? (
+            <>
+              <EmptyState
+                icon={CircleX}
+                title={t("common.error")}
+                body={apiErrorMessage(report.error)}
+              />
+              <Button
+                title={t("common.retry")}
+                variant="secondary"
+                onPress={() => void report.refetch()}
+              />
+            </>
+          ) : (
+            <>
+              <Skeleton height={72} radius={radius.card} />
+              <Skeleton height={90} width="70%" radius={radius.card} />
+              <Skeleton height={60} width="60%" radius={radius.card} style={{ alignSelf: "flex-end" }} />
+            </>
+          )}
+        </View>
+      </View>
     );
   }
 
   const urgent = isUrgentCategory(data.category);
-  const closed = !isOpenReport(data.status);
+  const state = conversationState(data);
+  const replyable = canReply(data) && !messages.data?.legacy;
+  const items = messages.data?.messages ?? [];
 
   return (
-    <Screen
-      refreshControl={refresh}
-      header={<FlowHeader title={t("reports.detailTitle")} onBack={leave} />}
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: theme.background }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={{ gap: space.md }}>
-        <View style={[styles.summary, { backgroundColor: theme.surface }]}>
-          <IconTile
-            icon={CATEGORY_ICONS[data.category]}
-            tone={urgent ? "danger" : "primary"}
-            size={52}
-          />
-          <View style={{ flex: 1, gap: 4 }}>
-            <Txt variant="subtitle">
-              {t(`report.category.${data.category}.title`)}
-            </Txt>
-            <Txt variant="caption" color="muted">
-              {t("reports.sentOn", { date: formatDateTime(data.created_at) })}
-            </Txt>
-            <View style={styles.pills}>
-              <ReportStatusPill status={data.status} />
-              {data.priority === "urgent" && !closed ? (
-                <StatusPill label={t("reports.priority")} tone="danger" />
+      {header}
+      <FlatList
+        ref={listRef}
+        data={items}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <MessageBubble message={item} />}
+        contentContainerStyle={{ padding: space.md, gap: space.sm, flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        onContentSizeChange={() => {
+          // Jump to the newest message when one arrives (not on every re-render).
+          if (items.length !== count.current) {
+            count.current = items.length;
+            listRef.current?.scrollToEnd({ animated: count.current > 0 });
+          }
+        }}
+        ListHeaderComponent={
+          <View style={{ gap: space.sm, marginBottom: space.xs }}>
+            {data.ride_id && !ride.isError ? (
+              <RideContextCard ride={ride.data} />
+            ) : null}
+            {urgent && state !== "closed" ? <UrgentNote compact /> : null}
+            {state === "waiting" ? (
+              <Txt variant="caption" color="muted" align="center">
+                {responsePromise(config, i18n.language)}
+              </Txt>
+            ) : null}
+          </View>
+        }
+        ListEmptyComponent={
+          messages.isPending ? (
+            <ActivityIndicator color={theme.primary} style={{ marginTop: space.xl }} />
+          ) : messages.isError ? (
+            <View>
+              <EmptyState
+                icon={CircleX}
+                title={t("common.error")}
+                body={apiErrorMessage(messages.error)}
+              />
+              <Button
+                title={t("common.retry")}
+                variant="secondary"
+                onPress={() => void messages.refetch()}
+              />
+            </View>
+          ) : (
+            <EmptyState icon={MessagesSquare} title={t("support.thread.empty")} />
+          )
+        }
+        ListFooterComponent={
+          state === "closed" || !replyable ? (
+            <View style={{ gap: space.sm, marginTop: space.sm }}>
+              {canRate(data) ? <CsatCard report={data} /> : null}
+              {data.csat ? (
+                <Txt variant="caption" color="muted" align="center">
+                  {t("support.csat.given", { score: data.csat })}
+                </Txt>
               ) : null}
             </View>
-          </View>
-        </View>
-
-        {closed ? <Resolution report={data} /> : null}
-
-        <View style={[styles.card, { backgroundColor: theme.surface }]}>
-          <Txt variant="overline" color="muted">
-            {t("reports.progress")}
-          </Txt>
-          <Timeline
-            steps={reportTimeline(data)}
-            urgent={data.priority === "urgent"}
-            formatDate={formatDateTime}
-          />
-        </View>
-
-        <View style={[styles.card, { backgroundColor: theme.surface }]}>
-          <Txt variant="overline" color="muted">
-            {t("reports.youWrote")}
-          </Txt>
-          <Txt>{data.description}</Txt>
-        </View>
-
-        {data.ride_id ? (
-          ride.isError ? null : (
-            <RideContextCard ride={ride.data} />
-          )
-        ) : null}
-
-        {urgent && !closed ? <UrgentNote /> : null}
-      </View>
-    </Screen>
+          ) : null
+        }
+      />
+      {replyable ? (
+        <Composer report={data} />
+      ) : !canReply(data) ? (
+        <ClosedBar report={data} />
+      ) : null}
+    </KeyboardAvoidingView>
   );
 }
 
-/** The team's answer once the report is resolved or dismissed. */
-function Resolution({ report }: { report: Report }) {
+/** "Te respondimos" / "Esperando respuesta del equipo" or the closed status. */
+function HeaderStatus({ report }: { report: Report }) {
   const { t } = useTranslation();
-  const theme = useTheme();
-  const resolved = report.status === "resolved";
+  const state = conversationState(report);
   return (
-    <View
-      accessibilityRole="summary"
-      style={[
-        styles.card,
-        {
-          backgroundColor: resolved ? theme.successSoft : theme.surfaceAlt,
-        },
-      ]}
-    >
-      <View style={styles.resolutionTitle}>
-        <MessageCircle
-          size={18}
-          color={resolved ? theme.success : theme.muted}
-          strokeWidth={2.2}
+    <View style={styles.pills}>
+      {state === "closed" ? (
+        <ReportStatusPill status={report.status} />
+      ) : (
+        <StatusPill
+          label={t(`reports.state.${state}`)}
+          tone={state === "replied" ? "primary" : "info"}
+          dot
         />
-        <Txt
-          variant="bodyStrong"
-          style={{ color: resolved ? theme.success : theme.text, flex: 1 }}
-        >
-          {t("reports.resolution")}
-        </Txt>
-      </View>
-      <Txt>{report.resolution?.trim() || t("reports.noResolution")}</Txt>
+      )}
+      {report.priority === "urgent" && state !== "closed" ? (
+        <StatusPill label={t("reports.priority")} tone="danger" />
+      ) : null}
     </View>
   );
 }
 
-function Timeline({
-  steps,
-  urgent,
-  formatDate,
-}: {
-  steps: TimelineStep[];
-  urgent: boolean;
-  formatDate: (value: string) => string;
-}) {
+function MessageBubble({ message }: { message: ReportMessage }) {
+  const { t, i18n } = useTranslation();
+  const theme = useTheme();
+  const time = new Date(message.created_at).toLocaleString(i18n.language, {
+    day: "numeric",
+    month: "short",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  if (message.author_kind === "system") {
+    return (
+      <View style={[styles.system, { backgroundColor: theme.surfaceAlt }]}>
+        <Txt variant="caption" color="muted" align="center">
+          {message.body}
+        </Txt>
+        <Txt variant="micro" color="muted" align="center">
+          {time}
+        </Txt>
+      </View>
+    );
+  }
+
+  const mine = message.mine;
+  const author = mine
+    ? t("support.thread.you")
+    : message.author_name
+      ? t("support.thread.staffNamed", { name: message.author_name })
+      : t("support.thread.staff");
+  const fg = mine ? theme.onPrimary : theme.text;
+  return (
+    <View
+      style={{ alignItems: mine ? "flex-end" : "flex-start" }}
+      accessible
+      accessibilityLabel={`${author}, ${time}: ${message.body}${
+        message.attachments.length
+          ? `. ${t("support.thread.photos", { count: message.attachments.length })}`
+          : ""
+      }`}
+    >
+      {!mine ? (
+        <Txt variant="micro" color="muted" style={{ marginBottom: 2, marginLeft: space.xs }}>
+          {author}
+        </Txt>
+      ) : null}
+      <View
+        style={[
+          styles.bubble,
+          mine
+            ? { backgroundColor: theme.primary, borderBottomRightRadius: 6 }
+            : { backgroundColor: theme.surface, borderBottomLeftRadius: 6 },
+        ]}
+      >
+        {message.body ? <Txt style={{ color: fg }}>{message.body}</Txt> : null}
+        {message.attachments.length ? (
+          <View style={styles.attachments}>
+            {message.attachments.map((file, index) => (
+              <Pressable
+                key={file.key}
+                accessibilityRole="imagebutton"
+                accessibilityLabel={t("support.thread.openPhoto", { n: index + 1 })}
+                onPress={() => void Linking.openURL(file.url).catch(() => undefined)}
+              >
+                <Image
+                  source={{ uri: file.url }}
+                  style={[styles.attachment, { backgroundColor: theme.surfaceAlt }]}
+                  accessibilityIgnoresInvertColors
+                />
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
+        <Txt
+          variant="micro"
+          style={{ color: mine ? theme.onPrimary : theme.muted, opacity: 0.75, alignSelf: "flex-end" }}
+        >
+          {time}
+        </Txt>
+      </View>
+    </View>
+  );
+}
+
+/** Reply box: text, up to 4 photos and send. */
+function Composer({ report }: { report: Report }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
+  const send = useSendReportMessage(report.id);
+  const reportQuery = useReport(report.id);
+  const photos = usePhotoAttachments();
+  const [text, setText] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const busy = uploading || send.isPending;
+  const problem = messageProblem(text);
+  const ready = !problem && !busy;
 
-  const detail = (step: TimelineStep) => {
-    if (step.at) return formatDate(step.at);
-    if (step.key === "in_review") {
-      if (step.state === "current") return t("reports.timeline.reviewing");
-      if (step.state === "upcoming")
-        return urgent
-          ? t("reports.timeline.waitingUrgent")
-          : t("reports.timeline.waiting");
+  const submit = async () => {
+    if (!ready) return;
+    selectionHaptic();
+    let attachments: string[] = [];
+    if (photos.photos.length) {
+      setUploading(true);
+      try {
+        attachments = await photos.upload();
+      } catch (error) {
+        showToast(uploadErrorMessage(error, t), "danger");
+        return;
+      } finally {
+        setUploading(false);
+      }
     }
-    if (step.state === "upcoming") return t("reports.timeline.pending");
-    return null;
+    send.mutate(
+      { body: text.trim(), ...(attachments.length ? { attachments } : {}) },
+      {
+        onSuccess: () => {
+          setText("");
+          photos.clear();
+        },
+        onError: (error) => {
+          showToast(apiErrorMessage(error), "danger");
+          if (error instanceof ApiError && error.code === "report_closed")
+            void reportQuery.refetch();
+        },
+      },
+    );
   };
 
   return (
-    <View>
-      {steps.map((step, index) => {
-        const last = index === steps.length - 1;
-        const done = step.state === "done";
-        const current = step.state === "current";
-        const label = t(`reports.timeline.${step.key}`);
-        const text = detail(step);
-        const dotColor = done
-          ? theme.primary
-          : current
-            ? theme.warning
-            : theme.border;
-        return (
-          <View
-            key={step.key}
-            style={styles.step}
-            accessible
-            accessibilityLabel={`${t("reports.timeline.stepA11y", {
-              label,
-              state: t(`reports.timeline.state.${step.state}`),
-            })}${text ? `. ${text}` : ""}`}
+    <View
+      style={[
+        styles.composer,
+        {
+          backgroundColor: theme.surface,
+          borderTopColor: theme.border,
+          paddingBottom: Math.max(insets.bottom, space.sm),
+        },
+      ]}
+    >
+      {photos.sheet}
+      <PhotoStrip photos={photos.photos} onRemove={photos.remove} disabled={busy} />
+      <View style={styles.inputRow}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("support.photos.add")}
+          accessibilityState={{ disabled: busy || photos.full }}
+          disabled={busy}
+          onPress={photos.open}
+          style={({ pressed }) => [
+            styles.round,
+            { backgroundColor: theme.background, opacity: pressed || photos.full ? 0.6 : 1 },
+          ]}
+        >
+          <Paperclip size={20} color={theme.text} strokeWidth={2.2} />
+        </Pressable>
+        <TextInput
+          value={text}
+          onChangeText={setText}
+          placeholder={t("support.thread.placeholder")}
+          placeholderTextColor={theme.muted}
+          accessibilityLabel={t("support.thread.placeholder")}
+          multiline
+          maxLength={MESSAGE_MAX}
+          selectionColor={theme.primary}
+          cursorColor={theme.primary}
+          maxFontSizeMultiplier={1.5}
+          style={[styles.input, { color: theme.text, backgroundColor: theme.background }]}
+        />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("support.thread.send")}
+          accessibilityState={{ disabled: !ready, busy }}
+          disabled={!ready}
+          onPress={() => void submit()}
+          style={({ pressed }) => [
+            styles.round,
+            { backgroundColor: ready ? theme.primary : theme.disabled, opacity: pressed ? 0.8 : 1 },
+          ]}
+        >
+          {busy ? (
+            <ActivityIndicator color={theme.onPrimary} size="small" />
+          ) : (
+            <Send size={20} color={ready ? theme.onPrimary : theme.onDisabled} strokeWidth={2.4} />
+          )}
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+/** "Esta conversación está cerrada" and a way to start a new one. */
+function ClosedBar({ report }: { report: Report }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const insets = useSafeAreaInsets();
+  return (
+    <View
+      style={[
+        styles.composer,
+        {
+          backgroundColor: theme.surface,
+          borderTopColor: theme.border,
+          paddingBottom: Math.max(insets.bottom, space.sm),
+        },
+      ]}
+    >
+      <View style={styles.closedRow}>
+        <Lock size={18} color={theme.muted} strokeWidth={2.2} />
+        <Txt variant="caption" color="muted" style={{ flex: 1 }}>
+          {t("support.thread.closed")}
+        </Txt>
+      </View>
+      <Button
+        title={t("support.thread.newConversation")}
+        variant="secondary"
+        size="sm"
+        onPress={() =>
+          router.push({
+            pathname: "/report",
+            params: report.ride_id ? { ride_id: report.ride_id } : {},
+          })
+        }
+      />
+    </View>
+  );
+}
+
+/** "¿Cómo te atendimos?": 1 to 5 stars and an optional comment. */
+function CsatCard({ report }: { report: Report }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const rate = useRateReport(report.id);
+  const [score, setScore] = useState(0);
+  const [comment, setComment] = useState("");
+
+  const submit = () => {
+    if (!score) return;
+    const text = comment.trim();
+    rate.mutate(
+      { score, ...(text ? { comment: text.slice(0, CSAT_COMMENT_MAX) } : {}) },
+      {
+        onSuccess: () => {
+          confirmHaptic();
+          showToast(t("support.csat.thanks"), "success");
+        },
+        onError: (error) => showToast(apiErrorMessage(error), "danger"),
+      },
+    );
+  };
+
+  return (
+    <View style={[styles.csat, { backgroundColor: theme.surface }]}>
+      <Txt variant="subtitle" align="center">
+        {t("support.csat.title")}
+      </Txt>
+      <Txt variant="caption" color="muted" align="center">
+        {t("support.csat.body")}
+      </Txt>
+      <View style={styles.stars} accessibilityRole="radiogroup">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <Pressable
+            key={n}
+            accessibilityRole="radio"
+            accessibilityLabel={t("support.csat.star", { count: n })}
+            accessibilityState={{ checked: score === n }}
+            hitSlop={6}
+            onPress={() => {
+              selectionHaptic();
+              setScore(n);
+            }}
           >
-            <View style={styles.rail}>
-              <View
-                style={[
-                  styles.dot,
-                  {
-                    backgroundColor: done ? dotColor : theme.surface,
-                    borderColor: dotColor,
-                  },
-                ]}
-              >
-                {done ? (
-                  <Check size={14} color={theme.onPrimary} strokeWidth={3} />
-                ) : current ? (
-                  <View
-                    style={[styles.innerDot, { backgroundColor: dotColor }]}
-                  />
-                ) : null}
-              </View>
-              {!last ? (
-                <View
-                  style={[
-                    styles.line,
-                    {
-                      backgroundColor:
-                        steps[index + 1]?.state === "upcoming"
-                          ? theme.border
-                          : theme.primary,
-                    },
-                  ]}
-                />
-              ) : null}
-            </View>
-            <View
-              style={[styles.stepBody, !last && { paddingBottom: space.md }]}
-            >
-              <Txt
-                variant="bodyStrong"
-                color={step.state === "upcoming" ? "muted" : "text"}
-              >
-                {label}
-              </Txt>
-              {text ? (
-                <Txt variant="caption" color="muted">
-                  {text}
-                </Txt>
-              ) : null}
-            </View>
-          </View>
-        );
-      })}
+            <Star
+              size={36}
+              color={theme.accent}
+              fill={n <= score ? theme.accent : "transparent"}
+              strokeWidth={2}
+            />
+          </Pressable>
+        ))}
+      </View>
+      {score ? (
+        <>
+          <TextInput
+            value={comment}
+            onChangeText={setComment}
+            placeholder={t("support.csat.comment")}
+            placeholderTextColor={theme.muted}
+            accessibilityLabel={t("support.csat.comment")}
+            multiline
+            maxLength={CSAT_COMMENT_MAX}
+            selectionColor={theme.primary}
+            cursorColor={theme.primary}
+            maxFontSizeMultiplier={1.5}
+            textAlignVertical="top"
+            style={[
+              styles.comment,
+              { color: theme.text, backgroundColor: theme.background, borderColor: theme.border },
+            ]}
+          />
+          <Button title={t("support.csat.submit")} loading={rate.isPending} onPress={submit} />
+        </>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  summary: {
+  header: {
     flexDirection: "row",
     alignItems: "center",
-    gap: space.md,
-    borderRadius: radius.card,
-    padding: space.md,
+    gap: space.sm,
+    paddingHorizontal: space.sm,
+    paddingBottom: space.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   pills: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 2 },
-  card: { borderRadius: radius.card, padding: space.md, gap: space.sm },
-  resolutionTitle: {
-    flexDirection: "row",
-    alignItems: "center",
+  system: {
+    alignSelf: "center",
+    maxWidth: "90%",
+    borderRadius: radius.tile,
+    paddingHorizontal: space.md,
+    paddingVertical: space.xs,
+    gap: 2,
+  },
+  bubble: {
+    maxWidth: "84%",
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    gap: 4,
+  },
+  attachments: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 2 },
+  attachment: { width: 96, height: 96, borderRadius: radius.field },
+  composer: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: space.xs,
+    paddingHorizontal: space.md,
     gap: space.xs,
   },
-  step: { flexDirection: "row", gap: space.sm },
-  rail: { alignItems: "center", width: 24 },
-  dot: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
+  inputRow: { flexDirection: "row", alignItems: "flex-end", gap: space.xs },
+  input: {
+    flex: 1,
+    minHeight: 48,
+    maxHeight: 140,
+    borderRadius: 24,
+    paddingHorizontal: space.md,
+    paddingTop: 13,
+    paddingBottom: 13,
+    fontFamily: fonts.medium,
+    fontSize: 16,
+  },
+  round: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
   },
-  innerDot: { width: 10, height: 10, borderRadius: 5 },
-  line: { width: 2, flex: 1, marginVertical: 2, borderRadius: 1 },
-  stepBody: { flex: 1, gap: 2, paddingTop: 1 },
+  closedRow: { flexDirection: "row", alignItems: "center", gap: space.xs },
+  csat: { borderRadius: radius.card, padding: space.md, gap: space.sm },
+  stars: { flexDirection: "row", justifyContent: "center", gap: space.xs },
+  comment: {
+    minHeight: 88,
+    borderWidth: 1.5,
+    borderRadius: radius.field,
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 12,
+    fontFamily: fonts.medium,
+    fontSize: 15,
+  },
 });

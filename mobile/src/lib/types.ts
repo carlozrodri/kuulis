@@ -94,6 +94,17 @@ export interface AppConfig extends RideConfig {
   vehicle_photo_min_count: number;
   /** Doc 12 (older servers omit it; see DEFAULT_VERIFICATION in lib/verification.ts). */
   verification?: VerificationConfig;
+  /** Doc 13 (older servers omit it). */
+  support?: Partial<SupportConfig>;
+}
+
+/** Support settings the app reads (doc 13), from GET /config/public. */
+export interface SupportConfig {
+  response_promise_es: string;
+  response_promise_en: string;
+  auto_close_days: number;
+  lost_item_days: number;
+  lost_item_chat_hours: number;
 }
 
 /** Ongoing driver verification settings (doc 12), from GET /config/public. */
@@ -645,12 +656,77 @@ export interface Report {
   /** The team's answer, shown to the reporter once resolved or dismissed. */
   resolution: string | null;
   resolved_at: string | null;
+  // Doc 13: the report is a conversation (optional: older servers do not send them).
+  source?: ReportSource;
+  /** Who has to answer next; null once closed. */
+  waiting_on?: "staff" | "user" | null;
+  last_message_at?: string | null;
+  csat?: number | null;
+  /** The team wrote after the user last opened it. */
+  unread?: boolean;
+  can_reply?: boolean;
+  can_rate?: boolean;
 }
+
+export type ReportSource = "app" | "help" | "lost_item" | "web";
 
 export interface ReportInput {
   category: ReportCategory;
   description: string;
   ride_id?: string;
+  /** Doc 13: uploaded photo keys (folder "uploads"), at most 4. */
+  attachments?: string[];
+  /** Doc 13: the help article the user came from ("Contactar a soporte"). */
+  help_article_id?: string;
+}
+
+/** GET /reports/me/{id}/messages (doc 13), oldest first. */
+export interface ReportMessage {
+  id: string;
+  author_kind: "user" | "staff" | "system";
+  /** Staff first name; null for the user and automatic lines. */
+  author_name: string | null;
+  mine: boolean;
+  body: string;
+  attachments: { key: string; url: string }[];
+  created_at: string;
+}
+
+// ── Doc 13: help center ──
+
+export type HelpTopic = "account" | "rides" | "payments" | "wallet" | "safety" | "documents" | "app";
+export type HelpAudience = "all" | "passenger" | "driver";
+
+export interface HelpArticleSummary {
+  id: string;
+  slug: string;
+  locale: string;
+  topic: HelpTopic;
+  audience: HelpAudience;
+  title: string;
+  /** Plain text, ≤180 chars. */
+  excerpt: string;
+  position: number;
+  updated_at: string;
+}
+
+export interface HelpArticle extends HelpArticleSummary {
+  body_md: string;
+}
+
+// ── Doc 13: lost item ──
+
+export interface LostItem {
+  id: string;
+  ride_id: string;
+  description: string;
+  answer: "has_it" | "not_found" | null;
+  answered_at: string | null;
+  /** The ride chat stays open until then when the driver has it. */
+  chat_until: string | null;
+  chat_open: boolean;
+  report_id: string | null;
+  created_at: string;
 }
 
 /** `details` of a 409 report_already_open. */

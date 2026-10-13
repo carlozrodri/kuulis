@@ -11,6 +11,18 @@ describe('legal markdown', () => {
     ])
   })
 
+  it('parses safe links only', () => {
+    expect(parseInline('Ve a [Contacto](/contacto) o [web](https://kuulis.app).')).toEqual([
+      { text: 'Ve a ', bold: false },
+      { text: 'Contacto', bold: false, href: '/contacto' },
+      { text: ' o ', bold: false },
+      { text: 'web', bold: false, href: 'https://kuulis.app' },
+      { text: '.', bold: false },
+    ])
+    expect(parseInline('[x](javascript:alert(1))')[0]).not.toHaveProperty('href')
+    expect(parseInline('[x](//evil.example)')[0]).toEqual({ text: 'x', bold: false })
+  })
+
   it('parses headings, lists, quotes and tables', () => {
     const blocks = parseMarkdown('> **Borrador**\n\n## 1. Uso\nTexto que\nsigue.\n\n- uno\n- dos\n\n| Dato | Plazo |\n|---|---|\n| Chat | 180 días |')
     expect(blocks.map(b => b.type)).toEqual(['quote', 'heading', 'paragraph', 'list', 'table'])

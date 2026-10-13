@@ -14,11 +14,11 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ChevronLeft, MessageCircle, Send } from '@/components/icons';
+import { Backpack, ChevronLeft, MessageCircle, Send } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { EmptyState, IconButton, Notice, Txt } from '@/components/ui';
 import { useFlag } from '@/hooks/useBootstrap';
-import { useRide, useRideMessages, useSendMessage } from '@/hooks/useRides';
+import { useLostItem, useRide, useRideMessages, useSendMessage } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { ApiError } from '@/lib/api';
 import { selectionHaptic } from '@/lib/feedback';
@@ -36,7 +36,10 @@ const QUICK_REPLIES = {
   driver: ['onMyWay', 'arrived', 'outside', 'traffic'],
 } as const;
 
-/** Ride chat (driver ⇄ passenger) with one-tap quick replies. */
+/**
+ * Ride chat (driver ⇄ passenger) with one-tap quick replies. Doc 13: after a completed ride it stays open
+ * while a lost item chat is (`chat_open`), so they agree on the hand-over without sharing phones.
+ */
 export function ChatScreen() {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
@@ -45,7 +48,10 @@ export function ChatScreen() {
   const { mode } = useMode();
   const { id } = useLocalSearchParams<{ id: string }>();
   const ride = useRide(id).data;
-  const messages = useRideMessages(id);
+  const afterRide = ride?.status === 'completed';
+  const lostItem = useLostItem(id, afterRide).data;
+  const lostItemChat = afterRide && !!lostItem?.chat_open;
+  const messages = useRideMessages(id, lostItemChat);
   const send = useSendMessage(id ?? '');
   const [text, setText] = useState('');
   const [closed, setClosed] = useState(false);
@@ -64,7 +70,10 @@ export function ChatScreen() {
 
   const role = ride ? rideRole(ride, user?.id, mode ?? 'passenger') : 'passenger';
   const other = role === 'passenger' ? ride?.driver : ride?.passenger;
-  const canWrite = chatOn && !closed && (!ride || isChatOpen(ride.status));
+  const canWrite = chatOn && !closed && (!ride || isChatOpen(ride.status) || lostItemChat);
+  const chatUntil = lostItem?.chat_until
+    ? new Date(lostItem.chat_until).toLocaleString(i18n.language, { weekday: 'long', hour: 'numeric', minute: '2-digit' })
+    : null;
   const items = useMemo(() => [...(messages.data ?? [])].reverse(), [messages.data]);
 
   const submit = (value: string) => {
@@ -117,6 +126,15 @@ export function ChatScreen() {
         </View>
       </View>
 
+      {lostItemChat ? (
+        <View style={[styles.lostItem, { backgroundColor: theme.surfaceAlt }]}>
+          <Backpack size={18} color={theme.primary} strokeWidth={2.2} />
+          <Txt variant="caption" style={{ flex: 1 }}>
+            {chatUntil ? t('lostItem.chatBanner', { until: chatUntil }) : t('lostItem.chatBannerShort')}
+          </Txt>
+        </View>
+      ) : null}
+
       <FlatList
         inverted
         data={items}
@@ -140,7 +158,7 @@ export function ChatScreen() {
         {canWrite ? (
           <>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.quick}>
-              {QUICK_REPLIES[role].map((key) => (
+              {(lostItemChat ? [] : QUICK_REPLIES[role]).map((key) => (
                 <Pressable
                   key={key}
                   accessibilityRole="button"
@@ -202,6 +220,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   bubbleRow: { flexDirection: 'row' },
+  lostItem: { flexDirection: 'row', alignItems: 'center', gap: space.xs, paddingHorizontal: space.md, paddingVertical: space.xs },
   bubble: { maxWidth: '80%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10, gap: 2 },
   composer: { borderTopWidth: StyleSheet.hairlineWidth, paddingTop: space.xs, paddingHorizontal: space.md, gap: space.xs },
   quick: { gap: space.xs, paddingVertical: 2 },

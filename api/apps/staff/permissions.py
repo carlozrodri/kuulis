@@ -5,7 +5,7 @@ roles and audit), which no staff role can be given."""
 # Stable keys, grouped as the roles matrix shows them. Adding one here makes it assignable.
 PERMISSIONS: dict[str, tuple[str, ...]] = {
     "users": ("users.view", "users.suspend", "users.suspend_long"),
-    "reports": ("reports.manage",),
+    "reports": ("reports.manage", "help.manage"),
     "drivers": ("drivers.view", "drivers.review", "drivers.suspend"),
     "rides": ("rides.view", "rides.cancel", "live.view"),
     "safety": ("safety.view", "safety.manage"),
@@ -40,6 +40,7 @@ DEFAULT_ROLES: dict[str, tuple[str, tuple[str, ...]]] = {
             "users.view",
             "users.suspend",
             "reports.manage",
+            "help.manage",
             "rides.view",
             "drivers.view",
             "live.view",

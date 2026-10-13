@@ -623,7 +623,11 @@ async def post_message(
     role = "driver" if user.id == ride.driver_id else "passenger"
     await control.ensure_enabled(session, "chat", Audience(ident=str(user.id), role=role))
     if ride.status not in ASSIGNED_STATUSES:
-        raise ChatClosedError(details={"status": ride.status.value})
+        from apps.support.services import lost_item_chat_open
+
+        # After the ride, only while a lost item is being handed over (doc 13).
+        if ride.status != RideStatus.COMPLETED or not await lost_item_chat_open(session, ride.id):
+            raise ChatClosedError(details={"status": ride.status.value})
     message = RideMessage(ride_id=ride.id, sender_id=user.id, text=data.text)
     session.add(message)
     await session.commit()

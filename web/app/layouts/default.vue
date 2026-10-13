@@ -8,6 +8,7 @@ watch([() => route.fullPath, locale], () => (open.value = false))
 const links = computed(() => [
   { to: '/motorizados', label: t('nav.drivers') },
   { to: '/descargar', label: t('nav.download') },
+  { to: '/ayuda', label: t('nav.help') },
   { to: '/legal', label: t('nav.legal') },
 ])
 const other = computed(() => (locale.value === 'es' ? 'en' : 'es'))
@@ -85,6 +86,12 @@ const year = new Date().getFullYear()
           </NuxtLink>
           <NuxtLink to="/descargar">
             {{ t('nav.download') }}
+          </NuxtLink>
+          <NuxtLink to="/ayuda">
+            {{ t('nav.help') }}
+          </NuxtLink>
+          <NuxtLink to="/contacto">
+            {{ t('nav.contact') }}
           </NuxtLink>
           <NuxtLink to="/legal/terms">
             {{ t('legal.kinds.terms') }}

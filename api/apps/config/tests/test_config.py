@@ -84,6 +84,16 @@ DEFAULTS = {
         "report_window_days": 30,
         "induction_required": False,
     },
+    "support": {
+        "sla_urgent_minutes": 15,
+        "sla_normal_hours": 24,
+        "response_promise_es": "Respondemos en menos de 24 horas.",
+        "response_promise_en": "We answer within 24 hours.",
+        "auto_close_days": 7,
+        "auto_assign": False,
+        "lost_item_days": 7,
+        "lost_item_chat_hours": 72,
+    },
 }
 
 

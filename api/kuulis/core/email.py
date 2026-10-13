@@ -19,7 +19,9 @@ def is_undeliverable(address: str) -> bool:
     return domain in RESERVED_DOMAINS or domain.endswith(RESERVED_TLDS)
 
 
-async def send_email(to: str, subject: str, html: str, text: str | None = None) -> bool:
+async def send_email(
+    to: str, subject: str, html: str, text: str | None = None, reply_to: str | None = None
+) -> bool:
     if not settings.EMAIL_ENABLED or not settings.RESEND_API_KEY:
         logger.info("Email disabled, skipping '%s' to %s", subject, to)
         return False
@@ -29,6 +31,8 @@ async def send_email(to: str, subject: str, html: str, text: str | None = None) 
     payload = {"from": settings.EMAIL_FROM, "to": [to], "subject": subject, "html": html}
     if text:
         payload["text"] = text
+    if reply_to:
+        payload["reply_to"] = reply_to
     async with httpx.AsyncClient(timeout=10) as client:
         response = await client.post(
             RESEND_URL,

@@ -297,9 +297,22 @@ async def export_data(session: AsyncSession, user: User) -> dict[str, Any]:
         }
         for c in charges
     ]
-    reports = await session.scalars(
-        select(Report).where(Report.reporter_id == user.id).order_by(Report.created_at)
+    reports = list(
+        await session.scalars(
+            select(Report).where(Report.reporter_id == user.id).order_by(Report.created_at)
+        )
     )
+    from apps.moderation.models import ReportMessage
+
+    messages: dict = {}
+    for m in await session.scalars(
+        select(ReportMessage)
+        .where(ReportMessage.report_id.in_([r.id for r in reports]))
+        .order_by(ReportMessage.created_at)
+    ):
+        messages.setdefault(m.report_id, []).append(
+            {"date": m.created_at, "from": m.author_kind.value, "text": m.body}
+        )
     data["reports_filed"] = [
         {
             "date": r.created_at,
@@ -307,6 +320,8 @@ async def export_data(session: AsyncSession, user: User) -> dict[str, Any]:
             "description": r.description,
             "status": r.status.value,
             "resolution": r.resolution,
+            "conversation": messages.get(r.id, []),
+            "rating": r.csat,
         }
         for r in reports
     ]

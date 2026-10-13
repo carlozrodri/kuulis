@@ -12,7 +12,7 @@ import { isActiveStatus } from '@/lib/ride';
 import { elevation, radius, space, useTheme } from '@/theme';
 
 /** Screens still open during maintenance: account, ride history, notifications, help and legal texts. */
-const OPEN_DURING_MAINTENANCE = ['/rides', '/profile', '/notifications', '/reports', '/report', '/legal', '/ride/detail', '/wallet'];
+const OPEN_DURING_MAINTENANCE = ['/rides', '/profile', '/notifications', '/reports', '/report', '/help', '/ride/lost-item', '/ride/chat', '/legal', '/ride/detail', '/wallet'];
 
 export function isOpenDuringMaintenance(pathname: string) {
   return OPEN_DURING_MAINTENANCE.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));

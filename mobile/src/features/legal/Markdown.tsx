@@ -5,11 +5,23 @@ import { Txt, type TxtProps } from '@/components/ui';
 import { parseMarkdown, type Span } from '@/lib/legal';
 import { fonts, radius, space, useTheme } from '@/theme';
 
-function Spans({ spans, ...props }: { spans: Span[] } & Omit<TxtProps, 'children'>) {
+type LinkHandler = (href: string) => void;
+
+function Spans({ spans, onLink, ...props }: { spans: Span[]; onLink?: LinkHandler } & Omit<TxtProps, 'children'>) {
+  const theme = useTheme();
   return (
     <Txt {...props}>
       {spans.map((span, index) =>
-        span.bold ? (
+        span.href ? (
+          <Txt
+            key={index}
+            variant={props.variant}
+            accessibilityRole="link"
+            onPress={() => onLink?.(span.href!)}
+            style={[styles.link, { color: theme.scheme === 'dark' ? theme.primary : theme.primaryPressed }, span.bold && styles.bold]}>
+            {span.text}
+          </Txt>
+        ) : span.bold ? (
           <Txt key={index} variant={props.variant} color={props.color} style={styles.bold}>
             {span.text}
           </Txt>
@@ -21,8 +33,11 @@ function Spans({ spans, ...props }: { spans: Span[] } & Omit<TxtProps, 'children
   );
 }
 
-/** Renders the legal texts' Markdown (lib/legal parseMarkdown) with the app's type scale. */
-export function Markdown({ source }: { source: string }) {
+/**
+ * Renders the legal texts' and help articles' Markdown (lib/legal parseMarkdown) with the app's type scale.
+ * Links call `onLink` (they are plain text without it).
+ */
+export function Markdown({ source, onLink }: { source: string; onLink?: LinkHandler }) {
   const theme = useTheme();
   const blocks = useMemo(() => parseMarkdown(source), [source]);
   return (
@@ -34,6 +49,7 @@ export function Markdown({ source }: { source: string }) {
               <Spans
                 key={index}
                 spans={block.spans}
+                onLink={onLink}
                 variant={block.level === 2 ? 'subtitle' : 'bodyStrong'}
                 accessibilityRole="header"
                 style={{ marginTop: space.sm }}
@@ -42,7 +58,7 @@ export function Markdown({ source }: { source: string }) {
           case 'quote':
             return (
               <View key={index} style={[styles.quote, { backgroundColor: theme.warningSoft, borderColor: theme.warning }]}>
-                <Spans spans={block.spans} variant="caption" />
+                <Spans spans={block.spans} onLink={onLink} variant="caption" />
               </View>
             );
           case 'list':
@@ -53,7 +69,7 @@ export function Markdown({ source }: { source: string }) {
                     <Txt color="muted" style={styles.bullet}>
                       {block.ordered ? `${n + 1}.` : '•'}
                     </Txt>
-                    <Spans spans={item} style={styles.flex} />
+                    <Spans spans={item} onLink={onLink} style={styles.flex} />
                   </View>
                 ))}
               </View>
@@ -69,14 +85,14 @@ export function Markdown({ source }: { source: string }) {
                       { borderColor: theme.border, backgroundColor: r === 0 ? theme.surfaceAlt : theme.surface },
                     ]}>
                     {row.map((cell, c) => (
-                      <Spans key={c} spans={cell} variant={r === 0 ? 'label' : 'caption'} style={styles.cell} />
+                      <Spans key={c} spans={cell} onLink={onLink} variant={r === 0 ? 'label' : 'caption'} style={styles.cell} />
                     ))}
                   </View>
                 ))}
               </View>
             );
           default:
-            return <Spans key={index} spans={block.spans} />;
+            return <Spans key={index} spans={block.spans} onLink={onLink} />;
         }
       })}
     </View>
@@ -86,6 +102,7 @@ export function Markdown({ source }: { source: string }) {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   bold: { fontFamily: fonts.bold },
+  link: { fontFamily: fonts.semibold, textDecorationLine: 'underline' },
   quote: { borderLeftWidth: 3, borderRadius: radius.field, padding: space.sm },
   item: { flexDirection: 'row', gap: space.xs },
   bullet: { minWidth: 18 },

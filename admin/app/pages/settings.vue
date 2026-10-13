@@ -1127,6 +1127,56 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           </div>
         </UCard>
 
+        <!-- Doc 13: support -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.support.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.support.help') }}
+            </p>
+          </template>
+          <div class="space-y-6">
+            <div class="grid gap-4 sm:grid-cols-3">
+              <UFormField
+                v-for="key in SUPPORT_NUMBERS"
+                :key="key"
+                :label="t(`settings.support.numbers.${key}`)"
+                :help="t(`settings.support.numbersHelp.${key}`, { min: SUPPORT_LIMITS[key][0], max: SUPPORT_LIMITS[key][1] })"
+              >
+                <UInputNumber
+                  v-model="form.support[key]"
+                  :min="SUPPORT_LIMITS[key][0]"
+                  :max="SUPPORT_LIMITS[key][1]"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <UFormField
+                v-for="lang in (['es', 'en'] as const)"
+                :key="lang"
+                :label="t(`settings.support.promise.${lang}`)"
+                :help="t('settings.support.promiseHelp', { max: PROMISE_MAX })"
+              >
+                <UInput
+                  v-model="form.support[`response_promise_${lang}`]"
+                  class="w-full"
+                  :maxlength="PROMISE_MAX"
+                  :disabled="readOnly"
+                />
+              </UFormField>
+            </div>
+            <USwitch
+              v-model="form.support.auto_assign"
+              :label="t('settings.support.autoAssign')"
+              :description="t('settings.support.autoAssignHelp')"
+              :disabled="readOnly"
+            />
+          </div>
+        </UCard>
+
         <UAlert
           v-if="!readOnly && dirty && issues.length"
           color="error"

@@ -19,8 +19,10 @@ from apps.moderation.models import (
     ReporterRole,
     ReportNote,
     ReportPriority,
+    ReportSource,
     ReportStatus,
     Suspension,
+    WaitingOn,
 )
 from apps.rides import presence
 from apps.rides.models import Ride, RideStatus
@@ -316,7 +318,15 @@ async def create_report(
     category: ReportCategory,
     description: str,
     ride_id: uuid.UUID | None,
+    *,
+    attachments: Sequence[str] = (),
+    help_article_id: uuid.UUID | None = None,
+    source: ReportSource | None = None,
 ) -> Report:
+    from apps.config.services import get_app_config
+    from apps.support import conversation
+
+    keys = conversation.check_attachments(user, attachments)
     reported_id = None
     role = None
     if ride_id is not None:
@@ -356,12 +366,21 @@ async def create_report(
         priority=(
             ReportPriority.URGENT if category in URGENT_CATEGORIES else ReportPriority.NORMAL
         ),
+        source=source or (ReportSource.HELP if help_article_id else ReportSource.APP),
+        help_article_id=help_article_id,
+        locale=user.locale if user.locale in ("es", "en") else "es",
+        tags=[],
+        created_at=utcnow(),
     )
     session.add(report)
     try:
         await session.flush()
     except IntegrityError as exc:  # a double tap raced the check above
         raise ReportAlreadyOpenError() from exc
+    await conversation.opened(
+        session, report, await get_app_config(session), author=user, attachments=keys
+    )
+    await session.flush()
     return report
 
 
@@ -407,8 +426,28 @@ async def list_reports(
     q: str | None = None,
     user_id: uuid.UUID | None = None,
     ride_id: uuid.UUID | None = None,
+    waiting_on: WaitingOn | None = None,
+    assigned_to_id: uuid.UUID | None = None,
+    unassigned: bool = False,
+    tag: str | None = None,
+    overdue: bool = False,
+    source: ReportSource | None = None,
 ) -> tuple[list[Report], int]:
     stmt = select(Report)
+    if waiting_on:
+        stmt = stmt.where(Report.waiting_on == waiting_on, Report.status.in_(OPEN_STATUSES))
+    if assigned_to_id:  # "Mis tickets": the open ones unless a status is asked for
+        stmt = stmt.where(Report.assigned_to_id == assigned_to_id)
+        if not status:
+            stmt = stmt.where(Report.status.in_(OPEN_STATUSES))
+    if unassigned:
+        stmt = stmt.where(Report.assigned_to_id.is_(None), Report.status.in_(OPEN_STATUSES))
+    if tag:
+        stmt = stmt.where(Report.tags.any(tag.strip().lower()))  # type: ignore[arg-type]
+    if overdue:
+        stmt = stmt.where(_overdue(utcnow()))
+    if source:
+        stmt = stmt.where(Report.source == source)
     if status:
         stmt = stmt.where(Report.status == status)
     if category:
@@ -423,10 +462,12 @@ async def list_reports(
         term = f"%{q.strip().lower()}%"
         reporter, reported = aliased(User), aliased(User)
         stmt = (
-            stmt.join(reporter, reporter.id == Report.reporter_id)
+            stmt.outerjoin(reporter, reporter.id == Report.reporter_id)
             .outerjoin(reported, reported.id == Report.reported_user_id)
             .where(
                 or_(
+                    func.lower(Report.contact_email).like(term),
+                    func.lower(Report.contact_name).like(term),
                     func.lower(reporter.email).like(term),
                     func.lower(reporter.full_name).like(term),
                     func.lower(reported.email).like(term),
@@ -451,19 +492,36 @@ async def list_reports(
     return list(rows), total
 
 
-async def counts(session: AsyncSession) -> dict[str, int]:
+def _overdue(now: datetime):
+    return (
+        Report.status.in_(OPEN_STATUSES)
+        & (Report.waiting_on == WaitingOn.STAFF)
+        & (Report.sla_due_at <= now)
+    )
+
+
+async def counts(session: AsyncSession, me: uuid.UUID | None = None) -> dict[str, int]:
+    is_open = Report.status.in_(OPEN_STATUSES)
     row = (
         await session.execute(
             select(
                 func.count().filter(Report.status == ReportStatus.OPEN),
                 func.count().filter(Report.status == ReportStatus.IN_REVIEW),
-                func.count().filter(
-                    Report.status.in_(OPEN_STATUSES), Report.priority == ReportPriority.URGENT
-                ),
+                func.count().filter(is_open, Report.priority == ReportPriority.URGENT),
+                func.count().filter(is_open, Report.waiting_on == WaitingOn.STAFF),
+                func.count().filter(_overdue(utcnow())),
+                func.count().filter(is_open, Report.assigned_to_id == me),
             )
         )
     ).one()
-    return {"open": row[0], "in_review": row[1], "urgent_open": row[2]}
+    return {
+        "open": row[0],
+        "in_review": row[1],
+        "urgent_open": row[2],
+        "waiting_staff": row[3],
+        "overdue": row[4],
+        "mine": row[5],
+    }
 
 
 async def notes_counts(session: AsyncSession, report_ids: list[uuid.UUID]) -> dict:
@@ -485,6 +543,12 @@ async def notes(session: AsyncSession, report_id: uuid.UUID) -> list[ReportNote]
             .order_by(ReportNote.created_at, ReportNote.id)
         )
     )
+
+
+def status_note(
+    session: AsyncSession, report: Report, author: User | None, body: str
+) -> ReportNote:
+    return _system_note(session, report, author, NoteKind.STATUS, body)
 
 
 def _system_note(
@@ -512,6 +576,7 @@ async def update_report(
     priority: ReportPriority | None,
     assign: bool,
     assigned_to_id: uuid.UUID | None,
+    tags: list[str] | None = None,
 ) -> Report:
     changes = []
     if status is not None and status != report.status:
@@ -520,8 +585,17 @@ async def update_report(
         changes.append(f"status: {report.status.value} → {status.value}")
         report.status = status
     if priority is not None and priority != report.priority:
+        from apps.config.services import get_app_config
+        from apps.support import conversation
+
         changes.append(f"priority: {report.priority.value} → {priority.value}")
         report.priority = priority
+        conversation.reprioritized(report, await get_app_config(session))
+    if tags is not None:
+        clean = sorted({t.strip().lower()[:40] for t in tags if t and t.strip()})
+        if clean != sorted(report.tags or []):
+            changes.append(f"tags: {', '.join(clean) or '—'}")
+            report.tags = clean
     if assign and assigned_to_id != report.assigned_to_id:
         assignee = None
         if assigned_to_id is not None:
@@ -537,27 +611,42 @@ async def update_report(
 
 
 async def resolve(
-    session: AsyncSession, admin: User, report: Report, status: ReportStatus, resolution: str
+    session: AsyncSession,
+    admin: User,
+    report: Report,
+    status: ReportStatus,
+    resolution: str,
+    *,
+    attachments: Sequence[str] = (),
 ) -> Report:
+    """Closes the ticket. The resolution is the team's last message and the user is asked to
+    rate the help (CSAT)."""
+    from apps.moderation.models import AuthorKind
+    from apps.support import conversation
+
     if report.status not in OPEN_STATUSES:
         raise ReportClosedError()
     _system_note(
         session, report, admin, NoteKind.STATUS, f"status: {report.status.value} → {status.value}"
     )
+    now = utcnow()
+    conversation.add_message(
+        session,
+        report,
+        AuthorKind.STAFF,
+        resolution,
+        author=admin,
+        attachments=attachments,
+        now=now,
+    )
     report.status = status
     report.resolution = resolution
-    report.resolved_at = utcnow()
+    report.resolved_at = now
     report.resolved_by_id = admin.id
-    await notify.send(
-        session,
-        report.reporter_id,
-        "report_resolved",
-        kind="report",
-        templates=TEMPLATES,
-        data={"report_id": str(report.id)},
-        resolution=resolution,
-    )
+    report.first_response_at = report.first_response_at or now
+    conversation.stop_waiting(report)
     await session.flush()
+    await conversation.tell_user(session, report, "report_resolved", resolution)
     return report
 
 
@@ -574,6 +663,10 @@ async def reopen(session: AsyncSession, admin: User, report: Report) -> Report:
     report.status = ReportStatus.IN_REVIEW
     report.resolved_at = None
     report.resolved_by_id = None
+    from apps.config.services import get_app_config
+    from apps.support import conversation
+
+    conversation.wait_on_staff(report, await get_app_config(session), utcnow())
     await session.flush()
     return report
 

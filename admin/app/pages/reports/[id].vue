@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PersonSummary, ReportAdminDetail, ReportNote, ReportPriority, ReportUpdate } from '~/types/api'
+import type { PersonSummary, ReportAdminDetail, ReportNote, ReportPriority, ReportUpdate, TagCount } from '~/types/api'
 import { REPORT_PRIORITIES } from '~/types/api'
 
 definePageMeta({ permission: 'reports.manage' })
@@ -22,6 +22,21 @@ const closed = computed(() => !!report.value && isClosedReport(report.value.stat
 const urgent = computed(() => report.value?.priority === 'urgent' && !closed.value)
 const me = computed(() => auth.user.value?.id ?? null)
 const assignedToMe = computed(() => !!me.value && report.value?.assigned_to?.id === me.value)
+
+const contact = computed(() => (report.value ? ticketContact(report.value) : null))
+const messages = computed(() => report.value?.messages ?? null)
+
+// The answer deadline moves with the clock: re-read it every minute, and the ticket too (the user may answer).
+const now = ref(Date.now())
+let timer: ReturnType<typeof setInterval> | undefined
+onMounted(() => {
+  timer = setInterval(() => {
+    now.value = Date.now()
+    if (document.visibilityState === 'visible' && !busy.value) refresh()
+  }, 60_000)
+})
+onBeforeUnmount(() => clearInterval(timer))
+const sla = computed(() => (report.value ? slaState(report.value, now.value) : null))
 
 // Oldest first, like a conversation.
 const notes = computed(() => [...(report.value?.notes ?? [])].sort((a, b) => a.created_at.localeCompare(b.created_at)))
@@ -77,6 +92,24 @@ async function reopen() {
     busy.value = null
   }
 }
+
+// ---- Conversation ------------------------------------------------------------------------------
+
+async function onSent(detail: ReportAdminDetail | null) {
+  if (detail) report.value = detail
+  else await refresh()
+  reportCounts.refresh()
+}
+
+// ---- Tags ---------------------------------------------------------------------------------------
+
+const { data: tagCounts } = useAsyncData('support-tags-ticket', () => request<TagCount[]>('/admin/support/tags').catch(() => [] as TagCount[]), { lazy: true })
+const tags = ref<string[]>([])
+watch(() => report.value?.tags, (value) => {
+  tags.value = [...(value ?? [])]
+}, { immediate: true })
+const tagsDirty = computed(() => JSON.stringify(tags.value) !== JSON.stringify(report.value?.tags ?? []))
+const saveTags = () => update('tags', { tags: tags.value }, t('support.toast.tags'))
 
 // ---- Notes ----------------------------------------------------------------------------------
 
@@ -248,8 +281,30 @@ const rideDriver = computed(() => ride.value?.driver_name || personName(ride.val
                 />
                 <span class="font-semibold">{{ t(`reports.categories.${report.category}`, report.category) }}</span>
                 <span class="text-(--ui-text-muted)">· {{ t(`reports.categoryHelp.${report.category}`, '') }}</span>
+                <UBadge
+                  v-if="report.source"
+                  color="neutral"
+                  variant="outline"
+                  size="sm"
+                  :icon="sourceIcon[report.source]"
+                >
+                  {{ t(`support.sources.${report.source}`) }}
+                </UBadge>
+                <UBadge
+                  v-for="item in report.tags ?? []"
+                  :key="item"
+                  color="neutral"
+                  variant="subtle"
+                  size="sm"
+                  icon="i-lucide-tag"
+                >
+                  {{ item }}
+                </UBadge>
               </div>
-              <blockquote class="border-l-4 border-(--ui-border-accented) pl-4 text-base whitespace-pre-wrap break-words">
+              <blockquote
+                v-if="!messages"
+                class="border-l-4 border-(--ui-border-accented) pl-4 text-base whitespace-pre-wrap break-words"
+              >
                 {{ report.description }}
               </blockquote>
               <dl class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
@@ -267,9 +322,17 @@ const rideDriver = computed(() => ride.value?.driver_name || personName(ride.val
                 </div>
                 <div>
                   <dt class="text-(--ui-text-muted)">
-                    {{ t('reports.updatedAt') }}
+                    {{ t('support.firstResponse') }}
                   </dt>
-                  <dd>{{ formatDate(report.updated_at, locale) }}</dd>
+                  <dd>
+                    <template v-if="report.first_response_at">
+                      {{ formatMinutesSpan((new Date(report.first_response_at).getTime() - new Date(report.created_at).getTime()) / 60_000) }}
+                    </template>
+                    <span
+                      v-else
+                      class="text-(--ui-text-muted)"
+                    >{{ t('support.noResponseYet') }}</span>
+                  </dd>
                 </div>
                 <div v-if="report.resolved_at">
                   <dt class="text-(--ui-text-muted)">
@@ -277,7 +340,48 @@ const rideDriver = computed(() => ride.value?.driver_name || personName(ride.val
                   </dt>
                   <dd>{{ formatDate(report.resolved_at, locale) }}</dd>
                 </div>
+                <div v-else>
+                  <dt class="text-(--ui-text-muted)">
+                    {{ t('reports.updatedAt') }}
+                  </dt>
+                  <dd>{{ formatDate(report.last_message_at ?? report.updated_at, locale) }}</dd>
+                </div>
               </dl>
+
+              <!-- Where the ticket came from (doc 13) -->
+              <UAlert
+                v-if="report.help_article"
+                color="neutral"
+                variant="subtle"
+                icon="i-lucide-book-open"
+                :title="t('support.fromArticle', { title: report.help_article.title })"
+                :description="report.help_article.slug"
+              />
+              <UAlert
+                v-if="report.lost_item"
+                :color="report.lost_item.answer === 'has_it' ? 'success' : report.lost_item.answer === 'not_found' ? 'neutral' : 'warning'"
+                variant="subtle"
+                icon="i-lucide-package-search"
+                :title="t(`support.lostItem.${report.lost_item.answer ?? 'waiting'}`)"
+              >
+                <template #description>
+                  <p class="whitespace-pre-wrap break-words">
+                    {{ report.lost_item.description }}
+                  </p>
+                  <p
+                    v-if="report.lost_item.answered_at"
+                    class="mt-1 text-xs"
+                  >
+                    {{ t('support.lostItem.answeredAt', { when: formatDate(report.lost_item.answered_at, locale) }) }}
+                  </p>
+                  <p
+                    v-if="report.lost_item.chat_until"
+                    class="mt-1 text-xs"
+                  >
+                    {{ t(report.lost_item.chat_open ? 'support.lostItem.chatOpen' : 'support.lostItem.chatClosed', { when: formatDate(report.lost_item.chat_until, locale) }) }}
+                  </p>
+                </template>
+              </UAlert>
               <UAlert
                 v-if="report.resolution"
                 :color="report.status === 'resolved' ? 'success' : 'neutral'"
@@ -286,7 +390,81 @@ const rideDriver = computed(() => ride.value?.driver_name || personName(ride.val
                 :title="t('reports.resolutionSent')"
                 :description="report.resolution"
               />
+              <UAlert
+                v-if="report.csat"
+                color="warning"
+                variant="subtle"
+                icon="i-lucide-star"
+                :title="t('support.csatTitle', { n: report.csat })"
+                :description="report.csat_comment || t('support.csatNoComment')"
+              />
             </div>
+          </UCard>
+
+          <!-- Conversation (doc 13) -->
+          <UCard v-if="messages">
+            <template #header>
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h2 class="font-semibold">
+                  {{ t('support.thread.title') }}
+                </h2>
+                <div class="flex items-center gap-2">
+                  <UBadge
+                    v-if="report.waiting_on"
+                    :color="waitingOnColor[report.waiting_on]"
+                    variant="subtle"
+                  >
+                    {{ t(`support.waitingOn.${report.waiting_on}`) }}
+                  </UBadge>
+                  <UBadge
+                    v-if="sla === 'overdue'"
+                    color="error"
+                    variant="solid"
+                    icon="i-lucide-alarm-clock"
+                  >
+                    {{ t('support.overdue') }}
+                  </UBadge>
+                  <span
+                    v-else-if="sla"
+                    class="text-xs"
+                    :class="sla === 'soon' ? 'font-medium text-warning' : 'text-(--ui-text-muted)'"
+                    :title="formatDate(report.sla_due_at, locale)"
+                  >
+                    {{ t('support.dueIn', { when: formatAgo(report.sla_due_at, locale, now) }) }}
+                  </span>
+                </div>
+              </div>
+            </template>
+            <SupportThread
+              :messages="messages"
+              :user-name="contact?.name ?? ''"
+            />
+            <template #footer>
+              <SupportComposer
+                v-if="!closed"
+                :report-id="report.id"
+                :recipient="contact?.name ?? ''"
+                :web="!report.reporter"
+                @sent="onSent"
+              />
+              <div
+                v-else
+                class="flex flex-wrap items-center justify-between gap-2"
+              >
+                <p class="text-sm text-(--ui-text-muted)">
+                  {{ t('support.closedHint') }}
+                </p>
+                <UButton
+                  icon="i-lucide-rotate-ccw"
+                  color="neutral"
+                  variant="outline"
+                  size="sm"
+                  :label="t('reports.actions.reopen')"
+                  :loading="busy === 'reopen'"
+                  @click="reopen"
+                />
+              </div>
+            </template>
           </UCard>
 
           <!-- People -->
@@ -295,10 +473,55 @@ const rideDriver = computed(() => ride.value?.driver_name || personName(ride.val
             :class="report.reported_summary ? 'md:grid-cols-2' : ''"
           >
             <PersonSummaryCard
+              v-if="report.reporter_summary"
               :summary="report.reporter_summary"
               :title="t('reports.reporter')"
               @suspend="suspendTarget = report.reporter_summary"
             />
+            <UCard v-else>
+              <template #header>
+                <div class="flex items-center justify-between gap-2">
+                  <h2 class="font-semibold">
+                    {{ t('reports.reporter') }}
+                  </h2>
+                  <UBadge
+                    color="info"
+                    variant="subtle"
+                    icon="i-lucide-globe"
+                  >
+                    {{ t('support.web') }}
+                  </UBadge>
+                </div>
+              </template>
+              <dl class="space-y-2 text-sm">
+                <div>
+                  <dt class="text-(--ui-text-muted)">
+                    {{ t('support.contactName') }}
+                  </dt>
+                  <dd class="font-medium">
+                    {{ report.contact_name || '—' }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-(--ui-text-muted)">
+                    {{ t('support.contactEmail') }}
+                  </dt>
+                  <dd>
+                    <ULink
+                      v-if="report.contact_email"
+                      :to="`mailto:${report.contact_email}`"
+                      class="text-primary"
+                    >
+                      {{ report.contact_email }}
+                    </ULink>
+                    <span v-else>—</span>
+                  </dd>
+                </div>
+              </dl>
+              <p class="mt-3 text-xs text-(--ui-text-muted)">
+                {{ t('support.webHelp') }}
+              </p>
+            </UCard>
             <PersonSummaryCard
               v-if="report.reported_summary"
               :summary="report.reported_summary"
@@ -482,6 +705,22 @@ const rideDriver = computed(() => ride.value?.driver_name || personName(ride.val
                 </div>
               </div>
 
+              <UFormField :label="t('support.tags')">
+                <TagEditor
+                  v-model="tags"
+                  :suggestions="tagCounts"
+                />
+                <UButton
+                  v-if="tagsDirty"
+                  class="mt-2"
+                  size="xs"
+                  icon="i-lucide-save"
+                  :label="t('support.saveTags')"
+                  :loading="busy === 'tags'"
+                  @click="saveTags"
+                />
+              </UFormField>
+
               <div
                 v-if="!closed"
                 class="space-y-2 border-t border-(--ui-border) pt-4"
@@ -618,7 +857,7 @@ const rideDriver = computed(() => ride.value?.driver_name || personName(ride.val
               color="info"
               variant="subtle"
               icon="i-lucide-eye"
-              :title="t('reports.resolve.visible', { name: report?.reporter?.name || report?.reporter?.email || '' })"
+              :title="t('reports.resolve.visible', { name: contact?.name ?? '' })"
               :description="t('reports.resolve.visibleHelp')"
             />
             <UFormField
