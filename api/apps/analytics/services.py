@@ -25,7 +25,14 @@ from apps.analytics.schemas import (
     TopUpTotals,
 )
 from apps.config.schemas import AppConfig, ServiceArea
-from apps.drivers.models import DriverProfile, DriverStatus
+from apps.drivers.models import (
+    CheckStatus,
+    DocumentStatus,
+    DriverCheck,
+    DriverDocument,
+    DriverProfile,
+    DriverStatus,
+)
 from apps.moderation import services as moderation
 from apps.monitoring import alerts
 from apps.rates import services as rates
@@ -533,6 +540,21 @@ async def overview(session: AsyncSession) -> Overview:
             DriverProfile.status == DriverStatus.PENDING_REVIEW
         )
     )
+    reverifications = await session.scalar(
+        select(func.count(DriverCheck.id)).where(DriverCheck.status == CheckStatus.PENDING)
+    )
+    today = local_now().date()
+    expiring = await session.scalar(
+        select(func.count(DriverDocument.id))
+        .join(DriverProfile, DriverProfile.id == DriverDocument.driver_id)
+        .where(
+            DriverProfile.status == DriverStatus.APPROVED,
+            DriverDocument.status == DocumentStatus.APPROVED,
+            DriverDocument.superseded_by_id.is_(None),
+            DriverDocument.expires_on >= today,
+            DriverDocument.expires_on <= today + timedelta(days=7),
+        )
+    )
     top_ups = dict(
         (
             await session.execute(
@@ -557,6 +579,8 @@ async def overview(session: AsyncSession) -> Overview:
         completed_today=today_row[1],
         gmv_today=_money(today_row[2]),
         pending_driver_applications=applications or 0,
+        pending_reverifications=reverifications or 0,
+        documents_expiring_week=expiring or 0,
         pending_top_ups=top_ups.get(TopUpStatus.PENDING, 0),
         unmatched_top_ups=top_ups.get(TopUpStatus.UNMATCHED, 0),
         open_reports=reports["open"] + reports["in_review"],

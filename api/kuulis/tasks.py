@@ -23,6 +23,7 @@ TASK_MODULES = [
     "apps.files.metadata",
     "apps.privacy.tasks",
     "apps.safety.tasks",
+    "apps.drivers.tasks",
 ]
 
 if settings.APP_ENV == "test":

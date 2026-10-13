@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Request, status
 
 from apps.audit.services import audit, note, snapshot
+from apps.drivers import checks as driver_checks
 from apps.moderation import services
 from apps.moderation.models import (
     Report,
@@ -60,6 +61,13 @@ async def create(
     )
     await session.commit()
     await session.refresh(report)
+    if (
+        report.category == ReportCategory.VEHICLE_MISMATCH
+        and report.reporter_role == ReporterRole.PASSENGER
+        and report.reported_user_id is not None
+    ):
+        # Enough "it wasn't that moto" reports ask the driver for a selfie and new photos (doc 12).
+        await driver_checks.after_mismatch_report(session, report.reported_user_id)
     return ReportRead.model_validate(report)
 
 

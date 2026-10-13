@@ -122,6 +122,8 @@ class Overview(BaseModel):
     completed_today: int
     gmv_today: Money
     pending_driver_applications: int
+    pending_reverifications: int = 0  # doc 12: selfies, renewals and moto changes to review
+    documents_expiring_week: int = 0
     pending_top_ups: int
     unmatched_top_ups: int
     open_reports: int

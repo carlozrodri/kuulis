@@ -76,5 +76,9 @@ inicial ya existe; falta mantenerla en el tiempo y hacer la revisión más rápi
 06 (rol `verificador` y auditoría de cada acceso a documentos).
 
 ## Preguntas para Carlos
-1. ¿Frecuencia de la selfie al azar? Recomendado: una vez por semana por motorizado, al conectarse.
-2. ¿Pedir certificado de antecedentes penales como documento opcional? Recomendado: opcional al lanzar.
+1. **Decidido (recomendado):** una selfie en vivo más o menos una vez por semana por motorizado, en un momento
+   al azar entre 3,5 y 10,5 días, al conectarse. Se cambia en Ajustes → Verificación (`selfie_every_days`;
+   0 la apaga).
+2. **Decidido (recomendado):** el certificado de antecedentes penales es un documento opcional al lanzar
+   (`verification.optional_documents`); se vuelve obligatorio agregándolo a los documentos requeridos.
+

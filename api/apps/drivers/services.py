@@ -15,12 +15,16 @@ from apps.drivers.models import (
     DRIVER_TRANSITIONS,
     EDITABLE_STATUSES,
     MULTI_FILE_KINDS,
+    PHOTO_KINDS,
+    RENEWABLE_KINDS,
     DocumentKind,
     DocumentStatus,
     DriverDocument,
     DriverProfile,
     DriverStatus,
+    MarkKind,
     Vehicle,
+    VehicleStatus,
 )
 from apps.drivers.schemas import (
     DOCUMENT_CONTENT_TYPES,
@@ -30,9 +34,11 @@ from apps.drivers.schemas import (
     DocumentRegister,
     DocumentReview,
     DriverAdminRead,
+    DriverCheckRead,
     DriverProfileRead,
     DriverProfileWrite,
     Requirements,
+    StaffBrief,
     VehicleRead,
     VehicleWrite,
     compact_upper,
@@ -88,6 +94,7 @@ def _now() -> datetime:
 def _full_query() -> Select[tuple[DriverProfile]]:
     return select(DriverProfile).options(
         selectinload(DriverProfile.vehicle),
+        selectinload(DriverProfile.pending_vehicle),
         selectinload(DriverProfile.documents),
         selectinload(DriverProfile.user),
     )
@@ -143,7 +150,7 @@ def transition(profile: DriverProfile, target: DriverStatus) -> None:
     profile.status = target
 
 
-async def _flush_unique(session: AsyncSession, message: str, code: str) -> None:
+async def flush_unique(session: AsyncSession, message: str, code: str) -> None:
     try:
         await session.flush()
     except IntegrityError as exc:
@@ -154,7 +161,11 @@ async def _flush_unique(session: AsyncSession, message: str, code: str) -> None:
 
 
 def requirements(profile: DriverProfile, config: AppConfig) -> Requirements:
-    current = [d for d in profile.documents if d.status != DocumentStatus.REJECTED]
+    current = [
+        d
+        for d in profile.documents
+        if d.status != DocumentStatus.REJECTED and d.superseded_by_id is None
+    ]
     kinds = {d.kind for d in current}
     required = config.driver_required_documents
     missing = [k for k in required if k not in MULTI_FILE_KINDS and k not in kinds]
@@ -206,15 +217,43 @@ def _base_fields(profile: DriverProfile, config: AppConfig) -> dict:
         "rating_count": profile.rating_count,
         "created_at": profile.created_at,
         "vehicle": VehicleRead.model_validate(profile.vehicle) if profile.vehicle else None,
+        "pending_vehicle": (
+            VehicleRead.model_validate(profile.pending_vehicle) if profile.pending_vehicle else None
+        ),
         "requirements": requirements(profile, config),
+        "induction_completed_at": profile.induction_completed_at,
     }
 
 
-def to_read(profile: DriverProfile, config: AppConfig) -> DriverProfileRead:
+def _verification(profile: DriverProfile, config: AppConfig, checks: list) -> dict:
+    from apps.drivers import verification
+
+    return {
+        "verification": verification.verification_state(profile, checks, config, today_caracas()),
+        "checks": [DriverCheckRead.model_validate(c) for c in checks],
+    }
+
+
+def to_read(
+    profile: DriverProfile, config: AppConfig, checks: list | None = None
+) -> DriverProfileRead:
+    """``checks``: the open ones (see ``read``); without them the state assumes none."""
     return DriverProfileRead(
         **_base_fields(profile, config),
-        documents=[DocumentRead.model_validate(d) for d in profile.documents],
+        **_verification(profile, config, checks or []),
+        # Replaced files (renewals, moto changes) are history for the admin only.
+        documents=[
+            DocumentRead.model_validate(d) for d in profile.documents if d.superseded_by_id is None
+        ],
     )
+
+
+async def read(
+    session: AsyncSession, profile: DriverProfile, config: AppConfig
+) -> DriverProfileRead:
+    from apps.drivers import verification
+
+    return to_read(profile, config, await verification.open_checks(session, profile.id))
 
 
 def _download_url(key: str) -> str | None:
@@ -224,8 +263,17 @@ def _download_url(key: str) -> str | None:
         return None  # Storage not configured (local development).
 
 
+def staff_brief(user: User | None) -> StaffBrief | None:
+    return StaffBrief(id=user.id, full_name=user.full_name, email=user.email) if user else None
+
+
 def to_admin_read(
-    profile: DriverProfile, config: AppConfig, *, with_urls: bool = True
+    profile: DriverProfile,
+    config: AppConfig,
+    *,
+    with_urls: bool = True,
+    checks: list | None = None,
+    extra: dict | None = None,
 ) -> DriverAdminRead:
     documents = [
         DocumentAdminRead.model_validate(d).model_copy(
@@ -235,8 +283,29 @@ def to_admin_read(
     ]
     return DriverAdminRead(
         **_base_fields(profile, config),
+        **_verification(profile, config, checks or []),
         user=UserRead.model_validate(profile.user),
         documents=documents,
+        **(extra or {}),
+    )
+
+
+async def admin_read(
+    session: AsyncSession, profile: DriverProfile, config: AppConfig
+) -> DriverAdminRead:
+    """The driver's page: every check (timeline), duplicates and who reviews it."""
+    from apps.drivers import verification
+
+    checks = await verification.driver_checks(session, profile.id)
+    assigned = await session.get(User, profile.assigned_to_id) if profile.assigned_to_id else None
+    return to_admin_read(
+        profile,
+        config,
+        checks=checks,
+        extra={
+            "assigned_to": staff_brief(assigned),
+            "duplicates": await verification.duplicates(session, profile.user_id),
+        },
     )
 
 
@@ -261,14 +330,14 @@ async def upsert_profile(
         _ensure_editable(profile)
         for field, value in data.model_dump().items():
             setattr(profile, field, value)
-    await _flush_unique(session, "National id already registered", "national_id_taken")
+    await flush_unique(session, "National id already registered", "national_id_taken")
+    from apps.drivers import verification
+
+    await verification.record_profile_marks(session, profile)
     return await reload(session, profile)
 
 
-async def set_vehicle(
-    session: AsyncSession, profile: DriverProfile, data: VehicleWrite, config: AppConfig
-) -> DriverProfile:
-    _ensure_editable(profile)
+def validate_vehicle(data: VehicleWrite, config: AppConfig) -> None:
     if data.type not in config.enabled_vehicle_types:
         raise AppError(
             "This vehicle type is not accepted",
@@ -284,26 +353,56 @@ async def set_vehicle(
         )
     if data.year > today_caracas().year + 1:
         raise AppError("Invalid vehicle year", code="vehicle_year_invalid")
-    plate = normalize_plate(data.plate)
+
+
+async def ensure_plate_free(session: AsyncSession, plate: str, profile_id: uuid.UUID) -> None:
     taken = await session.scalar(
-        select(Vehicle.id).where(Vehicle.plate == plate, Vehicle.driver_id != profile.id)
+        select(Vehicle.id).where(
+            Vehicle.plate == plate,
+            Vehicle.driver_id != profile_id,
+            Vehicle.status.in_((VehicleStatus.ACTIVE, VehicleStatus.PENDING)),
+        )
     )
     if taken:
         raise ConflictError("Plate already registered", code="plate_taken")
+
+
+async def set_vehicle(
+    session: AsyncSession, profile: DriverProfile, data: VehicleWrite, config: AppConfig
+) -> DriverProfile:
+    _ensure_editable(profile)
+    validate_vehicle(data, config)
+    plate = normalize_plate(data.plate)
+    await ensure_plate_free(session, plate, profile.id)
     values = data.model_dump() | {"plate": plate}
     if profile.vehicle is None:
         session.add(Vehicle(driver_id=profile.id, **values))
     else:
         for field, value in values.items():
             setattr(profile.vehicle, field, value)
-    await _flush_unique(session, "Plate already registered", "plate_taken")
+    await flush_unique(session, "Plate already registered", "plate_taken")
+    from apps.drivers import verification
+
+    await verification.record_marks(session, profile.user_id, {MarkKind.PLATE: plate})
     return await reload(session, profile)
 
 
-def presign_document(
-    user: User, profile: DriverProfile, data: DocumentPresignRequest
-) -> UploadResponse:
+def _ensure_can_upload(profile: DriverProfile, kind: DocumentKind, config: AppConfig) -> None:
+    """While onboarding, anything; once approved, only renewals of document files (doc 12)."""
+    if profile.status in EDITABLE_STATUSES:
+        return
+    renewable = kind in RENEWABLE_KINDS and (
+        kind in config.driver_required_documents or kind in config.verification.optional_documents
+    )
+    if profile.status in (DriverStatus.APPROVED, DriverStatus.SUSPENDED) and renewable:
+        return
     _ensure_editable(profile)
+
+
+def presign_document(
+    user: User, profile: DriverProfile, data: DocumentPresignRequest, config: AppConfig
+) -> UploadResponse:
+    _ensure_can_upload(profile, data.kind, config)
     if data.content_type not in DOCUMENT_CONTENT_TYPES:
         raise AppError("File type not allowed", code="file_type_not_allowed")
     if data.size > settings.STORAGE_MAX_UPLOAD_MB * 1024 * 1024:
@@ -332,9 +431,14 @@ def _type_from_extension(key: str) -> str:
 
 
 async def register_document(
-    session: AsyncSession, user: User, profile: DriverProfile, data: DocumentRegister
+    session: AsyncSession,
+    user: User,
+    profile: DriverProfile,
+    data: DocumentRegister,
+    config: AppConfig,
 ) -> DriverProfile:
-    _ensure_editable(profile)
+    _ensure_can_upload(profile, data.kind, config)
+    renewal = profile.status not in EDITABLE_STATUSES
     if not storage.key_in_folder(data.key, document_folder(user.id, data.kind)):
         raise AppError("The file does not belong to this upload", code="document_key_invalid")
     if any(d.key == data.key for d in profile.documents):
@@ -348,24 +452,39 @@ async def register_document(
     if head is None:
         raise AppError("The file was not uploaded", code="document_not_uploaded")
     content_type = str(head.get("ContentType", "")).split(";")[0].strip().lower()
-    if content_type not in DOCUMENT_CONTENT_TYPES:
+    if content_type not in DOCUMENT_CONTENT_TYPES or (
+        data.kind in PHOTO_KINDS and not content_type.startswith("image/")
+    ):
         raise AppError("File type not allowed", code="file_type_not_allowed")
     if int(head.get("ContentLength", 0)) > settings.STORAGE_MAX_UPLOAD_MB * 1024 * 1024:
         raise AppError("File too large", code="file_too_large")
+    expiring = data.kind in config.verification.expiring_documents
+    if renewal and expiring and data.expires_on is None:
+        raise AppError("Type the expiry date", code="expiry_required")
+    if expiring and data.expires_on is not None and data.expires_on < today_caracas():
+        raise AppError("This document is already expired", code="document_already_expired")
 
-    same_kind = [d for d in profile.documents if d.kind == data.kind]
+    same_kind = [d for d in profile.documents if d.kind == data.kind and d.superseded_by_id is None]
     if data.kind in MULTI_FILE_KINDS:
         if len(same_kind) >= MAX_VEHICLE_PHOTOS:
             raise AppError("Too many files of this kind", code="too_many_documents")
-    else:
+    elif not renewal:
         for old in same_kind:
             await session.delete(old)
-    session.add(
-        DriverDocument(
-            driver_id=profile.id, kind=data.kind, key=data.key, content_type=content_type
-        )
+    document = DriverDocument(
+        driver_id=profile.id,
+        kind=data.kind,
+        key=data.key,
+        content_type=content_type,
+        expires_on=data.expires_on if expiring else None,
     )
-    await _flush_unique(session, "Document already registered", "document_already_registered")
+    session.add(document)
+    await flush_unique(session, "Document already registered", "document_already_registered")
+    if renewal:
+        from apps.drivers import verification
+
+        await verification.register_renewal(session, profile, document)
+        await session.flush()
     if content_type in metadata.FORMATS:
         await metadata.schedule(data.key)
     return await reload(session, profile)
@@ -406,15 +525,21 @@ async def list_drivers(
     *,
     status: DriverStatus | None = None,
     q: str | None = None,
+    assigned_to: uuid.UUID | None = None,
 ) -> tuple[list[DriverProfile], int]:
     stmt = (
         _full_query()
         .join(User, User.id == DriverProfile.user_id)
-        .outerjoin(Vehicle, Vehicle.driver_id == DriverProfile.id)
+        .outerjoin(
+            Vehicle,
+            (Vehicle.driver_id == DriverProfile.id) & (Vehicle.status == VehicleStatus.ACTIVE),
+        )
         .order_by(DriverProfile.created_at.desc())
     )
     if status:
         stmt = stmt.where(DriverProfile.status == status)
+    if assigned_to is not None:
+        stmt = stmt.where(DriverProfile.assigned_to_id == assigned_to)
     if q and q.strip():
         term = f"%{q.strip().lower()}%"
         compact = f"%{compact_upper(q)}%"
@@ -434,23 +559,37 @@ def _mark_reviewed(profile: DriverProfile, admin: User) -> None:
     profile.reviewed_by_id = admin.id
 
 
-async def approve(session: AsyncSession, profile: DriverProfile, admin: User) -> DriverProfile:
+async def approve(
+    session: AsyncSession, profile: DriverProfile, admin: User, config: AppConfig
+) -> DriverProfile:
+    from apps.drivers import verification
+
     if profile.status == DriverStatus.PENDING_REVIEW and any(
-        d.status == DocumentStatus.REJECTED for d in profile.documents
+        d.status == DocumentStatus.REJECTED and d.superseded_by_id is None
+        for d in profile.documents
     ):
         raise ConflictError(
             "Some documents are rejected; reject the application instead",
             code="driver_documents_rejected",
         )
+    if (
+        profile.status == DriverStatus.PENDING_REVIEW
+        and config.verification.induction_required
+        and profile.induction_completed_at is None
+    ):
+        raise ConflictError("Mark the induction as done first", code="induction_required")
     transition(profile, DriverStatus.APPROVED)
     _mark_reviewed(profile, admin)
     profile.approved_at = _now()
+    if profile.selfie_due_at is None:
+        profile.selfie_due_at = verification.next_selfie_at(config, profile.approved_at)
     profile.rejection_reason = None
     for document in profile.documents:
         if document.status == DocumentStatus.PENDING:
             document.status = DocumentStatus.APPROVED
             document.reviewed_at = profile.reviewed_at
             document.reviewed_by_id = admin.id
+            document.expiry_confirmed = document.expires_on is not None
     return await reload(session, profile)
 
 
@@ -501,6 +640,11 @@ async def review_document(
     document.rejection_reason = data.reason if data.status == DocumentStatus.REJECTED else None
     document.reviewed_at = _now()
     document.reviewed_by_id = admin.id
+    if data.expires_on is not None:
+        document.expires_on = data.expires_on
+        document.expiry_notice_days = None
+    if data.status == DocumentStatus.APPROVED:
+        document.expiry_confirmed = document.expires_on is not None
     return await reload(session, profile), document
 
 
@@ -515,6 +659,7 @@ DOCUMENT_LABELS: dict[str, dict[DocumentKind, str]] = {
         DocumentKind.VEHICLE_REGISTRATION: "Carnet de circulación",
         DocumentKind.SELFIE: "Selfie",
         DocumentKind.VEHICLE_PHOTO: "Foto del vehículo",
+        DocumentKind.CRIMINAL_RECORD: "Certificado de antecedentes penales",
     },
     "en": {
         DocumentKind.ID_CARD: "ID card",
@@ -524,6 +669,7 @@ DOCUMENT_LABELS: dict[str, dict[DocumentKind, str]] = {
         DocumentKind.VEHICLE_REGISTRATION: "Vehicle registration",
         DocumentKind.SELFIE: "Selfie",
         DocumentKind.VEHICLE_PHOTO: "Vehicle photo",
+        DocumentKind.CRIMINAL_RECORD: "Criminal record certificate",
     },
 }
 
@@ -556,6 +702,50 @@ TEMPLATES: dict[str, dict[str, tuple[str, str]]] = {
         "es": ("Documento rechazado", "{document}: {reason}. Sube uno nuevo."),
         "en": ("Document rejected", "{document}: {reason}. Please upload a new one."),
     },
+    # --- Ongoing verification (doc 12) ---
+    "document_expiring": {
+        "es": (
+            "Un documento vence pronto",
+            "{document} vence el {date}. Sube el nuevo para seguir recibiendo viajes.",
+        ),
+        "en": (
+            "A document expires soon",
+            "{document} expires on {date}. Upload the new one to keep receiving rides.",
+        ),
+    },
+    "document_expired": {
+        "es": (
+            "Un documento venció",
+            "{document} venció. No puedes conectarte hasta subir el nuevo y que lo aprobemos.",
+        ),
+        "en": (
+            "A document expired",
+            "{document} expired. You can't go online until you upload the new one and we "
+            "approve it.",
+        ),
+    },
+    "document_renewed": {
+        "es": ("Documento aprobado", "{document}: listo, ya está al día."),
+        "en": ("Document approved", "{document}: done, it's up to date."),
+    },
+    "selfie_requested": {
+        "es": (
+            "Verifica tu identidad",
+            "Tómate una selfie y fotos nuevas de tu moto para seguir conectándote.",
+        ),
+        "en": (
+            "Verify your identity",
+            "Take a selfie and new photos of your moto to keep going online.",
+        ),
+    },
+    "vehicle_approved": {
+        "es": ("Moto aprobada", "Desde ahora tus viajes salen con tu moto {plate}."),
+        "en": ("Moto approved", "From now on your rides use your moto {plate}."),
+    },
+    "vehicle_rejected": {
+        "es": ("Cambio de moto rechazado", "Motivo: {reason}. Sigues con tu moto actual."),
+        "en": ("Moto change rejected", "Reason: {reason}. You keep your current moto."),
+    },
 }
 
 
@@ -564,7 +754,7 @@ def render(event: str, locale: str, **values: str) -> tuple[str, str]:
     title, body = TEMPLATES[event][locale]
     document = values.pop("document", None)
     label = DOCUMENT_LABELS[locale][DocumentKind(document)] if document else ""
-    return title, body.format(document=label, **values)
+    return title.format(document=label, **values), body.format(document=label, **values)
 
 
 async def notify(
@@ -574,6 +764,8 @@ async def notify(
     *,
     reason: str | None = None,
     document: DriverDocument | None = None,
+    values: dict[str, str] | None = None,
+    data: dict[str, str] | None = None,
 ) -> None:
     """Inbox row + push in the driver's language. Commits, so the change and its notice land
     together, then queues the push (the worker must see the committed rows)."""
@@ -581,11 +773,16 @@ async def notify(
     if user is None:
         return
     title, body = render(
-        event, user.locale, reason=reason or "", document=document.kind.value if document else ""
+        event,
+        user.locale,
+        reason=reason or "",
+        document=document.kind.value if document else "",
+        **(values or {}),
     )
-    data = {"type": "driver_status", "event": event, "status": profile.status.value}
+    payload = {"type": "driver_status", "event": event, "status": profile.status.value}
     if document is not None:
-        data |= {"type": "driver_document", "document_id": str(document.id)}
+        payload |= {"type": "driver_document", "document_id": str(document.id)}
+    data = payload | (data or {})
     await notifications.create_notifications(session, [user.id], title, body, data)
     await session.commit()
     await notification_tasks.send_push.kiq([str(user.id)], title, body, data)

@@ -233,7 +233,13 @@ async def ensure_deletable(session: AsyncSession, user: User) -> None:
 async def erase_due(session: AsyncSession, now: datetime | None = None, limit: int = 50) -> int:
     """Erases the personal data of accounts whose grace period ended. Rides, payments, fees and
     reports stay (accounting and safety records) but no longer point to a person."""
-    from apps.drivers.models import DriverDocument, DriverProfile, Vehicle
+    from apps.drivers.models import (
+        DriverCheck,
+        DriverDocument,
+        DriverProfile,
+        Vehicle,
+        VehicleStatus,
+    )
     from apps.moderation.models import Suspension
     from apps.notifications.models import Device, Notification
     from apps.places.models import SavedPlace
@@ -267,8 +273,21 @@ async def erase_due(session: AsyncSession, now: datetime | None = None, limit: i
                     select(DriverDocument.key).where(DriverDocument.driver_id == profile.id)
                 )
             )
+            checks = list(
+                await session.scalars(
+                    select(DriverCheck).where(DriverCheck.driver_id == profile.id)
+                )
+            )
+            keys += [f["key"] for c in checks for f in c.files]
+            await session.execute(delete(DriverCheck).where(DriverCheck.driver_id == profile.id))
             await session.execute(
                 delete(DriverDocument).where(DriverDocument.driver_id == profile.id)
+            )
+            # One live moto keeps a placeholder plate; the rest go (rides keep their snapshot).
+            await session.execute(
+                delete(Vehicle).where(
+                    Vehicle.driver_id == profile.id, Vehicle.status != VehicleStatus.ACTIVE
+                )
             )
             await session.execute(
                 update(Vehicle)

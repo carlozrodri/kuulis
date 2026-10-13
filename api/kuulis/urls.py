@@ -9,6 +9,7 @@ from apps.auth.router import router as auth_router
 from apps.config.router import router as config_router
 from apps.control.router import router as control_router
 from apps.drivers.router import admin_router as drivers_admin_router
+from apps.drivers.router import checks_admin_router as drivers_checks_admin_router
 from apps.drivers.router import router as drivers_router
 from apps.files.router import router as files_router
 from apps.geo.router import router as geo_router
@@ -66,6 +67,7 @@ api_v1.include_router(referrals_router)
 api_v1.include_router(files_router)
 # Before drivers_admin_router: /admin/drivers/online must win over /admin/drivers/{driver_id}.
 api_v1.include_router(rides_admin_drivers_router)
+api_v1.include_router(drivers_checks_admin_router)
 api_v1.include_router(drivers_admin_router)
 api_v1.include_router(geo_router)
 api_v1.include_router(rides_admin_router)

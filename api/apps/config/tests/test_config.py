@@ -75,6 +75,15 @@ DEFAULTS = {
         "sos_location_seconds": 5,
         "sos_team_alert": False,
     },
+    "verification": {
+        "expiring_documents": ["drivers_license", "medical_certificate", "vehicle_registration"],
+        "optional_documents": ["criminal_record"],
+        "expiry_notice_days": [30, 7, 1],
+        "selfie_every_days": 7,
+        "mismatch_reports": 2,
+        "report_window_days": 30,
+        "induction_required": False,
+    },
 }
 
 

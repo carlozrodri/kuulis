@@ -214,6 +214,46 @@ class SafetySettings(BaseModel):
         return now >= start or now < end
 
 
+class VerificationSettings(BaseModel):
+    """Ongoing driver verification (doc 12): expiring documents, the random live selfie,
+    re-verification after reports and the optional induction."""
+
+    # Documents that carry an expiry date; once expired the driver cannot go online.
+    expiring_documents: list[DocumentKind] = Field(
+        default_factory=lambda: [
+            DocumentKind.DRIVERS_LICENSE,
+            DocumentKind.MEDICAL_CERTIFICATE,
+            DocumentKind.VEHICLE_REGISTRATION,
+        ]
+    )
+    # Documents the driver may add without being asked (certificado de antecedentes).
+    optional_documents: list[DocumentKind] = Field(
+        default_factory=lambda: [DocumentKind.CRIMINAL_RECORD]
+    )
+    # "Expires in N days" notices before the expiry day.
+    expiry_notice_days: list[int] = Field(default_factory=lambda: [30, 7, 1], max_length=5)
+    # A live selfie roughly this often, on a random day, when going online (0: never). Weekly
+    # (Carlos, 2026-10-13).
+    selfie_every_days: int = Field(default=7, ge=0, le=90)
+    # This many vehicle_mismatch reports in ``report_window_days`` ask for a selfie and new photos.
+    mismatch_reports: int = Field(default=2, ge=1, le=20)
+    report_window_days: int = Field(default=30, ge=1, le=365)
+    # "Inducción completada" must be marked in the admin before approving a driver.
+    induction_required: bool = False
+
+    @field_validator("expiring_documents", "optional_documents")
+    @classmethod
+    def _unique_kinds(cls, value: list[DocumentKind]) -> list[DocumentKind]:
+        return _unique(value)
+
+    @field_validator("expiry_notice_days")
+    @classmethod
+    def _days(cls, value: list[int]) -> list[int]:
+        if any(d < 1 or d > 120 for d in value):
+            raise ValueError("days must be between 1 and 120")
+        return sorted(set(value), reverse=True)
+
+
 NoticeKind = Literal["maintenance", "pause"]
 
 
@@ -307,6 +347,9 @@ class AppConfig(BaseModel):
     # --- Trip safety (doc 11) -------------------------------------------------------------------
     safety: SafetySettings = Field(default_factory=SafetySettings)
 
+    # --- Driver verification (doc 12) -----------------------------------------------------------
+    verification: VerificationSettings = Field(default_factory=VerificationSettings)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -378,6 +421,7 @@ class AppConfigUpdate(BaseModel):
     app_links: AppLinks | None = None
     location_intervals: LocationIntervals | None = None
     safety: SafetySettings | None = None
+    verification: VerificationSettings | None = None
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
