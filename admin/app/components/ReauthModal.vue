@@ -32,10 +32,12 @@ async function confirm() {
 </script>
 
 <template>
+  <!-- Above any modal already open (e.g. "New role"): otherwise it opens hidden behind it and the action waits forever. -->
   <UModal
     :open="reauth.open.value"
     :title="t('totp.reauthTitle')"
     :description="t('totp.reauthHelp')"
+    :ui="{ overlay: 'z-[100]', content: 'z-[100]' }"
     @update:open="(open: boolean) => { if (!open) reauth.finish(false) }"
   >
     <template #body>
