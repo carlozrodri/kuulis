@@ -107,14 +107,14 @@ watch(data, value => reportCounts.set(value?.counts), { immediate: true })
 
 const { data: tagCounts } = useAsyncData('support-tags', () => request<TagCount[]>('/admin/support/tags').catch(() => [] as TagCount[]))
 
-// New tickets and answers arrive while the inbox is open: refresh quietly every minute (also re-reads the SLA).
+// New tickets and answers arrive while the inbox is open: refresh quietly every 15 s (also re-reads the SLA).
 const now = ref(Date.now())
 let timer: ReturnType<typeof setInterval> | undefined
 onMounted(() => {
   timer = setInterval(() => {
     now.value = Date.now()
     if (document.visibilityState === 'visible') refresh()
-  }, 60_000)
+  }, 15_000)
 })
 onBeforeUnmount(() => clearInterval(timer))
 
