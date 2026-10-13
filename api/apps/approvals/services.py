@@ -104,11 +104,23 @@ async def _broadcast(p: dict) -> None:
     await tasks.broadcast.kiq(p["title"], p["body"], p["data"], p.get("role"))
 
 
+async def _campaign_send(session: AsyncSession, requester: User, p: dict) -> None:
+    """Doc 14: an approved campaign is scheduled, unless it was edited (back to draft) since."""
+    from apps.notifications import campaigns
+    from apps.notifications.models import CampaignStatus
+
+    campaign = await campaigns.get(session, uuid.UUID(p["campaign_id"]))
+    if campaign.status == CampaignStatus.PENDING_APPROVAL:
+        when = p.get("scheduled_at")
+        await campaigns.schedule(campaign, datetime.fromisoformat(when) if when else None)
+
+
 ACTIONS: dict[str, Action] = {
     "wallet.adjust": Action("wallet.adjust", _wallet_adjust),
     "fee_schedule.create": Action(None, _fee_schedule),
     "config.update": Action(None, _config_update, _config_cache),
     "notification.broadcast": Action("notifications.send", _nothing, _broadcast),
+    "campaign.send": Action("notifications.send", _campaign_send),
 }
 
 
@@ -125,7 +137,7 @@ async def required(session: AsyncSession, action: str, **facts: Any) -> bool:
         return limit > 0 and abs(facts["amount"]) > limit
     if action in ("fee_schedule.create", "config.update"):
         return config.approval_fares
-    if action == "notification.broadcast":
+    if action in ("notification.broadcast", "campaign.send"):
         return config.approval_broadcasts
     return False
 

@@ -63,15 +63,22 @@ async def update_me(data: UserUpdateMe, user: CurrentUser, session: DBSession) -
 async def change_password(data: ChangePassword, user: CurrentUser) -> None:
     await services.change_password(user, data.current_password, data.new_password)
     await auth.revoke_others(str(user.id), user.auth_sid)  # other devices sign in again
+    await auth.password_changed(user)
 
 
 @router.delete("/me", response_model=DeletionScheduled)
 async def delete_me(user: CurrentUser, session: DBSession) -> DeletionScheduled:
     """Deactivates the account now and erases the personal data after the grace period; signing
     in before then restores it. Every session is closed."""
+    from apps.notifications import emails
+    from apps.wallet.notify import date_label
+
     erase_at = await services.request_deletion(session, user)
     await auth.revoke_all(str(user.id))
     await presence.go_offline(user.id)
+    await emails.send_to_user(
+        user.id, "account_deletion", {"date": date_label(erase_at, user.locale)}
+    )
     return DeletionScheduled(erase_at=erase_at)
 
 

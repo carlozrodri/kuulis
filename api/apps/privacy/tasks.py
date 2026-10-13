@@ -3,7 +3,6 @@ with each worker process; a Redis key makes one process do each day)."""
 
 import asyncio
 import contextlib
-import html
 import logging
 import uuid
 from datetime import UTC, datetime, timedelta
@@ -18,21 +17,6 @@ logger = logging.getLogger(__name__)
 
 CHECK_EVERY_SECONDS = 3600
 _task: asyncio.Task | None = None
-
-EXPORT_EMAIL = {
-    "es": (
-        "Tus datos de Kuulis",
-        "Hola {name}, aquí puedes descargar una copia de tus datos de Kuulis (un archivo JSON). "
-        "El enlace vence en 24 horas: <a href='{link}'>descargar mis datos</a>. Si no lo pediste, "
-        "cambia tu contraseña desde la app.",
-    ),
-    "en": (
-        "Your Kuulis data",
-        "Hi {name}, here you can download a copy of your Kuulis data (a JSON file). The link "
-        "expires in 24 hours: <a href='{link}'>download my data</a>. If you did not ask for it, "
-        "change your password in the app.",
-    ),
-}
 
 
 @broker.task(task_name="privacy.build_export")
@@ -73,12 +57,14 @@ async def build_export(export_id: str) -> str:
         export.completed_at = now
         export.expires_at = now + timedelta(seconds=services.EXPORT_LINK_SECONDS)
         await session.commit()
-        subject, body = EXPORT_EMAIL.get(user.locale, EXPORT_EMAIL["es"])
-        safe = body.format(
-            name=html.escape(user.full_name or user.email), link=html.escape(link, quote=True)
+        from apps.notifications import emails
+        from apps.notifications.tasks import first_name
+
+        subject, body, text = emails.render(
+            "data_export", user.locale, {"name": first_name(user), "link": link}
         )
         try:
-            await send_email(user.email, subject, safe)
+            await send_email(user.email, subject, body, text)
         except Exception:
             logger.warning("Could not email data export %s", export_id, exc_info=True)
         return export.status

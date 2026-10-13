@@ -20,6 +20,7 @@ from apps.moderation.router import admin_router as moderation_admin_router
 from apps.moderation.router import router as moderation_router
 from apps.monitoring.router import metrics_router
 from apps.monitoring.router import router as monitoring_router
+from apps.notifications.router import admin_router as notifications_admin_router
 from apps.notifications.router import router as notifications_router
 from apps.places.router import router as places_router
 from apps.privacy.router import router as privacy_router
@@ -57,6 +58,7 @@ api_v1.include_router(config_router)
 api_v1.include_router(users_router)
 api_v1.include_router(rates_router)
 api_v1.include_router(notifications_router)
+api_v1.include_router(notifications_admin_router)
 api_v1.include_router(drivers_router)
 api_v1.include_router(auth_router)
 api_v1.include_router(realtime_router)
