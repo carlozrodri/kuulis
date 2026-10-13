@@ -1,7 +1,8 @@
 /**
- * Pages behind the profile menu, so the profile itself stays short: account and preferences, security and
- * privacy, legal, preferred payment, frequent places and invites.
+ * Pages behind the profile, so the profile itself stays short: settings, legal, preferred payment, frequent
+ * places and invites.
  */
+import * as Application from 'expo-application';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -12,6 +13,8 @@ import {
   Download,
   Gift,
   HeartHandshake,
+  Info,
+  LifeBuoy,
   LockKeyhole,
   LogOut,
   MapPinned,
@@ -20,7 +23,6 @@ import {
   Pencil,
   ScrollText,
   Settings,
-  ShieldCheck,
   Smartphone,
   Sun,
   UserX,
@@ -50,11 +52,13 @@ import { SubScreen } from './SubScreen';
 
 const LANGUAGE_LABELS: Record<Locale, string> = { es: 'Español', en: 'English' };
 
-/** Perfil → Cuenta y preferencias: edit the profile, password, language and appearance. */
-export function AccountSettingsScreen() {
+/** Perfil → Ajustes: everything that is not about trips in one page (account, preferences, security, privacy, help and legal). */
+export function SettingsScreen() {
   const { t, i18n } = useTranslation();
-  const { refreshUser } = useAuth();
+  const { user, signOut, refreshUser } = useAuth();
   const preference = useStore(themePreference);
+  const contactCount = useTrustedContacts(!!user).data?.length ?? 0;
+  const [confirm, setConfirm] = useState(false);
 
   async function changeLanguage(locale: Locale) {
     if (locale === i18n.language) return;
@@ -67,12 +71,24 @@ export function AccountSettingsScreen() {
     }
   }
 
+  async function logoutEverywhere() {
+    try {
+      await api('/auth/logout-all', { method: 'POST' });
+    } catch (e) {
+      showToast(apiErrorMessage(e), 'danger');
+      return;
+    }
+    await signOut();
+  }
+
   return (
     <SubScreen icon={Settings} tone="primary" title={t('profile.menu.settings')} subtitle={t('profile.menu.settingsHint')}>
-      <Card style={{ paddingVertical: space.xxs }}>
-        <ListRow icon={Pencil} title={t('profile.edit.title')} subtitle={t('profile.edit.hint')} divider onPress={() => router.push('/profile/edit')} />
-        <ListRow icon={LockKeyhole} title={t('profile.password.title')} subtitle={t('profile.password.hint')} onPress={() => router.push('/profile/password')} />
-      </Card>
+      <Section title={t('profile.account')}>
+        <Card style={{ paddingVertical: space.xxs }}>
+          <ListRow icon={Pencil} title={t('profile.edit.title')} subtitle={t('profile.edit.hint')} divider onPress={() => router.push('/profile/edit')} />
+          <ListRow icon={LockKeyhole} title={t('profile.password.title')} subtitle={t('profile.password.hint')} onPress={() => router.push('/profile/password')} />
+        </Card>
+      </Section>
       <Section title={t('profile.preferences')}>
         <Card style={{ gap: space.lg }}>
           <View style={{ gap: space.xs }}>
@@ -106,40 +122,16 @@ export function AccountSettingsScreen() {
           </View>
         </Card>
       </Section>
-    </SubScreen>
-  );
-}
-
-/** Perfil → Seguridad y privacidad: trusted contacts, sessions, my data and deleting the account. */
-export function SecurityScreen() {
-  const { t } = useTranslation();
-  const { user, signOut } = useAuth();
-  const contactCount = useTrustedContacts(!!user).data?.length ?? 0;
-  const [confirm, setConfirm] = useState(false);
-
-  async function logoutEverywhere() {
-    try {
-      await api('/auth/logout-all', { method: 'POST' });
-    } catch (e) {
-      showToast(apiErrorMessage(e), 'danger');
-      return;
-    }
-    await signOut();
-  }
-
-  return (
-    <SubScreen icon={ShieldCheck} tone="accent" title={t('profile.menu.security')} subtitle={t('profile.menu.securityHint')}>
-      <Card style={{ paddingVertical: space.xxs }}>
-        <ListRow
-          icon={HeartHandshake}
-          iconTone="accent"
-          title={t('profile.contact.title')}
-          subtitle={contactCount ? t('profile.contact.current', { count: contactCount }) : t('profile.contact.rowHint')}
-          onPress={() => router.push('/profile/contact')}
-        />
-      </Card>
-      <Section title={t('profile.menu.sessions')}>
+      <Section title={t('profile.security')}>
         <Card style={{ paddingVertical: space.xxs }}>
+          <ListRow
+            icon={HeartHandshake}
+            iconTone="accent"
+            title={t('profile.contact.title')}
+            subtitle={contactCount ? t('profile.contact.current', { count: contactCount }) : t('profile.contact.rowHint')}
+            divider
+            onPress={() => router.push('/profile/contact')}
+          />
           <ListRow
             icon={Smartphone}
             iconTone="neutral"
@@ -173,6 +165,26 @@ export function SecurityScreen() {
             title={t('profile.deactivate.title')}
             subtitle={t('profile.deactivate.hint')}
             onPress={() => router.push('/profile/delete')}
+          />
+        </Card>
+      </Section>
+      <Section title={t('profile.menu.helpLegal')}>
+        <Card style={{ paddingVertical: space.xxs }}>
+          <ListRow icon={LifeBuoy} title={t('profile.help')} subtitle={t('profile.helpHint')} divider onPress={() => router.push('/reports')} />
+          <ListRow
+            icon={ScrollText}
+            iconTone="neutral"
+            title={t('legal.title')}
+            subtitle={t('profile.menu.legalHint')}
+            divider
+            onPress={() => router.push('/profile/legal')}
+          />
+          <ListRow
+            icon={Info}
+            iconTone="neutral"
+            title={t('about.title')}
+            subtitle={t('about.rowHint', { version: Application.nativeApplicationVersion ?? 'dev' })}
+            onPress={() => router.push('/profile/about')}
           />
         </Card>
       </Section>

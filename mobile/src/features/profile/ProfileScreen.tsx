@@ -10,23 +10,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Bike,
   Camera,
-  Info,
-  LifeBuoy,
   LogOut,
   Mail,
   MapPin,
   Pencil,
   Sparkles,
   Star,
-  ScrollText,
   Settings,
-  ShieldCheck,
 } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { Button, Card, IconTile, ListRow, TAB_BAR_SPACE, Txt, Wordmark } from '@/components/ui';
 import { useDriverProfile } from '@/hooks/useDriver';
 import { useDriverStats, usePassengerStats } from '@/hooks/useRides';
-import { useTrustedContacts } from '@/hooks/useSafety';
 import { apiErrorMessage } from '@/i18n';
 import { api } from '@/lib/api';
 import { config as appConfig } from '@/lib/config';
@@ -46,7 +41,6 @@ export function ProfileScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { user, signOut, refreshUser } = useAuth();
-  const contactCount = useTrustedContacts(!!user).data?.length ?? 0;
   const { mode: storedMode, setMode } = useMode();
   const mode: AppMode = storedMode ?? 'passenger';
   const [signingOut, setSigningOut] = useState(false);
@@ -157,41 +151,9 @@ export function ProfileScreen() {
             <PassengerProfile stats={passengerStats.data} loading={passengerStats.isPending} />
           )}
 
-          <Section title={t('profile.menu.title')}>
-            <Card style={{ paddingVertical: space.xxs }}>
-              <ListRow
-                icon={Settings}
-                title={t('profile.menu.settings')}
-                subtitle={t('profile.menu.settingsHint')}
-                divider
-                onPress={() => router.push('/profile/settings')}
-              />
-              <ListRow
-                icon={ShieldCheck}
-                iconTone="accent"
-                title={t('profile.menu.security')}
-                subtitle={contactCount ? t('profile.contact.current', { count: contactCount }) : t('profile.menu.securityHint')}
-                divider
-                onPress={() => router.push('/profile/security')}
-              />
-              <ListRow icon={LifeBuoy} title={t('profile.help')} subtitle={t('profile.helpHint')} divider onPress={() => router.push('/reports')} />
-              <ListRow
-                icon={ScrollText}
-                iconTone="neutral"
-                title={t('legal.title')}
-                subtitle={t('profile.menu.legalHint')}
-                divider
-                onPress={() => router.push('/profile/legal')}
-              />
-              <ListRow
-                icon={Info}
-                iconTone="neutral"
-                title={t('about.title')}
-                subtitle={t('about.rowHint', { version: Application.nativeApplicationVersion ?? 'dev' })}
-                onPress={() => router.push('/profile/about')}
-              />
-            </Card>
-          </Section>
+          <Card style={{ paddingVertical: space.xxs, marginTop: space.xl }}>
+            <ListRow icon={Settings} title={t('profile.menu.settings')} subtitle={t('profile.menu.settingsHint')} onPress={() => router.push('/profile/settings')} />
+          </Card>
 
           <Button
             title={t('auth.logout')}
