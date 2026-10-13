@@ -1,21 +1,31 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { Bike, ChevronDown, ChevronRight, FileText, Gift, LockKeyhole, Receipt, TrendingUp, Wallet } from '@/components/icons';
+import {
+  ArrowLeftRight,
+  Bike,
+  ChevronRight,
+  FileText,
+  Gift,
+  Hourglass,
+  LockKeyhole,
+  Receipt,
+  TrendingUp,
+  Wallet,
+} from '@/components/icons';
 import { Button, Card, IconTile, ListRow, Skeleton, StatusPill, type Tone, Txt } from '@/components/ui';
 import { PlateBadge } from '@/features/ride/components';
 import { useWalletFormat } from '@/features/wallet/format';
 import { useAppConfig } from '@/hooks/useDriver';
 import { useSubscription, useWallet } from '@/hooks/useWallet';
-import { documentChecklist, type DocumentState } from '@/lib/driver';
 import { formatFare } from '@/lib/ride';
 import type { DriverProfile as Driver, DriverStats } from '@/lib/types';
+import { documentBadge, myDocuments, needsAttention } from '@/lib/verification';
 import { pendingTotal, subscriptionState } from '@/lib/wallet';
 import { radius, space, useTheme } from '@/theme';
 
-import { Meter, Section } from './components';
+import { Section } from './components';
 import { InviteCard, RedeemSection } from './ReferralCard';
 
 const isActiveDriver = (driver: Driver | null | undefined) =>
@@ -54,17 +64,40 @@ export function DriverProfile({
     <>
       {driver?.vehicle ? (
         <Section title={t('profile.driver.vehicle')}>
-          <Card style={styles.vehicle}>
-            <IconTile icon={Bike} tone="accent" size={52} />
-            <View style={{ flex: 1, gap: 2 }}>
-              <Txt variant="subtitle" numberOfLines={2}>
-                {driver.vehicle.brand} {driver.vehicle.model}
-              </Txt>
-              <Txt variant="caption" color="muted" numberOfLines={1}>
-                {[driver.vehicle.year, driver.vehicle.color].filter(Boolean).join(' · ')}
-              </Txt>
+          <Card style={{ gap: space.md }}>
+            <View style={styles.vehicle}>
+              <IconTile icon={Bike} tone="accent" size={52} />
+              <View style={{ flex: 1, gap: 2 }}>
+                <Txt variant="subtitle" numberOfLines={2}>
+                  {driver.vehicle.brand} {driver.vehicle.model}
+                </Txt>
+                <Txt variant="caption" color="muted" numberOfLines={1}>
+                  {[driver.vehicle.year, driver.vehicle.color].filter(Boolean).join(' · ')}
+                </Txt>
+              </View>
+              <PlateBadge plate={driver.vehicle.plate} />
             </View>
-            <PlateBadge plate={driver.vehicle.plate} />
+            {driver.pending_vehicle ? (
+              <ListRow
+                icon={Hourglass}
+                iconTone="info"
+                title={t('verification.vehicle.pendingRow', {
+                  moto: `${driver.pending_vehicle.brand} ${driver.pending_vehicle.model}`,
+                })}
+                subtitle={t('verification.vehicle.pendingRowHint')}
+                right={<StatusPill label={t('verification.badge.in_review')} tone="info" />}
+                onPress={() => router.push('/driver/vehicle-change')}
+              />
+            ) : driver.status === 'approved' ? (
+              <Button
+                title={t('verification.vehicle.title')}
+                size="sm"
+                variant="secondary"
+                icon={ArrowLeftRight}
+                style={{ marginTop: 0 }}
+                onPress={() => router.push('/driver/vehicle-change')}
+              />
+            ) : null}
           </Card>
         </Section>
       ) : null}
@@ -184,96 +217,43 @@ function SubscriptionRow() {
   );
 }
 
-const DOC_TONE: Record<DocumentState, Tone> = {
-  approved: 'success',
-  pending: 'info',
-  rejected: 'danger',
-  missing: 'warning',
-  partial: 'warning',
-};
-
-/** Approved / pending / rejected documents with a bar; tap to see each one (and fix a rejected one). */
+/** Doc 12: "Mis documentos" with what needs attention (expired, expiring, missing date, rejected renewal). */
 function DocumentsRow({ driver }: { driver: Driver }) {
   const { t } = useTranslation();
   const theme = useTheme();
   const { config } = useAppConfig();
-  const [open, setOpen] = useState(false);
-  const items = documentChecklist(driver, config);
-  const approved = items.filter((item) => item.state === 'approved').length;
-  const rejected = items.filter((item) => item.state === 'rejected').length;
-  const missing = items.filter((item) => item.state === 'missing' || item.state === 'partial').length;
-  const tone = rejected ? 'danger' : missing ? 'warning' : 'primary';
-  const label = rejected
-    ? t('profile.driver.docs.rejected', { count: rejected })
-    : missing
-      ? t('profile.driver.docs.missing', { count: missing })
-      : approved === items.length
-        ? t('profile.driver.docs.allApproved')
-        : t('profile.driver.docs.inReview', { count: items.length - approved });
+  const items = myDocuments(driver, config);
+  const attention = needsAttention(items);
+  const urgent = items[0];
+  const badge = urgent ? documentBadge(urgent) : null;
+  const tone: Tone = !attention || !badge ? 'success' : badge.tone === 'danger' ? 'danger' : 'warning';
+  const label =
+    !attention || !urgent || !badge
+      ? t('verification.profile.allGood')
+      : attention === 1
+        ? `${t(`driver.doc.${urgent.kind}.title`)}: ${t(badge.key, { count: badge.count }).toLocaleLowerCase()}`
+        : t('verification.profile.attention', { count: attention });
 
   return (
-    <Card style={{ gap: space.sm }}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ expanded: open }}
-        accessibilityLabel={`${t('profile.driver.docs.title')}: ${label}`}
-        onPress={() => setOpen((value) => !value)}
-        style={({ pressed }) => ({ gap: space.sm, opacity: pressed ? 0.7 : 1 })}>
-        <View style={styles.row}>
-          <IconTile icon={FileText} tone={tone === 'primary' ? 'success' : tone} />
-          <View style={{ flex: 1, gap: 2 }}>
-            <Txt variant="bodyStrong">{t('profile.driver.docs.title')}</Txt>
-            <Txt variant="caption" color={tone === 'primary' ? 'muted' : tone}>
-              {label}
-            </Txt>
-          </View>
-          <Txt variant="label" color="muted" tabular>
-            {approved}/{items.length}
-          </Txt>
-          <ChevronDown
-            size={20}
-            color={theme.muted}
-            strokeWidth={2.2}
-            style={{ transform: [{ rotate: open ? '180deg' : '0deg' }] }}
-          />
-        </View>
-        <Meter value={approved} total={items.length} tone={tone} />
-      </Pressable>
-      {open ? (
-        <View style={{ marginTop: space.xs }}>
-          {items.map((item, index) => (
-            <View
-              key={item.kind}
-              style={[styles.docRow, index < items.length - 1 && { borderBottomWidth: 1, borderBottomColor: theme.divider }]}>
-              <View style={{ flex: 1 }}>
-                <Txt numberOfLines={1}>{t(`driver.doc.${item.kind}.title`)}</Txt>
-                {item.rejectionReason ? (
-                  <Txt variant="caption" color="danger">
-                    {item.rejectionReason}
-                  </Txt>
-                ) : null}
-              </View>
-              <StatusPill label={t(`driver.docState.${item.state}`)} tone={DOC_TONE[item.state]} dot />
-            </View>
-          ))}
-          {rejected ? (
-            <Button
-              title={t('profile.driver.docs.help')}
-              size="sm"
-              variant="secondary"
-              onPress={() => router.push('/reports')}
-              style={{ marginTop: space.sm }}
-            />
-          ) : null}
-        </View>
-      ) : null}
+    <Card
+      onPress={() => router.push('/driver/my-documents')}
+      accessibilityLabel={`${t('verification.myDocs.title')}: ${label}`}
+      style={styles.docs}>
+      <IconTile icon={FileText} tone={tone} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <Txt variant="bodyStrong">{t('verification.myDocs.title')}</Txt>
+        <Txt variant="caption" color={tone === 'danger' ? 'danger' : tone === 'warning' ? 'warning' : 'muted'}>
+          {label}
+        </Txt>
+      </View>
+      <ChevronRight size={20} color={theme.muted} strokeWidth={2.2} />
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  docRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 44, paddingVertical: space.xs },
+  docs: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   vehicle: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   balance: {
     flexDirection: 'row',

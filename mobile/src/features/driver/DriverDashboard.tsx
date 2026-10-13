@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, Platform, StyleSheet, View } from 'react-native';
 
@@ -17,6 +17,7 @@ import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { useWalletFormat } from '@/features/wallet/format';
 import { EarningsCard, goToTopUp } from '@/features/wallet/SubscriptionCard';
 import { useBootstrap } from '@/hooks/useBootstrap';
+import { DRIVER_QUERY_KEY, useDriverProfile } from '@/hooks/useDriver';
 import { getFreshPosition, requestLocationPermission, useUserLocation } from '@/hooks/useLocation';
 import { useActiveRide, useDriverState, useGoOffline, useGoOnline } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
@@ -30,9 +31,13 @@ import { formatAmount } from '@/lib/money';
 import { formatFare, isActiveStatus } from '@/lib/ride';
 import { useStore } from '@/lib/store';
 import type { SubscriptionSummary } from '@/lib/types';
+import { dashboardAlert, type OnlineBlock, onlineBlockFromError } from '@/lib/verification';
 import { nextDueAt, pendingTotal, shortfall, subscriptionState } from '@/lib/wallet';
 import { useAuth } from '@/providers/AuthProvider';
 import { elevation, radius, space, useTheme } from '@/theme';
+
+import { connectRequest } from './store';
+import { OnlineBlockSheet, VerificationBanner } from './VerificationNotices';
 
 /** Breathing green dot while online. */
 function LiveDot({ online }: { online: boolean }) {
@@ -87,6 +92,10 @@ export function DriverDashboard() {
   const { suspension, handleError: handleSuspended } = useSuspension();
   // Android shares the position from the background while online; elsewhere the app must stay on screen.
   const sharingInBackground = useStore(backgroundLocationActive);
+  // Doc 12: expiring or expired documents and live selfies; going online refused for one of them opens a sheet.
+  const verification = useDriverProfile().data?.verification;
+  const alert = dashboardAlert(verification);
+  const [block, setBlock] = useState<OnlineBlock | null>(null);
 
   const online = !!state.data?.online;
   const activeRide = active.data && isActiveStatus(active.data.status) ? active.data : null;
@@ -143,6 +152,14 @@ export function DriverDashboard() {
         heavyHaptic();
         return;
       }
+      const verificationBlock = onlineBlockFromError(error);
+      if (verificationBlock) {
+        // 403 document_expired / selfie_required: the sheet opens Mis documentos or the selfie screen.
+        heavyHaptic();
+        setBlock(verificationBlock);
+        void queryClient.invalidateQueries({ queryKey: DRIVER_QUERY_KEY });
+        return;
+      }
       if (isSubscriptionOverdue(error)) {
         // The blocked banner explains it; refresh the fee so it shows the amount.
         heavyHaptic();
@@ -155,6 +172,20 @@ export function DriverDashboard() {
       setLocating(false);
     }
   };
+
+  // "Conectarme ahora" on the selfie screen: go online as soon as the dashboard is back.
+  const connectIfOffline = () => (online ? Promise.resolve() : connect());
+  const connectRef = useRef(connectIfOffline);
+  useEffect(() => {
+    connectRef.current = connectIfOffline;
+  });
+  const requested = useStore(connectRequest);
+  useEffect(() => {
+    if (!requested) return;
+    connectRequest.set(0);
+    // Only a fresh request: never go online by surprise later.
+    if (Date.now() - requested < 60_000) void connectRef.current();
+  }, [requested]);
 
   const disconnect = () => {
     heavyHaptic();
@@ -213,6 +244,8 @@ export function DriverDashboard() {
 
           {fee === 'pending' && summary && !blocked ? <PendingFeeNotice summary={summary} /> : null}
 
+          {alert && !suspended ? <VerificationBanner alert={alert} /> : null}
+
           <UpdateBanner />
 
           {permission !== 'granted' && !(blocked && !online) && !suspended ? <LocationPrompt variant="driver" /> : null}
@@ -263,6 +296,7 @@ export function DriverDashboard() {
         onClose={() => setDisclosure(false)}
         options={[{ label: t('privacy.location.accept'), icon: MapPinned, onPress: () => void acceptDisclosure() }]}
       />
+      <OnlineBlockSheet block={block} onClose={() => setBlock(null)} />
     </MapSheetLayout>
   );
 }

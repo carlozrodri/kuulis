@@ -8,6 +8,7 @@ import {
   Calendar,
   CircleCheck,
   CircleX,
+  FileText,
   Gift,
   Hourglass,
   type Icon,
@@ -202,6 +203,14 @@ function DriverStatus({
             {profile.suspension_reason || profile.rejection_reason || ''}
           </Notice>
         ) : null}
+        {/* Doc 12: documents can still be renewed while suspended. */}
+        <Button
+          title={t('verification.myDocs.title')}
+          variant="secondary"
+          icon={FileText}
+          style={{ marginTop: space.lg }}
+          onPress={() => router.push('/driver/my-documents')}
+        />
       </Screen>
     );
   }

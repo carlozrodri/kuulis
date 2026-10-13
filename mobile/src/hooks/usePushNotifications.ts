@@ -15,6 +15,7 @@ import { config } from '@/lib/config';
 import i18n from '@/i18n';
 import { isAccountNotification, isReportNotification, reportIdOf } from '@/lib/reports';
 import { alertIdOf, checkInAnswerOf, isSafetyNotification, SAFETY_CATEGORY } from '@/lib/safety';
+import { verificationHrefOf } from '@/lib/verification';
 import { useAuth } from '@/providers/AuthProvider';
 
 Notifications.setNotificationHandler({
@@ -87,6 +88,9 @@ export function usePushNotifications(enabled: boolean) {
       // Tapping a report push opens that report.
       const reportId = isReportNotification(data) ? reportIdOf(data) : null;
       if (reportId) router.push({ pathname: '/reports/[id]', params: { id: reportId } });
+      // Doc 12: "Verifica tu identidad" opens the live selfie; expiring documents open Mis documentos.
+      const verification = verificationHrefOf(data);
+      if (verification) router.push(verification);
     });
     // A button pressed while the app was closed: the response is waiting here.
     void Notifications.getLastNotificationResponseAsync()

@@ -9,6 +9,7 @@ import { Button, Card, EmptyState, Skeleton, TAB_BAR_SPACE, Txt } from '@/compon
 import { api } from '@/lib/api';
 import { isReportNotification, reportIdOf } from '@/lib/reports';
 import type { AppNotification, Page } from '@/lib/types';
+import { verificationHrefOf } from '@/lib/verification';
 import { radius, space, useTheme } from '@/theme';
 
 export default function NotificationsScreen() {
@@ -72,6 +73,8 @@ export default function NotificationsScreen() {
           const unread = !item.read_at;
           // A report answer opens that report.
           const reportId = isReportNotification(item.data) ? reportIdOf(item.data) : null;
+          // Doc 12: a selfie request or an expiring document opens where it is solved.
+          const verification = verificationHrefOf(item.data);
           return (
             <Pressable
               accessibilityRole="button"
@@ -79,6 +82,7 @@ export default function NotificationsScreen() {
               onPress={() => {
                 if (unread) markRead.mutate(item.id);
                 if (reportId) router.push({ pathname: '/reports/[id]', params: { id: reportId } });
+                else if (verification) router.push(verification);
               }}>
               <Card style={[styles.item, { opacity: unread ? 1 : 0.7 }]}>
                 <View style={[styles.dot, { backgroundColor: unread ? theme.primary : 'transparent' }]} />

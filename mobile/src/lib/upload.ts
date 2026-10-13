@@ -19,9 +19,14 @@ export class UploadError extends Error {
 
 /**
  * Uploads one driver document: presign → PUT the bytes to storage with the returned headers → register.
- * Returns the updated DriverProfile.
+ * `expiresOn` ("YYYY-MM-DD") goes with expiring kinds (doc 12); an approved driver's upload is a renewal that
+ * waits for review while the current file stays in use. Returns the updated DriverProfile.
  */
-export async function uploadDriverDocument(kind: DocumentKind, file: LocalFile): Promise<DriverProfile> {
+export async function uploadDriverDocument(
+  kind: DocumentKind,
+  file: LocalFile,
+  expiresOn?: string | null,
+): Promise<DriverProfile> {
   const filename = file.name || file.uri.split('/').pop() || `${kind}.jpg`;
   const contentType = contentTypeFor(filename, file.mimeType);
   if (!contentType) throw new UploadError('file_type_not_allowed');
@@ -36,7 +41,31 @@ export async function uploadDriverDocument(kind: DocumentKind, file: LocalFile):
   const status = await putFile(presign.upload_url, presign.method ?? 'PUT', file.uri, headers);
   if (status < 200 || status >= 300) throw new UploadError('upload_failed');
 
-  return api<DriverProfile>('/drivers/me/documents', { method: 'POST', body: { kind, key: presign.key } });
+  return api<DriverProfile>('/drivers/me/documents', {
+    method: 'POST',
+    body: expiresOn ? { kind, key: presign.key, expires_on: expiresOn } : { kind, key: presign.key },
+  });
+}
+
+/** Kinds a check (live selfie, re-verification, moto change) carries; selfie and moto photos must be images. */
+export type CheckFileKind = 'selfie' | 'vehicle_photo' | 'vehicle_registration';
+
+/** One file for a check (doc 12): presign in the checks folder → PUT. Returns the key to submit. */
+export async function uploadCheckFile(kind: CheckFileKind, file: LocalFile): Promise<string> {
+  const filename = file.name || file.uri.split('/').pop() || `${kind}.jpg`;
+  const contentType = contentTypeFor(filename, file.mimeType);
+  if (!contentType || (kind !== 'vehicle_registration' && !contentType.startsWith('image/'))) {
+    throw new UploadError('file_type_not_allowed');
+  }
+  const size = await fileSize(file.uri);
+  const presign = await api<PresignResponse>('/drivers/me/checks/presign', {
+    method: 'POST',
+    body: { kind, filename, content_type: contentType, size },
+  });
+  const headers = { 'Content-Type': contentType, ...presign.headers };
+  const status = await putFile(presign.upload_url, presign.method ?? 'PUT', file.uri, headers);
+  if (status < 200 || status >= 300) throw new UploadError('upload_failed');
+  return presign.key;
 }
 
 /** Profile photo: presign in the avatars folder → PUT → returns the key to save with PATCH /users/me. */

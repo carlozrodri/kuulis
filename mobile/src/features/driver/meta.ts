@@ -1,4 +1,4 @@
-import { Bike, FileText, type Icon, IdCard, ScanFace, ShieldCheck } from '@/components/icons';
+import { Bike, FileText, type Icon, IdCard, ScanFace, ScrollText, ShieldCheck } from '@/components/icons';
 import type { Tone } from '@/components/ui';
 import type { DocumentState, DriverStep } from '@/lib/driver';
 import type { DocumentKind } from '@/lib/types';
@@ -11,6 +11,7 @@ export const DOCUMENT_ICONS: Record<DocumentKind, Icon> = {
   vehicle_registration: FileText,
   selfie: ScanFace,
   vehicle_photo: Bike,
+  criminal_record: ScrollText,
 };
 
 export const DOCUMENT_STATE_TONE: Record<DocumentState, Tone> = {

@@ -479,6 +479,10 @@
         "title": "Fotos de la moto",
         "hint": "Con la placa visible",
         "hintCount": "Mínimo {{count}}, con la placa visible"
+      },
+      "criminal_record": {
+        "title": "Certificado de antecedentes penales",
+        "hint": "Opcional, emitido en los últimos 6 meses"
       }
     },
     "docState": {
@@ -619,7 +623,20 @@
     "sos_closed": "El SOS solo se puede activar durante el viaje o poco después",
     "alert_not_found": "Esa alerta ya no existe",
     "alert_closed": "Esa alerta ya se cerró",
-    "no_active_sos": "No tienes un SOS activo"
+    "no_active_sos": "No tienes un SOS activo",
+    "document_expired": "Tienes un documento vencido. Sube el nuevo para conectarte.",
+    "selfie_required": "Envía una selfie en vivo para conectarte.",
+    "expiry_required": "Escribe la fecha de vencimiento del documento.",
+    "document_already_expired": "Ese documento ya está vencido. Sube uno vigente.",
+    "expiry_confirmed": "Nuestro equipo ya confirmó esa fecha. Para cambiarla, sube el documento nuevo.",
+    "check_files_missing": "Faltan fotos. Toma la selfie y las fotos de la moto que te pedimos.",
+    "check_files_invalid": "Alguna foto no es válida. Tómalas de nuevo con la cámara.",
+    "check_not_requested": "Esta verificación ya fue enviada o ya no está pendiente.",
+    "check_not_found": "No encontramos esta verificación.",
+    "vehicle_change_pending": "Ya tienes un cambio de moto en revisión.",
+    "vehicle_same_plate": "Esa es la moto que ya usas. Escribe la placa de la moto nueva.",
+    "vehicle_change_not_found": "No tienes un cambio de moto en revisión.",
+    "document_not_found": "No encontramos ese documento. Actualiza la pantalla."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -1586,6 +1603,162 @@
     "transfersOff": {
       "title": "Transferencias no disponibles",
       "body": "Por ahora no se pueden hacer transferencias. Tu saldo sigue seguro; inténtalo más tarde."
+    }
+  },
+  "verification": {
+    "expiresOn": "Vence el {{date}}",
+    "expiredOn": "Venció el {{date}}",
+    "asksExpiry": "te pediremos la fecha de vencimiento",
+    "badge": {
+      "expired": "Vencido",
+      "today": "Vence hoy",
+      "tomorrow": "Vence mañana",
+      "inDays_one": "Vence en {{count}} día",
+      "inDays_other": "Vence en {{count}} días",
+      "in_review": "En revisión",
+      "rejected": "Rechazado",
+      "optional": "Opcional",
+      "missing": "Falta",
+      "missing_expiry": "Falta la fecha",
+      "valid": "Vigente",
+      "approved": "Aprobado"
+    },
+    "expiry": {
+      "title": "¿Cuándo vence?",
+      "body": "Escribe la fecha de vencimiento tal como aparece en el documento.",
+      "label": "Fecha de vencimiento",
+      "placeholder": "DD/MM/AAAA",
+      "invalid": "Escribe una fecha válida (DD/MM/AAAA)",
+      "past": "Esa fecha ya pasó. Sube un documento vigente.",
+      "upload": "Subir documento",
+      "save": "Guardar fecha",
+      "photoReady": "Foto lista",
+      "pdfReady": "Archivo listo",
+      "fileHint": "Búscala en el documento y escríbela abajo."
+    },
+    "optional": {
+      "title": "Documentos opcionales",
+      "hint": "Opcional: suma confianza con los pasajeros.",
+      "add": "Agregar"
+    },
+    "myDocs": {
+      "title": "Mis documentos",
+      "subtitle": "Mantenlos al día para seguir recibiendo viajes. Te avisamos {{days}} días antes de que venzan.",
+      "expiredTitle": "No puedes conectarte",
+      "expiredBody": "Tienes un documento vencido. Sube el nuevo: podrás conectarte apenas lo aprobemos.",
+      "expiredPendingTitle": "Estamos revisando tu documento",
+      "expiredPendingBody": "Ya recibimos el nuevo. Te avisamos por notificación apenas lo aprobemos para que vuelvas a conectarte.",
+      "missingExpiry": "Indica su fecha de vencimiento para que te avisemos a tiempo.",
+      "inReview": "Enviaste uno nuevo el {{date}}. Mientras lo revisamos sigues usando el actual.",
+      "rejected": "Rechazamos el nuevo: {{reason}}. Sube otro.",
+      "rejectedNoReason": "Rechazamos el nuevo. Sube otro.",
+      "noExpiry": "Aprobado, no vence",
+      "update": "Actualizar",
+      "setExpiry": "Indicar fecha",
+      "how": "Cuando subes un documento nuevo, nuestro equipo lo revisa (suele tomar menos de 48 horas) y sigues usando el actual mientras tanto."
+    },
+    "profile": {
+      "allGood": "Todo al día",
+      "attention_one": "{{count}} documento necesita tu atención",
+      "attention_other": "{{count}} documentos necesitan tu atención"
+    },
+    "banner": {
+      "selfieTitle": "Verificación pendiente",
+      "selfieBody": "Tómate una selfie en vivo para conectarte.",
+      "reverificationBody": "Envía una selfie y fotos de tu moto para conectarte.",
+      "selfieAction": "Verificar",
+      "expiredTitle": "Documento vencido",
+      "expiredBody": "{{docs}}. Sube el nuevo para volver a conectarte.",
+      "expiredPendingTitle": "Revisando tu documento nuevo",
+      "expiredPendingBody": "{{docs}}: te avisamos apenas lo aprobemos para que te conectes.",
+      "see": "Ver",
+      "missingTitle": "Falta una fecha",
+      "missingBody": "Indica cuándo vence: {{docs}}.",
+      "missingAction": "Indicar",
+      "expiringBody": "Sube el nuevo a tiempo para no quedarte sin conectarte."
+    },
+    "block": {
+      "expiredTitle": "No puedes conectarte todavía",
+      "expiredBody": "Documento vencido: {{docs}}. Sube el nuevo y podrás conectarte apenas lo aprobemos.",
+      "expiredBodyGeneric": "Tienes un documento vencido. Sube el nuevo y podrás conectarte apenas lo aprobemos.",
+      "expiredAction": "Actualizar documentos",
+      "selfieTitle": "Verifica que eres tú",
+      "selfieBody": "Antes de conectarte necesitamos una selfie en vivo. Toma menos de un minuto y te conectas apenas la envíes.",
+      "selfieAction": "Tomar selfie",
+      "reverificationTitle": "Verifica tu identidad y tu moto",
+      "reverificationBody": "Necesitamos una selfie en vivo y fotos nuevas de tu moto. Te conectas apenas las envíes.",
+      "reverificationAction": "Verificar ahora",
+      "later": "Ahora no"
+    },
+    "selfie": {
+      "title": "Verifica que eres tú",
+      "titleMoto": "Verifica tu identidad y tu moto",
+      "body": "Por la seguridad de todos, de vez en cuando te pedimos una selfie en vivo. Toma menos de un minuto.",
+      "bodyMoto_one": "Necesitamos una selfie en vivo y {{count}} foto nueva de tu moto con la placa visible.",
+      "bodyMoto_other": "Necesitamos una selfie en vivo y {{count}} fotos nuevas de tu moto con la placa visible.",
+      "tips": {
+        "light": {
+          "title": "Busca buena luz",
+          "body": "De frente a una ventana o una lámpara, sin sombras en la cara."
+        },
+        "clear": {
+          "title": "Sin lentes oscuros ni casco",
+          "body": "Queremos ver tu cara completa, como en tu cédula."
+        },
+        "center": {
+          "title": "Cara centrada",
+          "body": "Mira a la cámara y deja tu cara dentro del óvalo."
+        }
+      },
+      "take": "Tomar selfie",
+      "cameraDenied": "Permite el acceso a la cámara en los ajustes. La selfie tiene que ser en vivo, no de la galería.",
+      "reviewTitle": "¿Se ve bien tu cara?",
+      "reviewBody": "Revisa que esté nítida, con buena luz y sin nada que la tape.",
+      "previewA11y": "Tu selfie",
+      "retake": "Repetir selfie",
+      "motoTitle": "Fotos de tu moto",
+      "motoHint": "Con la cámara, en este momento, con la placa visible.",
+      "motoTake": "Tomar foto de la moto",
+      "photosMissing_one": "Falta {{count}} foto de tu moto",
+      "photosMissing_other": "Faltan {{count}} fotos de tu moto",
+      "send": "Enviar",
+      "uploading": "Subiendo {{done}} de {{total}}…",
+      "privacy": "Solo nuestro equipo de verificación ve estas fotos, para compararlas con tu cédula y tu registro.",
+      "sentTitle": "Listo, está en revisión",
+      "sentBody": "Ya puedes conectarte. Nuestro equipo revisará tu selfie en las próximas horas.",
+      "sentBodyMoto": "Ya puedes conectarte. Nuestro equipo revisará tu selfie y las fotos de tu moto en las próximas horas.",
+      "sentNotify": "Te avisamos por notificación si necesitamos algo más.",
+      "connectNow": "Conectarme ahora",
+      "nothingTitle": "No tienes verificaciones pendientes",
+      "nothingBody": "Te avisaremos cuando necesitemos una selfie nueva."
+    },
+    "vehicle": {
+      "title": "Cambiar de moto",
+      "subtitle": "Registra tu nueva moto (año {{year}} o más nueva). Mientras la revisamos sigues trabajando con la actual.",
+      "current": "Moto actual",
+      "inUse": "En uso",
+      "new": "Moto nueva",
+      "newData": "Datos de la moto nueva",
+      "registrationHint": "Carnet de la moto nueva",
+      "registrationSub": "Foto o PDF, legible y vigente",
+      "registrationMissing": "Sube el carnet de circulación de la moto nueva",
+      "change": "Cambiar",
+      "expiryHint": "La fecha de vencimiento que aparece en el carnet.",
+      "photosMissing_one": "Agrega al menos {{count}} foto",
+      "photosMissing_other": "Agrega al menos {{count}} fotos",
+      "submit": "Enviar a revisión",
+      "sent": "Enviamos tu moto nueva a revisión",
+      "how": "Revisamos el cambio en menos de 48 horas. Cuando lo aprobemos, tus viajes saldrán con la moto nueva y te avisaremos.",
+      "pendingTitle": "Tu moto nueva está en revisión",
+      "pendingBody": "Sigues trabajando con tu moto actual hasta que la aprobemos.",
+      "pendingBodyDate": "La enviaste el {{date}}. Sigues trabajando con tu moto actual hasta que la aprobemos.",
+      "pendingNotice": "Te avisaremos por notificación cuando terminemos de revisarla.",
+      "pendingRow": "{{moto}} en revisión",
+      "pendingRowHint": "Sigues usando esta moto hasta que la aprobemos",
+      "cancel": "Cancelar cambio",
+      "cancelTitle": "¿Cancelar el cambio de moto?",
+      "cancelBody": "Seguirás con tu moto actual. Si quieres cambiarla después, tendrás que enviar todo de nuevo.",
+      "cancelled": "Cancelaste el cambio de moto"
     }
   }
 }
