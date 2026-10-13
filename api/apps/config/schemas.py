@@ -178,6 +178,38 @@ class LocationIntervals(BaseModel):
     on_ride_seconds: int = Field(default=4, ge=1, le=60)
 
 
+class SafetySettings(BaseModel):
+    """Trip safety (doc 11): start PIN, passenger photo, anomaly rules and SOS location rate."""
+
+    # Cities where the driver must type the passenger's PIN to start a ride.
+    pin_areas: list[str] = Field(default_factory=lambda: ["Caracas"], max_length=20)
+    # When the driver sees the passenger's photo (if any) with the offer and during the ride.
+    passenger_photo: Literal["off", "night", "always"] = "night"
+    night_start: str = "19:00"  # Caracas time
+    night_end: str = "06:00"
+    # Anomalies during ``in_progress``; each asks both "¿Todo bien?" before alerting the team.
+    stop_minutes: int = Field(default=10, ge=2, le=60)
+    deviation_m: int = Field(default=600, ge=100, le=10_000)
+    deviation_minutes: int = Field(default=3, ge=1, le=30)
+    overtime_factor: float = Field(default=2.0, ge=1.2, le=10)
+    check_in_seconds: int = Field(default=120, ge=30, le=900)
+    # How often the app sends its location while an SOS is active.
+    sos_location_seconds: int = Field(default=5, ge=2, le=60)
+
+    @field_validator("night_start", "night_end")
+    @classmethod
+    def _hhmm(cls, value: str) -> str:
+        if not _HHMM.match(value):
+            raise ValueError("expected HH:MM (24h)")
+        return value
+
+    def is_night(self, now: time) -> bool:
+        start, end = time.fromisoformat(self.night_start), time.fromisoformat(self.night_end)
+        if start <= end:
+            return start <= now < end
+        return now >= start or now < end
+
+
 NoticeKind = Literal["maintenance", "pause"]
 
 
@@ -268,6 +300,9 @@ class AppConfig(BaseModel):
     app_links: AppLinks = Field(default_factory=AppLinks)
     location_intervals: LocationIntervals = Field(default_factory=LocationIntervals)
 
+    # --- Trip safety (doc 11) -------------------------------------------------------------------
+    safety: SafetySettings = Field(default_factory=SafetySettings)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -338,6 +373,7 @@ class AppConfigUpdate(BaseModel):
     approval_broadcasts: bool | None = None
     app_links: AppLinks | None = None
     location_intervals: LocationIntervals | None = None
+    safety: SafetySettings | None = None
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

@@ -85,6 +85,8 @@ class PersonBrief(BaseModel):
     id: uuid.UUID
     first_name: str
     rating: float | None
+    # Passenger: shown to the driver only when the city's safety rule allows it (doc 11).
+    photo_url: str | None = None
 
 
 class VehicleBrief(BaseModel):
@@ -144,11 +146,15 @@ class RideRead(BaseModel):
     cancelled_at: datetime | None
     cancel_reason: str | None
     my_rating: RatingRead | None
+    # Start PIN (doc 11): the driver must type it to start; only the passenger receives the code.
+    pin_required: bool = False
+    start_pin: str | None = None
 
 
 class OfferPassenger(BaseModel):
     first_name: str
     rating: float | None
+    photo_url: str | None = None
 
 
 class Offer(BaseModel):
@@ -230,6 +236,7 @@ class RideAdminRead(RideRead):
     driver_email: str | None
     driver_profile_id: uuid.UUID | None
     cancelled_by_id: uuid.UUID | None
+    pin_failures: int = 0
 
 
 class RatingAdminRead(RatingRead):
@@ -252,10 +259,32 @@ class OfferAdminRead(BaseModel):
     responded_at: datetime | None
 
 
+class RideSafetyAlert(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    kind: str
+    status: str
+    user_id: uuid.UUID
+    lat: float | None
+    lng: float | None
+    details: dict
+    created_at: datetime
+    resolved_at: datetime | None
+    outcome: str | None
+
+
 class RideAdminDetail(RideAdminRead):
     messages: list[MessageRead]
     ratings: list[RatingAdminRead]
     offers: list[OfferAdminRead]
+    # The driver's real path, [[lat, lng, unix_seconds], ...] (empty until the ride ends).
+    track: list[list[float]] = Field(default_factory=list)
+    safety_alerts: list[RideSafetyAlert] = Field(default_factory=list)
+
+
+class StartRequest(BaseModel):
+    pin: str | None = Field(default=None, pattern=r"^\d{4}$")
 
 
 class OnlineDriver(BaseModel):

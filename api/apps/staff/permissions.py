@@ -8,6 +8,7 @@ PERMISSIONS: dict[str, tuple[str, ...]] = {
     "reports": ("reports.manage",),
     "drivers": ("drivers.view", "drivers.review", "drivers.suspend"),
     "rides": ("rides.view", "rides.cancel", "live.view"),
+    "safety": ("safety.view", "safety.manage"),
     "promotions": ("promotions.view", "promotions.manage"),
     "rates": ("rates.view", "rates.manage"),
     "notifications": ("notifications.send",),
@@ -42,6 +43,8 @@ DEFAULT_ROLES: dict[str, tuple[str, tuple[str, ...]]] = {
             "rides.view",
             "drivers.view",
             "live.view",
+            "safety.view",
+            "safety.manage",
         ),
     ),
     "verificador": (
@@ -86,6 +89,8 @@ DEFAULT_ROLES: dict[str, tuple[str, tuple[str, ...]]] = {
             "flags.view",
             "announcements.view",
             "announcements.manage",
+            "safety.view",
+            "safety.manage",
         ),
     ),
 }

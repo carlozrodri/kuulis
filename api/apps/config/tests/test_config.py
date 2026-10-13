@@ -62,6 +62,18 @@ DEFAULTS = {
         "privacy_url": "",
     },
     "location_intervals": {"online_seconds": 10, "on_ride_seconds": 4},
+    "safety": {
+        "pin_areas": ["Caracas"],
+        "passenger_photo": "night",
+        "night_start": "19:00",
+        "night_end": "06:00",
+        "stop_minutes": 10,
+        "deviation_m": 600,
+        "deviation_minutes": 3,
+        "overtime_factor": 2.0,
+        "check_in_seconds": 120,
+        "sos_location_seconds": 5,
+    },
 }
 
 

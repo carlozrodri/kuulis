@@ -14,6 +14,7 @@ export const NAV: NavEntry[] = [
   { key: 'drivers', icon: 'i-lucide-bike', to: '/drivers', permission: 'drivers.view' },
   { key: 'rides', icon: 'i-lucide-route', to: '/rides', permission: 'rides.view' },
   { key: 'live', icon: 'i-lucide-radar', to: '/live', permission: 'live.view' },
+  { key: 'safety', icon: 'i-lucide-siren', to: '/safety', permission: 'safety.view' },
   { key: 'reports', icon: 'i-lucide-flag', to: '/reports', permission: 'reports.manage' },
   { key: 'rates', icon: 'i-lucide-banknote', to: '/rates', permission: 'rates.view' },
   { key: 'promotions', icon: 'i-lucide-ticket-percent', to: '/promotions', permission: 'promotions.view' },

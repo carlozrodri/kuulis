@@ -65,13 +65,19 @@ const timeline = computed<Step[]>(() => {
 // ---- Map ------------------------------------------------------------------------------------
 
 const routePoints = computed(() => decodeRoute(ride.value?.polyline))
+// Doc 11: the real path of the driver, drawn over the planned route.
+const trackPoints = computed(() => trackLine(ride.value?.track))
 const mapLines = computed<MapLine[]>(() => {
   const r = ride.value
   if (!r) return []
-  if (routePoints.value.length > 1) return [{ id: 'route', points: routePoints.value, color: MAP_COLORS.route }]
-  // No polyline (OSRM unavailable): straight dashed line as a visual hint only.
-  return [{ id: 'route', points: [[r.pickup.lat, r.pickup.lng], [r.dropoff.lat, r.dropoff.lng]], color: MAP_COLORS.route, dashed: true }]
+  const lines: MapLine[] = routePoints.value.length > 1
+    ? [{ id: 'route', points: routePoints.value, color: MAP_COLORS.route, dashed: trackPoints.value.length > 1 }]
+    // No polyline (OSRM unavailable): straight dashed line as a visual hint only.
+    : [{ id: 'route', points: [[r.pickup.lat, r.pickup.lng], [r.dropoff.lat, r.dropoff.lng]], color: MAP_COLORS.route, dashed: true }]
+  if (trackPoints.value.length > 1) lines.push({ id: 'track', points: trackPoints.value, color: MAP_COLORS.track })
+  return lines
 })
+const safetyAlerts = computed(() => ride.value?.safety_alerts ?? [])
 const mapMarkers = computed<MapMarker[]>(() => {
   const r = ride.value
   if (!r) return []
@@ -88,6 +94,10 @@ const mapMarkers = computed<MapMarker[]>(() => {
       radius: 9,
       label: `${t('rides.driver')}: ${personName(r.driver)}`,
     })
+  }
+  for (const alert of ride.value?.safety_alerts ?? []) {
+    if (alert.lat === null || alert.lng === null) continue
+    markers.push({ id: `alert:${alert.id}`, lat: alert.lat, lng: alert.lng, color: ALERT_COLORS[alert.kind], radius: 9, label: t(`safety.kinds.${alert.kind}`) })
   }
   return markers
 })
@@ -265,6 +275,65 @@ async function confirmCancel() {
               >
                 {{ t('rides.estimatedRoute') }}
               </p>
+              <p
+                v-if="trackPoints.length > 1"
+                class="flex items-center gap-2 text-xs text-(--ui-text-muted) sm:col-span-2"
+              >
+                <span
+                  class="inline-block h-1 w-6 rounded"
+                  :style="{ background: MAP_COLORS.track }"
+                />{{ t('rides.safety.track', { n: trackPoints.length }) }}
+              </p>
+            </div>
+          </UCard>
+
+          <UCard v-if="ride.pin_required || ride.pin_failures || safetyAlerts.length">
+            <template #header>
+              <h2 class="font-semibold">
+                {{ t('rides.safety.title') }}
+              </h2>
+            </template>
+            <div class="space-y-3 text-sm">
+              <p v-if="ride.pin_required || ride.pin_failures">
+                <UIcon
+                  name="i-lucide-key-round"
+                  class="mr-1 size-4 align-text-bottom"
+                />
+                {{ ride.pin_failures ? t('rides.safety.pinFailures', { n: ride.pin_failures }) : t('rides.safety.pinOk') }}
+              </p>
+              <ul
+                v-if="safetyAlerts.length"
+                class="space-y-2"
+              >
+                <li
+                  v-for="alert in safetyAlerts"
+                  :key="alert.id"
+                  class="flex flex-wrap items-center justify-between gap-2 rounded-md border border-(--ui-border) p-2"
+                >
+                  <span class="flex items-center gap-2">
+                    <UIcon
+                      :name="alert.kind === 'sos' ? 'i-lucide-siren' : 'i-lucide-triangle-alert'"
+                      class="size-4"
+                      :style="{ color: ALERT_COLORS[alert.kind] }"
+                    />
+                    {{ t(`safety.kinds.${alert.kind}`) }}
+                    <span class="text-xs text-(--ui-text-muted)">{{ alertDetail(alert) }} · {{ formatTime(alert.created_at, locale) }}</span>
+                  </span>
+                  <span class="flex items-center gap-2">
+                    <UBadge
+                      :color="alertStatusColor(alert.status)"
+                      variant="subtle"
+                      size="sm"
+                    >
+                      {{ t(`safety.statuses.${alert.status}`) }}
+                    </UBadge>
+                    <NuxtLink
+                      :to="`/safety?alert=${alert.id}`"
+                      class="text-xs text-primary hover:underline"
+                    >{{ t('rides.safety.open') }}</NuxtLink>
+                  </span>
+                </li>
+              </ul>
             </div>
           </UCard>
 

@@ -21,6 +21,7 @@ import orjson
 
 from apps.drivers.models import VehicleType
 from apps.realtime.manager import publish
+from apps.safety import track
 from kuulis.core.redis import redis_client
 from kuulis.settings import settings
 
@@ -211,6 +212,7 @@ async def handle_location(user_id: str, message: dict[str, Any]) -> None:
 
     if active:
         ride_id, passenger_id = active.split("|", 1)
+        await track.record(ride_id, lat, lng)
         if await redis_client.set(_throttle_key(ride_id), "1", nx=True, px=FORWARD_INTERVAL_MS):
             await publish(
                 "ride.driver_location",

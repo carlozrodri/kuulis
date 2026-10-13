@@ -9,6 +9,8 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.config.schemas import AppConfig
+from apps.config.services import get_app_config
 from apps.drivers.models import DocumentKind, DocumentStatus, DriverDocument, DriverProfile
 from apps.notifications import services as notifications
 from apps.notifications import tasks as notification_tasks
@@ -18,7 +20,7 @@ from apps.rates import services as rates
 from apps.rates.schemas import FrozenRates
 from apps.realtime.manager import publish
 from apps.rides import notify, presence
-from apps.rides.models import ASSIGNED_STATUSES, Rating, Ride, RideMessage, RideOffer
+from apps.rides.models import ASSIGNED_STATUSES, Rating, Ride, RideMessage, RideOffer, RideStatus
 from apps.rides.schemas import (
     DriverAdminBrief,
     DriverBrief,
@@ -34,8 +36,10 @@ from apps.rides.schemas import (
 )
 from apps.users.models import User
 from kuulis.core import storage
+from kuulis.core.calendar import local_now
 
 logger = logging.getLogger(__name__)
+PIN_STATUSES = frozenset({RideStatus.DRIVER_ASSIGNED, RideStatus.DRIVER_ARRIVED})
 
 
 def first_name(user: User | None) -> str:
@@ -110,6 +114,31 @@ async def _profiles(
     return {p.user_id: (p, selfies.get(p.id)) for p in profiles.values()}
 
 
+def passenger_photo_allowed(config: AppConfig) -> bool:
+    """Whether drivers see the passenger's photo now (doc 11: "night" by default)."""
+    mode = config.safety.passenger_photo
+    return mode == "always" or (mode == "night" and config.safety.is_night(local_now().time()))
+
+
+async def _passenger_photos(
+    session: AsyncSession, rides: Sequence[Ride], users: dict[uuid.UUID, User]
+) -> dict[uuid.UUID, str | None]:
+    """ride id -> passenger photo for the driver (only rides with a driver and a photo)."""
+    candidates = [
+        r
+        for r in rides
+        if r.driver_id
+        and r.status in ASSIGNED_STATUSES
+        and (p := users.get(r.passenger_id)) is not None
+        and p.avatar_key
+    ]
+    if not candidates or not passenger_photo_allowed(await get_app_config(session)):
+        return {}
+    return {
+        r.id: storage.download_url_or_none(users[r.passenger_id].avatar_key) for r in candidates
+    }
+
+
 async def serialize_rides(
     session: AsyncSession,
     rides: Sequence[Ride],
@@ -135,6 +164,7 @@ async def serialize_rides(
     live = [str(r.driver_id) for r in rides if r.driver_id and r.status in ASSIGNED_STATUSES]
     locations = await presence.get_locations(live)
     promos = await _promotions(session, {r.promotion_id for r in rides if r.promotion_id})
+    photos = await _passenger_photos(session, rides, users)
 
     result: list[RideRead] = []
     for ride in rides:
@@ -179,6 +209,7 @@ async def serialize_rides(
                 id=ride.passenger_id,
                 first_name=first_name(passenger),
                 rating=_rating(passenger.rating_avg) if passenger else None,
+                photo_url=photos.get(ride.id),
             ),
             "driver": driver,
             "driver_location": location,
@@ -190,6 +221,8 @@ async def serialize_rides(
             "cancelled_at": ride.cancelled_at,
             "cancel_reason": ride.cancel_reason,
             "my_rating": RatingRead.model_validate(mine) if mine else None,
+            "pin_required": ride.start_pin is not None,
+            "start_pin": _pin_for(ride, viewer_id),
         }
         if admin:
             if driver is not None:
@@ -205,11 +238,19 @@ async def serialize_rides(
                     driver_email=driver_user.email if driver_user else None,
                     driver_profile_id=profile.id if profile else None,
                     cancelled_by_id=ride.cancelled_by_id,
+                    pin_failures=ride.pin_failures or 0,
                 )
             )
         else:
             result.append(RideRead(**fields))
     return result
+
+
+def _pin_for(ride: Ride, viewer_id: uuid.UUID | None) -> str | None:
+    """Only the passenger gets the code, and only until the ride starts."""
+    if viewer_id != ride.passenger_id or ride.status not in PIN_STATUSES:
+        return None
+    return ride.start_pin
 
 
 async def serialize_ride(
@@ -232,7 +273,10 @@ async def emit_updated(session: AsyncSession, ride: Ride) -> None:
     for user_id in participants:
         mine = ratings.get(user_id)
         payload = base.model_copy(
-            update={"my_rating": RatingRead.model_validate(mine) if mine else None}
+            update={
+                "my_rating": RatingRead.model_validate(mine) if mine else None,
+                "start_pin": _pin_for(ride, user_id),
+            }
         )
         await publish("ride.updated", payload.model_dump(mode="json"), user_ids=[str(user_id)])
 
@@ -259,6 +303,13 @@ async def driver_name(session: AsyncSession, ride: Ride) -> str:
 
 async def build_offer(session: AsyncSession, ride: Ride, offer: RideOffer) -> Offer:
     passenger = await session.get(User, ride.passenger_id)
+    photo = None
+    if (
+        passenger is not None
+        and passenger.avatar_key
+        and passenger_photo_allowed(await get_app_config(session))
+    ):
+        photo = storage.download_url_or_none(passenger.avatar_key)
     return Offer(
         ride_id=ride.id,
         pickup=_place(ride.pickup_lat, ride.pickup_lng, ride.pickup_address),
@@ -275,6 +326,7 @@ async def build_offer(session: AsyncSession, ride: Ride, offer: RideOffer) -> Of
         passenger=OfferPassenger(
             first_name=first_name(passenger),
             rating=_rating(passenger.rating_avg) if passenger else None,
+            photo_url=photo,
         ),
         expires_at=offer.expires_at,
     )

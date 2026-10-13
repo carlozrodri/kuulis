@@ -8,6 +8,7 @@
     "settings": "Configuración",
     "rides": "Viajes",
     "live": "En vivo",
+    "safety": "Seguridad",
     "rates": "Tasas",
     "promotions": "Promociones",
     "topUps": "Recargas",
@@ -483,7 +484,9 @@
       "termsUrl": "El enlace a los términos debe empezar con https:// (máximo 300 caracteres).",
       "privacyUrl": "El enlace a la privacidad debe empezar con https:// (máximo 300 caracteres).",
       "onlineSeconds": "Ubicación sin viaje: entre {min} y {max} segundos.",
-      "onRideSeconds": "Ubicación en viaje: entre {min} y {max} segundos."
+      "onRideSeconds": "Ubicación en viaje: entre {min} y {max} segundos.",
+      "nightHours": "Las horas de noche deben ser HH:MM y distintas",
+      "safetyNumber": "Un valor de seguridad está fuera de rango ({min}–{max})"
     },
     "fares": {
       "title": "Tarifas",
@@ -597,6 +600,31 @@
       "onlineSeconds": "Conectado, sin viaje (segundos)",
       "onRideSeconds": "En viaje (segundos)",
       "secondsRange": "Entre {min} y {max} segundos."
+    },
+    "safety": {
+      "title": "Seguridad en el viaje",
+      "help": "PIN de inicio, foto del pasajero y reglas que preguntan \"¿Todo bien?\" antes de avisar al equipo.",
+      "pinAreas": "Ciudades con PIN de inicio",
+      "pinAreasHelp": "El motorizado escribe el código del pasajero para iniciar el viaje.",
+      "passengerPhoto": "Foto del pasajero para el motorizado",
+      "photo": {
+        "off": "Nunca",
+        "night": "Solo de noche",
+        "always": "Siempre"
+      },
+      "nightStart": "Noche desde",
+      "nightEnd": "Noche hasta",
+      "anomalies": "Anomalías",
+      "anomaliesHelp": "Durante el viaje: parada larga fuera del destino, desvío de la ruta o duración muy por encima de lo estimado.",
+      "numbers": {
+        "stop_minutes": "Parada (minutos)",
+        "deviation_m": "Desvío (metros)",
+        "deviation_minutes": "Desvío sostenido (minutos)",
+        "overtime_factor": "Duración máxima (× estimado)",
+        "check_in_seconds": "Tiempo para responder (s)",
+        "sos_location_seconds": "Ubicación durante SOS (s)"
+      },
+      "range": "Entre {min} y {max}"
     }
   },
   "paymentMethods": {
@@ -720,7 +748,14 @@
     "promotion": "Promoción",
     "totalVes": "Total en Bs ({source})",
     "frozenRate": "Tasa {rate} al pedir",
-    "pays": "Paga {amount}"
+    "pays": "Paga {amount}",
+    "safety": {
+      "title": "Seguridad",
+      "track": "Recorrido real ({n} puntos)",
+      "pinOk": "Con PIN de inicio, sin intentos fallidos",
+      "pinFailures": "PIN incorrecto {n} veces",
+      "open": "Abrir"
+    }
   },
   "live": {
     "activeRides": "Viajes ({n})",
@@ -2087,5 +2122,71 @@
     "deleted": "Anuncio borrado",
     "deleteTitle": "¿Borrar el anuncio?",
     "deleteBody": "«{title}» deja de mostrarse en la app y se pierden sus números de alcance. Si solo quieres que termine, edita su fecha de fin."
+  },
+  "safety": {
+    "help": "Alertas SOS y anomalías de los viajes. Un SOS llega al momento con sonido; una anomalía llega solo si nadie respondió \"Estoy bien\" o alguien pidió ayuda.",
+    "sound": "Sonido",
+    "testSound": "Probar sonido",
+    "filters": {
+      "active": "Activas",
+      "checking": "Preguntando",
+      "closed": "Cerradas"
+    },
+    "empty": {
+      "active": "No hay alertas activas.",
+      "checking": "Ningún viaje está esperando un \"¿Todo bien?\".",
+      "closed": "Todavía no hay alertas cerradas."
+    },
+    "kinds": {
+      "sos": "SOS",
+      "stop": "Parada larga",
+      "deviation": "Desvío de la ruta",
+      "overtime": "Viaje demasiado largo"
+    },
+    "statuses": {
+      "checking": "Preguntando",
+      "open": "Abierta",
+      "acknowledged": "Atendiendo",
+      "resolved": "Resuelta",
+      "dismissed": "Estaba bien"
+    },
+    "reasons": {
+      "help": "pidió ayuda",
+      "no_answer": "nadie respondió"
+    },
+    "roles": {
+      "passenger": "Pasajero",
+      "driver": "Motorizado"
+    },
+    "answers": {
+      "ok": "Estoy bien",
+      "help": "Necesito ayuda",
+      "none": "sin respuesta"
+    },
+    "answer": "Respuesta",
+    "vehicle": "Moto",
+    "position": "Última posición",
+    "handledBy": "atiende {name}",
+    "justNow": "ahora",
+    "minutesAgo": "hace {n} min",
+    "acknowledge": "Atendiendo",
+    "acknowledged": "Marcada como atendiendo",
+    "resolve": "Cerrar alerta",
+    "resolveTitle": "Cerrar la alerta",
+    "resolved": "Alerta cerrada",
+    "notes": "Notas",
+    "saveNotes": "Guardar notas",
+    "notesSaved": "Notas guardadas",
+    "outcome": "Resultado",
+    "outcomes": {
+      "assisted": "Se le ayudó",
+      "emergency_services": "Se avisó a emergencias",
+      "false_alarm": "Falsa alarma",
+      "no_answer": "No respondió",
+      "other": "Otro",
+      "cancelled_by_user": "Lo canceló quien lo activó",
+      "passenger_ok": "El pasajero dijo que estaba bien"
+    },
+    "pick": "Elige una alerta para ver sus datos."
   }
 }

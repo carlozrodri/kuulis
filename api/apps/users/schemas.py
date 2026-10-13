@@ -43,8 +43,6 @@ class UserRead(BaseModel):
     # Rating received as a passenger.
     rating_avg: float | None = None
     rating_count: int = 0
-    trusted_contact_name: str | None = None
-    trusted_contact_phone: str | None = None
     suspension: SuspensionRead | None = None
     # Admin panel accounts only (/users/me): what their role lets them do (apps.staff).
     permissions: list[str] | None = None
@@ -69,9 +67,6 @@ class UserUpdateMe(BaseModel):
     locale: Locale | None = None
     # A key from POST /files/presign-upload with folder "avatars"; null or "" removes the photo.
     avatar_key: str | None = Field(default=None, max_length=512)
-    # Both null (or "") remove the contact. The phone is E.164 ("+584121234567").
-    trusted_contact_name: str | None = Field(default=None, max_length=80)
-    trusted_contact_phone: str | None = Field(default=None, pattern=r"^(\+\d{10,15})?$")
 
 
 class DeletionScheduled(BaseModel):

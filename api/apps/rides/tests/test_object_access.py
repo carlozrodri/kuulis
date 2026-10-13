@@ -4,7 +4,7 @@ person's ride, chat, report, saved place, notification or session by guessing it
 from apps.moderation.tests.test_moderation import _ride
 from apps.notifications.models import Notification
 from apps.rides.models import RideStatus
-from conftest import _login, _make_user
+from conftest import _login, _make_user, ride_step
 from kuulis.core.db import SessionLocal
 
 from .conftest import make_driver
@@ -62,7 +62,7 @@ async def test_strangers_cannot_reach_someone_elses_objects(client, passenger, r
 
     # Another driver can't move someone else's ride along.
     for step in ("arrive", "start", "complete"):
-        response = await client.post(f"{API}/rides/{ride}/{step}", headers=other_driver.headers)
+        response = await ride_step(client, ride, step, other_driver.headers)
         assert response.status_code in (403, 404, 409), (step, response.status_code)
 
     # Plain users don't see other people's profiles.

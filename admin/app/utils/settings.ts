@@ -1,4 +1,4 @@
-import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, PaymentMethod, RateSource, ServiceArea, VehicleType } from '~/types/api'
+import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, PaymentMethod, RateSource, SafetySettings, ServiceArea, VehicleType } from '~/types/api'
 import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/types/api'
 
 /** Editable copy of AppConfig: decimals as numbers so they bind to numeric inputs. */
@@ -36,6 +36,7 @@ export interface SettingsForm {
   approval_broadcasts: boolean
   app_links: AppLinks
   location_intervals: LocationIntervals
+  safety: SafetySettings
 }
 
 export const FARE_FIELDS = ['base', 'per_km', 'per_minute', 'minimum'] as const
@@ -69,6 +70,17 @@ export const ONLINE_SECONDS_MIN = 2
 export const ONLINE_SECONDS_MAX = 120
 export const ON_RIDE_SECONDS_MIN = 1
 export const ON_RIDE_SECONDS_MAX = 60
+/** Doc 11: trip safety limits (same as the API validation). */
+export const SAFETY_LIMITS = {
+  stop_minutes: [2, 60],
+  deviation_m: [100, 10_000],
+  deviation_minutes: [1, 30],
+  overtime_factor: [1.2, 10],
+  check_in_seconds: [30, 900],
+  sos_location_seconds: [2, 60],
+} as const
+export type SafetyNumber = keyof typeof SAFETY_LIMITS
+export const SAFETY_NUMBERS = Object.keys(SAFETY_LIMITS) as SafetyNumber[]
 
 /** Defaults from docs/api/phase-1a.md, phase-1b.md and phase-1c.md, used for keys an older API does not return yet. */
 export function defaultSettings(): SettingsForm {
@@ -106,6 +118,18 @@ export function defaultSettings(): SettingsForm {
     approval_broadcasts: true,
     app_links: { support_whatsapp: '', support_email: '', emergency_number: '911', terms_url: '', privacy_url: '' },
     location_intervals: { online_seconds: 10, on_ride_seconds: 4 },
+    safety: {
+      pin_areas: ['Caracas'],
+      passenger_photo: 'night',
+      night_start: '19:00',
+      night_end: '06:00',
+      stop_minutes: 10,
+      deviation_m: 600,
+      deviation_minutes: 3,
+      overtime_factor: 2,
+      check_in_seconds: 120,
+      sos_location_seconds: 5,
+    },
   }
 }
 
@@ -172,6 +196,7 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
       online_seconds: num(config.location_intervals?.online_seconds, d.location_intervals.online_seconds),
       on_ride_seconds: num(config.location_intervals?.on_ride_seconds, d.location_intervals.on_ride_seconds),
     },
+    safety: { ...d.safety, ...config.safety, pin_areas: [...(config.safety?.pin_areas ?? d.safety.pin_areas)] },
   }
 }
 
@@ -230,6 +255,12 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
       privacy_url: form.app_links.privacy_url.trim(),
     },
     location_intervals: { ...form.location_intervals },
+    safety: {
+      ...form.safety,
+      // In the order of the cities list, and only cities that still exist.
+      pin_areas: form.service_areas.map(a => a.name.trim()).filter(name => form.safety.pin_areas.includes(name)),
+      overtime_factor: Math.round(Number(form.safety.overtime_factor) * 10) / 10,
+    },
   }
 }
 
@@ -328,6 +359,14 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
   }
   if (!between(form.location_intervals.on_ride_seconds, ON_RIDE_SECONDS_MIN, ON_RIDE_SECONDS_MAX)) {
     issues.push({ key: 'onRideSeconds', params: { min: ON_RIDE_SECONDS_MIN, max: ON_RIDE_SECONDS_MAX } })
+  }
+  if (!TIME.test(form.safety.night_start) || !TIME.test(form.safety.night_end) || form.safety.night_start === form.safety.night_end) {
+    issues.push({ key: 'nightHours' })
+  }
+  for (const key of SAFETY_NUMBERS) {
+    const [min, max] = SAFETY_LIMITS[key]
+    const value = Number(form.safety[key])
+    if (!(Number.isFinite(value) && value >= min && value <= max)) issues.push({ key: 'safetyNumber', params: { min, max } })
   }
   return issues
 }

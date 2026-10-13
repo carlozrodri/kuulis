@@ -11,32 +11,6 @@ from kuulis.core.db import SessionLocal
 API = "/api/v1"
 
 
-async def test_trusted_contact(client, user_headers):
-    response = await client.patch(
-        f"{API}/users/me",
-        json={"trusted_contact_name": " Mamá ", "trusted_contact_phone": "+584141234567"},
-        headers=user_headers,
-    )
-    assert response.status_code == 200, response.text
-    assert response.json()["trusted_contact_name"] == "Mamá"
-
-    half = await client.patch(
-        f"{API}/users/me", json={"trusted_contact_name": ""}, headers=user_headers
-    )
-    assert half.json()["error"]["code"] == "trusted_contact_incomplete"
-    bad = await client.patch(
-        f"{API}/users/me", json={"trusted_contact_phone": "04141234567"}, headers=user_headers
-    )
-    assert bad.status_code == 422
-
-    cleared = await client.patch(
-        f"{API}/users/me",
-        json={"trusted_contact_name": None, "trusted_contact_phone": None},
-        headers=user_headers,
-    )
-    assert cleared.json()["trusted_contact_phone"] is None
-
-
 async def test_delete_restore_and_erase(client, user_headers):
     me = (await client.get(f"{API}/users/me", headers=user_headers)).json()
     await client.post(

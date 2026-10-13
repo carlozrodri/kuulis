@@ -15,7 +15,7 @@ from apps.rides.tests.conftest import (
     request_ride,
 )
 from apps.users.models import Role
-from conftest import _login, _make_user, make_staff_role
+from conftest import _login, _make_user, make_staff_role, ride_step
 
 API = "/api/v1"
 CARACAS = {"lat": PICKUP["lat"], "lng": PICKUP["lng"]}
@@ -83,7 +83,7 @@ async def test_maintenance_and_city_pause(client, admin_headers, passenger, upda
     assert accepted.status_code == 200, accepted.text
     assert await presence.is_online(driver.id)
     for step in ("arrive", "start", "complete"):
-        response = await client.post(f"{API}/rides/{ride['id']}/{step}", headers=driver.headers)
+        response = await ride_step(client, ride["id"], step, driver.headers)
         assert response.status_code == 200, response.text
     assert await dispatch.offline_paused() == [driver.id]
     paused = [(d, u) for e, d, u in updates if e == dispatch.PAUSED_EVENT]
@@ -154,7 +154,7 @@ def test_flag_rules():
     assert not evaluate("chat", row, Audience(area="Valencia"))
     assert evaluate("chat", row, Audience())  # unknown facts do not exclude
     assert not evaluate("chat", {"enabled": False, "rules": {}}, Audience())
-    assert evaluate("chat", None, Audience()) and not evaluate("share_live_link", None, Audience())
+    assert evaluate("chat", None, Audience()) and evaluate("share_live_link", None, Audience())
 
 
 async def test_flags(client, admin_headers, passenger):

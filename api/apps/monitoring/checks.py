@@ -53,6 +53,7 @@ def expected_loops() -> dict[str, int]:
         "account_erasure": 3 * 3600,  # runs every hour
         "privacy_retention": 3 * 3600,  # checks every hour, works once a day
         "monitoring": 5 * 60,
+        "safety": 5 * 60,  # anomaly checks every 30 s
     }
     if settings.RATES_ENABLED:
         loops["rates"] = 10 * 60  # checks every minute which source is due

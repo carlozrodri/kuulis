@@ -95,6 +95,17 @@ class RatingAlreadySubmittedError(ConflictError):
     message = "You already rated this ride"
 
 
+class PinInvalidError(AppError):
+    code = "pin_invalid"
+    message = "The PIN is not correct"
+
+
+class PinAttemptsExceededError(AppError):
+    status_code = 429
+    code = "pin_attempts_exceeded"
+    message = "Too many wrong PINs: call support or cancel the ride"
+
+
 # --- Locking and transitions -------------------------------------------------------------------
 
 

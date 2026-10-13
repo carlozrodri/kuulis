@@ -55,6 +55,8 @@ from apps.rides.state import (
     OfferExpiredError,
     OutsideServiceAreaError,
     PaymentMethodInvalidError,
+    PinAttemptsExceededError,
+    PinInvalidError,
     QuoteExpiredError,
     RatingAlreadySubmittedError,
     RatingRequiredError,
@@ -67,6 +69,7 @@ from apps.rides.state import (
     transition,
     utcnow,
 )
+from apps.safety import tasks as safety_tasks
 from apps.subscriptions import services as subscriptions
 from apps.users.models import User
 from apps.wallet import services as wallet
@@ -77,6 +80,7 @@ from kuulis.core.redis import redis_client
 from kuulis.settings import settings
 
 QUOTE_PREFIX = f"{settings.APP_ENV}:rides:quote:"
+PIN_MAX_ATTEMPTS = 3
 
 
 # --- Queries -----------------------------------------------------------------------------------
@@ -383,6 +387,16 @@ async def accept(session: AsyncSession, user: User, ride_id: uuid.UUID) -> Ride:
     transition(ride, RideStatus.DRIVER_ASSIGNED)
     ride.driver_id = user.id
     ride.assigned_at = now
+    config = await get_app_config(session)
+    area = config.area_at(ride.pickup_lat, ride.pickup_lng)
+    # Load-test accounts (apps.loadtest) skip it: the simulated driver cannot hear the code.
+    passenger = await session.get(User, ride.passenger_id)
+    if (
+        area is not None
+        and area.name in config.safety.pin_areas
+        and not (passenger and passenger.is_test_account)
+    ):
+        ride.start_pin = f"{secrets.randbelow(10_000):04d}"
     ride.vehicle = {
         "type": vehicle.type.value,
         "brand": vehicle.brand,
@@ -434,8 +448,29 @@ _DRIVER_STEPS: dict[RideStatus, tuple[str, str | None]] = {
 }
 
 
+async def _check_pin(session: AsyncSession, ride: Ride, pin: str | None) -> None:
+    """The passenger's code, when the city asks for it. Three wrong tries lock the start: the
+    driver calls support or cancels."""
+    if ride.start_pin is None:
+        return
+    if ride.pin_failures >= PIN_MAX_ATTEMPTS:
+        raise PinAttemptsExceededError()
+    if pin is not None and secrets.compare_digest(pin, ride.start_pin):
+        return
+    ride.pin_failures += 1
+    left = PIN_MAX_ATTEMPTS - ride.pin_failures
+    await session.commit()
+    if left <= 0:
+        raise PinAttemptsExceededError()
+    raise PinInvalidError(details={"attempts_left": left})
+
+
 async def driver_step(
-    session: AsyncSession, user: User, ride_id: uuid.UUID, target: RideStatus
+    session: AsyncSession,
+    user: User,
+    ride_id: uuid.UUID,
+    target: RideStatus,
+    pin: str | None = None,
 ) -> Ride:
     """arrive / start / complete. Repeating the same step is a no-op (flaky networks)."""
     ride = await lock_ride_or_404(session, ride_id)
@@ -444,6 +479,8 @@ async def driver_step(
     if ride.status == target:
         await session.commit()  # release the lock; nothing changed
         return ride
+    if target == RideStatus.IN_PROGRESS and ride.status == RideStatus.DRIVER_ARRIVED:
+        await _check_pin(session, ride, pin)
     transition(ride, target)
     field, push_event = _DRIVER_STEPS[target]
     now = utcnow()
@@ -466,6 +503,7 @@ async def driver_step(
     await session.commit()
     if target == RideStatus.COMPLETED:
         await presence.clear_active_ride(user.id, ride.id)
+        await safety_tasks.ride_ended.kiq(str(ride.id))
         if credited:
             await events.notify_promo_credit(session, ride)
         if inviter is not None:
@@ -526,6 +564,8 @@ async def _close(
         await presence.release_offer(offer.driver_id, ride.id)
         await events.emit_offer_cancelled(offer.driver_id, ride.id)
     await presence.clear_active_ride(ride.driver_id, ride.id)
+    if ride.driver_id is not None:
+        await safety_tasks.ride_ended.kiq(str(ride.id))
     await events.emit_updated(session, ride)
     for user_id in notify_ids:
         await events.push_to(session, user_id, ride.status.value, ride)

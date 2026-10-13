@@ -179,6 +179,11 @@ class Ride(BaseModel):
         ForeignKey("users.id", ondelete="SET NULL")
     )
 
+    # Safety (doc 11): the passenger tells the driver this code and the driver types it to start.
+    # None when the city does not ask for it.
+    start_pin: Mapped[str | None] = mapped_column(String(4))
+    pin_failures: Mapped[int] = mapped_column(SmallInteger, default=0, server_default=text("0"))
+
     rated_by_passenger: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
     rated_by_driver: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
 
