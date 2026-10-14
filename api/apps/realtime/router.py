@@ -44,7 +44,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     Protocol: connect, then send ``{"type": "auth", "token": "<access token>"}`` as the first
     message within 10s (tokens are kept out of URLs and proxy logs). After that the server pushes
     ``{"event": str, "data": any}`` messages; clients may send ``{"type": "ping"}``.
-    Drivers send ``{"type": "location", "lat", "lng", "heading"?, "speed"?}`` every 3-5 s.
+    Drivers send ``{"type": "location", "lat", "lng", "heading"?, "speed"?, "mocked"?}`` every
+    3-5 s.
 
     The connection lives as long as its access token: a minute before it expires the server sends
     ``auth.expiring``; the client refreshes and sends ``{"type": "auth", "token"}`` again

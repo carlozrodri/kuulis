@@ -26,6 +26,7 @@ import {
   ListRow,
   Notice,
   Skeleton,
+  StatusPill,
   TAB_BAR_SPACE,
   Txt,
 } from "@/components/ui";
@@ -81,7 +82,7 @@ export function WalletScreen() {
     item: WalletEntry;
     index: number;
   }) => {
-    const { title, subtitle } = entryText(item);
+    const { title, subtitle, tag } = entryText(item);
     const date = new Date(item.created_at).toLocaleDateString(i18n.language, {
       day: "numeric",
       month: "short",
@@ -105,6 +106,11 @@ export function WalletScreen() {
           <Txt variant="caption" color="muted" numberOfLines={2}>
             {subtitle ? `${subtitle} · ${date}` : date}
           </Txt>
+          {tag ? (
+            <View style={{ alignSelf: "flex-start", marginTop: 2 }}>
+              <StatusPill label={tag.label} tone={tag.tone} />
+            </View>
+          ) : null}
         </View>
         <Txt
           variant="bodyStrong"
@@ -117,7 +123,7 @@ export function WalletScreen() {
       </View>
     );
     const label = t("wallet.entryA11y", {
-      title,
+      title: tag ? `${title}, ${tag.label}` : title,
       amount,
       currency: wallet.data?.currency ?? "USDT",
       date,

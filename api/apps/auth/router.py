@@ -23,6 +23,7 @@ from apps.auth.schemas import (
 )
 from apps.legal import services as legal
 from apps.moderation import services as moderation
+from apps.risk import services as risk
 from apps.users import passwords
 from apps.users import services as users
 from apps.users.dependencies import CurrentUser, DBSession, StaffUser
@@ -38,6 +39,9 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @limiter.limit(settings.RATE_LIMIT_AUTH)
 async def register(request: Request, data: RegisterRequest, session: DBSession) -> AuthResponse:
     passwords.ensure_allowed(data.password)
+    await risk.ensure_not_blocked(
+        session, {"email": data.email, "device": request.headers.get("x-device-id")}
+    )
     user = await users.create_user(session, UserCreate(**data.model_dump(exclude={"accept_legal"})))
     if data.accept_legal:
         await legal.accept(session, user, list(legal.FOR_EVERYONE), request)
@@ -166,7 +170,9 @@ async def google_login(
     request: Request, data: GoogleLoginRequest, session: DBSession
 ) -> AuthResponse:
     identity = await social.verify_google_token(data.id_token)
-    user = await services.social_login(session, identity)
+    user = await services.social_login(
+        session, identity, device_id=request.headers.get("x-device-id")
+    )
     await session.commit()
     tokens = await services.issue_tokens(user, request)
     return AuthResponse(**tokens.model_dump(), user=await moderation.user_read(session, user))
@@ -178,7 +184,9 @@ async def apple_login(
     request: Request, data: AppleLoginRequest, session: DBSession
 ) -> AuthResponse:
     identity = await social.verify_apple_token(data.id_token)
-    user = await services.social_login(session, identity, data.full_name)
+    user = await services.social_login(
+        session, identity, data.full_name, device_id=request.headers.get("x-device-id")
+    )
     await session.commit()
     tokens = await services.issue_tokens(user, request)
     return AuthResponse(**tokens.model_dump(), user=await moderation.user_read(session, user))

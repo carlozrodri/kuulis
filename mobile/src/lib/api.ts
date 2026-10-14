@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 
 import { APP_VERSION_HEADERS } from './appVersion';
 import { config } from './config';
-import { deviceHeaders } from './deviceId';
+import { deviceHeaders, deviceModelHeaders } from './deviceId';
 import { secureStorage } from './storage';
 import type { TokenPair } from './types';
 
@@ -11,9 +11,10 @@ const REFRESH_KEY = 'kuulis.refresh_token';
 /**
  * X-Client-Platform lets the API label this device in the session list (Perfil → Sesiones activas); the
  * X-App-* headers say which build is talking (doc 09: builds in use, mandatory updates). X-Device-Id (doc 12,
- * added per request in `clientHeaders`) helps spot one phone behind several driver accounts.
+ * added per request in `clientHeaders`) helps spot one phone behind several driver accounts; X-Device-Model
+ * (doc 16) labels that phone in the risk review.
  */
-const CLIENT_HEADERS = { 'X-Client-Platform': Platform.OS, ...APP_VERSION_HEADERS };
+const CLIENT_HEADERS = { 'X-Client-Platform': Platform.OS, ...APP_VERSION_HEADERS, ...deviceModelHeaders() };
 
 async function clientHeaders(): Promise<Record<string, string>> {
   return { ...CLIENT_HEADERS, ...(await deviceHeaders().catch(() => ({}))) };

@@ -1,5 +1,6 @@
 """JWT access tokens + rotating refresh tokens stored in Redis (revocable)."""
 
+import logging
 import uuid
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
@@ -14,10 +15,13 @@ from apps.auth.social import SocialIdentity
 from apps.users import services as users
 from apps.users.models import SocialAccount, User
 from apps.users.tasks import send_templated_email
+from kuulis.core.db import SessionLocal
 from kuulis.core.exceptions import AuthenticationError, NotFoundError
 from kuulis.core.redis import redis_client
 from kuulis.core.security import create_token, decode_token
 from kuulis.settings import settings
+
+logger = logging.getLogger(__name__)
 
 _PREFIX = f"{settings.APP_ENV}:auth"
 
@@ -100,11 +104,29 @@ async def issue_tokens(
         )
         pipe.expire(_session_key(sid), seconds)
         await pipe.execute()
+    await _record_device(user, request)
     return TokenPair(
         access_token=access,
         refresh_token=refresh,
         expires_in=settings.ACCESS_TOKEN_TTL_MINUTES * 60,
     )
+
+
+async def _record_device(user: User, request: Request | None) -> None:
+    """The phone behind the session, for the anti-fraud rules (doc 16). Never fails a login."""
+    from apps.config.services import get_app_config
+    from apps.risk import services as risk
+
+    info = risk.DeviceInfo.from_headers(request.headers) if request is not None else None
+    if info is None:
+        return
+    try:
+        async with SessionLocal() as session:
+            config = (await get_app_config(session)).risk
+            await risk.record_device(session, user, info, config)
+            await session.commit()
+    except Exception:
+        logger.exception("Could not record the device of %s", user.id)
 
 
 async def password_login(session: AsyncSession, email: str, password: str) -> User:
@@ -326,7 +348,10 @@ async def password_changed(user: User) -> None:
 
 
 async def social_login(
-    session: AsyncSession, identity: SocialIdentity, full_name: str | None = None
+    session: AsyncSession,
+    identity: SocialIdentity,
+    full_name: str | None = None,
+    device_id: str | None = None,
 ) -> User:
     """Finds the user by social account, then by verified email (linking it), else creates one."""
     account = await session.scalar(
@@ -348,6 +373,9 @@ async def social_login(
             )
         user = await users.get_by_email(session, identity.email)
         if user is None:
+            from apps.risk import services as risk
+
+            await risk.ensure_not_blocked(session, {"email": identity.email, "device": device_id})
             user = User(
                 email=users.normalize_email(identity.email),
                 hashed_password=None,

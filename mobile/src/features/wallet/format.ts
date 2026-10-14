@@ -9,9 +9,11 @@ import type { SubscriptionSummary, WalletEntry } from "@/lib/types";
 import {
   chargeDate,
   feeTierFor,
+  isReturnedTransfer,
   monthDate,
   tierBounds,
   type TierMatch,
+  transferTag,
 } from "@/lib/wallet";
 
 const capitalize = (text: string) =>
@@ -43,6 +45,14 @@ export function useWalletFormat() {
     toDate(value)?.toLocaleDateString(lang, {
       day: "numeric",
       month: "long",
+    }) ?? "";
+  /** "15 de octubre, 3:45 p. m." / "October 15 at 3:45 PM". */
+  const dateTime = (value: string | Date | null | undefined) =>
+    toDate(value)?.toLocaleString(lang, {
+      day: "numeric",
+      month: "long",
+      hour: "numeric",
+      minute: "2-digit",
     }) ?? "";
   /** "14 ene" / "Jan 14". */
   const shortDate = (value: string | Date | null | undefined) =>
@@ -83,6 +93,7 @@ export function useWalletFormat() {
     monthName,
     monthTitle,
     dayMonth,
+    dateTime,
     shortDate,
     tierText,
     earnedSentence,
@@ -90,11 +101,17 @@ export function useWalletFormat() {
   };
 }
 
-/** Title and subtitle of a wallet movement, from its kind and `details`. */
+/** Title and subtitle of a wallet movement, from its kind and `details`, and a tag for held transfers. */
+export type EntryText = {
+  title: string;
+  subtitle: string | null;
+  tag?: { label: string; tone: "warning" | "neutral" } | null;
+};
+
 export function useEntryText() {
   const { t } = useTranslation();
   const { monthName } = useWalletFormat();
-  return (entry: WalletEntry): { title: string; subtitle: string | null } => {
+  return (entry: WalletEntry): EntryText => {
     const details = entry.details ?? {};
     const text = (key: string) => {
       const value = details[key];
@@ -128,6 +145,15 @@ export function useEntryText() {
         const name = text("counterpart_name");
         const note = text("note");
         const sent = entry.kind === "transfer_out";
+        // Doc 16: a held transfer the team did not deliver comes back to its sender.
+        if (isReturnedTransfer(entry))
+          return {
+            title: t("wallet.kind.transfer_in.returned"),
+            subtitle: name
+              ? t("wallet.kind.transfer_in.returnedFrom", { name })
+              : null,
+          };
+        const tag = transferTag(entry);
         return {
           title: name
             ? t(
@@ -142,6 +168,12 @@ export function useEntryText() {
                   : "wallet.kind.transfer_in.titleNoName",
               ),
           subtitle: note ? `“${note}”` : null,
+          tag: tag
+            ? {
+                label: t(`wallet.kind.transfer_out.${tag}`),
+                tone: tag === "held" ? "warning" : "neutral",
+              }
+            : null,
         };
       }
       case "subscription_fee": {

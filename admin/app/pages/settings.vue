@@ -1272,6 +1272,44 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           </div>
         </UCard>
 
+        <!-- Doc 16: anti-fraud -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.risk.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.risk.help') }}
+            </p>
+          </template>
+          <div class="space-y-6">
+            <div
+              v-for="section in RISK_SECTIONS"
+              :key="section.key"
+            >
+              <h3 class="mb-2 text-sm font-medium">
+                {{ t(`settings.risk.sections.${section.key}`) }}
+              </h3>
+              <div class="grid gap-4 sm:grid-cols-3">
+                <UFormField
+                  v-for="key in section.fields"
+                  :key="key"
+                  :label="t(`settings.risk.numbers.${key}`)"
+                  :help="t(`settings.risk.numbersHelp.${key}`, { min: RISK_LIMITS[key][0], max: RISK_LIMITS[key][1] })"
+                >
+                  <UInputNumber
+                    v-model="form.risk[key]"
+                    :min="RISK_LIMITS[key][0]"
+                    :max="RISK_LIMITS[key][1]"
+                    :format-options="RISK_PERCENT_FIELDS.includes(key) ? { maximumFractionDigits: 1 } : undefined"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+              </div>
+            </div>
+          </div>
+        </UCard>
+
         <UAlert
           v-if="!readOnly && dirty && issues.length"
           color="error"

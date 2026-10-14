@@ -1,4 +1,5 @@
 import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
 import { secureStorage } from './storage';
@@ -73,4 +74,22 @@ export function getDeviceId(): Promise<string | null> {
 export async function deviceHeaders(): Promise<Record<string, string>> {
   const id = await getDeviceId().catch(() => null);
   return id ? { 'X-Device-Id': id } : {};
+}
+
+/** The API takes X-Device-Model up to 80 characters. */
+const MODEL_MAX_LENGTH = 80;
+
+/** {'X-Device-Model': model} for a known model name (trimmed, up to 80 chars), else nothing (doc 16). */
+export function modelHeader(modelName: string | null | undefined): Record<string, string> {
+  const model = typeof modelName === 'string' ? modelName.trim().slice(0, MODEL_MAX_LENGTH).trim() : '';
+  return model ? { 'X-Device-Model': model } : {};
+}
+
+/** This phone's model (e.g. "Pixel 7") as a header; empty on web, in tests or when the module fails. */
+export function deviceModelHeaders(): Record<string, string> {
+  try {
+    return modelHeader(Device.modelName);
+  } catch {
+    return {};
+  }
 }

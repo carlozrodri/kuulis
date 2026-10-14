@@ -88,6 +88,19 @@ describe('hrefForNotification: quality (doc 15)', () => {
     expect(notificationKind({ type: 'quality', event: 'low_priority' })).toBe('quality');
   });
 
+  it('opens driver home for a mock location notice (doc 16)', () => {
+    expect(hrefForNotification({ type: 'risk', event: 'mock_location' }, driver)).toEqual(route('/', 'driver'));
+    expect(hrefForNotification({ type: 'risk', event: 'mock_location' }, passenger)).toEqual(route('/', 'driver'));
+    expect(notificationKind({ type: 'risk', event: 'mock_location' })).toBe('account');
+  });
+
+  it('opens the wallet for held, released and voided credits and returned transfers (doc 16)', () => {
+    for (const event of ['promo_held', 'promo_released', 'promo_voided', 'transfer_returned']) {
+      expect(hrefForNotification({ type: 'wallet', event }, driver)).toEqual(route('/wallet', 'driver'));
+      expect(notificationKind({ type: 'wallet', event })).toBe('wallet');
+    }
+  });
+
   it('opens the passenger ride screen when the driver cancelled or the passenger did not show up', () => {
     for (const event of ['reassigning', 'no_show']) {
       expect(hrefForNotification({ type: 'ride', event, ride_id: 'r1' }, driver)).toEqual(

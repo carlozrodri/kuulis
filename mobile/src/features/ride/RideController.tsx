@@ -23,6 +23,7 @@ import {
 } from '@/hooks/useRides';
 import { api } from '@/lib/api';
 import { setBackgroundLocation } from '@/lib/backgroundLocation';
+import { positionBody } from '@/lib/location';
 import { locationIntervalMs } from '@/lib/bootstrap';
 import { confirmHaptic, heavyHaptic, preloadRideSounds, tick } from '@/lib/feedback';
 import { isActiveStatus, isNoShow, isReassigning, rideRole, rideRoleStrict } from '@/lib/ride';
@@ -194,13 +195,7 @@ function useLocationBroadcast(enabled: boolean, intervalMs: number) {
       if (AppState.currentState !== 'active') return;
       const position = getLastPosition();
       if (!position) return;
-      send({
-        type: 'location',
-        lat: position.lat,
-        lng: position.lng,
-        ...(position.heading != null ? { heading: Math.round(position.heading) } : {}),
-        ...(position.speed != null ? { speed: Math.round(position.speed * 10) / 10 } : {}),
-      });
+      send({ type: 'location', ...positionBody(position) });
     };
     push();
     const timer = setInterval(push, intervalMs);

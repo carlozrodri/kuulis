@@ -298,6 +298,39 @@ class QualitySettings(BaseModel):
         return self
 
 
+class RiskSettings(BaseModel):
+    """Anti-fraud rules (doc 16): simple signals a person reviews, never automatic bans."""
+
+    # Signals of the last this many days add up to a person's risk score (0-100).
+    window_days: int = Field(default=90, ge=7, le=365)
+    # From this score, promotion credits wait for review and outgoing transfers are blocked.
+    freeze_score: int = Field(default=60, ge=10, le=100)
+    # A ride whose findings add up to this holds its promotion credit until someone reviews it.
+    ride_hold_score: int = Field(default=30, ge=5, le=100)
+    # More accounts than this on one phone raise a "shared device" alert.
+    max_accounts_per_device: int = Field(default=2, ge=1, le=20)
+    # Suspicious ride: real path under this share of the estimate, real duration under this
+    # share of the estimate, or start and end this close (only for rides of ``min_ride_m``+).
+    min_path_share: float = Field(default=0.3, ge=0, le=1)
+    min_duration_share: float = Field(default=0.3, ge=0, le=1)
+    same_place_m: int = Field(default=150, ge=20, le=2000)
+    min_ride_m: int = Field(default=1000, ge=100, le=20000)
+    # A passenger and a driver with this many completed rides together in ``pair_days``.
+    pair_rides: int = Field(default=5, ge=2, le=100)
+    pair_days: int = Field(default=30, ge=1, le=180)
+    # Fake GPS: this many jumps faster than 150 km/h within 10 minutes raise an alert.
+    jump_alerts: int = Field(default=3, ge=1, le=50)
+    # Transfers: the first one of each account waits this long (0: off); money passed on within
+    # ``chain_minutes``; a driver receiving from this many senders in 7 days; accounts younger
+    # than ``new_account_days`` receiving balance.
+    first_transfer_hold_hours: int = Field(default=24, ge=0, le=168)
+    chain_minutes: int = Field(default=60, ge=5, le=1440)
+    fan_in_senders: int = Field(default=5, ge=2, le=100)
+    new_account_days: int = Field(default=7, ge=0, le=90)
+    # Mutual 5-star ratings between the same two people this many times in 30 days.
+    rating_ring_rides: int = Field(default=3, ge=2, le=50)
+
+
 class VerificationSettings(BaseModel):
     """Ongoing driver verification (doc 12): expiring documents, the random live selfie,
     re-verification after reports and the optional induction."""
@@ -443,6 +476,9 @@ class AppConfig(BaseModel):
     # --- Cancellations and quality (doc 15) -----------------------------------------------------
     quality: QualitySettings = Field(default_factory=QualitySettings)
 
+    # --- Anti-fraud (doc 16) ----------------------------------------------------------------------
+    risk: RiskSettings = Field(default_factory=RiskSettings)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -518,6 +554,7 @@ class AppConfigUpdate(BaseModel):
     support: SupportSettings | None = None
     notifications: NotificationSettings | None = None
     quality: QualitySettings | None = None
+    risk: RiskSettings | None = None
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

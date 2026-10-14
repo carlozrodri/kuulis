@@ -194,8 +194,10 @@ async def go_online(
     device_id: Annotated[str | None, Header(alias="X-Device-Id", max_length=100)] = None,
 ) -> DriverState:
     """403 ``document_expired`` / ``selfie_required`` when the driver must update something
-    first (doc 12)."""
-    return await services.go_online(session, user, data.lat, data.lng, device_id=device_id)
+    first (doc 12); 409 ``mock_location`` with a simulated location (doc 16)."""
+    return await services.go_online(
+        session, user, data.lat, data.lng, device_id=device_id, mocked=data.mocked
+    )
 
 
 @driver_router.post("/offline", response_model=DriverState)

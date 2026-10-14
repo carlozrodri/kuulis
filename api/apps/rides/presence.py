@@ -22,6 +22,7 @@ import orjson
 from apps.drivers.models import VehicleType
 from apps.realtime.manager import publish
 from apps.safety import track
+from apps.safety.geo import distance_m
 from kuulis.core.redis import redis_client
 from kuulis.settings import settings
 
@@ -31,6 +32,9 @@ LOC_KEY = f"{PREFIX}:loc"
 STALE_AFTER_SECONDS = 60  # no location for this long -> no offers
 MIN_LOCATION_INTERVAL = 1.0  # ignore faster updates (abuse / buggy clients)
 FORWARD_INTERVAL_MS = 2000  # ride.driver_location to the passenger at most every 2 s
+# Fake GPS (doc 16): a jump longer than MIN_JUMP_M faster than 150 km/h is impossible on a moto.
+MAX_SPEED_MS = 150 / 3.6
+MIN_JUMP_M = 500
 
 # Compare-and-delete: release a key only if it still holds our value.
 _RELEASE = """
@@ -199,9 +203,22 @@ async def handle_location(user_id: str, message: dict[str, Any]) -> None:
         online_raw, active, last_raw = await pipe.execute()
     if not online_raw and not active:
         return
+    if message.get("mocked") is True:  # a mock location app (Android), doc 16
+        from apps.risk import gps
+
+        await gps.on_mocked(user_id, lat, lng, active=bool(active))
+        if not active:
+            return
     last = _location(last_raw)
-    if last and time.time() - last.ts < MIN_LOCATION_INTERVAL:
+    now = time.time()
+    if last and now - last.ts < MIN_LOCATION_INTERVAL:
         return
+    if last:
+        moved = distance_m(last.lat, last.lng, lat, lng)
+        if moved > MIN_JUMP_M and moved > MAX_SPEED_MS * (now - last.ts):
+            from apps.risk import gps
+
+            await gps.on_jump(user_id, moved, now - last.ts)
 
     online = _loads(online_raw)
     async with redis_client.pipeline(transaction=False) as pipe:

@@ -89,6 +89,10 @@ construir. Las preguntas de cada documento están en su sección final.
 - **15** hecho (2026-10-13): motivos de cancelación, espera de 5 min y "no se presentó", reasignación automática
   cuando el motorizado cancela, tasas por persona, avisos, pausas cortas y prioridad en el despacho, sin cobrar
   dinero. Página Calidad en el admin y "Mi calidad" en la app del motorizado.
+- **16** hecho (2026-10-14): huella del teléfono, GPS simulado, viajes sospechosos, puntuación de riesgo,
+  créditos de promoción y transferencias retenidas hasta revisión (la primera transferencia espera 24 h),
+  vetados que no pueden volver a registrarse y calificaciones entre parejas sospechosas fuera del promedio.
+  Página Riesgo en el admin.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

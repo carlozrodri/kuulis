@@ -5,7 +5,7 @@
  */
 import { normalizePhone } from "./driver";
 import { parseAmount } from "./money";
-import type { Charge, FeeTier, SubscriptionSummary } from "./types";
+import type { Charge, FeeTier, SubscriptionSummary, WalletEntry } from "./types";
 import { isEmail } from "./validation";
 
 type Amount = string | number | null | undefined;
@@ -263,3 +263,33 @@ export const isValidBinancePayId = (value: string) =>
 export function normalizeOrderReference(value: string): string {
   return value.replace(/[^0-9A-Za-z]/g, "").slice(0, 64);
 }
+
+// ── Held and returned transfers (doc 16) ──
+
+type EntryFlags = Pick<WalletEntry, "kind" | "details">;
+
+const flag = (entry: EntryFlags, key: string) => entry.details?.[key] === true;
+
+/**
+ * A transfer just sent that waits before reaching the recipient: `until` is when it is delivered (the first
+ * transfer of an account waits 24 h), null when the team reviews it first. Null for a transfer delivered now.
+ */
+export function heldTransfer(entry: EntryFlags | null | undefined): { until: string | null } | null {
+  if (!entry || entry.kind !== "transfer_out" || !flag(entry, "held")) return null;
+  const until = entry.details?.held_until;
+  return {
+    until: typeof until === "string" && Number.isFinite(new Date(until).getTime()) ? until : null,
+  };
+}
+
+/** Tag of a sent transfer in the history: "held" while it waits, "returned" when it came back. */
+export function transferTag(entry: EntryFlags): "held" | "returned" | null {
+  if (entry.kind !== "transfer_out") return null;
+  if (flag(entry, "returned")) return "returned";
+  if (flag(entry, "held")) return "held";
+  return null;
+}
+
+/** Money of a held transfer that went back to its sender (a `transfer_in` with `returned`). */
+export const isReturnedTransfer = (entry: EntryFlags) =>
+  entry.kind === "transfer_in" && flag(entry, "returned");

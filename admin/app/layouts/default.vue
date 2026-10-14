@@ -35,6 +35,12 @@ const safetyBadge = computed(() => {
   if (!total) return undefined
   return { label: String(total), color: s?.open ? 'error' as const : 'warning' as const, variant: 'solid' as const }
 })
+// Risk (doc 16): open alerts plus held payments.
+const risk = useRiskSummary()
+const riskBadge = computed(() => {
+  const total = riskBadgeTotal(risk.summary.value)
+  return total ? { label: String(total), color: 'warning' as const, variant: 'subtle' as const } : undefined
+})
 let safetyTimer: ReturnType<typeof setInterval> | undefined
 onMounted(() => {
   safety.refresh()
@@ -46,6 +52,7 @@ onBeforeUnmount(() => clearInterval(safetyTimer))
 function refreshCounts() {
   reportCounts.refresh()
   approvalCount.refresh()
+  risk.refresh()
 }
 let countsTimer: ReturnType<typeof setInterval> | undefined
 onMounted(() => {
@@ -62,6 +69,7 @@ const badges = computed<Record<string, NavBadge | undefined>>(() => ({
   reports: reportsBadge.value,
   approvals: approvalsBadge.value,
   safety: safetyBadge.value,
+  risk: riskBadge.value,
 }))
 
 // A folded section carries its pages' counts, coloured by the most urgent one, so an SOS still shows.

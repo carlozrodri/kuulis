@@ -198,6 +198,7 @@ async def test_recipient_lookup_needs_a_whole_phone(client, query):
     assert response.status_code == 404
 
 
+@pytest.mark.usefixtures("relaxed_risk")
 async def test_transfers(client, admin_headers, staff_headers):
     luis = await make_driver(client, "luis@example.com", "Luis Gómez")
     ana = await make_driver(client, "ana2@example.com", "Ana Ruiz")

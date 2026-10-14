@@ -35,6 +35,7 @@ from apps.rides.router import admin_drivers_router as rides_admin_drivers_router
 from apps.rides.router import admin_router as rides_admin_router
 from apps.rides.router import driver_router as rides_driver_router
 from apps.rides.router import router as rides_router
+from apps.risk.router import admin_router as risk_admin_router
 from apps.safety.router import admin_router as safety_admin_router
 from apps.safety.router import router as safety_router
 from apps.staff.router import public_router as staff_public_router
@@ -100,6 +101,7 @@ api_v1.include_router(monitoring_router)
 api_v1.include_router(safety_admin_router)
 api_v1.include_router(quality_router)
 api_v1.include_router(quality_admin_router)
+api_v1.include_router(risk_admin_router)
 
 root = APIRouter()
 root.include_router(health_router)

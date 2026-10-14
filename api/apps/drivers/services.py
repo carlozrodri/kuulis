@@ -316,6 +316,16 @@ async def admin_read(
 async def upsert_profile(
     session: AsyncSession, user: User, data: DriverProfileWrite
 ) -> DriverProfile:
+    from apps.risk import services as risk
+
+    await risk.ensure_not_blocked(
+        session,
+        {
+            MarkKind.NATIONAL_ID.value: data.national_id,
+            MarkKind.RIF.value: data.rif,
+            MarkKind.PHONE.value: data.phone,
+        },
+    )
     profile = await get_by_user(session, user.id)
     taken = await session.scalar(
         select(DriverProfile.id).where(
@@ -366,6 +376,9 @@ async def ensure_plate_free(session: AsyncSession, plate: str, profile_id: uuid.
     )
     if taken:
         raise ConflictError("Plate already registered", code="plate_taken")
+    from apps.risk import services as risk
+
+    await risk.ensure_not_blocked(session, {MarkKind.PLATE.value: plate})
 
 
 async def set_vehicle(

@@ -318,64 +318,7 @@ const checkIcon = (check: DriverCheck) => ({
             <p class="mb-2">
               {{ t('verification.duplicates.help') }}
             </p>
-            <ul class="space-y-1">
-              <li
-                v-for="dup in driver.duplicates"
-                :key="`${dup.kind}-${dup.user_id}`"
-                class="flex flex-wrap items-center gap-2"
-              >
-                <UBadge
-                  color="error"
-                  variant="outline"
-                  size="sm"
-                >
-                  {{ t(`verification.duplicates.kinds.${dup.kind}`) }}
-                </UBadge>
-                <NuxtLink
-                  v-if="dup.driver_id"
-                  :to="`/drivers/${dup.driver_id}`"
-                  class="font-medium hover:underline"
-                >
-                  {{ dup.name || '—' }}
-                </NuxtLink>
-                <NuxtLink
-                  v-else-if="!dup.deleted"
-                  :to="`/users/${dup.user_id}`"
-                  class="font-medium hover:underline"
-                >
-                  {{ dup.name || '—' }}
-                </NuxtLink>
-                <span
-                  v-else
-                  class="font-medium"
-                >{{ dup.name || '—' }}</span>
-                <span class="text-(--ui-text-muted)">{{ dup.email ?? t('verification.duplicates.erased') }}</span>
-                <UBadge
-                  v-if="dup.deleted"
-                  color="neutral"
-                  variant="subtle"
-                  size="sm"
-                >
-                  {{ t('verification.duplicates.deleted') }}
-                </UBadge>
-                <UBadge
-                  v-if="dup.suspended"
-                  color="error"
-                  variant="solid"
-                  size="sm"
-                >
-                  {{ t('verification.duplicates.suspended') }}
-                </UBadge>
-                <UBadge
-                  v-if="dup.driver_status"
-                  :color="driverStatusColor[dup.driver_status]"
-                  variant="subtle"
-                  size="sm"
-                >
-                  {{ t(`drivers.statuses.${dup.driver_status}`) }}
-                </UBadge>
-              </li>
-            </ul>
+            <DuplicateList :duplicates="driver.duplicates" />
           </template>
         </UAlert>
 
@@ -786,6 +729,9 @@ const checkIcon = (check: DriverCheck) => ({
           :user-id="driver.user_id"
           role="driver"
         />
+
+        <!-- Doc 16: anti-fraud -->
+        <RiskCard :user-id="driver.user_id" />
 
         <!-- Phase 1D: wallet & subscription -->
         <DriverWalletCard

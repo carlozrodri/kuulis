@@ -91,6 +91,22 @@ async def set_config(**values) -> None:
     await services.invalidate_cache()
 
 
+@pytest.fixture
+async def relaxed_risk() -> None:
+    """Anti-fraud rules (doc 16) that don't fire on test rides, which end instantly and without
+    a GPS path, nor on the first transfer of a brand-new account."""
+    await set_config(
+        risk={
+            "min_ride_m": 20000,
+            "min_duration_share": 0,
+            "pair_rides": 100,
+            "first_transfer_hold_hours": 0,
+            "new_account_days": 0,
+            "fan_in_senders": 100,
+        }
+    )
+
+
 async def _login(client: AsyncClient, email: str) -> dict[str, str]:
     response = await client.post("/api/v1/auth/login", json={"email": email, "password": PASSWORD})
     assert response.status_code == 200, response.text

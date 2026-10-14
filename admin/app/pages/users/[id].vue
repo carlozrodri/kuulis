@@ -225,6 +225,8 @@ async function save() {
         />
         <!-- Doc 15: cancellations and quality -->
         <QualityCard :user-id="user.id" />
+        <!-- Doc 16: anti-fraud -->
+        <RiskCard :user-id="user.id" />
         <ReportsList :user-id="user.id" />
         <LegalAcceptancesCard
           v-if="user.role === 'user'"

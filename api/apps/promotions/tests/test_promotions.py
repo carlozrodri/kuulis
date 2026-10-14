@@ -1,6 +1,7 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
+import pytest
 from sqlalchemy import select
 
 from apps.notifications.models import Notification
@@ -130,6 +131,7 @@ async def test_admin_promotion_validation(client, admin_headers, staff_headers):
 # --- Applying ----------------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("relaxed_risk")
 async def test_automatic_promotion_quote_ride_and_credit(
     client, admin_headers, passenger, recorder
 ):
@@ -273,6 +275,7 @@ async def test_budget_runs_out_between_quote_and_request(client, admin_headers, 
     assert listing.json()["total"] == 1
 
 
+@pytest.mark.usefixtures("relaxed_risk")
 async def test_pair_alerts(client, admin_headers, passenger):
     await client.patch(
         f"{API}/admin/config", json={"promo_pair_alert_threshold": 2}, headers=admin_headers

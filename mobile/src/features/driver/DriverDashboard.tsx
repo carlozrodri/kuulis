@@ -29,6 +29,7 @@ import { api } from '@/lib/api';
 import { confirmHaptic, heavyHaptic } from '@/lib/feedback';
 import { backgroundLocationActive } from '@/lib/backgroundLocation';
 import { serviceNotice } from '@/lib/bootstrap';
+import { isMockLocationError } from '@/lib/location';
 import { formatAmount } from '@/lib/money';
 import { formatFare, isActiveStatus } from '@/lib/ride';
 import { useStore } from '@/lib/store';
@@ -151,7 +152,7 @@ export function DriverDashboard() {
         showToast(t('location.unavailable'), 'danger');
         return;
       }
-      await goOnline.mutateAsync({ lat: position.lat, lng: position.lng });
+      await goOnline.mutateAsync({ lat: position.lat, lng: position.lng, mocked: position.mocked });
       confirmHaptic();
     } catch (error) {
       if (handleSuspended(error)) {
@@ -170,6 +171,12 @@ export function DriverDashboard() {
         heavyHaptic();
         setBlock(verificationBlock);
         void queryClient.invalidateQueries({ queryKey: DRIVER_QUERY_KEY });
+        return;
+      }
+      if (isMockLocationError(error)) {
+        // 409 mock_location (doc 16): a mock location app is on; no offers until it is turned off.
+        heavyHaptic();
+        showToast(t('risk.mockLocation.body'), 'danger');
         return;
       }
       if (isSubscriptionOverdue(error)) {

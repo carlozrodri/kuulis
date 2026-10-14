@@ -33,7 +33,8 @@
     "help": "Centro de ayuda",
     "campaigns": "Campañas",
     "emailTemplates": "Plantillas de email",
-    "quality": "Calidad"
+    "quality": "Calidad",
+    "risk": "Riesgo"
   },
   "navGroups": {
     "operations": "Operación",
@@ -175,7 +176,8 @@
       "releases": "Versiones de la app",
       "app_control": "Control de la app",
       "quality": "Calidad",
-      "safety": "Seguridad"
+      "safety": "Seguridad",
+      "risk": "Riesgo"
     },
     "permissions": {
       "users": {
@@ -263,6 +265,10 @@
       "safety": {
         "view": "Ver las alertas de seguridad",
         "manage": "Atender las alertas de seguridad"
+      },
+      "risk": {
+        "view": "Ver las alertas de riesgo",
+        "manage": "Revisar alertas y pagos retenidos, vetar cuentas"
       }
     }
   },
@@ -414,7 +420,12 @@
     "campaign_not_found": "No encontramos esa campaña",
     "campaign_not_editable": "Esa campaña ya salió o se canceló: no se puede cambiar",
     "email_template_not_found": "No encontramos esa plantilla",
-    "pause_not_active": "Esa pausa ya terminó o la levantaron."
+    "pause_not_active": "Esa pausa ya terminó o la levantaron.",
+    "risk_signal_not_found": "No encontramos esa alerta",
+    "risk_hold_not_found": "No encontramos ese pago retenido",
+    "risk_hold_not_held": "Ese pago ya se liberó o se anuló",
+    "blocked_identifier_not_found": "No encontramos ese dato vetado",
+    "cannot_ban_staff": "No se puede vetar una cuenta del equipo"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -564,7 +575,8 @@
       "notificationNumber": "Notificaciones: los valores deben estar entre {min} y {max}",
       "qualityNumber": "Calidad: los valores deben estar entre {min} y {max}",
       "qualityCancelOrder": "Calidad: los umbrales de cancelación deben ir de menor a mayor (aviso, menor prioridad, revisar)",
-      "qualityNoShowOrder": "Calidad: el aviso por \"no se presentó\" no puede ser mayor que la pausa"
+      "qualityNoShowOrder": "Calidad: el aviso por \"no se presentó\" no puede ser mayor que la pausa",
+      "riskNumber": "Riesgo: los valores deben estar entre {min} y {max}"
     },
     "fares": {
       "title": "Tarifas",
@@ -815,6 +827,53 @@
         "passenger_no_show_pause": "En el periodo: no puede pedir viajes por un tiempo. 0 = desactivado. Entre {min} y {max}.",
         "passenger_pause_hours": "Cuánto dura la pausa del pasajero. Entre {min} y {max}.",
         "dispatch_quality_weight": "Cuánto mueven la calificación y la aceptación al ofrecer viajes: el peor motorizado cuenta como hasta este porcentaje más lejos. 0 = solo distancia. Entre {min} y {max}."
+      }
+    },
+    "risk": {
+      "title": "Antifraude",
+      "help": "Reglas simples que levantan alertas para que alguien las revise. Nunca vetan solas: como mucho retienen un crédito de promoción o una transferencia hasta revisarla.",
+      "sections": {
+        "score": "Puntuación de riesgo",
+        "rides": "Viajes sospechosos",
+        "devices": "Teléfonos y GPS",
+        "transfers": "Transferencias",
+        "ratings": "Calificaciones"
+      },
+      "numbers": {
+        "window_days": "Periodo (días)",
+        "freeze_score": "Congelar desde (puntos)",
+        "ride_hold_score": "Retener crédito desde (puntos)",
+        "min_path_share": "Recorrido mínimo (%)",
+        "min_duration_share": "Duración mínima (%)",
+        "same_place_m": "Mismo lugar (metros)",
+        "min_ride_m": "Viajes desde (metros)",
+        "pair_rides": "Viajes de la misma pareja",
+        "pair_days": "En (días)",
+        "max_accounts_per_device": "Cuentas por teléfono",
+        "jump_alerts": "Saltos imposibles",
+        "first_transfer_hold_hours": "Espera de la primera transferencia (horas)",
+        "chain_minutes": "Pasar el dinero en (minutos)",
+        "fan_in_senders": "Remitentes distintos",
+        "new_account_days": "Cuenta nueva (días)",
+        "rating_ring_rides": "Viajes con 5 estrellas mutuas"
+      },
+      "numbersHelp": {
+        "window_days": "Las alertas de estos últimos días suman en la puntuación (0 a 100). Entre {min} y {max}.",
+        "freeze_score": "Con esta puntuación los créditos de promoción esperan revisión y no puede enviar transferencias. Entre {min} y {max}.",
+        "ride_hold_score": "Si los hallazgos de un viaje suman esto, su crédito de promoción espera revisión. Entre {min} y {max}.",
+        "min_path_share": "Recorrido real por debajo de este porcentaje de la ruta = se movió poco. Entre {min} y {max}.",
+        "min_duration_share": "Duración real por debajo de este porcentaje de la estimada = muy corto. Entre {min} y {max}.",
+        "same_place_m": "Empezó y terminó a menos de esta distancia. Entre {min} y {max}.",
+        "min_ride_m": "Las reglas de recorrido y mismo lugar solo miran viajes de al menos esta distancia. Entre {min} y {max}.",
+        "pair_rides": "El mismo pasajero y motorizado con tantos viajes juntos. Entre {min} y {max}.",
+        "pair_days": "Periodo para contar los viajes de la pareja. Entre {min} y {max}.",
+        "max_accounts_per_device": "Más cuentas que esto en un teléfono levantan una alerta. Entre {min} y {max}.",
+        "jump_alerts": "Saltos a más de 150 km/h en 10 minutos antes de alertar. Entre {min} y {max}.",
+        "first_transfer_hold_hours": "La primera transferencia de cada cuenta espera este tiempo. 0 = desactivado. Entre {min} y {max}.",
+        "chain_minutes": "Enviar el dinero recibido antes de este tiempo levanta una alerta. Entre {min} y {max}.",
+        "fan_in_senders": "Recibir de tantas personas distintas en 7 días levanta una alerta. Entre {min} y {max}.",
+        "new_account_days": "Cuentas más nuevas que esto que reciben saldo levantan una alerta. 0 = desactivado. Entre {min} y {max}.",
+        "rating_ring_rides": "Viajes en 30 días en que los dos se dieron 5 estrellas. Entre {min} y {max}."
       }
     }
   },
@@ -1259,7 +1318,11 @@
     "recipient": "Recibe",
     "amount": "Monto",
     "note": "Nota",
-    "total": "{n} transferencias"
+    "total": "{n} transferencias",
+    "held": "Retenida",
+    "heldHelp": "Retenida por revisión antifraude: el destinatario aún no la recibe.",
+    "returned": "Devuelta",
+    "returnedHelp": "Anulada en la revisión antifraude: el dinero volvió a quien la envió."
   },
   "subscriptions": {
     "charges": "Cobros",
@@ -1847,6 +1910,14 @@
       },
       "quality": {
         "pause_lift": "Levantó una pausa automática"
+      },
+      "risk": {
+        "signal_dismiss": "Descartó una alerta de riesgo",
+        "signal_confirm": "Confirmó una alerta de riesgo",
+        "hold_release": "Liberó un pago retenido",
+        "hold_void": "Anuló un pago retenido",
+        "ban": "Vetó una cuenta",
+        "unblock": "Quitó un dato vetado"
       }
     },
     "entities": {
@@ -1874,7 +1945,10 @@
       "feature_flag": "Función",
       "announcement": "Anuncio",
       "driver_check": "Reverificación",
-      "quality_pause": "Pausa automática"
+      "quality_pause": "Pausa automática",
+      "risk_signal": "Alerta de riesgo",
+      "risk_hold": "Pago retenido",
+      "blocked_identifier": "Dato vetado"
     }
   },
   "team": {
@@ -3107,6 +3181,184 @@
       "liftConfirm": "¿Levantar esta pausa? La persona podrá conectarse o pedir viajes de inmediato.",
       "liftDone": "Pausa levantada",
       "notDriver": "No es motorizado"
+    }
+  },
+  "risk": {
+    "score": "Puntuación de riesgo",
+    "scoreShort": "Puntos",
+    "points": "{n} pts",
+    "kinds": {
+      "shared_device": "Teléfono compartido",
+      "fake_gps": "GPS simulado",
+      "suspicious_ride": "Viaje sospechoso",
+      "frequent_pair": "Pareja frecuente",
+      "transfers": "Transferencias",
+      "rating_ring": "Calificaciones cruzadas"
+    },
+    "reasons": {
+      "same_device": "Pasajero y motorizado en el mismo teléfono",
+      "little_movement": "Se movió muy poco",
+      "too_short": "Duró muy poco",
+      "same_place": "Empezó y terminó en el mismo lugar",
+      "no_track": "Sin recorrido GPS",
+      "frequent_pair": "Siempre la misma pareja",
+      "shared_device": "Muchas cuentas en un teléfono",
+      "mocked": "Ubicación simulada",
+      "jumps": "Saltos imposibles",
+      "chain": "Pasó el dinero apenas lo recibió",
+      "fan_in": "Recibe de muchas personas",
+      "new_account": "Cuenta nueva",
+      "recipient_frozen": "Destinatario en revisión",
+      "first_transfer": "Primera transferencia (espera 24 h)",
+      "rating_ring": "5 estrellas mutuas una y otra vez",
+      "risk_score": "Cuenta en revisión"
+    },
+    "holdKinds": {
+      "promo_credit": "Crédito de promoción",
+      "transfer": "Transferencia"
+    },
+    "blockedKinds": {
+      "email": "Correo",
+      "national_id": "Cédula",
+      "rif": "RIF",
+      "plate": "Placa",
+      "phone": "Teléfono",
+      "binance_pay_id": "Binance Pay ID",
+      "device": "Teléfono (dispositivo)"
+    },
+    "statuses": {
+      "open": "Abiertas",
+      "confirmed": "Confirmadas",
+      "dismissed": "Descartadas"
+    },
+    "holdStatuses": {
+      "held": "Retenidos",
+      "released": "Liberados",
+      "voided": "Anulados"
+    },
+    "allKinds": "Todos los tipos",
+    "allStatuses": "Todos",
+    "kind": "Tipo",
+    "status": "Estado",
+    "reasonsLabel": "Por qué",
+    "user": "Cuenta",
+    "related": "Relacionada",
+    "date": "Fecha",
+    "tabs": {
+      "alerts": "Alertas",
+      "holds": "Pagos retenidos",
+      "blocked": "Vetados"
+    },
+    "help": {
+      "alerts": "Señales de posible fraude, de mayor a menor puntuación. Ninguna castiga sola: revisa la evidencia y descarta o confirma.",
+      "holds": "Créditos de promoción y transferencias que esperan revisión. Liberar los paga; anular quita el crédito o devuelve la transferencia a quien la envió.",
+      "blocked": "Datos de cuentas vetadas: nadie puede abrir una cuenta nueva con ellos."
+    },
+    "empty": {
+      "alerts": "Sin alertas con estos filtros",
+      "holds": "Sin pagos con estos filtros",
+      "blocked": "Nada vetado"
+    },
+    "totalAlerts": "sin alertas | 1 alerta | {n} alertas",
+    "totalHolds": "sin pagos | 1 pago | {n} pagos",
+    "totalBlocked": "nada vetado | 1 dato vetado | {n} datos vetados",
+    "heldTotal": "Retenido: {amount} en {n} pagos",
+    "detailTitle": "Alerta de riesgo",
+    "accounts": "Cuentas involucradas",
+    "heldForAlert": "Dinero retenido por esta alerta",
+    "ride": "El viaje",
+    "noTrack": "Sin recorrido real",
+    "estimate": "Estimado: {distance}, {duration}",
+    "discount": "Descuento de promoción: {amount}",
+    "reviewedBy": "Revisado por {name} el {date}",
+    "note": "Nota",
+    "noteHelp": "Opcional. Queda en el historial.",
+    "evidence": {
+      "sameDevice": "El pasajero y el motorizado usan el mismo teléfono (viaje consigo mismo)",
+      "noTrack": "No se registró recorrido GPS",
+      "path": "Recorrido real {real} de {estimated} estimados",
+      "samePlace": "Empezó y terminó en el mismo lugar",
+      "duration": "Duró {real} de {estimated} estimados",
+      "pair": "{n} viajes juntos",
+      "pairDays": "{n} viajes juntos en {days} días",
+      "promotion": "El viaje tenía descuento de promoción",
+      "sharedDevice": "{n} cuentas en el mismo teléfono",
+      "phone": "Teléfono: {phone}",
+      "mocked": "Ubicación simulada en {lat}, {lng}",
+      "mockedOnRide": "Ubicación simulada en {lat}, {lng} durante un viaje",
+      "jumps": "{n} saltos a más de 150 km/h en 10 minutos",
+      "lastJump": "El último: {distance} en {seconds} s",
+      "transfer": "Transferencia de {amount}",
+      "ratingRing": "{n} viajes con 5 estrellas mutuas en {days} días"
+    },
+    "review": {
+      "dismiss": "Descartar",
+      "confirm": "Confirmar",
+      "dismissTitle": "Descartar la alerta",
+      "confirmTitle": "Confirmar la alerta",
+      "dismissHelp": "No había nada raro: la alerta deja de sumar en la puntuación de riesgo.",
+      "confirmHelp": "Fue abuso: la alerta sigue sumando en la puntuación de riesgo.",
+      "dismissDone": "Alerta descartada",
+      "confirmDone": "Alerta confirmada"
+    },
+    "holds": {
+      "none": "Sin pagos retenidos",
+      "amount": "Monto",
+      "recipient": "Recibe",
+      "sender": "Envía",
+      "release": "Liberar",
+      "void": "Anular",
+      "releasesAt": "Se libera solo el {date}"
+    },
+    "holdModal": {
+      "release": {
+        "title": "Liberar el pago",
+        "promo_credit": "Se acreditan {amount} de crédito de promoción a {name}.",
+        "transfer": "Se entregan {amount} de {sender} a {name}.",
+        "done": "Pago liberado"
+      },
+      "void": {
+        "title": "Anular el pago",
+        "promo_credit": "El crédito de promoción de {amount} para {name} no se acredita.",
+        "transfer": "Los {amount} vuelven a {sender}; {name} no los recibe.",
+        "done": "Pago anulado"
+      }
+    },
+    "ban": {
+      "button": "Vetar cuenta",
+      "title": "Vetar a {name}",
+      "effects": "Suspende la cuenta sin fecha de fin y bloquea su correo, cédula, RIF, placa, teléfono, Binance Pay ID y los teléfonos que usa: no se podrán usar para abrir cuentas nuevas.",
+      "reason": "Motivo",
+      "reasonHelp": "Lo ve el equipo, no la persona. Mínimo {min} caracteres.",
+      "submit": "Vetar",
+      "done": "Cuenta vetada"
+    },
+    "blocked": {
+      "kind": "Dato",
+      "reason": "Motivo",
+      "account": "Cuenta",
+      "by": "Vetado",
+      "search": "Buscar por nombre, correo o motivo",
+      "remove": "Quitar",
+      "removeConfirm": "¿Quitar este dato vetado ({kind})? Podrá usarse otra vez para abrir una cuenta.",
+      "removed": "Dato quitado"
+    },
+    "card": {
+      "title": "Riesgo",
+      "frozen": "Créditos y transferencias en revisión",
+      "frozenHelp": "Su puntuación pasa el umbral: los créditos de promoción esperan revisión y no puede enviar transferencias.",
+      "alerts": "Últimas alertas",
+      "noAlerts": "Sin alertas",
+      "moreAlerts": "Y {n} más en Riesgo",
+      "devices": "Teléfonos",
+      "noDevices": "Sin teléfonos registrados",
+      "unknownModel": "Modelo desconocido",
+      "appVersion": "app {v}",
+      "seen": "Visto por primera vez {first} · última {last}",
+      "otherAccounts": "Nadie más | Otra cuenta en este teléfono: | {n} cuentas más en este teléfono:",
+      "duplicates": "Datos repetidos en otras cuentas",
+      "holds": "Pagos retenidos",
+      "blocked": "Datos vetados"
     }
   }
 }

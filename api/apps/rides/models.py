@@ -301,6 +301,8 @@ class Rating(BaseModel):
     stars: Mapped[int] = mapped_column(SmallInteger)
     tags: Mapped[list[str]] = mapped_column(ARRAY(String(32)), default=list)
     comment: Mapped[str | None] = mapped_column(Text)
+    # Left out of the averages: given between a pair that looks like fake rides (doc 16).
+    ignored: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
 
 
 class RideCancellation(BaseModel):

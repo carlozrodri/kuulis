@@ -335,7 +335,8 @@ class OnlineDriver(BaseModel):
 
 
 class GoOnline(Point):
-    pass
+    # Android reports positions from a mock location app; such a driver cannot go online.
+    mocked: bool = False
 
 
 class LocationUpdate(Point):
@@ -343,6 +344,7 @@ class LocationUpdate(Point):
 
     heading: float | None = Field(default=None, ge=0, le=360)
     speed: float | None = Field(default=None, ge=0, le=100)
+    mocked: bool = False
 
 
 # --- Driver stats ------------------------------------------------------------------------------

@@ -360,8 +360,12 @@ export function useRateRide() {
 export function useGoOnline() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (position: { lat: number; lng: number }) =>
-      api<DriverState | undefined>('/drivers/me/online', { method: 'POST', body: position }),
+    // `mocked` (doc 16): a position from a mock location app is refused with 409 mock_location.
+    mutationFn: (position: { lat: number; lng: number; mocked?: boolean }) =>
+      api<DriverState | undefined>('/drivers/me/online', {
+        method: 'POST',
+        body: { lat: position.lat, lng: position.lng, mocked: position.mocked === true },
+      }),
     onSuccess: (state) => {
       queryClient.setQueryData<DriverState>(rideKeys.driverState, (current) =>
         state && typeof state === 'object' && 'online' in state

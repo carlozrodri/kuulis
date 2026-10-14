@@ -3,7 +3,17 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, Numeric, String, UniqueConstraint, text
+from sqlalchemy import (
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    Numeric,
+    SmallInteger,
+    String,
+    UniqueConstraint,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from kuulis.core.models import BaseModel
@@ -40,6 +50,8 @@ class User(BaseModel):
     rating_sum: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     rating_count: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     rating_avg: Mapped[Decimal | None] = mapped_column(Numeric(3, 2))
+    # Anti-fraud score 0-100 from open and confirmed signals (doc 16); a cache of apps.risk.
+    risk_score: Mapped[int] = mapped_column(SmallInteger, default=0, server_default=text("0"))
     # Driver invite code (apps.referrals), created when an approved driver first asks for it.
     referral_code: Mapped[str | None] = mapped_column(String(12), unique=True)
     # Account deletion: requested by the user (account inactive, restorable by signing in) and

@@ -106,6 +106,29 @@ const columns = computed<TableColumn<AdminTransfer>[]>(() => [
         </template>
         <template #amount-cell="{ row }">
           <span class="whitespace-nowrap font-medium tabular-nums">{{ formatUsdt(row.original.amount, locale) }}</span>
+          <!-- Doc 16: held for an anti-fraud review, or sent back to the sender. -->
+          <UBadge
+            v-if="row.original.returned"
+            color="error"
+            variant="subtle"
+            size="sm"
+            icon="i-lucide-undo-2"
+            class="ml-2"
+            :title="t('transfers.returnedHelp')"
+          >
+            {{ t('transfers.returned') }}
+          </UBadge>
+          <UBadge
+            v-else-if="row.original.held"
+            color="warning"
+            variant="subtle"
+            size="sm"
+            icon="i-lucide-hourglass"
+            class="ml-2"
+            :title="t('transfers.heldHelp')"
+          >
+            {{ t('transfers.held') }}
+          </UBadge>
         </template>
         <template #note-cell="{ row }">
           <span
