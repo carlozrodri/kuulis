@@ -2,6 +2,7 @@ import * as Location from 'expo-location';
 import { useCallback, useEffect } from 'react';
 import { AppState, Linking } from 'react-native';
 
+import { isMockedLocation } from '@/lib/location';
 import { createStore, useStore } from '@/lib/store';
 
 export type PermissionState = 'unknown' | 'granted' | 'denied' | 'blocked';
@@ -13,6 +14,8 @@ export type UserPosition = {
   speed: number | null;
   accuracy: number | null;
   timestamp: number;
+  /** From a mock location app (Android reports it; doc 16). */
+  mocked: boolean;
 };
 
 type LocationState = { permission: PermissionState; position: UserPosition | null };
@@ -34,6 +37,7 @@ function toPosition(location: Location.LocationObject): UserPosition {
     speed: speed != null && speed >= 0 ? speed : null,
     accuracy: accuracy ?? null,
     timestamp: location.timestamp,
+    mocked: isMockedLocation(location),
   };
 }
 

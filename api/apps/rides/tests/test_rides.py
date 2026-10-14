@@ -3,6 +3,7 @@ import time
 import uuid
 from decimal import Decimal
 
+import pytest
 from sqlalchemy import select
 
 from apps.config.schemas import AppConfig
@@ -182,6 +183,7 @@ async def test_request_errors(client, passenger, user_headers):
 # --- Happy path --------------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("relaxed_risk")
 async def test_full_ride_flow(client, passenger, recorder):
     driver = await make_driver(client, "luis@example.com", "Luis Gómez")
     far_driver = await make_driver(client, "pedro@example.com", "Pedro Díaz")
@@ -348,6 +350,7 @@ async def test_full_ride_flow(client, passenger, recorder):
     ] == 0
 
 
+@pytest.mark.usefixtures("relaxed_risk")
 async def test_rating_average(client, passenger):
     driver = await make_driver(client, "luis@example.com", "Luis")
     for stars in (5, 4, 4):

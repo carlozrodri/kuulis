@@ -183,6 +183,10 @@ async def list_entries(
 
 async def set_binance_pay_id(session: AsyncSession, user: User, pay_id: str) -> Wallet:
     await require_driver(session, user.id)
+    from apps.drivers.models import MarkKind
+    from apps.risk import services as risk
+
+    await risk.ensure_not_blocked(session, {MarkKind.BINANCE_PAY_ID.value: pay_id})
     wallet = await lock_wallet(session, user.id)
     taken = await session.scalar(
         select(Wallet.id).where(Wallet.binance_pay_id == pay_id, Wallet.user_id != user.id)
@@ -280,6 +284,11 @@ async def transfer(
     limit = await transfer_limit(session, sender.id, config)
     if amount > limit.available:
         raise TransferLimitExceededError(details=limit.model_dump(mode="json"))
+    from apps.risk import services as risk
+
+    # 403 transfers_frozen for a high-risk sender; the first transfer and suspicious ones wait
+    # (doc 16): the money leaves now and reaches the recipient when released.
+    check = await risk.check_transfer(session, sender, recipient, amount, config.risk)
     sent = await post_entry(
         session,
         sender.id,
@@ -288,6 +297,16 @@ async def transfer(
         counterpart_user_id=recipient.id,
         details={"counterpart_name": short_name(recipient), "note": note},
     )
+    if check.held:
+        hold = await risk.hold_transfer(
+            session, sent.id, sender, recipient, amount, check, config.risk
+        )
+        sent.details = sent.details | {
+            "held": True,
+            "held_until": hold.release_at.isoformat() if hold.release_at else None,
+        }
+        await session.flush()
+        return sent
     await credit(
         session,
         recipient.id,

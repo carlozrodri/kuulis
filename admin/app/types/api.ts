@@ -309,6 +309,8 @@ export interface AppConfig {
   notifications?: NotificationSettings
   // ---- Cancellations and quality (doc 15). ----
   quality?: QualitySettings
+  // ---- Anti-fraud (doc 16). ----
+  risk?: RiskSettings
 }
 
 // ---- Phase 1B: rides (docs/api/phase-1b.md) ----
@@ -719,6 +721,9 @@ export interface AdminTransfer {
   /** Alternative flat shape, tolerated. */
   from_user?: PartyRef | null
   to_user?: PartyRef | null
+  // ---- Doc 16: held for an anti-fraud review / returned to the sender. Optional for an older API. ----
+  held?: boolean
+  returned?: boolean
 }
 
 export type ChargeStatus = 'paid' | 'pending' | 'waived'
@@ -1954,4 +1959,149 @@ export interface QualitySettings {
   rating_review_below: number
   rating_min_count: number
   dispatch_quality_weight: number
+}
+
+// ---- Doc 16: anti-fraud ----
+
+export const RISK_KINDS = ['shared_device', 'fake_gps', 'suspicious_ride', 'frequent_pair', 'transfers', 'rating_ring'] as const
+export type RiskKind = typeof RISK_KINDS[number]
+export const SIGNAL_STATUSES = ['open', 'confirmed', 'dismissed'] as const
+export type SignalStatus = typeof SIGNAL_STATUSES[number]
+export const HOLD_KINDS = ['promo_credit', 'transfer'] as const
+export type HoldKind = typeof HOLD_KINDS[number]
+export const HOLD_STATUSES = ['held', 'released', 'voided'] as const
+export type HoldStatus = typeof HOLD_STATUSES[number]
+/** Codes in signal.reasons / hold.reasons (a newer API may add more: they render as the code). */
+export type RiskReason
+  = | 'same_device' | 'little_movement' | 'too_short' | 'same_place' | 'no_track' | 'frequent_pair' | 'shared_device'
+    | 'mocked' | 'jumps' | 'chain' | 'fan_in' | 'new_account' | 'recipient_frozen' | 'first_transfer' | 'rating_ring' | 'risk_score'
+export type BlockedKind = 'email' | MarkKind
+
+/** A person in a risk row: links to the driver page when driver_profile_id is set. */
+export interface RiskUser {
+  id: string
+  name: string
+  /** null once the account was erased. */
+  email: string | null
+  /** 0..100 */
+  risk_score: number
+  driver_profile_id: string | null
+}
+
+export interface SignalRead {
+  id: string
+  kind: RiskKind
+  reasons: string[]
+  /** 0..100 */
+  score: number
+  status: SignalStatus
+  /** Numbers behind the alert; keys depend on the kind (see riskEvidenceLines). */
+  evidence: Record<string, unknown>
+  user: RiskUser
+  related_user: RiskUser | null
+  ride_id: string | null
+  created_at: string
+  reviewed_by_name: string | null
+  reviewed_at: string | null
+  review_note: string | null
+}
+
+export interface RideEvidence {
+  id: string
+  status: string
+  pickup: [number, number]
+  dropoff: [number, number]
+  /** Route estimate. */
+  distance_m: number
+  duration_s: number
+  discount: Decimal
+  started_at: string | null
+  completed_at: string | null
+  /** Real path: [lat, lng, unix seconds]; may be empty. */
+  track: [number, number, number][]
+}
+
+export interface HoldRead {
+  id: string
+  kind: HoldKind
+  status: HoldStatus
+  amount: Decimal
+  /** Who receives the money. */
+  user: RiskUser
+  sender: RiskUser | null
+  ride_id: string | null
+  reasons: string[]
+  /** Pays itself at this moment (first transfer of an account) unless someone acts first. */
+  release_at: string | null
+  created_at: string
+  resolved_at: string | null
+  resolved_by_name: string | null
+  note: string | null
+}
+
+export interface SignalDetail extends SignalRead {
+  ride: RideEvidence | null
+  accounts: RiskUser[]
+  holds: HoldRead[]
+}
+
+export interface DeviceRead {
+  id: string
+  platform: string
+  model: string
+  app_version: string
+  first_seen: string
+  last_seen: string
+  /** Other accounts seen on the same phone. */
+  other_accounts: RiskUser[]
+}
+
+export interface BlockedRead {
+  id: string
+  kind: BlockedKind
+  reason: string
+  source_user: RiskUser | null
+  created_at: string
+  created_by_name: string | null
+}
+
+/** GET /admin/risk/users/{user_id}. */
+export interface RiskUserDetail {
+  user: RiskUser
+  /** Promotion credits wait and outgoing transfers are blocked. */
+  frozen: boolean
+  suspended: boolean
+  signals: SignalRead[]
+  devices: DeviceRead[]
+  duplicates: DriverDuplicate[]
+  holds: HoldRead[]
+  blocked: BlockedRead[]
+}
+
+/** GET /admin/risk/summary. */
+export interface RiskSummary {
+  open: { kind: RiskKind, open: number }[]
+  holds: number
+  held_amount: Decimal
+}
+
+/** config.risk (doc 16). Shares are 0..1 fractions. */
+export interface RiskSettings {
+  window_days: number
+  freeze_score: number
+  ride_hold_score: number
+  max_accounts_per_device: number
+  min_path_share: number
+  min_duration_share: number
+  same_place_m: number
+  min_ride_m: number
+  pair_rides: number
+  pair_days: number
+  jump_alerts: number
+  /** 0 turns it off. */
+  first_transfer_hold_hours: number
+  chain_minutes: number
+  fan_in_senders: number
+  new_account_days: number
+  rating_ring_rides: number
 }

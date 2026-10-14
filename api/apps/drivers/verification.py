@@ -96,10 +96,11 @@ def _mark_key() -> bytes:
     return hashlib.sha256(b"kuulis:identity-marks:" + settings.SECRET_KEY.encode()).digest()
 
 
-def mark_hash(kind: MarkKind, value: str) -> str:
-    """Keyed hash: a cédula has few digits, so a plain hash could be reversed by brute force."""
+def mark_hash(kind: MarkKind | str, value: str) -> str:
+    """Keyed hash: a cédula has few digits, so a plain hash could be reversed by brute force.
+    ``kind`` may also be "email" (banned identifiers, doc 16)."""
     normalized = "".join(value.split()).upper()
-    return hmac.new(_mark_key(), f"{kind.value}:{normalized}".encode(), hashlib.sha256).hexdigest()
+    return hmac.new(_mark_key(), f"{kind}:{normalized}".encode(), hashlib.sha256).hexdigest()
 
 
 async def record_marks(

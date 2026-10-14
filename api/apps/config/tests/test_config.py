@@ -120,6 +120,24 @@ DEFAULTS = {
         "rating_min_count": 20,
         "dispatch_quality_weight": 0.2,
     },
+    "risk": {
+        "window_days": 90,
+        "freeze_score": 60,
+        "ride_hold_score": 30,
+        "max_accounts_per_device": 2,
+        "min_path_share": 0.3,
+        "min_duration_share": 0.3,
+        "same_place_m": 150,
+        "min_ride_m": 1000,
+        "pair_rides": 5,
+        "pair_days": 30,
+        "jump_alerts": 3,
+        "first_transfer_hold_hours": 24,
+        "chain_minutes": 60,
+        "fan_in_senders": 5,
+        "new_account_days": 7,
+        "rating_ring_rides": 3,
+    },
 }
 
 

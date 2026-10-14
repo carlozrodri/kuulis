@@ -275,6 +275,7 @@ async def test_decline_streak_pauses_and_admin_lifts(client, passenger, admin_he
 # --- Rates, levels and dispatch ----------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("relaxed_risk")
 async def test_rates_match_a_manual_count(client, passenger, admin_headers):
     driver = await make_driver(client, "a@example.com", "A")
     # 4 accepted: 1 completed, 2 cancelled by the driver (one a safety concern), 1 no-show.

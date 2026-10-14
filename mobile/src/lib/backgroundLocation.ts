@@ -3,6 +3,7 @@ import * as TaskManager from 'expo-task-manager';
 import { AppState, Platform } from 'react-native';
 
 import { api, tokens } from '@/lib/api';
+import { isMockedLocation, positionBody } from '@/lib/location';
 import { createStore } from '@/lib/store';
 
 /**
@@ -36,12 +37,7 @@ TaskManager.defineTask<TaskData>(TASK, async ({ data, error }) => {
     const { latitude, longitude, heading, speed } = last.coords;
     await api('/drivers/me/location', {
       method: 'POST',
-      body: {
-        lat: latitude,
-        lng: longitude,
-        ...(heading != null && heading >= 0 ? { heading: Math.round(heading) } : {}),
-        ...(speed != null && speed >= 0 ? { speed: Math.round(speed * 10) / 10 } : {}),
-      },
+      body: positionBody({ lat: latitude, lng: longitude, heading, speed, mocked: isMockedLocation(last) }),
     });
   } catch {
     // the next position retries

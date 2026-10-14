@@ -709,7 +709,10 @@
     "lost_item_answered": "Ya respondiste por este objeto.",
     "temporarily_paused": "Tu cuenta está en pausa {{until}}.",
     "no_show_too_early": "Todavía no termina el tiempo de espera.",
-    "cancel_reason_invalid": "Ese motivo no aplica para este viaje. Elige otro."
+    "cancel_reason_invalid": "Ese motivo no aplica para este viaje. Elige otro.",
+    "mock_location": "Desactiva la ubicación simulada para recibir viajes",
+    "registration_blocked": "No podemos crear esta cuenta. Escríbenos si crees que es un error.",
+    "transfers_frozen": "Tus transferencias están en pausa mientras revisamos tu cuenta."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -1207,11 +1210,15 @@
       },
       "transfer_in": {
         "title": "Transferencia de {{name}}",
-        "titleNoName": "Transferencia recibida"
+        "titleNoName": "Transferencia recibida",
+        "returned": "Transferencia devuelta",
+        "returnedFrom": "No llegó a {{name}}"
       },
       "transfer_out": {
         "title": "Transferencia a {{name}}",
-        "titleNoName": "Transferencia enviada"
+        "titleNoName": "Transferencia enviada",
+        "held": "Retenida",
+        "returned": "Devuelta"
       },
       "subscription_fee": {
         "title": "Cuota de {{month}}",
@@ -1375,7 +1382,10 @@
     "final": "Revisa bien el nombre: las transferencias son inmediatas y no se pueden revertir.",
     "send": "Enviar {{amount}} USDT",
     "doneTitle": "¡Transferencia enviada!",
-    "doneBody": "Enviaste {{amount}} USDT a {{name}}. Ya está en su billetera y le avisamos por notificación."
+    "doneBody": "Enviaste {{amount}} USDT a {{name}}. Ya está en su billetera y le avisamos por notificación.",
+    "heldBody": "Enviaste {{amount}} USDT a {{name}}.",
+    "heldUntil": "La recibirá el {{date}}.",
+    "heldReview": "La revisaremos antes de entregarla."
   },
   "charges": {
     "title": "Cuotas",
@@ -2144,6 +2154,12 @@
       "hint": "Aceptación {{acceptance}} · Cancelación {{cancellation}}",
       "hintLoading": "Tus tasas y cómo mejorarlas",
       "paused": "En pausa: podrás conectarte pronto"
+    }
+  },
+  "risk": {
+    "mockLocation": {
+      "title": "Ubicación simulada",
+      "body": "Desactiva la ubicación simulada para recibir viajes"
     }
   }
 }

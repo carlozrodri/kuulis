@@ -300,6 +300,8 @@ async def transfers(
             amount=-entry.amount,
             note=(entry.details or {}).get("note"),
             created_at=entry.created_at,
+            held=bool((entry.details or {}).get("held")),
+            returned=bool((entry.details or {}).get("returned")),
         )
         for entry, sender, receiver in rows
     ]

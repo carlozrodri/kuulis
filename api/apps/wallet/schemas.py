@@ -146,6 +146,9 @@ class TransferAdminRead(BaseModel):
     amount: MoneyStr
     note: str | None
     created_at: datetime
+    # Waiting for a review or for the first-transfer delay; returned to the sender if voided.
+    held: bool = False
+    returned: bool = False
 
 
 class Adjustment(BaseModel):

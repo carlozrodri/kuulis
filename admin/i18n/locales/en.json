@@ -33,7 +33,8 @@
     "help": "Help center",
     "campaigns": "Campaigns",
     "emailTemplates": "Email templates",
-    "quality": "Quality"
+    "quality": "Quality",
+    "risk": "Risk"
   },
   "navGroups": {
     "operations": "Operations",
@@ -175,7 +176,8 @@
       "releases": "App versions",
       "app_control": "App control",
       "quality": "Quality",
-      "safety": "Safety"
+      "safety": "Safety",
+      "risk": "Risk"
     },
     "permissions": {
       "users": {
@@ -263,6 +265,10 @@
       "safety": {
         "view": "See safety alerts",
         "manage": "Handle safety alerts"
+      },
+      "risk": {
+        "view": "See risk alerts",
+        "manage": "Review alerts and held payments, ban accounts"
       }
     }
   },
@@ -414,7 +420,12 @@
     "campaign_not_found": "We could not find that campaign",
     "campaign_not_editable": "That campaign was already sent or cancelled: it cannot change",
     "email_template_not_found": "We could not find that template",
-    "pause_not_active": "That pause already ended or was lifted."
+    "pause_not_active": "That pause already ended or was lifted.",
+    "risk_signal_not_found": "We could not find that alert",
+    "risk_hold_not_found": "We could not find that held payment",
+    "risk_hold_not_held": "That payment was already released or voided",
+    "blocked_identifier_not_found": "We could not find that banned identifier",
+    "cannot_ban_staff": "Team accounts cannot be banned"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -564,7 +575,8 @@
       "notificationNumber": "Notifications: values must be between {min} and {max}",
       "qualityNumber": "Quality: values must be between {min} and {max}",
       "qualityCancelOrder": "Quality: cancellation thresholds must go up (warning, lower priority, review)",
-      "qualityNoShowOrder": "Quality: the no-show warning cannot be higher than the pause"
+      "qualityNoShowOrder": "Quality: the no-show warning cannot be higher than the pause",
+      "riskNumber": "Risk: values must be between {min} and {max}"
     },
     "fares": {
       "title": "Fares",
@@ -815,6 +827,53 @@
         "passenger_no_show_pause": "In the window: they cannot request rides for a while. 0 = off. Between {min} and {max}.",
         "passenger_pause_hours": "How long the passenger's pause lasts. Between {min} and {max}.",
         "dispatch_quality_weight": "How much rating and acceptance move a driver when offering rides: the worst driver counts as up to this much farther away. 0 = distance only. Between {min} and {max}."
+      }
+    },
+    "risk": {
+      "title": "Anti-fraud",
+      "help": "Simple rules that raise alerts for someone to review. They never ban on their own: at most they hold a promotion credit or a transfer until it is reviewed.",
+      "sections": {
+        "score": "Risk score",
+        "rides": "Suspicious rides",
+        "devices": "Phones and GPS",
+        "transfers": "Transfers",
+        "ratings": "Ratings"
+      },
+      "numbers": {
+        "window_days": "Period (days)",
+        "freeze_score": "Freeze from (points)",
+        "ride_hold_score": "Hold credit from (points)",
+        "min_path_share": "Minimum path (%)",
+        "min_duration_share": "Minimum duration (%)",
+        "same_place_m": "Same place (meters)",
+        "min_ride_m": "Rides from (meters)",
+        "pair_rides": "Rides of the same pair",
+        "pair_days": "Within (days)",
+        "max_accounts_per_device": "Accounts per phone",
+        "jump_alerts": "Impossible jumps",
+        "first_transfer_hold_hours": "First transfer wait (hours)",
+        "chain_minutes": "Money passed on within (minutes)",
+        "fan_in_senders": "Different senders",
+        "new_account_days": "New account (days)",
+        "rating_ring_rides": "Rides with mutual 5 stars"
+      },
+      "numbersHelp": {
+        "window_days": "Alerts from these last days add up to the score (0 to 100). Between {min} and {max}.",
+        "freeze_score": "From this score promotion credits wait for review and outgoing transfers are blocked. Between {min} and {max}.",
+        "ride_hold_score": "When a ride's findings add up to this, its promotion credit waits for review. Between {min} and {max}.",
+        "min_path_share": "Real path under this share of the route = little movement. Between {min} and {max}.",
+        "min_duration_share": "Real duration under this share of the estimate = too short. Between {min} and {max}.",
+        "same_place_m": "Started and ended closer than this. Between {min} and {max}.",
+        "min_ride_m": "The path and same-place rules only look at rides at least this long. Between {min} and {max}.",
+        "pair_rides": "The same passenger and driver with this many rides together. Between {min} and {max}.",
+        "pair_days": "Period to count the pair's rides. Between {min} and {max}.",
+        "max_accounts_per_device": "More accounts than this on one phone raise an alert. Between {min} and {max}.",
+        "jump_alerts": "Jumps faster than 150 km/h within 10 minutes before alerting. Between {min} and {max}.",
+        "first_transfer_hold_hours": "The first transfer of each account waits this long. 0 = off. Between {min} and {max}.",
+        "chain_minutes": "Sending received money on within this time raises an alert. Between {min} and {max}.",
+        "fan_in_senders": "Receiving from this many different people in 7 days raises an alert. Between {min} and {max}.",
+        "new_account_days": "Accounts newer than this receiving balance raise an alert. 0 = off. Between {min} and {max}.",
+        "rating_ring_rides": "Rides in 30 days where both gave each other 5 stars. Between {min} and {max}."
       }
     }
   },
@@ -1259,7 +1318,11 @@
     "recipient": "To",
     "amount": "Amount",
     "note": "Note",
-    "total": "{n} transfers"
+    "total": "{n} transfers",
+    "held": "Held",
+    "heldHelp": "Held for an anti-fraud review: the recipient has not received it yet.",
+    "returned": "Returned",
+    "returnedHelp": "Voided in the anti-fraud review: the money went back to the sender."
   },
   "subscriptions": {
     "charges": "Charges",
@@ -1847,6 +1910,14 @@
       },
       "quality": {
         "pause_lift": "Lifted an automatic pause"
+      },
+      "risk": {
+        "signal_dismiss": "Dismissed a risk alert",
+        "signal_confirm": "Confirmed a risk alert",
+        "hold_release": "Released a held payment",
+        "hold_void": "Voided a held payment",
+        "ban": "Banned an account",
+        "unblock": "Removed a banned identifier"
       }
     },
     "entities": {
@@ -1874,7 +1945,10 @@
       "feature_flag": "Feature",
       "announcement": "Announcement",
       "driver_check": "Re-verification",
-      "quality_pause": "Automatic pause"
+      "quality_pause": "Automatic pause",
+      "risk_signal": "Risk alert",
+      "risk_hold": "Held payment",
+      "blocked_identifier": "Banned identifier"
     }
   },
   "team": {
@@ -3107,6 +3181,184 @@
       "liftConfirm": "Lift this pause? The person can go online or request rides right away.",
       "liftDone": "Pause lifted",
       "notDriver": "Not a driver"
+    }
+  },
+  "risk": {
+    "score": "Risk score",
+    "scoreShort": "Points",
+    "points": "{n} pts",
+    "kinds": {
+      "shared_device": "Shared phone",
+      "fake_gps": "Fake GPS",
+      "suspicious_ride": "Suspicious ride",
+      "frequent_pair": "Frequent pair",
+      "transfers": "Transfers",
+      "rating_ring": "Rating ring"
+    },
+    "reasons": {
+      "same_device": "Passenger and driver on the same phone",
+      "little_movement": "Barely moved",
+      "too_short": "Far too short",
+      "same_place": "Started and ended at the same spot",
+      "no_track": "No GPS path",
+      "frequent_pair": "Same pair again and again",
+      "shared_device": "Many accounts on one phone",
+      "mocked": "Simulated location",
+      "jumps": "Impossible jumps",
+      "chain": "Passed the money on right away",
+      "fan_in": "Receives from many people",
+      "new_account": "New account",
+      "recipient_frozen": "Recipient under review",
+      "first_transfer": "First transfer (waits 24 h)",
+      "rating_ring": "Mutual 5 stars again and again",
+      "risk_score": "Account under review"
+    },
+    "holdKinds": {
+      "promo_credit": "Promotion credit",
+      "transfer": "Transfer"
+    },
+    "blockedKinds": {
+      "email": "Email",
+      "national_id": "ID card",
+      "rif": "RIF",
+      "plate": "Plate",
+      "phone": "Phone",
+      "binance_pay_id": "Binance Pay ID",
+      "device": "Phone (device)"
+    },
+    "statuses": {
+      "open": "Open",
+      "confirmed": "Confirmed",
+      "dismissed": "Dismissed"
+    },
+    "holdStatuses": {
+      "held": "Held",
+      "released": "Released",
+      "voided": "Voided"
+    },
+    "allKinds": "All kinds",
+    "allStatuses": "All",
+    "kind": "Kind",
+    "status": "Status",
+    "reasonsLabel": "Why",
+    "user": "Account",
+    "related": "Related",
+    "date": "Date",
+    "tabs": {
+      "alerts": "Alerts",
+      "holds": "Held payments",
+      "blocked": "Banned"
+    },
+    "help": {
+      "alerts": "Possible fraud signals, highest score first. None punishes on its own: check the evidence and dismiss or confirm.",
+      "holds": "Promotion credits and transfers waiting for review. Releasing pays them; voiding drops the credit or returns the transfer to its sender.",
+      "blocked": "Identifiers of banned accounts: nobody can open a new account with them."
+    },
+    "empty": {
+      "alerts": "No alerts with these filters",
+      "holds": "No payments with these filters",
+      "blocked": "Nothing banned"
+    },
+    "totalAlerts": "no alerts | 1 alert | {n} alerts",
+    "totalHolds": "no payments | 1 payment | {n} payments",
+    "totalBlocked": "nothing banned | 1 banned identifier | {n} banned identifiers",
+    "heldTotal": "Held: {amount} in {n} payments",
+    "detailTitle": "Risk alert",
+    "accounts": "Accounts involved",
+    "heldForAlert": "Money held for this alert",
+    "ride": "The ride",
+    "noTrack": "No real path",
+    "estimate": "Estimate: {distance}, {duration}",
+    "discount": "Promotion discount: {amount}",
+    "reviewedBy": "Reviewed by {name} on {date}",
+    "note": "Note",
+    "noteHelp": "Optional. Kept in the history.",
+    "evidence": {
+      "sameDevice": "The passenger and the driver use the same phone (a ride with themselves)",
+      "noTrack": "No GPS path was recorded",
+      "path": "Real path {real} of {estimated} estimated",
+      "samePlace": "Started and ended at the same spot",
+      "duration": "Lasted {real} of {estimated} estimated",
+      "pair": "{n} rides together",
+      "pairDays": "{n} rides together in {days} days",
+      "promotion": "The ride had a promotion discount",
+      "sharedDevice": "{n} accounts on the same phone",
+      "phone": "Phone: {phone}",
+      "mocked": "Simulated location at {lat}, {lng}",
+      "mockedOnRide": "Simulated location at {lat}, {lng} during a ride",
+      "jumps": "{n} jumps faster than 150 km/h within 10 minutes",
+      "lastJump": "The last one: {distance} in {seconds} s",
+      "transfer": "Transfer of {amount}",
+      "ratingRing": "{n} rides with mutual 5 stars in {days} days"
+    },
+    "review": {
+      "dismiss": "Dismiss",
+      "confirm": "Confirm",
+      "dismissTitle": "Dismiss the alert",
+      "confirmTitle": "Confirm the alert",
+      "dismissHelp": "Nothing was wrong: the alert stops counting in the risk score.",
+      "confirmHelp": "It was abuse: the alert keeps counting in the risk score.",
+      "dismissDone": "Alert dismissed",
+      "confirmDone": "Alert confirmed"
+    },
+    "holds": {
+      "none": "No held payments",
+      "amount": "Amount",
+      "recipient": "Recipient",
+      "sender": "Sender",
+      "release": "Release",
+      "void": "Void",
+      "releasesAt": "Releases itself on {date}"
+    },
+    "holdModal": {
+      "release": {
+        "title": "Release the payment",
+        "promo_credit": "{name} gets {amount} of promotion credit.",
+        "transfer": "{name} receives {amount} from {sender}.",
+        "done": "Payment released"
+      },
+      "void": {
+        "title": "Void the payment",
+        "promo_credit": "The {amount} promotion credit for {name} is not paid.",
+        "transfer": "The {amount} go back to {sender}; {name} does not receive them.",
+        "done": "Payment voided"
+      }
+    },
+    "ban": {
+      "button": "Ban account",
+      "title": "Ban {name}",
+      "effects": "Suspends the account with no end and blocks its email, ID card, RIF, plate, phone, Binance Pay ID and the phones it uses: they cannot be used to open new accounts.",
+      "reason": "Reason",
+      "reasonHelp": "Seen by the team, not by the person. At least {min} characters.",
+      "submit": "Ban",
+      "done": "Account banned"
+    },
+    "blocked": {
+      "kind": "Identifier",
+      "reason": "Reason",
+      "account": "Account",
+      "by": "Banned",
+      "search": "Search by name, email or reason",
+      "remove": "Remove",
+      "removeConfirm": "Remove this banned identifier ({kind})? It can be used again to open an account.",
+      "removed": "Identifier removed"
+    },
+    "card": {
+      "title": "Risk",
+      "frozen": "Credits and transfers under review",
+      "frozenHelp": "Their score is over the threshold: promotion credits wait for review and they cannot send transfers.",
+      "alerts": "Latest alerts",
+      "noAlerts": "No alerts",
+      "moreAlerts": "And {n} more in Risk",
+      "devices": "Phones",
+      "noDevices": "No phones recorded",
+      "unknownModel": "Unknown model",
+      "appVersion": "app {v}",
+      "seen": "First seen {first} · last {last}",
+      "otherAccounts": "Nobody else | Another account on this phone: | {n} more accounts on this phone:",
+      "duplicates": "Identifiers repeated on other accounts",
+      "holds": "Held payments",
+      "blocked": "Banned identifiers"
     }
   }
 }

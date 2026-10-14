@@ -39,6 +39,7 @@ import { confirmHaptic, heavyHaptic } from "@/lib/feedback";
 import { formatAmount } from "@/lib/money";
 import type { Recipient, TransferAllowance } from "@/lib/types";
 import {
+  heldTransfer,
   maxTransfer,
   parseAmountInput,
   parseRecipientQuery,
@@ -51,6 +52,7 @@ import { fonts, radius, space, useTheme } from "@/theme";
 
 import { goToTopUp } from "./SubscriptionCard";
 import { FlowHeader, leaveFlow, SummaryRow } from "./components";
+import { useWalletFormat } from "./format";
 
 type Step = "recipient" | "amount" | "confirm" | "done";
 const STEPS: Step[] = ["recipient", "amount", "confirm"];
@@ -100,6 +102,9 @@ function TransferFlow() {
   const [amountError, setAmountError] = useState<string>();
   const [note, setNote] = useState("");
   const [submitError, setSubmitError] = useState<string>();
+  // Doc 16: the transfer may wait (first transfer: 24 h; under review: until the team checks it).
+  const [held, setHeld] = useState<{ until: string | null } | null>(null);
+  const { dateTime } = useWalletFormat();
 
   const balance = wallet.data?.balance;
   const allowance = wallet.data?.transfer ?? null;
@@ -170,8 +175,9 @@ function TransferFlow() {
         ...(note.trim() ? { note: note.trim() } : {}),
       },
       {
-        onSuccess: () => {
+        onSuccess: (entry) => {
           confirmHaptic();
+          setHeld(heldTransfer(entry));
           setStep("done");
         },
         onError: (e) => {
@@ -281,10 +287,20 @@ function TransferFlow() {
             {t("transfer.doneTitle")}
           </Txt>
           <Txt color="muted" align="center">
-            {t("transfer.doneBody", {
-              amount: formatAmount(value),
-              name: recipient.name,
-            })}
+            {held
+              ? [
+                  t("transfer.heldBody", {
+                    amount: formatAmount(value),
+                    name: recipient.name,
+                  }),
+                  held.until && dateTime(held.until)
+                    ? t("transfer.heldUntil", { date: dateTime(held.until) })
+                    : t("transfer.heldReview"),
+                ].join(" ")
+              : t("transfer.doneBody", {
+                  amount: formatAmount(value),
+                  name: recipient.name,
+                })}
           </Txt>
         </View>
       </Screen>

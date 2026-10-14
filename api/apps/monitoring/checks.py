@@ -58,6 +58,7 @@ def expected_loops() -> dict[str, int]:
         "support_sla": 5 * 60,  # every minute
         "notifications": 5 * 60,  # every 30 s (campaigns, receipts, daily cleanup)
         "quality": 5 * 60,  # beats every minute, recomputes every 10 min
+        "risk": 5 * 60,  # beats every minute
     }
     if settings.RATES_ENABLED:
         loops["rates"] = 10 * 60  # checks every minute which source is due

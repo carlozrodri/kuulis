@@ -10,6 +10,8 @@ import {
   feeFor,
   feeTierFor,
   formatTierBound,
+  heldTransfer,
+  isReturnedTransfer,
   isValidBinancePayId,
   maxTransfer,
   monthDate,
@@ -26,6 +28,7 @@ import {
   tierBounds,
   topUpAmountError,
   transferAmountError,
+  transferTag,
 } from "@/lib/wallet";
 
 /** The initial schedule from docs/product/business-model.md. */
@@ -302,5 +305,54 @@ describe("push payloads", () => {
     );
     expect(isSubscriptionNotification({ type: "wallet" })).toBe(false);
     expect(isSubscriptionNotification(null)).toBe(false);
+  });
+});
+
+describe("held and returned transfers (doc 16)", () => {
+  const out = (details: Record<string, unknown> | null) => ({
+    kind: "transfer_out",
+    details,
+  });
+  const incoming = (details: Record<string, unknown> | null) => ({
+    kind: "transfer_in",
+    details,
+  });
+
+  it("reads when a sent transfer will be delivered", () => {
+    expect(
+      heldTransfer(out({ held: true, held_until: "2026-10-15T15:45:00+00:00" })),
+    ).toEqual({ until: "2026-10-15T15:45:00+00:00" });
+    expect(heldTransfer(out({ held: true, held_until: null }))).toEqual({
+      until: null,
+    });
+    expect(heldTransfer(out({ held: true, held_until: "soon" }))).toEqual({
+      until: null,
+    });
+    expect(heldTransfer(out({ held: true }))).toEqual({ until: null });
+  });
+
+  it("is not held when delivered now or released", () => {
+    expect(heldTransfer(out({ counterpart_name: "Luis" }))).toBeNull();
+    expect(heldTransfer(out({ held: false, held_until: null }))).toBeNull();
+    expect(heldTransfer(out(null))).toBeNull();
+    expect(heldTransfer(incoming({ held: true }))).toBeNull();
+    expect(heldTransfer(null)).toBeNull();
+  });
+
+  it("tags sent transfers that wait or came back", () => {
+    expect(transferTag(out({ held: true }))).toBe("held");
+    expect(transferTag(out({ held: false, returned: true }))).toBe("returned");
+    expect(transferTag(out({ held: false }))).toBeNull();
+    expect(transferTag(out(null))).toBeNull();
+    // A released transfer_in keeps held: true as history; it is not tagged.
+    expect(transferTag(incoming({ held: true }))).toBeNull();
+    expect(transferTag(incoming({ returned: true }))).toBeNull();
+  });
+
+  it("spots money that came back to the sender", () => {
+    expect(isReturnedTransfer(incoming({ returned: true }))).toBe(true);
+    expect(isReturnedTransfer(incoming({ held: true }))).toBe(false);
+    expect(isReturnedTransfer(incoming(null))).toBe(false);
+    expect(isReturnedTransfer(out({ returned: true }))).toBe(false);
   });
 });

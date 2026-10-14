@@ -709,7 +709,10 @@
     "lost_item_answered": "You already answered about this item.",
     "temporarily_paused": "Your account is paused {{until}}.",
     "no_show_too_early": "The waiting time isn't over yet.",
-    "cancel_reason_invalid": "That reason doesn't apply to this ride. Pick another one."
+    "cancel_reason_invalid": "That reason doesn't apply to this ride. Pick another one.",
+    "mock_location": "Turn off the simulated location to receive rides",
+    "registration_blocked": "We can't create this account. Contact us if you think this is a mistake.",
+    "transfers_frozen": "Your transfers are paused while we review your account."
   },
   "map": {
     "recenter": "Recenter map"
@@ -1207,11 +1210,15 @@
       },
       "transfer_in": {
         "title": "Transfer from {{name}}",
-        "titleNoName": "Transfer received"
+        "titleNoName": "Transfer received",
+        "returned": "Transfer returned",
+        "returnedFrom": "It did not reach {{name}}"
       },
       "transfer_out": {
         "title": "Transfer to {{name}}",
-        "titleNoName": "Transfer sent"
+        "titleNoName": "Transfer sent",
+        "held": "On hold",
+        "returned": "Returned"
       },
       "subscription_fee": {
         "title": "{{month}} fee",
@@ -1375,7 +1382,10 @@
     "final": "Double-check the name: transfers are instant and can't be reversed.",
     "send": "Send {{amount}} USDT",
     "doneTitle": "Transfer sent!",
-    "doneBody": "You sent {{amount}} USDT to {{name}}. It's already in their wallet and we notified them."
+    "doneBody": "You sent {{amount}} USDT to {{name}}. It's already in their wallet and we notified them.",
+    "heldBody": "You sent {{amount}} USDT to {{name}}.",
+    "heldUntil": "They will receive it on {{date}}.",
+    "heldReview": "We'll review it before delivering it."
   },
   "charges": {
     "title": "Fees",
@@ -2144,6 +2154,12 @@
       "hint": "Acceptance {{acceptance}} · Cancellation {{cancellation}}",
       "hintLoading": "Your rates and how to improve them",
       "paused": "Paused: you can go online soon"
+    }
+  },
+  "risk": {
+    "mockLocation": {
+      "title": "Simulated location",
+      "body": "Turn off the simulated location to receive rides"
     }
   }
 }

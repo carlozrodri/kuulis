@@ -143,6 +143,9 @@ export function hrefForNotification(payload: unknown, context: NotificationConte
       const role = str(fields, 'role') ?? context.role;
       return role === 'driver' ? { kind: 'route', href: '/driver/quality', mode: 'driver' } : { kind: 'route', href: '/' };
     }
+    case 'risk':
+      // Doc 16: a mock location app took the driver offline; home says why and goes online again.
+      return { kind: 'route', href: '/', mode: 'driver' };
     case 'driver_status':
     case 'driver_document':
       // Driver home shows the application or the documents that need something.
@@ -181,7 +184,7 @@ export function notificationKind(payload: unknown, category?: string | null): No
   if (type?.startsWith('driver_')) return 'documents';
   if (type === 'referral') return 'referral';
   if (type === 'quality') return 'quality';
-  if (type?.startsWith('account')) return 'account';
+  if (type?.startsWith('account') || type === 'risk') return 'account';
   return 'general';
 }
 

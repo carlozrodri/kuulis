@@ -4,6 +4,7 @@ Pattern for every change: lock the ride row, validate + mutate, commit, then emi
 (realtime and push only after the commit, so clients never see uncommitted state).
 """
 
+import logging
 import secrets
 import uuid
 from datetime import date, datetime, time, timedelta
@@ -87,6 +88,8 @@ from kuulis.core.exceptions import AppError
 from kuulis.core.pagination import PageParams, paginate
 from kuulis.core.redis import redis_client
 from kuulis.settings import settings
+
+logger = logging.getLogger(__name__)
 
 QUOTE_PREFIX = f"{settings.APP_ENV}:rides:quote:"
 PIN_MAX_ATTEMPTS = 3
@@ -344,12 +347,22 @@ async def driver_state(session: AsyncSession, user: User) -> DriverState:
 
 
 async def go_online(
-    session: AsyncSession, user: User, lat: float, lng: float, device_id: str | None = None
+    session: AsyncSession,
+    user: User,
+    lat: float,
+    lng: float,
+    device_id: str | None = None,
+    mocked: bool = False,
 ) -> DriverState:
     from apps.drivers import services as drivers
     from apps.drivers import verification
+    from apps.risk import services as risk
 
     profile = await _approved_profile(session, user)
+    if mocked:  # Android says the position comes from a mock location app (doc 16)
+        await risk.gps_signal(session, user.id, "mocked", {"lat": lat, "lng": lng, "online": True})
+        await session.commit()
+        raise risk.MockLocationError()
     await moderation.ensure_not_suspended(session, user.id)
     await quality.ensure_not_paused(session, user.id, QualityRole.DRIVER)
     await subscriptions.ensure_not_overdue(session, user.id)
@@ -521,13 +534,16 @@ async def driver_step(
         )
         if first_trip is not None:
             inviter = await referrals.reward_first_trip(session, user.id)
-        credited = await _credit_promotion(session, ride)
+        hold = await _check_ride(session, ride)
+        credited = await _credit_promotion(session, ride, hold)
     await session.commit()
     if target == RideStatus.COMPLETED:
         await presence.clear_active_ride(user.id, ride.id)
         await safety_tasks.ride_ended.kiq(str(ride.id))
         if credited:
             await events.notify_promo_credit(session, ride)
+        elif hold and ride.discount > 0:
+            await _notify_promo_held(session, ride)
         if inviter is not None:
             await referrals.notify_rewarded(session, inviter, user)
     await events.emit_updated(session, ride)
@@ -538,10 +554,50 @@ async def driver_step(
     return ride
 
 
-async def _credit_promotion(session: AsyncSession, ride: Ride) -> bool:
+async def _check_ride(session: AsyncSession, ride: Ride) -> list[str] | None:
+    """Anti-fraud rules on a completed ride (doc 16). Returns the reasons when its promotion
+    credit must wait for a review. A failing rule never blocks the completion."""
+    from apps.risk import services as risk
+
+    try:
+        async with session.begin_nested():
+            result = await risk.check_ride(session, ride, await get_app_config(session))
+    except Exception:
+        logger.exception("Risk check failed for ride %s", ride.id)
+        return None
+    if not result.hold:
+        return None
+    return result.reasons + (["frequent_pair"] if result.pair_rides else []) or ["risk_score"]
+
+
+async def _notify_promo_held(session: AsyncSession, ride: Ride) -> None:
+    from apps.risk import services as risk
+    from apps.wallet import notify
+
+    assert ride.driver_id is not None
+    await notify.send(
+        session,
+        ride.driver_id,
+        "promo_held",
+        templates=risk.TEMPLATES,
+        amount=f"{ride.discount:.2f}",
+        data={"ride_id": str(ride.id)},
+    )
+    await session.commit()
+
+
+async def _credit_promotion(
+    session: AsyncSession, ride: Ride, hold: list[str] | None = None
+) -> bool:
     """Kuulis pays the promotion discount into the driver's wallet (same transaction as the
-    completion, so a completed promoted ride always has its credit)."""
+    completion, so a completed promoted ride always has its credit), or holds it for a review
+    when the ride looks fake (doc 16)."""
     if not ride.promotion_id or ride.discount <= 0 or ride.driver_id is None:
+        return False
+    if hold:
+        from apps.risk import services as risk
+
+        await risk.hold_promo_credit(session, ride, hold)
         return False
     promotion = await session.get(promotions.Promotion, ride.promotion_id)
     passenger = await session.get(User, ride.passenger_id)
@@ -844,7 +900,11 @@ async def rate(session: AsyncSession, user: User, ride_id: uuid.UUID, data: Rati
     if ride.rated_by_passenger if as_passenger else ride.rated_by_driver:
         raise RatingAlreadySubmittedError()
     assert ride.driver_id is not None
+    from apps.risk import services as risk
+
     ratee_id = ride.driver_id if as_passenger else ride.passenger_id
+    # Between a pair that looks like fake rides the rating is kept but not counted (doc 16).
+    ignored = await risk.rating_ignored(session, ride, await get_app_config(session))
     session.add(
         Rating(
             ride_id=ride.id,
@@ -854,6 +914,7 @@ async def rate(session: AsyncSession, user: User, ride_id: uuid.UUID, data: Rati
             stars=data.stars,
             tags=data.tags,
             comment=data.comment,
+            ignored=ignored,
         )
     )
     if as_passenger:
@@ -862,19 +923,20 @@ async def rate(session: AsyncSession, user: User, ride_id: uuid.UUID, data: Rati
     else:
         ride.rated_by_driver = True
         table, condition = User, User.id == ratee_id
-    # Old values on the right-hand side: one atomic UPDATE, exact average from sum / count.
-    await session.execute(
-        update(table)
-        .where(condition)
-        .values(
-            rating_sum=table.rating_sum + data.stars,
-            rating_count=table.rating_count + 1,
-            rating_avg=func.round(
-                cast(table.rating_sum + data.stars, Numeric) / (table.rating_count + 1), 2
-            ),
+    if not ignored:
+        # Old values on the right-hand side: one atomic UPDATE, exact average from sum / count.
+        await session.execute(
+            update(table)
+            .where(condition)
+            .values(
+                rating_sum=table.rating_sum + data.stars,
+                rating_count=table.rating_count + 1,
+                rating_avg=func.round(
+                    cast(table.rating_sum + data.stars, Numeric) / (table.rating_count + 1), 2
+                ),
+            )
+            .execution_options(synchronize_session=False)
         )
-        .execution_options(synchronize_session=False)
-    )
     try:
         await session.commit()
     except IntegrityError as exc:

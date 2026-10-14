@@ -26,6 +26,7 @@ import {
   withServiceNotice,
 } from '@/lib/bootstrap';
 import { localFile } from '@/lib/localFile';
+import { mockLocationTookOffline } from '@/lib/location';
 import { secureStorage } from '@/lib/storage';
 import { createStore, useStore } from '@/lib/store';
 import { useAuth } from '@/providers/AuthProvider';
@@ -191,6 +192,14 @@ export function BootstrapSync() {
       t(notice?.kind === 'maintenance' ? 'control.driverPaused.maintenanceTitle' : 'control.driverPaused.title'),
       [notice ? noticeText(notice, i18n.language) : t('control.pause.defaultBody'), t('control.driverPaused.body')].join('\n\n'),
     );
+  });
+
+  // Doc 16: positions from a mock location app. Off a ride the server takes the driver offline at once.
+  useRealtimeEvent<unknown>('driver.mock_location', (data) => {
+    if (!mockLocationTookOffline(data)) return;
+    void queryClient.invalidateQueries({ queryKey: rideKeys.driverState });
+    void queryClient.invalidateQueries({ queryKey: DRIVER_QUERY_KEY });
+    Alert.alert(t('risk.mockLocation.title'), t('risk.mockLocation.body'));
   });
 
   return null;

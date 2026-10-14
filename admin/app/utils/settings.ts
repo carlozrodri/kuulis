@@ -1,4 +1,4 @@
-import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, NotificationSettings, PaymentMethod, QualitySettings, RateSource, SafetySettings, ServiceArea, SupportSettings, VehicleType, VerificationSettings } from '~/types/api'
+import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, NotificationSettings, PaymentMethod, QualitySettings, RateSource, RiskSettings, SafetySettings, ServiceArea, SupportSettings, VehicleType, VerificationSettings } from '~/types/api'
 import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/types/api'
 
 /** Editable copy of AppConfig: decimals as numbers so they bind to numeric inputs. */
@@ -42,6 +42,8 @@ export interface SettingsForm {
   notifications: NotificationSettings
   /** Rates and the dispatch weight as percentages (15 = 0.15 in the API), see QUALITY_PERCENT_FIELDS. */
   quality: QualitySettings
+  /** Path and duration shares as percentages (30 = 0.3 in the API), see RISK_PERCENT_FIELDS. */
+  risk: RiskSettings
 }
 
 export const FARE_FIELDS = ['base', 'per_km', 'per_minute', 'minimum'] as const
@@ -141,6 +143,35 @@ export const QUALITY_SECTIONS: { key: 'pickup' | 'drivers' | 'driverPauses' | 'p
   { key: 'driverPauses', fields: ['driver_cancel_burst', 'driver_decline_streak', 'driver_pause_minutes'] },
   { key: 'passengers', fields: ['passenger_no_show_warn', 'passenger_no_show_pause', 'passenger_pause_hours'] },
   { key: 'general', fields: ['window_days', 'dispatch_quality_weight'] },
+]
+/** Doc 16: anti-fraud limits (same as the API validation; percentages here, fractions in the API). */
+export const RISK_LIMITS = {
+  window_days: [7, 365],
+  freeze_score: [10, 100],
+  ride_hold_score: [5, 100],
+  min_path_share: [0, 100],
+  min_duration_share: [0, 100],
+  same_place_m: [20, 2000],
+  min_ride_m: [100, 20000],
+  pair_rides: [2, 100],
+  pair_days: [1, 180],
+  max_accounts_per_device: [1, 20],
+  jump_alerts: [1, 50],
+  first_transfer_hold_hours: [0, 168],
+  chain_minutes: [5, 1440],
+  fan_in_senders: [2, 100],
+  new_account_days: [0, 90],
+  rating_ring_rides: [2, 50],
+} as const
+export type RiskNumber = keyof typeof RISK_LIMITS
+export const RISK_PERCENT_FIELDS: RiskNumber[] = ['min_path_share', 'min_duration_share']
+/** How the settings card groups the fields. */
+export const RISK_SECTIONS: { key: 'score' | 'rides' | 'devices' | 'transfers' | 'ratings', fields: RiskNumber[] }[] = [
+  { key: 'score', fields: ['window_days', 'freeze_score', 'ride_hold_score'] },
+  { key: 'rides', fields: ['min_path_share', 'min_duration_share', 'same_place_m', 'min_ride_m', 'pair_rides', 'pair_days'] },
+  { key: 'devices', fields: ['max_accounts_per_device', 'jump_alerts'] },
+  { key: 'transfers', fields: ['first_transfer_hold_hours', 'chain_minutes', 'fan_in_senders', 'new_account_days'] },
+  { key: 'ratings', fields: ['rating_ring_rides'] },
 ]
 // 0.15 ↔ 15, without float noise (0.07 * 100 = 7.000000000000001).
 const toPercent = (fraction: number) => Math.round(fraction * 10_000) / 100
@@ -252,6 +283,24 @@ export function defaultSettings(): SettingsForm {
       rating_min_count: 20,
       dispatch_quality_weight: 20,
     },
+    risk: {
+      window_days: 90,
+      freeze_score: 60,
+      ride_hold_score: 30,
+      max_accounts_per_device: 2,
+      min_path_share: 30,
+      min_duration_share: 30,
+      same_place_m: 150,
+      min_ride_m: 1000,
+      pair_rides: 5,
+      pair_days: 30,
+      jump_alerts: 3,
+      first_transfer_hold_hours: 24,
+      chain_minutes: 60,
+      fan_in_senders: 5,
+      new_account_days: 7,
+      rating_ring_rides: 3,
+    },
   }
 }
 
@@ -329,7 +378,18 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
     support: { ...d.support, ...config.support },
     notifications: { ...d.notifications, ...config.notifications },
     quality: qualityFromConfig(config.quality, d.quality),
+    risk: riskFromConfig(config.risk, d.risk),
   }
+}
+
+function riskFromConfig(risk: Partial<RiskSettings> | undefined, defaults: RiskSettings): RiskSettings {
+  const form = { ...defaults }
+  for (const key of Object.keys(RISK_LIMITS) as RiskNumber[]) {
+    const value = risk?.[key]
+    if (value === undefined || value === null) continue
+    form[key] = RISK_PERCENT_FIELDS.includes(key) ? toPercent(num(value, 0)) : num(value, defaults[key])
+  }
+  return form
 }
 
 function qualityFromConfig(quality: Partial<QualitySettings> | undefined, defaults: QualitySettings): QualitySettings {
@@ -421,6 +481,10 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
       if (QUALITY_PERCENT_FIELDS.includes(key)) return [key, fromPercent(value)]
       return [key, key === 'rating_review_below' ? Math.round(value * 10) / 10 : value]
     })) as unknown as QualitySettings,
+    risk: Object.fromEntries((Object.keys(RISK_LIMITS) as RiskNumber[]).map((key) => {
+      const value = Number(form.risk[key])
+      return [key, RISK_PERCENT_FIELDS.includes(key) ? fromPercent(value) : value]
+    })) as unknown as RiskSettings,
   }
 }
 
@@ -560,6 +624,16 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
     const ok = key === 'rating_review_below' || QUALITY_PERCENT_FIELDS.includes(key) ? Number.isFinite(value) && value >= min && value <= max : between(value, min, max)
     if (!ok) {
       issues.push({ key: 'qualityNumber', params: { min, max } })
+      break
+    }
+  }
+  for (const key of Object.keys(RISK_LIMITS) as RiskNumber[]) {
+    const [min, max] = RISK_LIMITS[key]
+    const value = Number(form.risk[key])
+    // The shares may have decimals; the rest are whole numbers.
+    const ok = RISK_PERCENT_FIELDS.includes(key) ? Number.isFinite(value) && value >= min && value <= max : between(value, min, max)
+    if (!ok) {
+      issues.push({ key: 'riskNumber', params: { min, max } })
       break
     }
   }

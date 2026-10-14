@@ -26,6 +26,12 @@ from apps.rides.models import (  # noqa: F401
     RideMessage,
     RideOffer,
 )
+from apps.risk.models import (  # noqa: F401
+    BlockedIdentifier,
+    DeviceFingerprint,
+    RiskHold,
+    RiskSignal,
+)
 from apps.safety.models import (  # noqa: F401
     RideShareLink,
     RideTrack,
