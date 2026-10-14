@@ -21,6 +21,7 @@ export function approvalLink(approval: Pick<ApprovalRead, 'action' | 'entity_id'
   switch (approval.action) {
     case 'wallet.adjust': return approval.entity_id ? `/wallets/${approval.entity_id}` : null
     case 'fee_schedule.create': return '/subscriptions?tab=schedules'
+    case 'charge.waive': return '/subscriptions'
     case 'config.update': return '/settings'
     case 'campaign.send': return approval.entity_id ? `/campaigns/${approval.entity_id}` : null
     default: return null

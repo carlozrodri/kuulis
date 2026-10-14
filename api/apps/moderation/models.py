@@ -22,13 +22,19 @@ class ReportCategory(enum.StrEnum):
     LOST_ITEM = "lost_item"
     NO_SHOW = "no_show"
     APP_ISSUE = "app_issue"
+    PAYMENT = "payment"  # a top-up that did not arrive (doc 17)
     OTHER = "other"
 
 
 URGENT_CATEGORIES = frozenset({ReportCategory.SAFETY, ReportCategory.HARASSMENT})
 # Categories that make sense without a ride.
 GENERAL_CATEGORIES = frozenset(
-    {ReportCategory.APP_ISSUE, ReportCategory.LOST_ITEM, ReportCategory.OTHER}
+    {
+        ReportCategory.APP_ISSUE,
+        ReportCategory.LOST_ITEM,
+        ReportCategory.PAYMENT,
+        ReportCategory.OTHER,
+    }
 )
 
 

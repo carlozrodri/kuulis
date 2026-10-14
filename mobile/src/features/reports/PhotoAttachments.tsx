@@ -17,18 +17,19 @@ export const uploadErrorMessage = (error: unknown, t: (key: string) => string) =
 
 /**
  * Up to 4 photos for a support message (doc 13): a camera / gallery sheet, the thumbnails with a remove
- * button, and `upload()` that sends them (presign in "uploads" → PUT) and returns their keys.
+ * button, and `upload()` that sends them (presign in "uploads" → PUT) and returns their keys. `max` lowers the
+ * limit (a top-up claim takes 3).
  */
-export function usePhotoAttachments() {
+export function usePhotoAttachments(max: number = MAX_ATTACHMENTS) {
   const { t } = useTranslation();
   const [photos, setPhotos] = useState<LocalFile[]>([]);
   const [visible, setVisible] = useState(false);
-  const full = photos.length >= MAX_ATTACHMENTS;
+  const full = photos.length >= max;
 
   const choose = async (source: 'camera' | 'library') => {
     try {
       const file = await pickFile(source);
-      if (file) setPhotos((current) => (current.length >= MAX_ATTACHMENTS ? current : [...current, file]));
+      if (file) setPhotos((current) => (current.length >= max ? current : [...current, file]));
     } catch (error) {
       if (error instanceof PermissionDenied) {
         showToast(t('support.photos.cameraDenied'), 'danger');
@@ -38,7 +39,7 @@ export function usePhotoAttachments() {
   };
 
   const open = () => {
-    if (full) showToast(t('support.photos.max', { max: MAX_ATTACHMENTS }));
+    if (full) showToast(t('support.photos.max', { max }));
     else setVisible(true);
   };
 
@@ -50,7 +51,7 @@ export function usePhotoAttachments() {
     <Sheet
       visible={visible}
       title={t('support.photos.title')}
-      subtitle={t('support.photos.subtitle', { max: MAX_ATTACHMENTS })}
+      subtitle={t('support.photos.subtitle', { max })}
       onClose={() => setVisible(false)}
       options={[
         { label: t('support.photos.camera'), icon: Camera, onPress: () => void choose('camera') },

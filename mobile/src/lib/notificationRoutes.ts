@@ -119,7 +119,8 @@ export function hrefForNotification(payload: unknown, context: NotificationConte
     case 'promo_credit':
       return { kind: 'route', href: '/wallet', mode: 'driver' };
     case 'subscription':
-      // Something to pay: the wallet (balance, top up and the fee card). Otherwise the list of fees.
+      // Something to pay: the wallet (balance, top up and the fee card). Otherwise the list of fees
+      // (fee_paid, fee_waived and doc 17's fee_reduced).
       return FEE_TO_PAY.has(event ?? '')
         ? { kind: 'route', href: '/wallet', mode: 'driver' }
         : { kind: 'route', href: '/wallet/charges', mode: 'driver' };

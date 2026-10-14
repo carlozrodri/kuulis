@@ -73,6 +73,10 @@ TEMPLATES: dict[str, dict[str, tuple[str, str]]] = {
         "es": ("Cuota condonada", "Kuulis condonó tu cuota de {month}."),
         "en": ("Fee waived", "Kuulis waived your {month} fee."),
     },
+    "fee_reduced": {
+        "es": ("Cuota reducida", "Kuulis bajó tu cuota de {month} a {fee} USDT."),
+        "en": ("Fee reduced", "Kuulis lowered your {month} fee to {fee} USDT."),
+    },
 }
 
 

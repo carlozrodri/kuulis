@@ -217,6 +217,7 @@ async def test_overdue_blocks_until_top_up(client, admin_headers, recorder):
 
 
 async def test_waive_and_admin_listing(client, admin_headers, staff_headers, recorder):
+    await set_config(approval_waivers=False)
     luis = await make_driver(client, "luis@example.com", "Luis Gómez")
     ana = await make_driver(client, "ana2@example.com", "Ana Ruiz")
     for driver in (luis, ana):

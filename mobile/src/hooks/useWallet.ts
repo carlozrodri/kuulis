@@ -6,14 +6,18 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
+import { reportKeys } from "@/hooks/useReports";
 import { rideKeys } from "@/hooks/useRides";
 import { ApiError, api } from "@/lib/api";
 import type {
   Charge,
   Page,
+  Receipt,
   Recipient,
+  Statement,
   SubscriptionSummary,
   TopUp,
+  TopUpDisputeInput,
   TopUpInfo,
   Wallet,
   WalletEntry,
@@ -28,6 +32,10 @@ export const walletKeys = {
   subscription: ["wallet", "me", "subscription"] as const,
   charges: ["wallet", "me", "charges"] as const,
   topUpInfo: ["wallet", "top-up-info"] as const,
+  receipt: (id: string) => ["wallet", "me", "receipts", id] as const,
+  /** `null`: the default month (last month, or the only one). */
+  statement: (month: string | null) =>
+    ["wallet", "me", "statements", month ?? "default"] as const,
 };
 
 const PAGE_SIZE = 20;
@@ -151,6 +159,31 @@ export function useCharges(enabled = true) {
   });
 }
 
+/** GET /wallet/me/receipts/{id} (doc 17): receipts never change once issued. */
+export function useReceipt(id: string | undefined) {
+  return useQuery({
+    queryKey: walletKeys.receipt(id ?? ""),
+    queryFn: () => api<Receipt>(`/wallet/me/receipts/${id}`),
+    enabled: !!id,
+    staleTime: Infinity,
+    retry: (count, error) =>
+      !(error instanceof ApiError && error.status === 404) && count < 2,
+  });
+}
+
+/** GET /wallet/me/statements?month= (doc 17, "Estado de cuenta"); without a month the API picks last month. */
+export function useStatement(month: string | null) {
+  return useQuery({
+    queryKey: walletKeys.statement(month),
+    queryFn: () =>
+      api<Statement>("/wallet/me/statements", {
+        query: month ? { month } : undefined,
+      }),
+    staleTime: 60_000,
+    placeholderData: (previous) => previous,
+  });
+}
+
 // ── Mutations ──
 
 /** PUT /wallet/me/binance: returns the wallet, which replaces the cached one. */
@@ -213,4 +246,45 @@ export function refreshSubscription(queryClient: QueryClient) {
   void queryClient.invalidateQueries({ queryKey: walletKeys.subscription });
   void queryClient.invalidateQueries({ queryKey: walletKeys.charges });
   void queryClient.invalidateQueries({ queryKey: rideKeys.driverState });
+}
+
+/**
+ * "No me llegó mi recarga" (doc 17): POST /wallet/me/top-ups/{id}/dispute. Without a top-up (the driver never
+ * pressed "Ya pagué") it first creates one with the amount and the transaction id as its reference. Opens an
+ * urgent support ticket (category payment): the top-up comes back with `dispute_report_id`.
+ */
+export function useDisputeTopUp() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      topUpId,
+      amount,
+      onCreated,
+      ...body
+    }: TopUpDisputeInput & {
+      topUpId?: string | null;
+      amount?: string;
+      /** The top-up created on the way, so a retry after a failed claim does not create another one. */
+      onCreated?: (topUp: TopUp) => void;
+    }) => {
+      let id = topUpId;
+      if (!id) {
+        const created = await api<TopUp>("/wallet/me/top-ups", {
+          method: "POST",
+          body: { amount, reference: body.transaction_id },
+        });
+        onCreated?.(created);
+        id = created.id;
+      }
+      return api<TopUp>(`/wallet/me/top-ups/${id}/dispute`, {
+        method: "POST",
+        body,
+      });
+    },
+    onSettled: () => {
+      // Also after an error: a top-up may have been created before the claim failed.
+      void queryClient.invalidateQueries({ queryKey: walletKeys.topUps });
+      void queryClient.invalidateQueries({ queryKey: reportKeys.mine });
+    },
+  });
 }

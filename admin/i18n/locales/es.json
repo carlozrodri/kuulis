@@ -34,7 +34,8 @@
     "campaigns": "Campañas",
     "emailTemplates": "Plantillas de email",
     "quality": "Calidad",
-    "risk": "Riesgo"
+    "risk": "Riesgo",
+    "closings": "Cierres"
   },
   "navGroups": {
     "operations": "Operación",
@@ -228,7 +229,8 @@
       },
       "finance": {
         "view": "Ver finanzas",
-        "export": "Exportar CSV de finanzas"
+        "export": "Exportar CSV de finanzas",
+        "close": "Cerrar meses, conciliar con Binance y verificar el libro"
       },
       "dashboard": {
         "view": "Panel principal"
@@ -425,7 +427,16 @@
     "risk_hold_not_found": "No encontramos ese pago retenido",
     "risk_hold_not_held": "Ese pago ya se liberó o se anuló",
     "blocked_identifier_not_found": "No encontramos ese dato vetado",
-    "cannot_ban_staff": "No se puede vetar una cuenta del equipo"
+    "cannot_ban_staff": "No se puede vetar una cuenta del equipo",
+    "month_open": "Ese mes todavía no terminó: solo se cierran meses pasados.",
+    "month_already_closed": "Ese mes ya está cerrado.",
+    "closing_out_of_order": "Hay que cerrar los meses en orden: ya hay un cierre posterior.",
+    "closing_not_found": "Ese mes no está cerrado.",
+    "statement_invalid": "El archivo no parece un historial de Binance Pay: no se encontraron las columnas del ID y del monto.",
+    "closing_reconciled": "Ese cierre ya está conciliado.",
+    "reconcile_note_required": "Sube primero el estado de cuenta de Binance y, si hay diferencias, explica por qué en la nota.",
+    "statement_not_found": "No hay un archivo guardado para ese mes.",
+    "fee_not_lower": "La nueva cuota debe ser menor que la actual ({fee})."
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -672,7 +683,9 @@
       "fares": "Tarifas y tramos de suscripción",
       "faresHelp": "Cambios de tarifas o redondeo en Configuración y nuevos tramos. Solo otro admin los aprueba.",
       "broadcasts": "Notificaciones masivas y campañas",
-      "broadcastsHelp": "Notificaciones a todos o a un rol completo, y el envío de campañas. Las de un solo usuario salen al momento."
+      "broadcastsHelp": "Notificaciones a todos o a un rol completo, y el envío de campañas. Las de un solo usuario salen al momento.",
+      "waivers": "Exonerar o bajar cuotas",
+      "waiversHelp": "Condonar la cuota de un motorizado o bajarla, también si ya estaba pagada (se le devuelve la diferencia)."
     },
     "app": {
       "title": "Contacto y ubicación en la app",
@@ -1355,12 +1368,20 @@
       "partial": "Hay demasiados cobros para contarlos todos aquí: algunos totales son parciales."
     },
     "waive": {
-      "button": "Condonar",
-      "title": "Condonar cuota",
-      "help": "La cuota queda en 0 y, si estaba bloqueado, el motorizado se desbloquea de inmediato.",
+      "button": "Condonar o bajar",
+      "title": "Condonar o bajar cuota",
+      "help": "Con 0 la cuota queda condonada; con un monto menor, se baja. Si estaba bloqueado, el motorizado se desbloquea de inmediato.",
       "reason": "Motivo",
       "summary": "{name} · {month} · {fee}",
-      "done": "Cuota condonada"
+      "done": "Cuota condonada",
+      "helpPaid": "La cuota ya está pagada: la diferencia se devuelve a la billetera del motorizado.",
+      "newFee": "Nueva cuota (USDT)",
+      "newFeeHelp": "0 la condona. Debe ser menor que la cuota actual ({fee}).",
+      "doneReduced": "Cuota bajada a {fee}",
+      "errors": {
+        "fee": "Escribe un monto válido de 0 o más.",
+        "notLower": "Debe ser menor que la cuota actual."
+      }
     },
     "run": {
       "button": "Cobrar mes",
@@ -1417,6 +1438,34 @@
         "monthTaken": "Ya hay un esquema programado para ese mes: elige otro."
       },
       "builtIn": "esquema inicial (business-model.md)"
+    },
+    "originalFee": "Antes: {fee}",
+    "simulator": {
+      "tab": "Simulador",
+      "title": "Simulador de tramos",
+      "help": "Calcula las cuotas de un mes ya cobrado con los tramos vigentes y con unos tramos propuestos. No cambia nada: para aplicar tramos nuevos crea un esquema en «Tramos».",
+      "month": "Mes",
+      "proposed": "Tramos propuestos",
+      "proposedHelp": "Parten de los tramos vigentes. Cada fila es «ganancia mayor que» → cuota; la primera empieza en 0.",
+      "reset": "Volver a los vigentes",
+      "run": "Simular",
+      "result": "Resultado de {month}",
+      "drivers": "Motorizados con cuota",
+      "referralFree": "Exentos por referidos",
+      "billed": "Cobrado ese mes",
+      "currentTotal": "Con los tramos vigentes",
+      "proposedTotal": "Con los propuestos",
+      "difference": "Diferencia",
+      "matches": "Los tramos vigentes reproducen exactamente lo que se cobró.",
+      "noMatch": "Los tramos vigentes no reproducen lo cobrado ({billed}): revisa ajustes, exoneraciones o un cambio de tramos ese mes.",
+      "tier": "Ganancia mayor que",
+      "current": "Vigente",
+      "proposedCol": "Propuesto",
+      "fee": "Cuota",
+      "count": "Motorizados",
+      "total": "Total",
+      "noTier": "—",
+      "loadError": "No se pudieron cargar los tramos vigentes."
     }
   },
   "charts": {
@@ -1556,6 +1605,7 @@
       "lost_item": "Objeto olvidado",
       "no_show": "No se presentó",
       "app_issue": "Falla de la app",
+      "payment": "Pagos y recargas",
       "other": "Otro"
     },
     "categoryHelp": {
@@ -1567,6 +1617,7 @@
       "lost_item": "objeto olvidado",
       "no_show": "no se presentó",
       "app_issue": "falla de la app",
+      "payment": "pagos y recargas",
       "other": "otro motivo"
     },
     "detailTitle": "Ticket · {category}",
@@ -1722,7 +1773,8 @@
       "rates": "Tasas",
       "binance": "Binance Pay",
       "privacy_retention": "Retención de datos",
-      "driver_expirations": "Vencimientos de motorizados"
+      "driver_expirations": "Vencimientos de motorizados",
+      "finance": "Finanzas (cierres e invariantes)"
     },
     "dashboardAlert": "Hay {count} alertas del sistema abiertas",
     "dashboardAlertHelp": "Algún servicio o proceso de fondo tiene problemas.",
@@ -1737,6 +1789,18 @@
       "restore": "Prueba de restauración (semanal)",
       "restoreOk": "Correcta",
       "restoreFailed": "Falló"
+    },
+    "ledger": {
+      "title": "Libro de billeteras",
+      "help": "Revisión diaria: cada saldo es la suma de sus movimientos, nada en negativo y cada pago de Binance acreditado una sola vez.",
+      "never": "Todavía no se ha revisado.",
+      "ok": "Cuadra",
+      "issues": "Con problemas",
+      "checkedAt": "Revisado {time}",
+      "wallets": "{n} billeteras",
+      "issueCount": "{n} problemas encontrados",
+      "firstIssue": "Primer problema: {issue}",
+      "open": "Ver cierres"
     }
   },
   "totp": {
@@ -1988,7 +2052,7 @@
     "noToken": "El enlace está incompleto. Pide una nueva invitación."
   },
   "approvals": {
-    "help": "Cambios de alto impacto que esperan la firma de una segunda persona: ajustes de saldo grandes, tarifas y tramos, y notificaciones masivas. Quien pide un cambio no puede aprobarlo. Las solicitudes vencen a las 48 horas.",
+    "help": "Cambios de alto impacto que esperan la firma de una segunda persona: ajustes de saldo grandes, tarifas y tramos, exoneraciones de cuotas y notificaciones masivas. Quien pide un cambio no puede aprobarlo. Las solicitudes vencen a las 48 horas.",
     "all": "Todas",
     "empty": "No hay solicitudes.",
     "date": "Fecha",
@@ -2031,6 +2095,9 @@
       },
       "campaign": {
         "send": "Envío de campaña"
+      },
+      "charge": {
+        "waive": "Exonerar o bajar cuota"
       }
     }
   },
@@ -2764,6 +2831,24 @@
       "sent": "Respuesta enviada",
       "sentResolved": "Respuesta enviada y ticket resuelto",
       "hint": "{'{nombre}'} y {'{viaje}'} se reemplazan al enviar. Ctrl + Enter envía."
+    },
+    "topUp": {
+      "title": "Recarga reclamada",
+      "help": "El motorizado dice que pagó y la recarga no le llegó. Busca el pago en Binance Pay por el ID de la transacción.",
+      "transactionId": "ID de transacción (del motorizado)",
+      "reference": "Referencia",
+      "amount": "Monto",
+      "status": "Estado",
+      "createdAt": "Creada",
+      "payer": "Pagador en Binance",
+      "rejection": "Motivo del rechazo",
+      "confirm": "Acreditar",
+      "confirmTitle": "Acreditar recarga reclamada",
+      "confirmHelp": "Verifica en Binance Pay que el pago llegó antes de acreditarlo.",
+      "find": "Buscar el pago en Recargas",
+      "findHelp": "Si el pago llegó como «Sin dueño», asígnalo a este motorizado desde Recargas.",
+      "done": "Recarga acreditada",
+      "wallet": "Ver billetera"
     }
   },
   "canned": {
@@ -3359,6 +3444,129 @@
       "duplicates": "Datos repetidos en otras cuentas",
       "holds": "Pagos retenidos",
       "blocked": "Datos vetados"
+    }
+  },
+  "closings": {
+    "help": "Cada mes cerrado congela sus totales con una huella encadenada al cierre anterior. Después se sube el historial de Binance Pay del mes para comparar pago por pago y se marca como conciliado.",
+    "empty": "Todavía no hay meses cerrados.",
+    "month": "Mes",
+    "feesCollected": "Cuotas cobradas",
+    "topUpsCredited": "Recargas acreditadas",
+    "closingBalance": "Saldo al cierre",
+    "status": "Estado",
+    "closedAt": "Cerrado",
+    "view": "Ver",
+    "statuses": {
+      "tampered": "Alterado",
+      "reconciled": "Conciliado",
+      "noStatement": "Sin estado de cuenta",
+      "differences": "Con diferencias",
+      "matched": "Cuadra con Binance"
+    },
+    "tampered": "Los datos guardados de este cierre ya no coinciden con su huella: alguien los cambió después de cerrar. Revisa la auditoría.",
+    "tamperedList": "Hay cierres alterados: sus datos ya no coinciden con la huella guardada.",
+    "close": {
+      "button": "Cerrar mes",
+      "title": "Cerrar un mes",
+      "help": "Congela los totales del mes. Después no cambian aunque se modifique un tramo o un ajuste (los ajustes nuevos van al mes siguiente).",
+      "month": "Mes",
+      "none": "No hay meses por cerrar: el último cierre es del mes pasado.",
+      "preview": "Así quedará el cierre",
+      "confirm": "Revisa los totales: un mes cerrado no se puede reabrir.",
+      "submit": "Cerrar {month}",
+      "done": "{month} cerrado"
+    },
+    "totals": {
+      "movements": "Movimientos del mes",
+      "kind": "Tipo",
+      "count": "Cantidad",
+      "credits": "Entradas",
+      "debits": "Salidas",
+      "topUps": "Recargas",
+      "credited": "Acreditadas",
+      "auto": "Automáticas",
+      "manual": "Manuales",
+      "unmatched": "Sin dueño",
+      "countAmount": "{n} · {amount}",
+      "charges": "Cuotas facturadas en el mes",
+      "feesCollected": "Cuotas cobradas",
+      "balances": "Saldos en billeteras",
+      "opening": "Al abrir",
+      "closing": "Al cerrar",
+      "net": "Variación"
+    },
+    "detail": {
+      "title": "Cierre de {month}",
+      "closedBy": "Cerrado por {by} el {at}",
+      "hash": "Huella",
+      "previousHash": "Huella anterior",
+      "first": "primer cierre"
+    },
+    "statement": {
+      "title": "Estado de cuenta de Binance Pay",
+      "help": "Descarga de Binance el historial de Binance Pay del mes en CSV y súbelo aquí. Se compara cada pago recibido con las recargas de Kuulis.",
+      "upload": "Subir CSV",
+      "replace": "Subir otro CSV",
+      "download": "Descargar CSV guardado",
+      "uploaded": "Subido el {at}",
+      "none": "Todavía no se subió.",
+      "done": "Estado de cuenta comparado",
+      "empty": "El archivo está vacío.",
+      "tooLarge": "El archivo es demasiado grande.",
+      "statementRows": "Pagos en Binance",
+      "kuulisRows": "Recargas en Kuulis",
+      "matched": "Coinciden"
+    },
+    "differences": {
+      "none": "Todo coincide: cada pago de Binance tiene su recarga en Kuulis con el mismo monto.",
+      "missingInKuulis": "En Binance pero no en Kuulis ({n})",
+      "missingInKuulisHelp": "Pagos recibidos que ninguna recarga acreditó: búscalos en Recargas (suelen estar «Sin dueño» o pendientes).",
+      "missingInBinance": "En Kuulis pero no en Binance ({n})",
+      "missingInBinanceHelp": "Recargas acreditadas o sin dueño que no aparecen en el historial: revisa las confirmaciones manuales.",
+      "amountMismatch": "Montos distintos ({n})",
+      "amountMismatchHelp": "La recarga existe en los dos lados pero con otro monto.",
+      "id": "ID",
+      "amount": "Monto",
+      "kuulisAmount": "En Kuulis",
+      "binanceAmount": "En Binance",
+      "at": "Fecha",
+      "status": "Estado",
+      "reasons": {
+        "not_found": "No está en el historial",
+        "no_reference": "Sin ID ni referencia"
+      },
+      "find": "Buscar en Recargas",
+      "limited": "Se muestran como máximo 500 filas por lista."
+    },
+    "reconcile": {
+      "title": "Conciliación",
+      "help": "Marca el mes como conciliado cuando el estado de cuenta cuadre o las diferencias estén explicadas.",
+      "note": "Nota",
+      "noteHelp": "Obligatoria si hay diferencias: explica qué son y qué se hizo.",
+      "needsStatement": "Sube primero el estado de cuenta de Binance.",
+      "submit": "Marcar como conciliado",
+      "done": "{month} conciliado",
+      "by": "Conciliado por {by} el {at}"
+    },
+    "invariants": {
+      "title": "Invariantes del libro",
+      "help": "Cada día se revisa que los saldos cuadren con sus movimientos, que no haya saldos negativos y que cada pago de Binance se haya acreditado una sola vez.",
+      "never": "Todavía no se ha revisado.",
+      "ok": "Todo cuadra",
+      "failed": "{n} problemas",
+      "checkedAt": "Revisado {time} · {wallets} billeteras",
+      "run": "Verificar ahora",
+      "ran": "Verificación terminada",
+      "more": "y {n} más",
+      "user": "Usuario",
+      "kinds": {
+        "balance_mismatch": "El saldo no es la suma de sus movimientos",
+        "last_entry_mismatch": "El saldo no coincide con el último movimiento",
+        "negative_balance": "Saldo negativo",
+        "duplicate_top_up": "Pago de Binance acreditado más de una vez",
+        "top_up_without_entry": "Recarga acreditada sin movimiento",
+        "fee_without_entry": "Cuota pagada sin débito"
+      }
     }
   }
 }

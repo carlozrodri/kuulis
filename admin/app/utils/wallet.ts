@@ -169,7 +169,12 @@ export function validateSchedule(effectiveMonth: string, tiers: TierForm[], curr
   const issues: ScheduleIssue[] = []
   if (!isMonth(effectiveMonth)) issues.push({ key: 'month' })
   else if (effectiveMonth <= current) issues.push({ key: 'monthTooEarly', params: { month: addMonths(current, 1) } })
+  return [...issues, ...validateTiers(tiers)]
+}
 
+/** The tier checks of validateSchedule on their own (also used by the simulator's proposed tiers). */
+export function validateTiers(tiers: TierForm[]): ScheduleIssue[] {
+  const issues: ScheduleIssue[] = []
   if (!tiers.length) issues.push({ key: 'noTiers' })
   if (tiers.length > TIERS_MAX) issues.push({ key: 'tooMany', params: { max: TIERS_MAX } })
   if (tiers.length && tiers[0]!.above !== 0) issues.push({ key: 'firstAbove' })

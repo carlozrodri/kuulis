@@ -712,7 +712,12 @@
     "cancel_reason_invalid": "That reason doesn't apply to this ride. Pick another one.",
     "mock_location": "Turn off the simulated location to receive rides",
     "registration_blocked": "We can't create this account. Contact us if you think this is a mistake.",
-    "transfers_frozen": "Your transfers are paused while we review your account."
+    "transfers_frozen": "Your transfers are paused while we review your account.",
+    "receipt_not_found": "We couldn't find that receipt.",
+    "top_up_dispute_not_allowed": "This top-up can't be claimed anymore: it was already credited or is under review.",
+    "top_up_dispute_open": "There's already an open claim for this top-up. Follow it in the support conversation.",
+    "top_up_not_found": "We couldn't find that top-up.",
+    "amount_too_low": "The minimum top-up is {{min_amount}} USDT"
   },
   "map": {
     "recenter": "Recenter map"
@@ -1264,6 +1269,50 @@
         "bodySince": "Your {{amount}} fee was due on {{date}}. You can't go online or get rides until you pay it.",
         "topUp": "Top up at least {{amount}} USDT: the fee is charged automatically and you're unblocked right away."
       }
+    },
+    "receipt": {
+      "title": "Receipt",
+      "view": "View receipt",
+      "share": "Share receipt",
+      "number": "Receipt No. {{number}}",
+      "nonFiscal": "Non-fiscal receipt",
+      "nonFiscalBody": "This receipt is a simple proof of payment from Kuulis and is not valid for tax purposes.",
+      "shareTitle": "{{issuer}} · Receipt No. {{number}}",
+      "concept": "Concept",
+      "amount": "Amount",
+      "balanceAfter": "Balance after",
+      "date": "Date",
+      "reference": "Reference",
+      "driver": "Driver"
+    },
+    "statement": {
+      "title": "Account statement",
+      "subtitle": "What you earned, your fee and how your balance moved in the month.",
+      "entryBody": "Your summary for each month",
+      "pickMonth": "Choose month",
+      "earned": "Earned",
+      "counted": "Counts for the fee",
+      "trips": "Completed trips",
+      "countedNote": "Trips during your free months don't count for the fee.",
+      "fee": "{{month}} fee",
+      "estimated": "Estimate",
+      "originalFee": "Was {{fee}}: Kuulis lowered your fee",
+      "tier": "Earnings tier above {{from}}",
+      "noTier": "No tier: no earnings counted for the fee.",
+      "estimateNote": "The month is still open: the fee is an estimate. It's charged on {{date}}.",
+      "movements": "Movements this month",
+      "opening": "Opening balance",
+      "closing": "Closing balance",
+      "noMovements": "No movements this month",
+      "emailNote": "We also email you this statement on the 1st of every month.",
+      "kind": {
+        "top_ups": "Top-ups",
+        "promo_credits": "Promotion refunds",
+        "transfers_in": "Transfers received",
+        "transfers_out": "Transfers sent",
+        "fees": "Fees paid",
+        "adjustments": "Kuulis adjustments"
+      }
     }
   },
   "topUp": {
@@ -1343,6 +1392,34 @@
       "bodyManual": "An admin will confirm your payment and we'll notify you when it's in your balance.",
       "done": "Back to wallet",
       "history": "See my top-ups"
+    },
+    "binanceDown": {
+      "title": "Automatic confirmation is having trouble",
+      "body": "We can't confirm top-ups automatically right now. A person from the team will confirm your payment: tell us with \"I've paid\" and the order ID."
+    },
+    "dispute": {
+      "title": "My top-up didn't arrive",
+      "subtitle": "Send us the Binance proof and we'll check your payment.",
+      "entry": "Didn't your top-up arrive?",
+      "entryBody": "Send us the proof and we'll check it",
+      "rowAction": "It didn't arrive",
+      "claimed": "Claim sent",
+      "openHint": "Opens the conversation with support",
+      "transactionId": "Binance transaction ID",
+      "transactionIdHint": "You'll find it in the payment details, in your Binance Pay history.",
+      "transactionIdInvalid": "Enter the transaction ID (at least 4 characters)",
+      "screenshot": "Payment screenshot (required, up to {{max}})",
+      "screenshotHint": "A screenshot of the payment details in Binance showing the amount and the ID.",
+      "screenshotRequired": "Attach at least one screenshot of the payment",
+      "note": "Note (optional)",
+      "notePlaceholder": "Anything else we should know",
+      "submit": "Send claim",
+      "openTitle": "You already sent a claim",
+      "sent": {
+        "title": "Claim sent",
+        "body": "The team will check your payment and answer you in the support conversation (Help → My reports). We'll let you know when it's in your balance.",
+        "open": "View the conversation"
+      }
     }
   },
   "transfer": {
@@ -1461,6 +1538,10 @@
       "other": {
         "title": "Something else",
         "body": "Anything else we should know"
+      },
+      "payment": {
+        "title": "Payments and top-ups",
+        "body": "A top-up that didn't arrive or a charge in your wallet"
       }
     },
     "placeholder": {
@@ -1472,7 +1553,8 @@
       "no_show": "How long did you wait? Could you reach them through the chat?",
       "lost_item": "What was left behind and what does it look like? If it was on a ride, we'll help you reach the other person.",
       "app_issue": "What were you doing and what happened? If you saw an error message, paste it here.",
-      "other": "Tell us what happened."
+      "other": "Tell us what happened.",
+      "payment": "How much did you send, when, and what's the Binance transaction ID?"
     },
     "urgent": {
       "title": "We treat this as urgent",

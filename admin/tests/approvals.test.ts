@@ -12,6 +12,7 @@ describe('approvals', () => {
     expect(approvalLink({ action: 'wallet.adjust', entity_id: 'abc' })).toBe('/wallets/abc')
     expect(approvalLink({ action: 'config.update', entity_id: null })).toBe('/settings')
     expect(approvalLink({ action: 'campaign.send', entity_id: 'c1' })).toBe('/campaigns/c1')
+    expect(approvalLink({ action: 'charge.waive', entity_id: 'ch1' })).toBe('/subscriptions')
     expect(approvalLink({ action: 'notification.broadcast', entity_id: null })).toBeNull()
   })
 })

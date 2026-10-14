@@ -712,7 +712,12 @@
     "cancel_reason_invalid": "Ese motivo no aplica para este viaje. Elige otro.",
     "mock_location": "Desactiva la ubicación simulada para recibir viajes",
     "registration_blocked": "No podemos crear esta cuenta. Escríbenos si crees que es un error.",
-    "transfers_frozen": "Tus transferencias están en pausa mientras revisamos tu cuenta."
+    "transfers_frozen": "Tus transferencias están en pausa mientras revisamos tu cuenta.",
+    "receipt_not_found": "No encontramos ese recibo.",
+    "top_up_dispute_not_allowed": "Esta recarga ya no se puede reclamar: ya fue acreditada o está en revisión.",
+    "top_up_dispute_open": "Ya hay un reclamo abierto por esta recarga. Síguelo en la conversación con soporte.",
+    "top_up_not_found": "No encontramos esa recarga.",
+    "amount_too_low": "La recarga mínima es {{min_amount}} USDT"
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -1264,6 +1269,50 @@
         "bodySince": "Tu cuota de {{amount}} venció el {{date}}. Hasta que la pagues no puedes conectarte ni recibir viajes.",
         "topUp": "Recarga al menos {{amount}} USDT: la cuota se cobra sola y te desbloqueamos al instante."
       }
+    },
+    "receipt": {
+      "title": "Recibo",
+      "view": "Ver recibo",
+      "share": "Compartir recibo",
+      "number": "Recibo N.º {{number}}",
+      "nonFiscal": "Recibo no fiscal",
+      "nonFiscalBody": "Este recibo es un comprobante simple de Kuulis y no tiene validez fiscal.",
+      "shareTitle": "{{issuer}} · Recibo N.º {{number}}",
+      "concept": "Concepto",
+      "amount": "Monto",
+      "balanceAfter": "Saldo después",
+      "date": "Fecha",
+      "reference": "Referencia",
+      "driver": "Motorizado"
+    },
+    "statement": {
+      "title": "Estado de cuenta",
+      "subtitle": "Lo que ganaste, tu cuota y el movimiento de tu saldo en el mes.",
+      "entryBody": "Tu resumen de cada mes",
+      "pickMonth": "Elegir mes",
+      "earned": "Ganado",
+      "counted": "Cuenta para la cuota",
+      "trips": "Viajes completados",
+      "countedNote": "Los viajes dentro de tus meses gratis no cuentan para la cuota.",
+      "fee": "Cuota de {{month}}",
+      "estimated": "Estimada",
+      "originalFee": "Antes {{fee}}: Kuulis bajó tu cuota",
+      "tier": "Tramo de ganancias de más de {{from}}",
+      "noTier": "Sin tramo: no hubo ganancias que cuenten para la cuota.",
+      "estimateNote": "El mes sigue abierto: la cuota es una estimación. Se cobra el {{date}}.",
+      "movements": "Movimientos del mes",
+      "opening": "Saldo al inicio",
+      "closing": "Saldo al cierre",
+      "noMovements": "Sin movimientos este mes",
+      "emailNote": "También te enviamos este estado de cuenta por correo el día 1 de cada mes.",
+      "kind": {
+        "top_ups": "Recargas",
+        "promo_credits": "Reintegros por promociones",
+        "transfers_in": "Transferencias recibidas",
+        "transfers_out": "Transferencias enviadas",
+        "fees": "Cuotas pagadas",
+        "adjustments": "Ajustes de Kuulis"
+      }
     }
   },
   "topUp": {
@@ -1343,6 +1392,34 @@
       "bodyManual": "Un administrador confirmará tu pago y te avisaremos por notificación cuando esté en tu saldo.",
       "done": "Volver a la billetera",
       "history": "Ver mis recargas"
+    },
+    "binanceDown": {
+      "title": "Confirmación automática con problemas",
+      "body": "Ahora mismo no podemos confirmar las recargas de forma automática. Una persona del equipo confirmará tu pago: avísanos con \"Ya pagué\" y el ID de la orden."
+    },
+    "dispute": {
+      "title": "No me llegó mi recarga",
+      "subtitle": "Envíanos el comprobante de Binance y revisamos tu pago.",
+      "entry": "¿No te llegó tu recarga?",
+      "entryBody": "Envíanos el comprobante y lo revisamos",
+      "rowAction": "No me llegó",
+      "claimed": "Reclamo enviado",
+      "openHint": "Abre la conversación con soporte",
+      "transactionId": "ID de la transacción de Binance",
+      "transactionIdHint": "Lo ves en el detalle del pago, en el historial de Binance Pay.",
+      "transactionIdInvalid": "Escribe el ID de la transacción (al menos 4 caracteres)",
+      "screenshot": "Captura del pago (obligatoria, hasta {{max}})",
+      "screenshotHint": "Una captura del detalle del pago en Binance, donde se vean el monto y el ID.",
+      "screenshotRequired": "Adjunta al menos una captura del pago",
+      "note": "Nota (opcional)",
+      "notePlaceholder": "Algo más que debamos saber",
+      "submit": "Enviar reclamo",
+      "openTitle": "Ya enviaste un reclamo",
+      "sent": {
+        "title": "Reclamo enviado",
+        "body": "El equipo revisará tu pago y te responderá en la conversación de soporte (Ayuda → Mis reportes). Te avisamos cuando esté en tu saldo.",
+        "open": "Ver la conversación"
+      }
     }
   },
   "transfer": {
@@ -1461,6 +1538,10 @@
       "other": {
         "title": "Otro problema",
         "body": "Cualquier otra cosa que debamos saber"
+      },
+      "payment": {
+        "title": "Pagos y recargas",
+        "body": "Una recarga que no llegó o un cobro de tu billetera"
       }
     },
     "placeholder": {
@@ -1472,7 +1553,8 @@
       "no_show": "¿Cuánto tiempo esperaste? ¿Pudiste comunicarte por el chat?",
       "lost_item": "¿Qué se quedó y cómo es? Si es sobre un viaje, te ayudamos a contactar a la otra persona.",
       "app_issue": "¿Qué estabas haciendo y qué pasó? Si viste un mensaje de error, cópialo aquí.",
-      "other": "Cuéntanos qué pasó."
+      "other": "Cuéntanos qué pasó.",
+      "payment": "¿Cuánto enviaste, cuándo y cuál es el ID de la transacción de Binance?"
     },
     "urgent": {
       "title": "Lo tratamos como urgente",

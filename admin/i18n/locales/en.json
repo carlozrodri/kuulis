@@ -34,7 +34,8 @@
     "campaigns": "Campaigns",
     "emailTemplates": "Email templates",
     "quality": "Quality",
-    "risk": "Risk"
+    "risk": "Risk",
+    "closings": "Closings"
   },
   "navGroups": {
     "operations": "Operations",
@@ -228,7 +229,8 @@
       },
       "finance": {
         "view": "View finance",
-        "export": "Export finance CSVs"
+        "export": "Export finance CSVs",
+        "close": "Close months, reconcile with Binance and check the ledger"
       },
       "dashboard": {
         "view": "Dashboard"
@@ -425,7 +427,16 @@
     "risk_hold_not_found": "We could not find that held payment",
     "risk_hold_not_held": "That payment was already released or voided",
     "blocked_identifier_not_found": "We could not find that banned identifier",
-    "cannot_ban_staff": "Team accounts cannot be banned"
+    "cannot_ban_staff": "Team accounts cannot be banned",
+    "month_open": "That month has not ended yet: only past months can be closed.",
+    "month_already_closed": "That month is already closed.",
+    "closing_out_of_order": "Months must be closed in order: there is already a later closing.",
+    "closing_not_found": "That month is not closed.",
+    "statement_invalid": "The file does not look like a Binance Pay history: the ID and amount columns were not found.",
+    "closing_reconciled": "That closing is already reconciled.",
+    "reconcile_note_required": "Upload the Binance statement first and, if there are differences, explain them in the note.",
+    "statement_not_found": "There is no stored file for that month.",
+    "fee_not_lower": "The new fee must be lower than the current one ({fee})."
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -672,7 +683,9 @@
       "fares": "Fares and subscription fee schedules",
       "faresHelp": "Fare or rounding changes in Settings and new fee schedules. Only another admin can approve them.",
       "broadcasts": "Mass notifications and campaigns",
-      "broadcastsHelp": "Notifications to everyone or a whole role, and sending campaigns. Single-user ones go out right away."
+      "broadcastsHelp": "Notifications to everyone or a whole role, and sending campaigns. Single-user ones go out right away.",
+      "waivers": "Waive or lower fees",
+      "waiversHelp": "Waiving a driver's fee or lowering it, also when it was already paid (the difference goes back to them)."
     },
     "app": {
       "title": "Contact and location in the app",
@@ -1355,12 +1368,20 @@
       "partial": "There are too many charges to count them all here: some totals are partial."
     },
     "waive": {
-      "button": "Waive",
-      "title": "Waive fee",
-      "help": "The fee is cleared and, if the driver was blocked, they are unblocked right away.",
+      "button": "Waive or lower",
+      "title": "Waive or lower fee",
+      "help": "0 waives the fee; a lower amount reduces it. If the driver was blocked, they are unblocked right away.",
       "reason": "Reason",
       "summary": "{name} · {month} · {fee}",
-      "done": "Fee waived"
+      "done": "Fee waived",
+      "helpPaid": "The fee is already paid: the difference goes back to the driver's wallet.",
+      "newFee": "New fee (USDT)",
+      "newFeeHelp": "0 waives it. It must be lower than the current fee ({fee}).",
+      "doneReduced": "Fee lowered to {fee}",
+      "errors": {
+        "fee": "Enter a valid amount of 0 or more.",
+        "notLower": "It must be lower than the current fee."
+      }
     },
     "run": {
       "button": "Charge month",
@@ -1417,6 +1438,34 @@
         "monthTaken": "A schedule is already planned for that month: choose another one."
       },
       "builtIn": "initial schedule (business-model.md)"
+    },
+    "originalFee": "Was: {fee}",
+    "simulator": {
+      "tab": "Simulator",
+      "title": "Tier simulator",
+      "help": "Works out the fees of an already billed month with the current tiers and with proposed ones. It changes nothing: to apply new tiers create a schedule under \"Tiers\".",
+      "month": "Month",
+      "proposed": "Proposed tiers",
+      "proposedHelp": "They start from the current tiers. Each row is \"earnings above\" → fee; the first starts at 0.",
+      "reset": "Back to the current ones",
+      "run": "Simulate",
+      "result": "Result for {month}",
+      "drivers": "Drivers with a fee",
+      "referralFree": "Free through referrals",
+      "billed": "Billed that month",
+      "currentTotal": "With the current tiers",
+      "proposedTotal": "With the proposed ones",
+      "difference": "Difference",
+      "matches": "The current tiers reproduce exactly what was billed.",
+      "noMatch": "The current tiers do not reproduce what was billed ({billed}): check adjustments, waivers or a tier change that month.",
+      "tier": "Earnings above",
+      "current": "Current",
+      "proposedCol": "Proposed",
+      "fee": "Fee",
+      "count": "Drivers",
+      "total": "Total",
+      "noTier": "—",
+      "loadError": "The current tiers could not be loaded."
     }
   },
   "charts": {
@@ -1556,6 +1605,7 @@
       "lost_item": "Lost item",
       "no_show": "No-show",
       "app_issue": "App issue",
+      "payment": "Payments and top-ups",
       "other": "Other"
     },
     "categoryHelp": {
@@ -1567,6 +1617,7 @@
       "lost_item": "item left behind",
       "no_show": "did not show up",
       "app_issue": "app malfunction",
+      "payment": "payments and top-ups",
       "other": "other reason"
     },
     "detailTitle": "Ticket · {category}",
@@ -1722,7 +1773,8 @@
       "rates": "Rates",
       "binance": "Binance Pay",
       "privacy_retention": "Data retention",
-      "driver_expirations": "Driver document expiry"
+      "driver_expirations": "Driver document expiry",
+      "finance": "Finance (closings and invariants)"
     },
     "dashboardAlert": "There are {count} open system alerts",
     "dashboardAlertHelp": "A service or background loop has problems.",
@@ -1737,6 +1789,18 @@
       "restore": "Restore check (weekly)",
       "restoreOk": "Passed",
       "restoreFailed": "Failed"
+    },
+    "ledger": {
+      "title": "Wallet ledger",
+      "help": "Daily check: every balance is the sum of its entries, nothing is negative and each Binance payment is credited only once.",
+      "never": "Not checked yet.",
+      "ok": "Balanced",
+      "issues": "Has problems",
+      "checkedAt": "Checked {time}",
+      "wallets": "{n} wallets",
+      "issueCount": "{n} problems found",
+      "firstIssue": "First problem: {issue}",
+      "open": "View closings"
     }
   },
   "totp": {
@@ -1988,7 +2052,7 @@
     "noToken": "The link is incomplete. Ask for a new invitation."
   },
   "approvals": {
-    "help": "High-impact changes waiting for a second person: large balance adjustments, fares and fee schedules, and mass notifications. Whoever asks for a change cannot approve it. Requests expire after 48 hours.",
+    "help": "High-impact changes waiting for a second person: large balance adjustments, fares and fee schedules, fee waivers and mass notifications. Whoever asks for a change cannot approve it. Requests expire after 48 hours.",
     "all": "All",
     "empty": "No requests.",
     "date": "Date",
@@ -2031,6 +2095,9 @@
       },
       "campaign": {
         "send": "Campaign send"
+      },
+      "charge": {
+        "waive": "Waive or lower a fee"
       }
     }
   },
@@ -2764,6 +2831,24 @@
       "sent": "Answer sent",
       "sentResolved": "Answer sent and ticket resolved",
       "hint": "{'{nombre}'} and {'{viaje}'} are replaced when sent. Ctrl + Enter sends."
+    },
+    "topUp": {
+      "title": "Disputed top-up",
+      "help": "The driver says they paid and the top-up did not arrive. Look for the payment in Binance Pay by its transaction ID.",
+      "transactionId": "Transaction ID (from the driver)",
+      "reference": "Reference",
+      "amount": "Amount",
+      "status": "Status",
+      "createdAt": "Created",
+      "payer": "Binance payer",
+      "rejection": "Rejection reason",
+      "confirm": "Credit",
+      "confirmTitle": "Credit disputed top-up",
+      "confirmHelp": "Check in Binance Pay that the payment arrived before crediting it.",
+      "find": "Find the payment in Top-ups",
+      "findHelp": "If the payment arrived as \"Unmatched\", assign it to this driver from Top-ups.",
+      "done": "Top-up credited",
+      "wallet": "View wallet"
     }
   },
   "canned": {
@@ -3359,6 +3444,129 @@
       "duplicates": "Identifiers repeated on other accounts",
       "holds": "Held payments",
       "blocked": "Banned identifiers"
+    }
+  },
+  "closings": {
+    "help": "Each closed month freezes its totals with a fingerprint chained to the previous closing. Then the month's Binance Pay history is uploaded to compare payment by payment, and the month is marked as reconciled.",
+    "empty": "No closed months yet.",
+    "month": "Month",
+    "feesCollected": "Fees collected",
+    "topUpsCredited": "Top-ups credited",
+    "closingBalance": "Closing balance",
+    "status": "Status",
+    "closedAt": "Closed",
+    "view": "View",
+    "statuses": {
+      "tampered": "Tampered",
+      "reconciled": "Reconciled",
+      "noStatement": "No statement",
+      "differences": "Differences",
+      "matched": "Matches Binance"
+    },
+    "tampered": "This closing's stored data no longer matches its fingerprint: someone changed it after closing. Check the audit log.",
+    "tamperedList": "Some closings were tampered with: their data no longer matches the stored fingerprint.",
+    "close": {
+      "button": "Close month",
+      "title": "Close a month",
+      "help": "Freezes the month's totals. They do not change afterwards even if a tier or an adjustment changes (new adjustments go to the next month).",
+      "month": "Month",
+      "none": "No months left to close: the latest closing is last month's.",
+      "preview": "What the closing will hold",
+      "confirm": "Check the totals: a closed month cannot be reopened.",
+      "submit": "Close {month}",
+      "done": "{month} closed"
+    },
+    "totals": {
+      "movements": "Month's movements",
+      "kind": "Kind",
+      "count": "Count",
+      "credits": "In",
+      "debits": "Out",
+      "topUps": "Top-ups",
+      "credited": "Credited",
+      "auto": "Automatic",
+      "manual": "Manual",
+      "unmatched": "Unmatched",
+      "countAmount": "{n} · {amount}",
+      "charges": "Fees billed in the month",
+      "feesCollected": "Fees collected",
+      "balances": "Wallet balances",
+      "opening": "Opening",
+      "closing": "Closing",
+      "net": "Change"
+    },
+    "detail": {
+      "title": "{month} closing",
+      "closedBy": "Closed by {by} on {at}",
+      "hash": "Fingerprint",
+      "previousHash": "Previous fingerprint",
+      "first": "first closing"
+    },
+    "statement": {
+      "title": "Binance Pay statement",
+      "help": "Download the month's Binance Pay history from Binance as CSV and upload it here. Each received payment is compared with Kuulis top-ups.",
+      "upload": "Upload CSV",
+      "replace": "Upload another CSV",
+      "download": "Download stored CSV",
+      "uploaded": "Uploaded on {at}",
+      "none": "Not uploaded yet.",
+      "done": "Statement compared",
+      "empty": "The file is empty.",
+      "tooLarge": "The file is too large.",
+      "statementRows": "Payments in Binance",
+      "kuulisRows": "Top-ups in Kuulis",
+      "matched": "Matched"
+    },
+    "differences": {
+      "none": "Everything matches: each Binance payment has its Kuulis top-up with the same amount.",
+      "missingInKuulis": "In Binance but not in Kuulis ({n})",
+      "missingInKuulisHelp": "Payments received that no top-up credited: look for them in Top-ups (usually \"Unmatched\" or pending).",
+      "missingInBinance": "In Kuulis but not in Binance ({n})",
+      "missingInBinanceHelp": "Credited or unmatched top-ups missing from the history: check the manual confirmations.",
+      "amountMismatch": "Different amounts ({n})",
+      "amountMismatchHelp": "The top-up is on both sides but with another amount.",
+      "id": "ID",
+      "amount": "Amount",
+      "kuulisAmount": "In Kuulis",
+      "binanceAmount": "In Binance",
+      "at": "Date",
+      "status": "Status",
+      "reasons": {
+        "not_found": "Not in the history",
+        "no_reference": "No ID or reference"
+      },
+      "find": "Find in Top-ups",
+      "limited": "Each list shows at most 500 rows."
+    },
+    "reconcile": {
+      "title": "Reconciliation",
+      "help": "Mark the month as reconciled when the statement matches or the differences are explained.",
+      "note": "Note",
+      "noteHelp": "Required when there are differences: explain what they are and what was done.",
+      "needsStatement": "Upload the Binance statement first.",
+      "submit": "Mark as reconciled",
+      "done": "{month} reconciled",
+      "by": "Reconciled by {by} on {at}"
+    },
+    "invariants": {
+      "title": "Ledger invariants",
+      "help": "Every day the panel checks that balances match their entries, that no balance is negative and that each Binance payment was credited only once.",
+      "never": "Not checked yet.",
+      "ok": "All balanced",
+      "failed": "{n} problems",
+      "checkedAt": "Checked {time} · {wallets} wallets",
+      "run": "Check now",
+      "ran": "Check finished",
+      "more": "and {n} more",
+      "user": "User",
+      "kinds": {
+        "balance_mismatch": "Balance is not the sum of its entries",
+        "last_entry_mismatch": "Balance does not match the last entry",
+        "negative_balance": "Negative balance",
+        "duplicate_top_up": "Binance payment credited more than once",
+        "top_up_without_entry": "Credited top-up without an entry",
+        "fee_without_entry": "Paid fee without a debit"
+      }
     }
   }
 }

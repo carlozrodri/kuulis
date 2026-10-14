@@ -16,6 +16,7 @@ from apps.geo.clients import http
 from apps.monitoring import alerts, stats
 from apps.monitoring.schemas import (
     BackupsHealth,
+    LedgerHealth,
     LoopHealth,
     Queues,
     RidesHealth,
@@ -59,11 +60,13 @@ def expected_loops() -> dict[str, int]:
         "notifications": 5 * 60,  # every 30 s (campaigns, receipts, daily cleanup)
         "quality": 5 * 60,  # beats every minute, recomputes every 10 min
         "risk": 5 * 60,  # beats every minute
+        "finance": 5 * 60,  # beats every minute, checks the ledger once a day
     }
     if settings.RATES_ENABLED:
         loops["rates"] = 10 * 60  # checks every minute which source is due
     if binance.enabled():
-        loops["binance"] = 10 * 60
+        # Beats only after a good pass: "down" (twice this) after 10 min failing (doc 17).
+        loops["binance"] = binance.FAILING_AFTER_SECONDS // 2
     if settings.backups_configured:
         loops["backups"] = 10 * 60  # checks every minute what is due
     return loops
@@ -214,6 +217,25 @@ def disk_used_percent() -> float | None:
     return round(usage.used / usage.total * 100, 1)
 
 
+async def ledger() -> LedgerHealth | None:
+    from apps.finance import services as finance
+
+    try:
+        last = await finance.last_invariants()
+    except Exception:
+        return None
+    if not last:
+        return None
+    issues = last.get("issues") or []
+    return LedgerHealth(
+        ok=last["ok"],
+        checked_at=last["checked_at"],
+        wallets=last.get("wallets", 0),
+        issues=len(issues),
+        first_issue=issues[0] if issues else None,
+    )
+
+
 async def collect(session: AsyncSession) -> SystemHealth:
     current = await rates.current_rates(session)
     return SystemHealth(
@@ -229,6 +251,7 @@ async def collect(session: AsyncSession) -> SystemHealth:
         disk_used_percent=disk_used_percent(),
         backups=await backups(),
         alerts=await alerts.open_alerts(),
+        ledger=await ledger(),
     )
 
 
@@ -263,6 +286,15 @@ def problems(health: SystemHealth) -> list[Problem]:
         )
     else:
         for loop in late:
+            if loop.name == "binance":
+                found.append(
+                    Problem(
+                        "loop:binance",
+                        "La conciliación de Binance Pay falla desde hace más de 10 min: las "
+                        "recargas pasan a confirmación manual",
+                    )
+                )
+                continue
             found.append(Problem(f"loop:{loop.name}", f"El proceso de fondo '{loop.name}' no late"))
 
     traffic = health.traffic
@@ -300,6 +332,16 @@ def problems(health: SystemHealth) -> list[Problem]:
             found.append(Problem("backup:restore", "Falló la prueba de restauración del backup"))
         for job, error in backup.errors.items():
             found.append(Problem(f"backup:{job}", f"Falla el backup '{job}': {error[:120]}"))
+
+    if health.ledger is not None and not health.ledger.ok:
+        first = health.ledger.first_issue or {}
+        found.append(
+            Problem(
+                "ledger:invariants",
+                f"Descuadre en las billeteras: {health.ledger.issues} problema(s), el primero "
+                f"'{first.get('kind', '?')}'. Revisa Finanzas → Cierres",
+            )
+        )
 
     rides = health.rides
     if (

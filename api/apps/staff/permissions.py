@@ -16,7 +16,7 @@ PERMISSIONS: dict[str, tuple[str, ...]] = {
     "notifications": ("notifications.send",),
     "wallet": ("wallet.view", "top_ups.view", "top_ups.manage", "transfers.view", "wallet.adjust"),
     "subscriptions": ("subscriptions.view", "subscriptions.manage"),
-    "finance": ("finance.view", "finance.export"),
+    "finance": ("finance.view", "finance.export", "finance.close"),
     "system": ("dashboard.view", "system.view", "config.view"),
     "releases": ("releases.view", "releases.manage"),
     "app_control": (
@@ -68,6 +68,7 @@ DEFAULT_ROLES: dict[str, tuple[str, tuple[str, ...]]] = {
             "subscriptions.manage",
             "finance.view",
             "finance.export",
+            "finance.close",
             "rates.view",
         ),
     ),

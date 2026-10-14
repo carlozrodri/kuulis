@@ -14,6 +14,7 @@ import {
   ShieldAlert,
   Siren,
   UserX,
+  Wallet,
 } from "@/components/icons";
 import {
   Button,
@@ -42,6 +43,7 @@ export const CATEGORY_ICONS: Record<ReportCategory, Icon> = {
   no_show: UserX,
   lost_item: Backpack,
   app_issue: Bug,
+  payment: Wallet,
   other: CircleEllipsis,
 };
 

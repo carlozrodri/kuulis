@@ -93,6 +93,11 @@ construir. Las preguntas de cada documento están en su sección final.
   créditos de promoción y transferencias retenidas hasta revisión (la primera transferencia espera 24 h),
   vetados que no pueden volver a registrarse y calificaciones entre parejas sospechosas fuera del promedio.
   Página Riesgo en el admin.
+- **17** hecho (2026-10-14): recibos no fiscales con número correlativo, estado de cuenta mensual en la app y por
+  correo, cierres mensuales con hash encadenado y conciliación con el CSV de Binance Pay, invariantes diarios
+  del libro con alerta, disputas de recarga en Soporte, paso automático a confirmación manual si Binance falla,
+  exonerar o bajar cuotas con doble aprobación y simulador de tramos. Pendiente: la recarga real de prueba
+  (necesita la cuenta de Carlos) y el [plan de Binance Merchant](binance-merchant.md) cuando exista empresa.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

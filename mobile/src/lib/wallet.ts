@@ -3,9 +3,17 @@
  * amount inputs, transfer limits and recipient lookups. No React and no network, so it can be unit tested.
  * The API validates everything again.
  */
+import { ApiError } from "./api";
 import { normalizePhone } from "./driver";
 import { parseAmount } from "./money";
-import type { Charge, FeeTier, SubscriptionSummary, WalletEntry } from "./types";
+import type {
+  Charge,
+  FeeTier,
+  Receipt,
+  SubscriptionSummary,
+  TopUp,
+  WalletEntry,
+} from "./types";
 import { isEmail } from "./validation";
 
 type Amount = string | number | null | undefined;
@@ -293,3 +301,95 @@ export function transferTag(entry: EntryFlags): "held" | "returned" | null {
 /** Money of a held transfer that went back to its sender (a `transfer_in` with `returned`). */
 export const isReturnedTransfer = (entry: EntryFlags) =>
   entry.kind === "transfer_in" && flag(entry, "returned");
+
+// ── Doc 17: receipts, statements and "No me llegó mi recarga" ──
+
+/** A fee Kuulis lowered: the original fee when it is above the current one, else null. */
+export function reducedFrom(
+  charge: Pick<Charge, "fee" | "original_fee"> | null | undefined,
+): number | null {
+  const original = toCents(charge?.original_fee);
+  const fee = toCents(charge?.fee);
+  return original !== null && fee !== null && original > fee
+    ? fromCents(original)
+    : null;
+}
+
+/** Only pending or rejected top-ups can be claimed, and only once while the claim is open. */
+export const canDisputeTopUp = (
+  topUp: Pick<TopUp, "status" | "dispute_report_id"> | null | undefined,
+) =>
+  !!topUp &&
+  (topUp.status === "pending" || topUp.status === "rejected") &&
+  !topUp.dispute_report_id;
+
+export const TRANSACTION_ID_MIN = 4;
+export const TRANSACTION_ID_MAX = 64;
+export const DISPUTE_NOTE_MAX = 500;
+export const DISPUTE_MAX_PHOTOS = 3;
+
+/** The API drops every space of a Binance transaction id; so do we, keeping at most 64 characters. */
+export function normalizeTransactionId(value: string): string {
+  return value.replace(/\s+/g, "").slice(0, TRANSACTION_ID_MAX);
+}
+
+export const isValidTransactionId = (value: string) =>
+  normalizeTransactionId(value).length >= TRANSACTION_ID_MIN;
+
+export type DisputeError =
+  /** Already claimed: the open ticket, when the API names it. */
+  | { kind: "open"; reportId: string | null }
+  /** The top-up was credited (or is being reviewed) meanwhile. */
+  | { kind: "not_allowed" }
+  | { kind: "not_found" }
+  | { kind: "attachment" }
+  | { kind: "other" };
+
+/** What a failed claim means for the form (409 top_up_dispute_open / _not_allowed, 404, 400 attachment). */
+export function disputeError(error: unknown): DisputeError {
+  if (!(error instanceof ApiError)) return { kind: "other" };
+  switch (error.code) {
+    case "top_up_dispute_open": {
+      const details = error.details as { report_id?: unknown } | null;
+      const id = details?.report_id;
+      return { kind: "open", reportId: typeof id === "string" && id ? id : null };
+    }
+    case "top_up_dispute_not_allowed":
+      return { kind: "not_allowed" };
+    case "top_up_not_found":
+      return { kind: "not_found" };
+    case "attachment_invalid":
+      return { kind: "attachment" };
+    default:
+      return { kind: "other" };
+  }
+}
+
+/**
+ * The receipt as plain text for the share sheet. `t` gives the labels (wallet.receipt.*) and `date` formats
+ * the issue date, so this stays free of React.
+ */
+export function receiptShareText(
+  receipt: Receipt,
+  t: (key: string, values?: Record<string, unknown>) => string,
+  date: (iso: string) => string,
+): string {
+  const money = (value: string) => `${(parseAmount(value) ?? 0).toFixed(2)} USDT`;
+  const lines = [
+    t("wallet.receipt.shareTitle", {
+      issuer: receipt.issuer || "Kuulis",
+      number: receipt.number,
+    }),
+    receipt.fiscal ? null : t("wallet.receipt.nonFiscal"),
+    "",
+    `${t("wallet.receipt.concept")}: ${receipt.concept}`,
+    `${t("wallet.receipt.amount")}: ${money(receipt.amount)}`,
+    `${t("wallet.receipt.balanceAfter")}: ${money(receipt.balance_after)}`,
+    `${t("wallet.receipt.date")}: ${date(receipt.issued_at)}`,
+    receipt.reference
+      ? `${t("wallet.receipt.reference")}: ${receipt.reference}`
+      : null,
+    `${t("wallet.receipt.driver")}: ${receipt.driver.name}`,
+  ];
+  return lines.filter((line): line is string => line !== null).join("\n");
+}

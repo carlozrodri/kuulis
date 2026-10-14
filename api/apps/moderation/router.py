@@ -334,6 +334,10 @@ async def _detail(session: DBSession, report: Report) -> ReportAdminDetail:
         await session.get(HelpArticle, report.help_article_id) if report.help_article_id else None
     )
     lost = await support.lost_item_for_ride(session, report.ride_id) if report.ride_id else None
+    from apps.wallet import services as wallet
+    from apps.wallet.router import _top_up_admin
+
+    top_up = await wallet.top_up_for_report(session, report.id)
     suspensions = await services.suspension_reads(
         session, [u for u in (report.reporter_id, report.reported_user_id) if u]
     )
@@ -363,6 +367,13 @@ async def _detail(session: DBSession, report: Report) -> ReportAdminDetail:
             else None
         ),
         lost_item=(support.lost_item_read(lost) if lost and lost.report_id == report.id else None),
+        top_up=(
+            _top_up_admin(
+                top_up, users.get(top_up.user_id) or await session.get(User, top_up.user_id)
+            )
+            if top_up
+            else None
+        ),
         reported_summary=await _summary(
             session,
             users.get(report.reported_user_id),

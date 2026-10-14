@@ -634,6 +634,8 @@ export interface WalletEntry {
    */
   details?: Record<string, unknown> | null;
   created_at: string;
+  /** Doc 17: top-ups and paid fees have a receipt ("Ver recibo"); older servers do not send it. */
+  receipt_id?: string | null;
 }
 
 // ── Phase 1D: top-ups, transfers and the monthly subscription (docs/api/phase-1d.md) ──
@@ -647,6 +649,11 @@ export interface TopUpInfo {
   min_amount: string;
   /** True when payments are matched automatically by the payer's Binance Pay ID. */
   automatic: boolean;
+  /**
+   * Doc 17: why top-ups are confirmed by hand right now although matching is configured ("binance_down":
+   * reconciliation with Binance has been failing). `automatic` is false then.
+   */
+  manual_reason?: "binance_down" | null;
 }
 
 export type TopUpStatus = "pending" | "completed" | "rejected" | "unmatched";
@@ -665,6 +672,22 @@ export interface TopUp {
   created_at: string;
   completed_at: string | null;
   rejection_reason: string | null;
+  /** Doc 17: the support ticket of "No me llegó mi recarga", once claimed. */
+  dispute_report_id?: string | null;
+}
+
+/** POST /wallet/me/top-ups/{id}/dispute (doc 17). */
+export interface TopUpDisputeInput {
+  /** Binance transaction id, 4–64 characters. */
+  transaction_id: string;
+  /** Uploaded screenshot keys (folder "uploads"), 1–3. */
+  attachments: string[];
+  note?: string;
+}
+
+/** `details` of a 409 top_up_dispute_open. */
+export interface TopUpDisputeOpenDetails {
+  report_id: string;
 }
 
 /** GET /wallet/recipients?q=: a driver who can receive a transfer (short name such as "Luis G."). */
@@ -697,6 +720,8 @@ export interface Charge {
   due_at: string | null;
   paid_at: string | null;
   waived_reason: string | null;
+  /** Doc 17: the fee before Kuulis lowered it; null when it was not reduced. */
+  original_fee?: string | null;
 }
 
 /** GET /wallet/me/subscription: the current month (Caracas time). */
@@ -718,6 +743,58 @@ export interface SubscriptionSummary {
   blocked: boolean;
   /** Completed trips this month. */
   trips?: number | null;
+}
+
+// ── Doc 17: receipts and monthly statements ──
+
+export type ReceiptKind = "top_up" | "subscription_fee";
+
+/** GET /wallet/me/receipts/{id}: a simple receipt, not a fiscal invoice (`fiscal` is false). */
+export interface Receipt {
+  id: string;
+  /** "000123". */
+  number: string;
+  kind: ReceiptKind | (string & {});
+  concept: string;
+  amount: string;
+  balance_after: string;
+  reference: string | null;
+  issued_at: string;
+  entry_id: string;
+  driver: { id: string; name: string; email: string };
+  issuer: string;
+  fiscal: boolean;
+}
+
+/** Money moved in a month, by kind; all positive except `adjustments` (signed). */
+export interface StatementMovements {
+  top_ups: string;
+  promo_credits: string;
+  transfers_in: string;
+  transfers_out: string;
+  fees: string;
+  adjustments: string;
+}
+
+/** GET /wallet/me/statements?month=YYYY-MM ("Estado de cuenta"). */
+export interface Statement {
+  month: string;
+  /** Months with a statement, newest first (the month picker). */
+  months: string[];
+  opening_balance: string;
+  closing_balance: string;
+  /** Everything earned (fare minus promo discount). */
+  earned: string;
+  /** What counts for the fee (rides inside the free period are excluded). */
+  counted: string;
+  trips: number;
+  tier: FeeTier | null;
+  fee: string;
+  /** The month is still open: the fee is an estimate. */
+  estimated: boolean;
+  /** The month's fee charge (billed on the 1st of the next month). */
+  charge: Charge | null;
+  movements: StatementMovements;
 }
 
 // ── Phase 1E: reports and account suspensions (docs/api/phase-1e.md) ──
@@ -752,6 +829,7 @@ export type ReportCategory =
   | "lost_item"
   | "no_show"
   | "app_issue"
+  | "payment"
   | "other";
 
 export type ReportStatus = "open" | "in_review" | "resolved" | "dismissed";

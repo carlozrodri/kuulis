@@ -12,6 +12,8 @@ from apps.drivers.router import admin_router as drivers_admin_router
 from apps.drivers.router import checks_admin_router as drivers_checks_admin_router
 from apps.drivers.router import router as drivers_router
 from apps.files.router import router as files_router
+from apps.finance.router import admin_router as finance_admin_router
+from apps.finance.router import router as finance_router
 from apps.geo.router import router as geo_router
 from apps.health.client_errors import router as client_errors_router
 from apps.health.router import router as health_router
@@ -81,8 +83,10 @@ api_v1.include_router(drivers_admin_router)
 api_v1.include_router(geo_router)
 api_v1.include_router(rides_admin_router)
 api_v1.include_router(promotions_admin_router)
+api_v1.include_router(finance_router)
 api_v1.include_router(wallet_router)
 api_v1.include_router(wallet_admin_router)
+api_v1.include_router(finance_admin_router)
 api_v1.include_router(subscriptions_router)
 api_v1.include_router(subscriptions_admin_router)
 api_v1.include_router(moderation_router)

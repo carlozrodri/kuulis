@@ -122,6 +122,7 @@ describe('hrefForNotification: account and money', () => {
     expect(hrefForNotification({ type: 'subscription', event: 'fee_due_soon' }, driver)).toEqual(route('/wallet', 'driver'));
     expect(hrefForNotification({ type: 'subscription', event: 'fee_paid' }, driver)).toEqual(route('/wallet/charges', 'driver'));
     expect(hrefForNotification({ type: 'subscription', event: 'fee_waived' }, driver)).toEqual(route('/wallet/charges', 'driver'));
+    expect(hrefForNotification({ type: 'subscription', event: 'fee_reduced' }, driver)).toEqual(route('/wallet/charges', 'driver'));
   });
 
   it('routes referral, account and driver application pushes', () => {

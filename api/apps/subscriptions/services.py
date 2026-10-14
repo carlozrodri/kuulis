@@ -25,9 +25,9 @@ from apps.rides.models import Ride, RideStatus
 from apps.subscriptions.models import Charge, ChargeStatus, FeeSchedule
 from apps.subscriptions.schemas import ChargeRead, Tier
 from apps.users.models import User
-from apps.wallet import notify
+from apps.wallet import notify, receipts
 from apps.wallet import services as wallet
-from apps.wallet.models import EntryKind
+from apps.wallet.models import EntryKind, ReceiptKind
 from kuulis.core.calendar import (
     add_months,
     add_months_dt,
@@ -233,6 +233,9 @@ async def _pay(session: AsyncSession, charge: Charge) -> bool:
     charge.status = ChargeStatus.PAID
     charge.paid_at = utcnow()
     charge.entry_id = entry.id
+    await receipts.issue(
+        session, entry, charge.user_id, ReceiptKind.SUBSCRIPTION_FEE, month=charge.month
+    )
     return True
 
 
@@ -329,6 +332,7 @@ async def charge_month(session: AsyncSession, month: date) -> RunResult:
 
 
 async def _notify(session: AsyncSession, charge: Charge, event: str) -> None:
+    extra = await receipts.email_values(session, charge.entry_id) if event == "fee_paid" else {}
     await notify.send(
         session,
         charge.user_id,
@@ -339,6 +343,7 @@ async def _notify(session: AsyncSession, charge: Charge, event: str) -> None:
             "due": notify.date_label(charge.due_at, locale),
         },
         fee=f"{charge.fee:.2f}",
+        **extra,
     )
 
 
@@ -361,17 +366,128 @@ async def collect_pending(session: AsyncSession, user_id: uuid.UUID) -> list[Cha
     return paid
 
 
-async def waive(session: AsyncSession, admin: User, charge_id: uuid.UUID, reason: str) -> Charge:
+class FeeNotLowerError(AppError):
+    code = "fee_not_lower"
+    message = "The new fee must be lower than the current one"
+
+
+async def check_waivable(session: AsyncSession, charge_id: uuid.UUID, fee: Decimal) -> Charge:
+    charge = await session.get(Charge, charge_id)
+    if charge is None:
+        raise ChargeNotFoundError()
+    if charge.status not in (ChargeStatus.PENDING, ChargeStatus.PAID):
+        raise ChargeNotPendingError(details={"status": charge.status.value})
+    if fee >= charge.fee:
+        raise FeeNotLowerError(details={"fee": f"{charge.fee:.2f}"})
+    return charge
+
+
+async def waive(
+    session: AsyncSession,
+    admin: User,
+    charge_id: uuid.UUID,
+    reason: str,
+    fee: Decimal = ZERO,
+) -> Charge:
+    """Waives a fee (``fee`` 0) or lowers it (doc 17: social cases, mistakes). A pending charge
+    owes less (and is collected if the wallet now covers it); a paid one gets the difference back
+    in the wallet as an adjustment. The original fee is kept in ``original_fee``."""
     charge = await session.scalar(select(Charge).where(Charge.id == charge_id).with_for_update())
     if charge is None:
         raise ChargeNotFoundError()
-    if charge.status != ChargeStatus.PENDING:
-        raise ChargeNotPendingError(details={"status": charge.status.value})
-    charge.status = ChargeStatus.WAIVED
+    await check_waivable(session, charge_id, fee)
+    was_paid = charge.status == ChargeStatus.PAID
+    refund = charge.fee - fee
+    charge.original_fee = charge.original_fee if charge.original_fee is not None else charge.fee
+    charge.fee = fee
     charge.waived_reason = reason
     charge.waived_by_id = admin.id
-    await _notify(session, charge, "fee_waived")
+    if fee == 0:
+        charge.status = ChargeStatus.WAIVED
+    if was_paid:
+        await wallet.credit(
+            session,
+            charge.user_id,
+            EntryKind.ADJUSTMENT,
+            refund,
+            created_by_id=admin.id,
+            details={
+                "reason": reason,
+                "charge_id": str(charge.id),
+                "month": format_month(charge.month),
+                "fee_refund": True,
+            },
+        )
+    elif fee > 0:
+        await _pay(session, charge)
+    await _notify(session, charge, "fee_waived" if fee == 0 else "fee_reduced")
     return charge
+
+
+# --- Simulator (doc 17) -------------------------------------------------------------------------
+
+
+@dataclass
+class TierCount:
+    tier: Tier
+    drivers: int = 0
+    total: Decimal = ZERO
+
+
+@dataclass
+class Simulation:
+    month: date
+    drivers: int  # charges of the month, free referral months excluded
+    referral_free: int
+    billed: Decimal  # what the month's charges billed (before any waiver or reduction)
+    current: list[TierCount]
+    current_total: Decimal
+    proposed: list[TierCount]
+    proposed_total: Decimal
+
+
+def _breakdown(tiers: Sequence[Tier], earnings: list[Decimal]) -> list[TierCount]:
+    ordered = sorted(tiers, key=lambda t: t.above)
+    counts = [TierCount(t) for t in ordered]
+    for value in earnings:
+        index = max((i for i, t in enumerate(ordered) if value > t.above), default=None)
+        if index is None:
+            continue
+        counts[index].drivers += 1
+        counts[index].total += ordered[index].fee
+    return counts
+
+
+async def simulate(
+    session: AsyncSession, month: date, proposed: Sequence[Tier] | None
+) -> Simulation:
+    """Fees of ``month`` with the tiers that applied and with ``proposed``, from the earnings
+    stored on that month's charges (the same numbers the 1st charged)."""
+    month = month_start(month)
+    schedule = await schedule_for(session, month)
+    rows = list(
+        await session.execute(
+            select(Charge.earnings, Charge.fee, Charge.original_fee, Charge.waived_reason).where(
+                Charge.month == month
+            )
+        )
+    )
+    counted = [r for r in rows if r.waived_reason != "referral"]
+    earnings_list = [r.earnings for r in counted]
+    current = _breakdown(schedule.tiers, earnings_list)
+    future = _breakdown(proposed or schedule.tiers, earnings_list)
+    return Simulation(
+        month=month,
+        drivers=len(counted),
+        referral_free=len(rows) - len(counted),
+        billed=sum(
+            ((r.original_fee if r.original_fee is not None else r.fee) for r in counted), ZERO
+        ),
+        current=current,
+        current_total=sum((c.total for c in current), ZERO),
+        proposed=future,
+        proposed_total=sum((c.total for c in future), ZERO),
+    )
 
 
 # --- Blocking ----------------------------------------------------------------------------------
@@ -441,6 +557,7 @@ def charge_read(charge: Charge) -> ChargeRead:
         paid_at=charge.paid_at,
         waived_reason=charge.waived_reason,
         overdue=charge.status == ChargeStatus.PENDING and charge.due_at <= utcnow(),
+        original_fee=charge.original_fee,
     )
 
 

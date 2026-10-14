@@ -41,6 +41,7 @@ export const NAV: NavEntry[] = [
   { key: 'supportMetrics', icon: 'i-lucide-chart-no-axes-column', to: '/support/metrics', permission: 'reports.manage', group: 'support' },
   { key: 'help', icon: 'i-lucide-book-open', to: '/help', permission: 'help.manage', group: 'support' },
   { key: 'finance', icon: 'i-lucide-chart-line', to: '/finance', permission: 'finance.view', group: 'money', shortLabel: 'navShort.finance' },
+  { key: 'closings', icon: 'i-lucide-book-lock', to: '/closings', permission: 'finance.view', group: 'money' },
   { key: 'topUps', icon: 'i-lucide-wallet', to: '/top-ups', permission: 'top_ups.view', group: 'money' },
   { key: 'transfers', icon: 'i-lucide-arrow-left-right', to: '/transfers', permission: 'transfers.view', group: 'money' },
   { key: 'subscriptions', icon: 'i-lucide-calendar-check', to: '/subscriptions', permission: 'subscriptions.view', group: 'money' },

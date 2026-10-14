@@ -34,6 +34,7 @@ export interface SettingsForm {
   approval_adjust_limit: number
   approval_fares: boolean
   approval_broadcasts: boolean
+  approval_waivers: boolean
   app_links: AppLinks
   location_intervals: LocationIntervals
   safety: SafetySettings
@@ -223,6 +224,7 @@ export function defaultSettings(): SettingsForm {
     approval_adjust_limit: 20,
     approval_fares: true,
     approval_broadcasts: true,
+    approval_waivers: true,
     app_links: { support_whatsapp: '', support_email: '', emergency_number: '911', terms_url: '', privacy_url: '' },
     location_intervals: { online_seconds: 10, on_ride_seconds: 4 },
     safety: {
@@ -362,6 +364,7 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
     approval_adjust_limit: num(config.approval_adjust_limit, d.approval_adjust_limit),
     approval_fares: config.approval_fares ?? d.approval_fares,
     approval_broadcasts: config.approval_broadcasts ?? d.approval_broadcasts,
+    approval_waivers: config.approval_waivers ?? d.approval_waivers,
     app_links: { ...d.app_links, ...config.app_links },
     location_intervals: {
       online_seconds: num(config.location_intervals?.online_seconds, d.location_intervals.online_seconds),
@@ -449,6 +452,7 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
     approval_adjust_limit: money(form.approval_adjust_limit),
     approval_fares: form.approval_fares,
     approval_broadcasts: form.approval_broadcasts,
+    approval_waivers: form.approval_waivers,
     app_links: {
       support_whatsapp: form.app_links.support_whatsapp.replace(/[\s-]+/g, ''),
       support_email: form.app_links.support_email.trim(),

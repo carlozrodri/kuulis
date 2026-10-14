@@ -19,8 +19,12 @@ from apps.subscriptions.schemas import (
     RunResultRead,
     ScheduleCreate,
     ScheduleRead,
+    SimulateRequest,
+    SimulationRead,
     SubscriptionSummary,
+    TierCountRead,
     UserBrief,
+    WaiveBody,
 )
 from apps.users.dependencies import (
     AdminUser,
@@ -29,8 +33,7 @@ from apps.users.dependencies import (
     DBSession,
 )
 from apps.users.models import User
-from apps.wallet.schemas import ReasonBody
-from kuulis.core.calendar import local_now, month_start, parse_month
+from kuulis.core.calendar import add_months, format_month, local_now, month_start, parse_month
 from kuulis.core.exceptions import AppError
 from kuulis.core.pagination import Page, PageParams, page_params
 
@@ -116,17 +119,67 @@ async def charges(
     "/charges/{charge_id}/waive",
     dependencies=[audit("charge.waive", "charge", "charge_id")],
     response_model=ChargeRead,
+    responses={202: {"model": ApprovalHeld, "description": "Waiting for a second approval"}},
 )
 async def waive(
     charge_id: uuid.UUID,
-    data: ReasonBody,
+    data: WaiveBody,
     admin: Can("subscriptions.manage", verified=True),
     session: DBSession,
-) -> ChargeRead:
-    charge = await services.waive(session, admin, charge_id, data.reason)
+) -> ChargeRead | JSONResponse:
+    """Waive (``fee`` 0) or lower a pending or paid fee. Needs a second person (doc 17)."""
+    if await approvals.required(session, "charge.waive"):
+        charge = await services.check_waivable(session, charge_id, data.fee)
+        target = await session.get(User, charge.user_id)
+        what = "Exonerar" if data.fee == 0 else f"Bajar a {data.fee:.2f} USD"
+        return await approvals.hold(
+            session,
+            admin,
+            "charge.waive",
+            entity_type="charge",
+            entity_id=charge_id,
+            summary=(
+                f"{what} la cuota de {format_month(charge.month)} ({charge.fee:.2f} USD) · "
+                f"{(target.full_name or target.email) if target else ''}"
+            ),
+            payload={"charge_id": str(charge_id), "fee": str(data.fee), "reason": data.reason},
+            reason=data.reason,
+        )
+    charge = await services.waive(session, admin, charge_id, data.reason, data.fee)
     await session.commit()
     await session.refresh(charge)
     return services.charge_read(charge)
+
+
+@admin_router.post(
+    "/simulate",
+    dependencies=[audit("subscription.simulate", "fee_schedule")],
+    response_model=SimulationRead,
+)
+async def simulate(
+    data: SimulateRequest, _: Can("subscriptions.view"), session: DBSession
+) -> SimulationRead:
+    month = data.month or add_months(month_start(local_now()), -1)
+    result = await services.simulate(session, month, data.tiers)
+
+    def counts(rows) -> list[TierCountRead]:
+        return [
+            TierCountRead(above=c.tier.above, fee=c.tier.fee, drivers=c.drivers, total=c.total)
+            for c in rows
+        ]
+
+    return SimulationRead(
+        month=result.month,
+        drivers=result.drivers,
+        referral_free=result.referral_free,
+        billed=result.billed,
+        matches=result.current_total == result.billed,
+        current=counts(result.current),
+        current_total=result.current_total,
+        proposed=counts(result.proposed),
+        proposed_total=result.proposed_total,
+        difference=result.proposed_total - result.current_total,
+    )
 
 
 @admin_router.post(
