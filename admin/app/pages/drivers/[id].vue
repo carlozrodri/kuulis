@@ -781,6 +781,12 @@ const checkIcon = (check: DriverCheck) => ({
           <ReportsList :user-id="driver.user_id" />
         </div>
 
+        <!-- Doc 15: cancellations and quality -->
+        <QualityCard
+          :user-id="driver.user_id"
+          role="driver"
+        />
+
         <!-- Phase 1D: wallet & subscription -->
         <DriverWalletCard
           :user-id="driver.user_id"

@@ -223,6 +223,8 @@ async function save() {
           :can-suspend="user.role === 'user'"
           @changed="refresh"
         />
+        <!-- Doc 15: cancellations and quality -->
+        <QualityCard :user-id="user.id" />
         <ReportsList :user-id="user.id" />
         <LegalAcceptancesCard
           v-if="user.role === 'user'"
