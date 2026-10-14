@@ -17,6 +17,7 @@ PERMISSIONS: dict[str, tuple[str, ...]] = {
     "wallet": ("wallet.view", "top_ups.view", "top_ups.manage", "transfers.view", "wallet.adjust"),
     "subscriptions": ("subscriptions.view", "subscriptions.manage"),
     "finance": ("finance.view", "finance.export", "finance.close"),
+    "analytics": ("analytics.view", "analytics.export"),
     "system": ("dashboard.view", "system.view", "config.view"),
     "releases": ("releases.view", "releases.manage"),
     "app_control": (

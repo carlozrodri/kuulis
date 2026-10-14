@@ -1,5 +1,5 @@
 import uuid
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Annotated
 
@@ -131,3 +131,106 @@ class Overview(BaseModel):
     overdue_drivers: int
     stale_rates: list[str]
     open_alerts: int = 0  # monitoring alerts not resolved yet (see /admin/system/health)
+
+
+# --- Product analytics (doc 19) ----------------------------------------------------------------
+
+
+class FunnelStep(BaseModel):
+    step: str
+    users: int
+
+
+class Funnels(BaseModel):
+    # Cohorts by the day they signed up / applied (precomputed daily).
+    passenger: list[FunnelStep]
+    driver: list[FunnelStep]
+    # Rides requested in the range: quotes seen in the app -> requests -> matched -> completed.
+    rides: list[FunnelStep]
+    # People who opened each screen of the driver application in the app.
+    onboarding_screens: list[FunnelStep]
+    computed_at: datetime | None
+
+
+class RetentionRow(BaseModel):
+    cohort: date
+    users: int
+    # "1", "2", "4", "8": people who rode again that week; None until the week is over.
+    weeks: dict[str, int | None]
+
+
+class RetentionTable(BaseModel):
+    rows: list[RetentionRow]
+    # Weighted % per week over the cohorts that can be measured.
+    average: dict[str, float | None]
+
+
+class Retention(BaseModel):
+    passenger: RetentionTable
+    driver: RetentionTable
+    computed_at: datetime | None
+
+
+class SupplyCell(BaseModel):
+    cell: str
+    lat: float
+    lng: float
+    requests: int
+    no_drivers: int
+    quotes: int
+    driver_hours: float
+
+
+class SupplyHourRow(BaseModel):
+    hour: int
+    requests: int
+    no_drivers: int
+    quotes: int
+    driver_hours: float
+
+
+class SupplyDemand(BaseModel):
+    cells: list[SupplyCell]
+    hours: list[SupplyHourRow]
+
+
+class PromotionRow(BaseModel):
+    id: uuid.UUID
+    name: str
+    code: str | None
+    rides: int
+    cost: Money
+    cost_per_ride: Money | None
+    # Passengers whose first completed ride used this promotion.
+    new_passengers: int
+    cost_per_new_passenger: Money | None
+    returned_30d: int
+    # New passengers whose first ride is at least 30 days old (the rest can still come back).
+    eligible_30d: int
+    retention_30d: float | None
+
+
+class ValueBucket(BaseModel):
+    min: float
+    max: float | None
+    count: int
+
+
+class TierDrivers(BaseModel):
+    above: Money
+    fee: Money
+    drivers: int
+
+
+class DriverEconomics(BaseModel):
+    month: date
+    drivers: int
+    total_earnings: Money
+    median_earnings: Money | None
+    earnings: list[ValueBucket]
+    tiers: list[TierDrivers]
+    online_drivers: int
+    online_hours: float
+    ride_hours: float
+    utilization: float | None
+    utilization_spread: list[ValueBucket]

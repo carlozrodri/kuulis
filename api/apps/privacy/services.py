@@ -42,7 +42,10 @@ from kuulis.core.rate_limit import client_ip
 
 logger = logging.getLogger(__name__)
 
-CONSENT_KINDS = ("background_location",)
+CONSENT_KINDS = ("background_location", "usage_data")
+# Answer in force while the user never chose: anonymous usage data is on until they opt out
+# (doc 19); everything else needs an explicit yes.
+CONSENT_DEFAULTS = {"usage_data": True}
 EXPORT_FOLDER = "exports"
 EXPORT_LINK_SECONDS = 24 * 3600
 EXPORT_EVERY = timedelta(days=1)
@@ -79,7 +82,17 @@ async def consents(session: AsyncSession, user_id: uuid.UUID) -> list[str]:
         .order_by(UserConsent.created_at)
     )
     latest = dict(rows.all())
-    return [kind for kind in CONSENT_KINDS if latest.get(kind)]
+    return [kind for kind in CONSENT_KINDS if latest.get(kind, CONSENT_DEFAULTS.get(kind, False))]
+
+
+async def consent_granted(session: AsyncSession, user_id: uuid.UUID, kind: str) -> bool:
+    granted = await session.scalar(
+        select(UserConsent.granted)
+        .where(UserConsent.user_id == user_id, UserConsent.kind == kind)
+        .order_by(UserConsent.created_at.desc())
+        .limit(1)
+    )
+    return CONSENT_DEFAULTS.get(kind, False) if granted is None else granted
 
 
 async def record_consent(
@@ -335,6 +348,17 @@ async def export_data(session: AsyncSession, user: User) -> dict[str, Any]:
         for a in acceptances
     ]
     data["consents"] = await consents(session, user.id)
+    from apps.analytics.models import AnalyticsEvent
+
+    usage = await session.execute(
+        select(AnalyticsEvent.event, AnalyticsEvent.occurred_at, AnalyticsEvent.props)
+        .where(AnalyticsEvent.user_id == user.id)
+        .order_by(AnalyticsEvent.occurred_at.desc())
+        .limit(5000)
+    )
+    data["usage_events"] = [
+        {"event": e.event, "date": e.occurred_at, "details": e.props} for e in usage
+    ]
     data["referrals"] = (
         await session.scalar(select(func.count(Referral.id)).where(Referral.referrer_id == user.id))
         or 0
@@ -417,6 +441,9 @@ async def scrub(session: AsyncSession, user: User, was_suspended: bool) -> list[
         update(LegalAcceptance).where(LegalAcceptance.user_id == user.id).values(ip=None)
     )
     await session.execute(delete(UserConsent).where(UserConsent.user_id == user.id))
+    from apps.analytics.models import AnalyticsEvent
+
+    await session.execute(delete(AnalyticsEvent).where(AnalyticsEvent.user_id == user.id))
     await session.execute(delete(UserTotp).where(UserTotp.user_id == user.id))
     keys = list(
         await session.scalars(

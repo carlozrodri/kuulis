@@ -38,6 +38,7 @@ import {
 import { useStore } from '@/lib/store';
 import { isAccountSuspended, suspensionFromError } from '@/lib/suspension';
 import { fonts, radius, space, useTheme } from '@/theme';
+import { track } from '@/lib/analytics';
 
 import { PaymentChips, PlaceRows } from './components';
 import { loadSavedPayment, rideDraft, routedRides, setDraftPayment, setDraftPromoCode } from './store';
@@ -125,12 +126,30 @@ export function QuoteScreen() {
 
   const route = useMemo(() => decodePolyline(quote.data?.polyline), [quote.data?.polyline]);
 
+  // Each price shown once (a refresh before it expires is a new quote), with the pickup's ~1 km cell (doc 19).
+  const quoteId = quote.data?.quote_id;
+  useEffect(() => {
+    if (!quote.data) return;
+    track(
+      'quote_shown',
+      {
+        vehicle_type: 'moto',
+        distance_km: Math.round(quote.data.distance_m / 100) / 10,
+        fare: Number(amountToPay(quote.data)),
+        promo: hasDiscount(quote.data),
+      },
+      draft.pickup,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quoteId]);
+
   const submit = async () => {
     if (!quote.data || !payment) return;
     try {
       let current = quote.data;
       if (secondsUntil(current.expires_at) <= 3) current = (await quote.refetch()).data ?? current;
       const ride = await request.mutateAsync({ quote_id: current.quote_id, payment_method: payment });
+      track('ride_requested', { vehicle_type: 'moto', payment_method: payment, promo: hasDiscount(current) }, draft.pickup);
       routedRides.add(ride.id);
       confirmHaptic();
       rideDraft.set((d) => ({ ...d, dropoff: null, promoCode: null }));

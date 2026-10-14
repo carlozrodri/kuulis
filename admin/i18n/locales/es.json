@@ -35,7 +35,8 @@
     "emailTemplates": "Plantillas de email",
     "quality": "Calidad",
     "risk": "Riesgo",
-    "closings": "Cierres"
+    "closings": "Cierres",
+    "analytics": "Analítica"
   },
   "navGroups": {
     "operations": "Operación",
@@ -178,7 +179,8 @@
       "app_control": "Control de la app",
       "quality": "Calidad",
       "safety": "Seguridad",
-      "risk": "Riesgo"
+      "risk": "Riesgo",
+      "analytics": "Analítica"
     },
     "permissions": {
       "users": {
@@ -271,6 +273,10 @@
       "risk": {
         "view": "Ver las alertas de riesgo",
         "manage": "Revisar alertas y pagos retenidos, vetar cuentas"
+      },
+      "analytics": {
+        "view": "Ver analítica de producto",
+        "export": "Exportar CSV de analítica"
       }
     }
   },
@@ -3567,6 +3573,123 @@
         "top_up_without_entry": "Recarga acreditada sin movimiento",
         "fee_without_entry": "Cuota pagada sin débito"
       }
+    }
+  },
+  "analytics": {
+    "tabs": {
+      "funnels": "Embudos",
+      "retention": "Retención",
+      "supply": "Oferta y demanda",
+      "promotions": "Promociones",
+      "drivers": "Motorizados"
+    },
+    "export": "Exportar CSV",
+    "month": "Mes",
+    "city": "Ciudad",
+    "empty": "Todavía no hay datos para este filtro",
+    "loading": "Cargando…",
+    "computedAt": "Calculado el {date}",
+    "refresh": "Recalcular",
+    "refreshQueued": "Recalculando embudos y retención; recarga en un minuto",
+    "funnels": {
+      "help": "Registro y solicitud de motorizado se cuentan por la fecha en que la persona empezó (se calculan una vez al día). El embudo de viajes y las pantallas del motorizado usan el rango tal cual.",
+      "ofPrevious": "{pct} del paso anterior",
+      "biggestDrop": "Mayor abandono: antes de «{step}» ({lost} personas)",
+      "groups": {
+        "passenger": {
+          "title": "Pasajeros: registro → primer viaje",
+          "help": "Personas que se registraron en el rango."
+        },
+        "driver": {
+          "title": "Motorizados: solicitud → primer mes con cuota",
+          "help": "Solicitudes de motorizado empezadas en el rango."
+        },
+        "rides": {
+          "title": "Viajes: cotización → completado",
+          "help": "Precios vistos en la app y viajes pedidos en el rango."
+        },
+        "screens": {
+          "title": "Pantallas del registro de motorizado",
+          "help": "Personas que abrieron cada paso en la app (muestra dónde se quedan)."
+        }
+      },
+      "steps": {
+        "signup": "Se registró",
+        "first_request": "Pidió su primer viaje",
+        "first_ride": "Completó su primer viaje",
+        "application": "Empezó la solicitud",
+        "vehicle": "Agregó la moto",
+        "documents": "Subió documentos",
+        "submitted": "Envió la solicitud",
+        "approved": "Aprobado",
+        "first_fee": "Primer mes con cuota",
+        "quote": "Vio el precio",
+        "request": "Pidió el viaje",
+        "matched": "Encontró motorizado",
+        "completed": "Completado",
+        "intro": "Vio los requisitos",
+        "personal": "Datos personales",
+        "review": "Revisión"
+      }
+    },
+    "retention": {
+      "help": "Cohortes semanales por la semana del primer viaje completado: qué parte volvió a viajar en la semana 1, 2, 4 y 8. Una semana que no ha terminado para toda la cohorte aparece con —.",
+      "passenger": "Pasajeros",
+      "driver": "Motorizados",
+      "cohort": "Cohorte",
+      "people": "Personas",
+      "week": "Semana {n}",
+      "weekOf": "Semana del {date}",
+      "average": "Promedio ponderado"
+    },
+    "supply": {
+      "help": "Cada cuadro es una zona de ~1 km. Pedidos sin motorizado y cotizaciones sin pedido muestran dónde falta oferta; las horas de motorizados conectados, dónde hay.",
+      "metric": "Qué mostrar en el mapa",
+      "hour": "Hora",
+      "allHours": "Todo el día",
+      "metrics": {
+        "no_drivers": "Pedidos sin motorizado",
+        "requests": "Pedidos",
+        "quotes": "Cotizaciones vistas",
+        "driver_hours": "Horas de motorizados conectados"
+      },
+      "short": {
+        "requests": "Pedidos",
+        "no_drivers": "Sin moto",
+        "driver_hours": "Horas moto"
+      },
+      "cellTooltip": "{requests} pedidos · {noDrivers} sin motorizado · {quotes} cotizaciones · {hours} h de motorizados",
+      "topCells": "Zonas con más pedidos sin motorizado",
+      "cell": "Zona (centro)",
+      "demandByHour": "Demanda por hora del día (Caracas)",
+      "supplyByHour": "Horas de motorizados conectados por hora del día"
+    },
+    "promotions": {
+      "help": "Costo para Kuulis de cada promoción en el rango, pasajeros que hicieron su primer viaje con ella y cuántos volvieron a viajar en los 30 días siguientes.",
+      "name": "Promoción",
+      "rides": "Viajes",
+      "cost": "Costo",
+      "costPerRide": "Costo por viaje",
+      "newPassengers": "Pasajeros nuevos",
+      "costPerNew": "Costo por pasajero nuevo",
+      "retention": "Volvieron en 30 días",
+      "returned": "{n} de {of} medibles"
+    },
+    "drivers": {
+      "help": "Ganancias del mes por motorizado (viajes completados, menos descuentos), cómo caen en los tramos de la cuota y qué parte del tiempo conectado pasan en viaje.",
+      "withRides": "Motorizados con viajes",
+      "online": "{n} se conectaron",
+      "median": "Ganancia mediana",
+      "total": "Total del mes: {amount}",
+      "utilization": "Utilización",
+      "hours": "{ride} h en viaje de {online} h conectados",
+      "tiers": "Motorizados por tramo",
+      "earnings": "Ganancias del mes",
+      "utilizationSpread": "Utilización por motorizado (al menos 1 h conectado)",
+      "driversLabel": "Motorizados",
+      "tiersHelp": "Con las ganancias de este mes y los tramos de cuota que le aplican.",
+      "earnedAbove": "Ganó más de",
+      "fee": "Cuota"
     }
   }
 }

@@ -19,6 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { setAnalyticsEnabled, startAnalytics, track } from '@/lib/analytics';
+import { screenName, usageAllowed } from '@/lib/analyticsCore';
 import { installCrashReporting, reportError, setCrashRoute } from '@/lib/crashReport';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import { ModeProvider, useMode } from '@/providers/ModeProvider';
@@ -26,6 +28,8 @@ import { loadThemePreference, useTheme } from '@/theme';
 
 // Uncaught JS errors and the last native crash (Android) are sent to the API logs.
 installCrashReporting();
+// Anonymous usage events (doc 19), off when the user opted out in Profile.
+startAnalytics();
 // Light / dark chosen in Profile (read while the splash is still up).
 void loadThemePreference();
 
@@ -42,6 +46,13 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
   useEffect(() => {
     setCrashRoute(pathname);
   }, [pathname]);
+  useEffect(() => {
+    track('screen_view', { screen: screenName(pathname), ...(mode ? { mode } : {}) });
+  }, [pathname, mode]);
+  // The signed-in user's answer wins; signed out, the last answer seen on this phone stays.
+  useEffect(() => {
+    if (user) void setAnalyticsEnabled(usageAllowed(user.consents, true));
+  }, [user]);
 
   const ready = fontsReady && !isLoading && !modeLoading;
   const pendingLegal = !!user?.pending_legal?.length;

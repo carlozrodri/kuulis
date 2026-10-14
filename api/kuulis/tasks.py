@@ -28,6 +28,7 @@ TASK_MODULES = [
     "apps.quality.tasks",
     "apps.risk.tasks",
     "apps.finance.tasks",
+    "apps.analytics.tasks",
 ]
 
 if settings.APP_ENV == "test":

@@ -35,7 +35,8 @@
     "emailTemplates": "Email templates",
     "quality": "Quality",
     "risk": "Risk",
-    "closings": "Closings"
+    "closings": "Closings",
+    "analytics": "Analytics"
   },
   "navGroups": {
     "operations": "Operations",
@@ -178,7 +179,8 @@
       "app_control": "App control",
       "quality": "Quality",
       "safety": "Safety",
-      "risk": "Risk"
+      "risk": "Risk",
+      "analytics": "Analytics"
     },
     "permissions": {
       "users": {
@@ -271,6 +273,10 @@
       "risk": {
         "view": "See risk alerts",
         "manage": "Review alerts and held payments, ban accounts"
+      },
+      "analytics": {
+        "view": "See product analytics",
+        "export": "Export analytics CSV"
       }
     }
   },
@@ -3567,6 +3573,123 @@
         "top_up_without_entry": "Credited top-up without an entry",
         "fee_without_entry": "Paid fee without a debit"
       }
+    }
+  },
+  "analytics": {
+    "tabs": {
+      "funnels": "Funnels",
+      "retention": "Retention",
+      "supply": "Supply and demand",
+      "promotions": "Promotions",
+      "drivers": "Drivers"
+    },
+    "export": "Export CSV",
+    "month": "Month",
+    "city": "City",
+    "empty": "No data for this filter yet",
+    "loading": "Loading…",
+    "computedAt": "Computed on {date}",
+    "refresh": "Recompute",
+    "refreshQueued": "Recomputing funnels and retention; reload in a minute",
+    "funnels": {
+      "help": "Sign-ups and driver applications are counted by the day the person started (computed once a day). The ride funnel and the driver screens use the range as is.",
+      "ofPrevious": "{pct} of the previous step",
+      "biggestDrop": "Biggest drop: before “{step}” ({lost} people)",
+      "groups": {
+        "passenger": {
+          "title": "Riders: sign-up → first ride",
+          "help": "People who signed up in the range."
+        },
+        "driver": {
+          "title": "Drivers: application → first month with a fee",
+          "help": "Driver applications started in the range."
+        },
+        "rides": {
+          "title": "Rides: quote → completed",
+          "help": "Prices seen in the app and rides requested in the range."
+        },
+        "screens": {
+          "title": "Driver sign-up screens",
+          "help": "People who opened each step in the app (shows where they stop)."
+        }
+      },
+      "steps": {
+        "signup": "Signed up",
+        "first_request": "Requested a first ride",
+        "first_ride": "Completed a first ride",
+        "application": "Started the application",
+        "vehicle": "Added the moto",
+        "documents": "Uploaded documents",
+        "submitted": "Submitted",
+        "approved": "Approved",
+        "first_fee": "First month with a fee",
+        "quote": "Saw the price",
+        "request": "Requested",
+        "matched": "Found a driver",
+        "completed": "Completed",
+        "intro": "Saw the requirements",
+        "personal": "Personal details",
+        "review": "Review"
+      }
+    },
+    "retention": {
+      "help": "Weekly cohorts by the week of the first completed ride: the share who rode again in week 1, 2, 4 and 8. A week that is not over for the whole cohort shows —.",
+      "passenger": "Riders",
+      "driver": "Drivers",
+      "cohort": "Cohort",
+      "people": "People",
+      "week": "Week {n}",
+      "weekOf": "Week of {date}",
+      "average": "Weighted average"
+    },
+    "supply": {
+      "help": "Each square is a ~1 km area. Requests without a driver and quotes without a request show where supply is missing; online driver hours show where it is.",
+      "metric": "What the map shows",
+      "hour": "Hour",
+      "allHours": "All day",
+      "metrics": {
+        "no_drivers": "Requests without a driver",
+        "requests": "Requests",
+        "quotes": "Quotes seen",
+        "driver_hours": "Online driver hours"
+      },
+      "short": {
+        "requests": "Requests",
+        "no_drivers": "No driver",
+        "driver_hours": "Driver h"
+      },
+      "cellTooltip": "{requests} requests · {noDrivers} without a driver · {quotes} quotes · {hours} driver hours",
+      "topCells": "Areas with most requests without a driver",
+      "cell": "Area (centre)",
+      "demandByHour": "Demand by hour of the day (Caracas)",
+      "supplyByHour": "Online driver hours by hour of the day"
+    },
+    "promotions": {
+      "help": "What each promotion cost Kuulis in the range, riders whose first ride used it and how many rode again within 30 days.",
+      "name": "Promotion",
+      "rides": "Rides",
+      "cost": "Cost",
+      "costPerRide": "Cost per ride",
+      "newPassengers": "New riders",
+      "costPerNew": "Cost per new rider",
+      "retention": "Came back within 30 days",
+      "returned": "{n} of {of} measurable"
+    },
+    "drivers": {
+      "help": "Each driver's earnings in the month (completed rides, minus discounts), how they fall into the fee tiers and how much of the online time is spent in rides.",
+      "withRides": "Drivers with rides",
+      "online": "{n} went online",
+      "median": "Median earnings",
+      "total": "Month total: {amount}",
+      "utilization": "Utilization",
+      "hours": "{ride} h in rides of {online} h online",
+      "tiers": "Drivers per tier",
+      "earnings": "Earnings in the month",
+      "utilizationSpread": "Utilization per driver (at least 1 h online)",
+      "driversLabel": "Drivers",
+      "tiersHelp": "With this month's earnings and the fee tiers that apply to it.",
+      "earnedAbove": "Earned above",
+      "fee": "Fee"
     }
   }
 }

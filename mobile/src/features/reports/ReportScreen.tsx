@@ -41,6 +41,7 @@ import {
 } from "@/lib/reports";
 import type { Report, ReportCategory } from "@/lib/types";
 import { fonts, radius, space, useTheme } from "@/theme";
+import { track } from "@/lib/analytics";
 
 import {
   CATEGORY_ICONS,
@@ -174,6 +175,7 @@ export function ReportScreen() {
       },
       {
         onSuccess: (report) => {
+          track("report_created", { category });
           confirmHaptic();
           setSent(report);
           setStep("sent");

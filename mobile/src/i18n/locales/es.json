@@ -1733,6 +1733,12 @@
       "title": "Tu ubicación mientras estás conectado",
       "body": "Mientras estés conectado, Kuulis usa tu ubicación para ofrecerte viajes cercanos y mostrarle al pasajero dónde vienes, incluso con la app minimizada o la pantalla apagada. Verás un aviso fijo mientras ocurre. Al desconectarte dejamos de usarla.",
       "accept": "Entendido, conectarme"
+    },
+    "usage": {
+      "title": "Compartir datos de uso anónimos",
+      "hint": "Nos ayuda a mejorar Kuulis: qué pantallas usas y dónde falta oferta. Sin tu nombre, correo, teléfono ni ubicación exacta.",
+      "on": "Gracias, compartirás datos de uso anónimos",
+      "off": "Listo, ya no enviamos datos de uso"
     }
   },
   "update": {

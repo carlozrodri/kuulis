@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
-import { type PropsWithChildren, type ReactNode } from 'react';
+import { type PropsWithChildren, type ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 import { ChevronLeft } from '@/components/icons';
 import { Button, IconButton, Notice, ProgressSteps, Row, Screen, Skeleton, Txt } from '@/components/ui';
 import { useDriverProfile } from '@/hooks/useDriver';
+import { track } from '@/lib/analytics';
 import { DRIVER_STEPS, type DriverStep, isEditable } from '@/lib/driver';
 import { radius, space } from '@/theme';
 
@@ -28,6 +29,9 @@ export function StepScreen({
   const profile = useDriverProfile();
   const locked = !!profile.data && !isEditable(profile.data.status);
   const current = STEP_NUMBER[step];
+  useEffect(() => {
+    if (!locked) track('driver_onboarding_step', { step });
+  }, [step, locked]);
 
   return (
     <Screen

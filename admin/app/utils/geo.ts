@@ -23,6 +23,11 @@ export interface MapRectangle {
   id: string
   bounds: [LatLng, LatLng]
   color: string
+  /** Filled squares (heat map cells) instead of the dashed outline of a city. */
+  fillOpacity?: number
+  solid?: boolean
+  /** Plain text tooltip, rendered with textContent. */
+  label?: string
 }
 
 /** Caracas centre, used when there is nothing to fit the map to. */

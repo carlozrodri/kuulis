@@ -19,6 +19,7 @@ import { placeFromGeo, shortAddress } from '@/lib/ride';
 import { useStore } from '@/lib/store';
 import type { Place } from '@/lib/types';
 import { elevation, fonts, radius, space, useTheme } from '@/theme';
+import { track } from '@/lib/analytics';
 
 import { type DraftField, rideDraft, setDraftPlace } from './store';
 import { useCurrentPickup } from './useCurrentPickup';
@@ -47,6 +48,14 @@ export function SearchScreen() {
   }, [query]);
 
   const near = position ?? draft.pickup;
+  // Once per visit, with the ~1 km cell of where the passenger is (doc 19).
+  const tracked = useRef(false);
+  useEffect(() => {
+    if (tracked.current) return;
+    tracked.current = true;
+    track('search_opened', {}, near);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const search = useGeoSearch(debounced, near ? { lat: near.lat, lng: near.lng } : null);
   const searching = query.trim().length >= 3;
   const results = searching ? (search.data ?? []) : [];

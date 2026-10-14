@@ -1,5 +1,5 @@
 import { Link, router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable } from 'react-native';
 
@@ -9,6 +9,7 @@ import { SocialButtons } from '@/components/SocialButtons';
 import { Button, ErrorText, Field, IconButton, Txt } from '@/components/ui';
 import { CheckRow } from '@/features/legal/CheckRow';
 import { apiErrorMessage, apiFieldErrors } from '@/i18n';
+import { track } from '@/lib/analytics';
 import type { LegalKind } from '@/lib/legal';
 import { isEmail, isPassword } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -29,6 +30,7 @@ export default function RegisterScreen() {
   const [socialBusy, setSocialBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [adult, setAdult] = useState(false);
+  useEffect(() => track('signup_started', { method: 'email' }), []);
 
   async function submit() {
     const fieldErrors: Errors = {

@@ -2255,3 +2255,98 @@ export interface Simulation {
   /** proposed - current. */
   difference: Decimal
 }
+
+// ---- Product analytics (doc 19) -----------------------------------------------------------------
+
+export interface FunnelStep {
+  step: string
+  users: number
+}
+
+/** GET /admin/analytics/funnels. */
+export interface Funnels {
+  passenger: FunnelStep[]
+  driver: FunnelStep[]
+  rides: FunnelStep[]
+  onboarding_screens: FunnelStep[]
+  computed_at: string | null
+}
+
+export interface RetentionRow {
+  cohort: string
+  users: number
+  /** "1", "2", "4", "8": people who rode again that week; null while the week is not over. */
+  weeks: Record<string, number | null>
+}
+
+export interface RetentionTable {
+  rows: RetentionRow[]
+  average: Record<string, number | null>
+}
+
+/** GET /admin/analytics/retention. */
+export interface Retention {
+  passenger: RetentionTable
+  driver: RetentionTable
+  computed_at: string | null
+}
+
+export interface SupplyCell {
+  cell: string
+  lat: number
+  lng: number
+  requests: number
+  no_drivers: number
+  quotes: number
+  driver_hours: number
+}
+
+export interface SupplyHourRow {
+  hour: number
+  requests: number
+  no_drivers: number
+  quotes: number
+  driver_hours: number
+}
+
+/** GET /admin/analytics/supply-demand. */
+export interface SupplyDemand {
+  cells: SupplyCell[]
+  hours: SupplyHourRow[]
+}
+
+/** GET /admin/analytics/promotions. */
+export interface PromotionAnalytics {
+  id: string
+  name: string
+  code: string | null
+  rides: number
+  cost: Decimal
+  cost_per_ride: Decimal | null
+  new_passengers: number
+  cost_per_new_passenger: Decimal | null
+  returned_30d: number
+  eligible_30d: number
+  retention_30d: number | null
+}
+
+export interface ValueBucket {
+  min: number
+  max: number | null
+  count: number
+}
+
+/** GET /admin/analytics/drivers. */
+export interface DriverEconomics {
+  month: string
+  drivers: number
+  total_earnings: Decimal
+  median_earnings: Decimal | null
+  earnings: ValueBucket[]
+  tiers: { above: Decimal, fee: Decimal, drivers: number }[]
+  online_drivers: number
+  online_hours: number
+  ride_hours: number
+  utilization: number | null
+  utilization_spread: ValueBucket[]
+}

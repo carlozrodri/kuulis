@@ -17,6 +17,13 @@ target_metadata = metadata
 DATABASE_URL = str(settings.DATABASE_URL)
 
 
+def include_object(obj, name, type_, reflected, compare_to):
+    """Leaves out the monthly partitions of analytics_events (and their indexes), which the
+    daily job creates and drops (doc 19)."""
+    table = obj.table.name if type_ == "index" else name
+    return not (reflected and table and table.startswith("analytics_events_"))
+
+
 def run_migrations_offline() -> None:
     context.configure(
         url=DATABASE_URL,
@@ -24,13 +31,19 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
+        include_object=include_object,
     )
     with context.begin_transaction():
         context.run_migrations()
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        compare_type=True,
+        include_object=include_object,
+    )
     with context.begin_transaction():
         # Serialize concurrent deploys (several containers starting at once).
         connection.exec_driver_sql("SELECT pg_advisory_xact_lock(727274)")

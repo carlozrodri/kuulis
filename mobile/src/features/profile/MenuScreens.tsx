@@ -7,10 +7,11 @@ import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Switch, View } from 'react-native';
 
 import {
   Bell,
+  ChartNoAxesColumn,
   Download,
   Gift,
   HeartHandshake,
@@ -38,13 +39,15 @@ import { useAppConfig } from '@/hooks/useDriver';
 import { usePassengerStats } from '@/hooks/useRides';
 import { useTrustedContacts } from '@/hooks/useSafety';
 import { apiErrorMessage, SUPPORTED_LOCALES, type Locale } from '@/i18n';
+import { setAnalyticsEnabled } from '@/lib/analytics';
+import { usageAllowed } from '@/lib/analyticsCore';
 import { api } from '@/lib/api';
 import { DRIVER_KINDS, type LegalKind } from '@/lib/legal';
 import { DEFAULT_PAYMENT_METHODS, shortAddress } from '@/lib/ride';
 import { useStore } from '@/lib/store';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
-import { radius, setThemePreference, space, themePreference, type ThemePreference } from '@/theme';
+import { radius, setThemePreference, space, themePreference, useTheme, type ThemePreference } from '@/theme';
 
 import { Section, Segmented } from './components';
 import { InviteCard, RedeemSection } from './ReferralCard';
@@ -53,6 +56,37 @@ import { SubScreen } from './SubScreen';
 
 const LANGUAGE_LABELS: Record<Locale, string> = { es: 'Español', en: 'English' };
 
+/**
+ * "Compartir datos de uso anónimos" (doc 19): on by default; the answer is saved as the consent "usage_data" and
+ * applies on this phone at once (the queued events are dropped when it is switched off).
+ */
+function useUsageData() {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const { user, refreshUser } = useAuth();
+  // The answer being saved, shown until the refreshed user carries it.
+  const [saving, setSaving] = useState<boolean | null>(null);
+  const value = saving ?? usageAllowed(user?.consents, !!user);
+  const busy = saving !== null;
+
+  async function toggle(next: boolean) {
+    if (busy) return;
+    void Haptics.selectionAsync().catch(() => undefined);
+    setSaving(next);
+    try {
+      await api('/users/me/consents', { method: 'PUT', body: { kind: 'usage_data', granted: next } });
+      await setAnalyticsEnabled(next);
+      await refreshUser();
+      showToast(next ? t('privacy.usage.on') : t('privacy.usage.off'), 'success');
+    } catch (e) {
+      showToast(apiErrorMessage(e), 'danger');
+    } finally {
+      setSaving(null);
+    }
+  }
+  return { value, busy, toggle, theme };
+}
+
 /** Perfil → Ajustes: everything that is not about trips in one page (account, preferences, security, privacy, help and legal). */
 export function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -60,6 +94,7 @@ export function SettingsScreen() {
   const preference = useStore(themePreference);
   const contactCount = useTrustedContacts(!!user).data?.length ?? 0;
   const [confirm, setConfirm] = useState(false);
+  const usage = useUsageData();
 
   async function changeLanguage(locale: Locale) {
     if (locale === i18n.language) return;
@@ -160,6 +195,28 @@ export function SettingsScreen() {
       </Section>
       <Section title={t('profile.menu.privacy')}>
         <Card style={{ paddingVertical: space.xxs }}>
+          <ListRow
+            icon={ChartNoAxesColumn}
+            iconTone="neutral"
+            title={t('privacy.usage.title')}
+            subtitle={t('privacy.usage.hint')}
+            chevron={false}
+            divider
+            accessibilityHint={t('privacy.usage.hint')}
+            onPress={() => usage.toggle(!usage.value)}
+            right={
+              <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+                <Switch
+                  value={usage.value}
+                  onValueChange={usage.toggle}
+                  disabled={usage.busy}
+                  trackColor={{ false: usage.theme.border, true: usage.theme.primary }}
+                  thumbColor={usage.theme.surface}
+                  ios_backgroundColor={usage.theme.border}
+                />
+              </View>
+            }
+          />
           <ListRow
             icon={Download}
             iconTone="neutral"

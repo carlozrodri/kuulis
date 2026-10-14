@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import i18n from '@/i18n';
+import { track } from '@/lib/analytics';
 import { api, setLegalRequiredHandler, setSessionExpiredHandler, tokens } from '@/lib/api';
 import { googleSignOut } from '@/lib/social';
 import type { AuthResponse, User } from '@/lib/types';
@@ -19,6 +20,12 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+/** A social sign-in that created the account just now counts as a sign-up (doc 19). */
+function trackSocialSignup(data: AuthResponse, method: 'google' | 'apple') {
+  const created = Date.parse(data.user.created_at);
+  if (Number.isFinite(created) && Date.now() - created < 2 * 60_000) track('signup_completed', { method });
+}
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
@@ -71,20 +78,21 @@ export function AuthProvider({ children }: PropsWithChildren) {
             auth: false,
           }),
         );
+        track('signup_completed', { method: 'email' });
       },
       signInWithGoogle: async (idToken) => {
-        await applySession(
-          await api<AuthResponse>('/auth/social/google', { method: 'POST', body: { id_token: idToken }, auth: false }),
-        );
+        const data = await api<AuthResponse>('/auth/social/google', { method: 'POST', body: { id_token: idToken }, auth: false });
+        await applySession(data);
+        trackSocialSignup(data, 'google');
       },
       signInWithApple: async (idToken, fullName) => {
-        await applySession(
-          await api<AuthResponse>('/auth/social/apple', {
-            method: 'POST',
-            body: { id_token: idToken, full_name: fullName },
-            auth: false,
-          }),
-        );
+        const data = await api<AuthResponse>('/auth/social/apple', {
+          method: 'POST',
+          body: { id_token: idToken, full_name: fullName },
+          auth: false,
+        });
+        await applySession(data);
+        trackSocialSignup(data, 'apple');
       },
       signOut: async () => {
         const refreshToken = await tokens.refreshToken();

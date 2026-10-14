@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter
 
+from apps.analytics.router import events_router as analytics_events_router
 from apps.analytics.router import router as analytics_router
 from apps.approvals.router import router as approvals_router
 from apps.audit.router import router as audit_router
@@ -62,6 +63,7 @@ api_v1.include_router(rides_router)
 api_v1.include_router(config_router)
 api_v1.include_router(users_router)
 api_v1.include_router(rates_router)
+api_v1.include_router(analytics_events_router)
 api_v1.include_router(notifications_router)
 api_v1.include_router(notifications_admin_router)
 api_v1.include_router(drivers_router)

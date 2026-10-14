@@ -3,6 +3,12 @@
 Add new apps here, like INSTALLED_APPS in Django.
 """
 
+from apps.analytics.models import (  # noqa: F401
+    AnalyticsCohort,
+    AnalyticsEvent,
+    DriverOnlineSession,
+    SupplyHour,
+)
 from apps.approvals.models import PendingApproval  # noqa: F401
 from apps.audit.models import AuditLog  # noqa: F401
 from apps.auth.models import UserTotp  # noqa: F401

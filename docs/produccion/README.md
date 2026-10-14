@@ -98,6 +98,9 @@ construir. Las preguntas de cada documento están en su sección final.
   del libro con alerta, disputas de recarga en Soporte, paso automático a confirmación manual si Binance falla,
   exonerar o bajar cuotas con doble aprobación y simulador de tramos. Pendiente: la recarga real de prueba
   (necesita la cuenta de Carlos) y el [plan de Binance Merchant](binance-merchant.md) cuando exista empresa.
+- **19** hecho (2026-10-14): eventos de producto propios con exclusión en Perfil, embudos de pasajero y
+  motorizado, retención por cohortes, mapa de oferta y demanda por hora, promociones, economía del motorizado
+  y exportación a CSV. Página Analítica en el admin. El 18 se canceló.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

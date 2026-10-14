@@ -1733,6 +1733,12 @@
       "title": "Your location while you are online",
       "body": "While you are online, Kuulis uses your location to offer you nearby rides and show the passenger where you are coming from, even with the app minimized or the screen off. You will see a fixed notice while it happens. When you go offline we stop using it.",
       "accept": "Got it, go online"
+    },
+    "usage": {
+      "title": "Share anonymous usage data",
+      "hint": "Helps us improve Kuulis: which screens you use and where riders lack drivers. Never your name, email, phone or exact location.",
+      "on": "Thanks, you are sharing anonymous usage data",
+      "off": "Done, we no longer send usage data"
     }
   },
   "update": {
