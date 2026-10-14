@@ -15,6 +15,7 @@ from apps.notifications.models import Device, Notification  # noqa: F401
 from apps.places.models import SavedPlace  # noqa: F401
 from apps.privacy.models import DataExport, ErasedEmail, UserConsent  # noqa: F401
 from apps.promotions.models import Promotion  # noqa: F401
+from apps.quality.models import QualityPause, QualityStats  # noqa: F401
 from apps.rates.models import ExchangeRate  # noqa: F401
 from apps.referrals.models import Referral  # noqa: F401
 from apps.releases.models import AppRelease  # noqa: F401
@@ -31,7 +32,6 @@ from apps.safety.models import (  # noqa: F401
     SafetyAlert,
     TrustedContact,
 )
-from apps.quality.models import QualityPause, QualityStats  # noqa: F401
 from apps.staff.models import StaffRole  # noqa: F401
 from apps.subscriptions.models import Charge, FeeSchedule  # noqa: F401
 from apps.support.models import CannedResponse, HelpArticle, LostItemRequest  # noqa: F401
