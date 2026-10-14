@@ -977,6 +977,12 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
               :description="t('settings.approvals.broadcastsHelp')"
               :disabled="readOnly"
             />
+            <USwitch
+              v-model="form.approval_waivers"
+              :label="t('settings.approvals.waivers')"
+              :description="t('settings.approvals.waiversHelp')"
+              :disabled="readOnly"
+            />
           </div>
         </UCard>
 

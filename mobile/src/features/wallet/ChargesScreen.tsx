@@ -23,7 +23,7 @@ import { useCharges, useSubscription } from "@/hooks/useWallet";
 import { apiErrorMessage } from "@/i18n";
 import { formatFare } from "@/lib/ride";
 import type { Charge, ChargeStatus, SubscriptionSummary } from "@/lib/types";
-import { feeTierFor, formatTierBound, toCents } from "@/lib/wallet";
+import { feeTierFor, formatTierBound, reducedFrom, toCents } from "@/lib/wallet";
 import { fonts, radius, space, useTheme } from "@/theme";
 
 import { FlowHeader } from "./components";
@@ -161,6 +161,11 @@ function ChargeCard({
       ? t("charges.waivedReason", { reason: charge.waived_reason })
       : t("charges.statusHint.waived");
   }
+
+  // Doc 17: Kuulis lowered the fee (the waived part goes back to the wallet when it was already paid).
+  const original = reducedFrom(charge);
+  if (original !== null)
+    detail = `${detail} · ${t("wallet.statement.originalFee", { fee: formatFare(original) })}`;
 
   const month = format.monthTitle(charge.month);
   return (

@@ -9,6 +9,7 @@ from apps.auth.models import UserTotp  # noqa: F401
 from apps.config.models import AppSetting  # noqa: F401
 from apps.control.models import Announcement, FeatureFlag  # noqa: F401
 from apps.drivers.models import DriverDocument, DriverProfile, Vehicle  # noqa: F401
+from apps.finance.models import MonthlyClosing  # noqa: F401
 from apps.legal.models import LegalAcceptance, LegalDocument  # noqa: F401
 from apps.moderation.models import Report, ReportMessage, ReportNote, Suspension  # noqa: F401
 from apps.notifications.models import Device, Notification  # noqa: F401
@@ -43,7 +44,7 @@ from apps.subscriptions.models import Charge, FeeSchedule  # noqa: F401
 from apps.support.models import CannedResponse, HelpArticle, LostItemRequest  # noqa: F401
 from apps.updates.models import AppUpdate  # noqa: F401
 from apps.users.models import SocialAccount, User  # noqa: F401
-from apps.wallet.models import TopUp, Wallet, WalletEntry  # noqa: F401
+from apps.wallet.models import Receipt, TopUp, Wallet, WalletEntry  # noqa: F401
 from kuulis.core.models import Base
 
 metadata = Base.metadata

@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
@@ -7,6 +8,8 @@ import {
   CircleCheck,
   CircleX,
   Hash,
+  LifeBuoy,
+  MessagesSquare,
   Pencil,
   Receipt,
   ShieldCheck,
@@ -20,6 +23,7 @@ import {
   ErrorText,
   Field,
   IconTile,
+  ListRow,
   Notice,
   Screen,
   Skeleton,
@@ -40,6 +44,7 @@ import { confirmHaptic } from "@/lib/feedback";
 import { formatAmount } from "@/lib/money";
 import type { TopUp, TopUpInfo, TopUpStatus } from "@/lib/types";
 import {
+  canDisputeTopUp,
   isValidBinancePayId,
   normalizeBinancePayId,
   normalizeOrderReference,
@@ -49,10 +54,22 @@ import {
 } from "@/lib/wallet";
 import { radius, space, useTheme } from "@/theme";
 
+import { BinanceDownNotice } from "./BinanceDownNotice";
 import { CopyValue, FlowHeader, leaveFlow, Steps } from "./components";
 import { useWalletFormat } from "./format";
 
 type Step = "binance" | "pay" | "notify" | "sent";
+
+/** "No me llegó mi recarga" (doc 17), for a given top-up or a new one. */
+export const goToDispute = (topUpId?: string) =>
+  router.push(
+    topUpId
+      ? { pathname: "/wallet/dispute", params: { top_up_id: topUpId } }
+      : "/wallet/dispute",
+  );
+
+const openReport = (reportId: string) =>
+  router.push({ pathname: "/reports/[id]", params: { id: reportId } });
 
 const STATUS_TONE: Record<TopUpStatus, Tone> = {
   pending: "warning",
@@ -304,6 +321,7 @@ function PayStep({
         ) : null
       }
     >
+      <BinanceDownNotice info={info} style={{ marginBottom: space.md }} />
       {available ? (
         <Card elevated style={{ gap: space.md }}>
           <CopyValue
@@ -362,6 +380,23 @@ function PayStep({
             ? t("topUp.firstBody")
             : t("topUp.manualBody")}
       </Notice>
+
+      <View
+        style={{
+          backgroundColor: theme.surface,
+          borderRadius: radius.card,
+          paddingHorizontal: space.md,
+          marginTop: space.md,
+        }}
+      >
+        <ListRow
+          icon={LifeBuoy}
+          iconTone="warning"
+          title={t("topUp.dispute.entry")}
+          subtitle={t("topUp.dispute.entryBody")}
+          onPress={() => goToDispute()}
+        />
+      </View>
 
       <Pressable
         accessibilityRole="button"
@@ -466,6 +501,7 @@ function TopUpRow({
   const { t } = useTranslation();
   const theme = useTheme();
   const status = t(`topUp.status.${item.status}`);
+  const claimId = item.dispute_report_id ?? null;
   const detail =
     item.status === "rejected" && item.rejection_reason
       ? item.rejection_reason
@@ -474,7 +510,7 @@ function TopUpRow({
         : t(`topUp.statusHint.${item.status}`);
   return (
     <View
-      accessible
+      accessible={!claimId && !canDisputeTopUp(item)}
       accessibilityLabel={`${formatAmount(item.amount)} USDT, ${status}, ${date}. ${detail}`}
       style={[
         styles.topUp,
@@ -489,6 +525,32 @@ function TopUpRow({
         <Txt variant="caption" color="muted" numberOfLines={2}>
           {`${detail} · ${date}`}
         </Txt>
+        {claimId ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityHint={t("topUp.dispute.openHint")}
+            hitSlop={8}
+            onPress={() => openReport(claimId)}
+            style={({ pressed }) => [styles.rowLink, { opacity: pressed ? 0.6 : 1 }]}
+          >
+            <MessagesSquare size={14} color={theme.primary} strokeWidth={2.2} />
+            <Txt variant="label" style={{ color: theme.primary }}>
+              {t("topUp.dispute.claimed")}
+            </Txt>
+          </Pressable>
+        ) : canDisputeTopUp(item) ? (
+          <Pressable
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={() => goToDispute(item.id)}
+            style={({ pressed }) => [styles.rowLink, { opacity: pressed ? 0.6 : 1 }]}
+          >
+            <LifeBuoy size={14} color={theme.primary} strokeWidth={2.2} />
+            <Txt variant="label" style={{ color: theme.primary }}>
+              {t("topUp.dispute.rowAction")}
+            </Txt>
+          </Pressable>
+        ) : null}
       </View>
       <StatusPill label={status} tone={STATUS_TONE[item.status]} />
     </View>
@@ -588,6 +650,7 @@ function NotifyStep({
         onSubmitEditing={submit}
       />
       <ErrorText>{formError}</ErrorText>
+      <BinanceDownNotice info={info} style={{ marginBottom: space.sm }} />
       <Notice tone="info">
         {info.automatic
           ? t("topUp.notify.noteAuto")
@@ -650,6 +713,13 @@ const styles = StyleSheet.create({
     borderRadius: radius.tile,
     padding: space.md,
     marginTop: space.md,
+  },
+  rowLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    alignSelf: "flex-start",
+    marginTop: 2,
   },
   topUp: {
     flexDirection: "row",

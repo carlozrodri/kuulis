@@ -14,10 +14,12 @@ import Svg, { Path } from "react-native-svg";
 import {
   ArrowUpRight,
   CircleX,
+  FileText,
   HandCoins,
   Hourglass,
   Info,
   Plus,
+  Receipt,
   Wallet,
 } from "@/components/icons";
 import {
@@ -111,6 +113,14 @@ export function WalletScreen() {
               <StatusPill label={tag.label} tone={tag.tone} />
             </View>
           ) : null}
+          {item.receipt_id && !item.ride_id ? (
+            <View style={styles.receiptLink}>
+              <Receipt size={14} color={theme.primary} strokeWidth={2.2} />
+              <Txt variant="label" style={{ color: theme.primary }}>
+                {t("wallet.receipt.view")}
+              </Txt>
+            </View>
+          ) : null}
         </View>
         <Txt
           variant="bodyStrong"
@@ -128,6 +138,25 @@ export function WalletScreen() {
       currency: wallet.data?.currency ?? "USDT",
       date,
     });
+    if (item.receipt_id && !item.ride_id) {
+      const receiptId = item.receipt_id;
+      return (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={label}
+          accessibilityHint={t("wallet.receipt.view")}
+          onPress={() =>
+            router.push({
+              pathname: "/wallet/receipt",
+              params: { id: receiptId },
+            })
+          }
+          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+        >
+          {content}
+        </Pressable>
+      );
+    }
     if (!item.ride_id) {
       return (
         <View accessible accessibilityLabel={label}>
@@ -199,6 +228,20 @@ export function WalletScreen() {
               error={subscription.isError ? subscription.error : null}
               onRetry={() => void subscription.refetch()}
             />
+            <View
+              style={{
+                backgroundColor: theme.surface,
+                borderRadius: radius.card,
+                paddingHorizontal: space.md,
+              }}
+            >
+              <ListRow
+                icon={FileText}
+                title={t("wallet.statement.title")}
+                subtitle={t("wallet.statement.entryBody")}
+                onPress={() => router.push("/wallet/statement")}
+              />
+            </View>
             {pendingTopUps.length ? (
               <View
                 style={{
@@ -451,6 +494,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.sm,
   },
   actionLabel: { fontFamily: fonts.extrabold, fontSize: 14 },
+  receiptLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    alignSelf: "flex-start",
+    marginTop: 2,
+  },
   entry: {
     flexDirection: "row",
     alignItems: "center",

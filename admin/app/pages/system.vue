@@ -6,6 +6,7 @@ definePageMeta({ permission: 'system.view' })
 const { t, locale } = useI18n()
 const { request } = useApi()
 const apiError = useApiError()
+const auth = useAuth()
 
 const { data: health, status, error, refresh } = await useAsyncData(
   'system-health',
@@ -263,6 +264,69 @@ const numbers = computed(() => {
               {{ job }}: {{ message }}
             </li>
           </ul>
+        </UCard>
+
+        <!-- Doc 17: daily wallet ledger invariants -->
+        <UCard>
+          <template #header>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <h2 class="font-semibold">
+                  {{ t('system.ledger.title') }}
+                </h2>
+                <UBadge
+                  v-if="health.ledger"
+                  :color="health.ledger.ok ? 'success' : 'error'"
+                  variant="subtle"
+                  size="sm"
+                >
+                  {{ t(health.ledger.ok ? 'system.ledger.ok' : 'system.ledger.issues') }}
+                </UBadge>
+              </div>
+              <UButton
+                v-if="auth.can('finance.view')"
+                to="/closings"
+                size="xs"
+                color="neutral"
+                variant="ghost"
+                trailing-icon="i-lucide-arrow-right"
+                :label="t('system.ledger.open')"
+              />
+            </div>
+          </template>
+          <p
+            v-if="!health.ledger"
+            class="text-sm text-(--ui-text-muted)"
+          >
+            {{ t('system.ledger.never') }}
+          </p>
+          <div
+            v-else
+            class="space-y-1 text-sm"
+          >
+            <p class="text-(--ui-text-muted)">
+              {{ t('system.ledger.checkedAt', { time: formatDate(health.ledger.checked_at, locale) }) }}
+              · {{ t('system.ledger.wallets', { n: formatNumber(health.ledger.wallets, locale) }) }}
+            </p>
+            <p
+              v-if="!health.ledger.ok"
+              class="font-semibold text-(--ui-error)"
+            >
+              {{ t('system.ledger.issueCount', { n: health.ledger.issues }) }}
+              <span
+                v-if="health.ledger.first_issue"
+                class="block font-normal"
+              >
+                {{ t('system.ledger.firstIssue', { issue: t(`closings.invariants.kinds.${health.ledger.first_issue.kind}`, health.ledger.first_issue.kind) }) }}
+              </span>
+            </p>
+            <p
+              v-else
+              class="text-(--ui-text-muted)"
+            >
+              {{ t('system.ledger.help') }}
+            </p>
+          </div>
         </UCard>
 
         <div class="grid gap-6 lg:grid-cols-3">

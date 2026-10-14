@@ -65,6 +65,8 @@ class Charge(BaseModel):
     entry_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("wallet_entries.id", ondelete="SET NULL")
     )
+    # The fee before an admin reduced it (doc 17); ``fee`` is what the driver owes now.
+    original_fee: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
     waived_reason: Mapped[str | None] = mapped_column(String(500))
     waived_by_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL")

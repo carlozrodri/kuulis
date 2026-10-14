@@ -81,6 +81,16 @@ async def _fee_schedule(session: AsyncSession, requester: User, p: dict) -> dict
     return {"schedule_id": str(row.id)}
 
 
+async def _charge_waive(session: AsyncSession, requester: User, p: dict) -> dict:
+    from apps.subscriptions import services as subscriptions
+
+    charge = await subscriptions.waive(
+        session, requester, uuid.UUID(p["charge_id"]), p["reason"], Decimal(p["fee"])
+    )
+    await session.flush()
+    return {"charge_id": str(charge.id), "status": charge.status.value}
+
+
 async def _config_update(session: AsyncSession, requester: User, p: dict) -> None:
     from apps.config import services as config
     from apps.config.schemas import AppConfigUpdate
@@ -118,6 +128,7 @@ async def _campaign_send(session: AsyncSession, requester: User, p: dict) -> Non
 ACTIONS: dict[str, Action] = {
     "wallet.adjust": Action("wallet.adjust", _wallet_adjust),
     "fee_schedule.create": Action(None, _fee_schedule),
+    "charge.waive": Action("subscriptions.manage", _charge_waive),
     "config.update": Action(None, _config_update, _config_cache),
     "notification.broadcast": Action("notifications.send", _nothing, _broadcast),
     "campaign.send": Action("notifications.send", _campaign_send),
@@ -139,6 +150,8 @@ async def required(session: AsyncSession, action: str, **facts: Any) -> bool:
         return config.approval_fares
     if action in ("notification.broadcast", "campaign.send"):
         return config.approval_broadcasts
+    if action == "charge.waive":
+        return config.approval_waivers
     return False
 
 

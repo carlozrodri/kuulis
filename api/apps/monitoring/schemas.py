@@ -49,6 +49,16 @@ class BackupsHealth(BaseModel):
     errors: dict[str, str] = {}  # job -> last error, while it keeps failing
 
 
+class LedgerHealth(BaseModel):
+    """The last daily wallet invariants check (doc 17)."""
+
+    ok: bool
+    checked_at: datetime
+    wallets: int
+    issues: int
+    first_issue: dict | None = None
+
+
 class OpenAlert(BaseModel):
     key: str
     message: str
@@ -68,3 +78,4 @@ class SystemHealth(BaseModel):
     disk_used_percent: float | None
     backups: BackupsHealth
     alerts: list[OpenAlert]
+    ledger: LedgerHealth | None = None  # None until the first check ran

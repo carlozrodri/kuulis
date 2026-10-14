@@ -197,6 +197,8 @@ class ReportAdminDetail(ReportAdminRead):
     reporter_summary: PersonSummary | None
     help_article: HelpArticleRef | None
     lost_item: "LostItemRead | None"
+    # "My top-up did not arrive" (doc 17): the disputed top-up, to confirm it from the ticket.
+    top_up: "TopUpAdminRead | None" = None
 
 
 class ReportUpdate(BaseModel):
@@ -225,5 +227,6 @@ class SuspendRequest(BaseModel):
 
 
 from apps.support.schemas import LostItemRead  # noqa: E402
+from apps.wallet.schemas import TopUpAdminRead  # noqa: E402
 
 ReportAdminDetail.model_rebuild()

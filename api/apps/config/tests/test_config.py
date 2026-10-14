@@ -47,6 +47,7 @@ DEFAULTS = {
     "approval_adjust_limit": "20.00",
     "approval_fares": True,
     "approval_broadcasts": True,
+    "approval_waivers": True,
     "maintenance": {
         "enabled": False,
         "message": {"es": "", "en": ""},

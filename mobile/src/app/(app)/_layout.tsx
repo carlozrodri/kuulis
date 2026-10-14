@@ -45,6 +45,9 @@ export default function AppLayout() {
           <Stack.Screen name="wallet/top-up" />
           <Stack.Screen name="wallet/transfer" />
           <Stack.Screen name="wallet/charges" />
+          <Stack.Screen name="wallet/statement" />
+          <Stack.Screen name="wallet/receipt" />
+          <Stack.Screen name="wallet/dispute" />
           <Stack.Screen name="report" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="reports/index" />
           <Stack.Screen name="reports/[id]" />

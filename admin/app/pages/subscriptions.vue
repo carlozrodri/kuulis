@@ -15,11 +15,14 @@ const apiError = useApiError()
 
 const queryString = (key: string) => (typeof route.query[key] === 'string' ? route.query[key] as string : '')
 
-type Section = 'charges' | 'schedules'
-const section = ref<Section>(queryString('tab') === 'schedules' ? 'schedules' : 'charges')
+type Section = 'charges' | 'schedules' | 'simulator'
+const SECTIONS: Section[] = ['charges', 'schedules', 'simulator']
+const initialSection = queryString('tab') as Section
+const section = ref<Section>(SECTIONS.includes(initialSection) ? initialSection : 'charges')
 const sectionTabs = computed(() => [
   { label: t('subscriptions.charges'), value: 'charges', icon: 'i-lucide-receipt' },
   { label: t('subscriptions.schedules.title'), value: 'schedules', icon: 'i-lucide-layers' },
+  { label: t('subscriptions.simulator.tab'), value: 'simulator', icon: 'i-lucide-calculator' },
 ])
 
 // ---- Charges filters (in the URL) -----------------------------------------------------------
@@ -157,9 +160,13 @@ const tableMeta = {
 
 // ---- Waive (admin) --------------------------------------------------------------------------
 
+const approvals = useApprovalCount()
 const waiving = ref<AdminCharge | null>(null)
 const waiveReason = ref('')
+/** Empty or 0 waives the fee; a lower amount reduces it (doc 17). */
+const waiveFee = ref<number | null>(null)
 const waiveBusy = ref(false)
+const waiveIssue = computed(() => (waiving.value ? waiveFeeIssue(waiveFee.value, waiving.value) : null))
 const waiveOpen = computed({
   get: () => waiving.value !== null,
   set: (open: boolean) => {
@@ -168,17 +175,26 @@ const waiveOpen = computed({
 })
 function askWaive(charge: AdminCharge) {
   waiveReason.value = ''
+  waiveFee.value = null
   waiving.value = charge
 }
 async function waive() {
   const charge = waiving.value
   const reason = waiveReason.value.trim()
-  if (!charge || !reason) return
+  if (!charge || !reason || waiveIssue.value) return
+  const body = waivePayload(reason, waiveFee.value)
   waiveBusy.value = true
   try {
-    await request(`/admin/subscriptions/charges/${charge.id}/waive`, { method: 'POST', body: { reason } })
-    toast.add({ title: t('subscriptions.waive.done'), color: 'success' })
+    const result = await request<unknown>(`/admin/subscriptions/charges/${charge.id}/waive`, { method: 'POST', body })
     waiving.value = null
+    if (isHeld(result)) {
+      await approvals.notifyHeld(result)
+      return
+    }
+    toast.add({
+      title: Number(body.fee) > 0 ? t('subscriptions.waive.doneReduced', { fee: formatUsdt(body.fee, locale.value) }) : t('subscriptions.waive.done'),
+      color: 'success',
+    })
     await Promise.all([refresh(), refreshSummary()])
   }
   catch (err) {
@@ -251,6 +267,7 @@ async function run() {
 
     <template #body>
       <FeeSchedules v-if="section === 'schedules'" />
+      <TierSimulator v-else-if="section === 'simulator'" />
 
       <template v-else>
         <div class="flex flex-wrap items-center justify-between gap-3">
@@ -368,6 +385,12 @@ async function run() {
           <template #fee-cell="{ row }">
             <span class="whitespace-nowrap font-medium tabular-nums">{{ formatUsdt(row.original.fee, locale) }}</span>
             <p
+              v-if="row.original.original_fee"
+              class="text-xs whitespace-nowrap text-(--ui-text-muted) line-through"
+            >
+              {{ t('subscriptions.originalFee', { fee: formatUsdt(row.original.original_fee, locale) }) }}
+            </p>
+            <p
               v-if="row.original.free_period"
               class="text-xs text-(--ui-text-muted)"
             >
@@ -417,7 +440,7 @@ async function run() {
           <template #actions-cell="{ row }">
             <div class="flex justify-end">
               <UButton
-                v-if="row.original.status === 'pending'"
+                v-if="row.original.status === 'pending' || (row.original.status === 'paid' && Number(row.original.fee) > 0)"
                 size="xs"
                 icon="i-lucide-hand-heart"
                 color="neutral"
@@ -460,6 +483,28 @@ async function run() {
                 fee: formatUsdt(waiving.fee, locale),
               }) }}
             </p>
+            <UAlert
+              v-if="waiving.status === 'paid'"
+              color="info"
+              variant="subtle"
+              icon="i-lucide-undo-2"
+              :title="t('subscriptions.waive.helpPaid')"
+            />
+            <UFormField
+              :label="t('subscriptions.waive.newFee')"
+              :help="t('subscriptions.waive.newFeeHelp', { fee: formatUsdt(waiving.fee, locale) })"
+              :error="waiveIssue ? t(`subscriptions.waive.errors.${waiveIssue}`) : undefined"
+            >
+              <UInputNumber
+                v-model="waiveFee"
+                :min="0"
+                :max="FEE_MAX"
+                :step="1"
+                :format-options="{ minimumFractionDigits: 2, maximumFractionDigits: 2 }"
+                placeholder="0.00"
+                class="w-full"
+              />
+            </UFormField>
             <UFormField
               :label="t('subscriptions.waive.reason')"
               required
@@ -486,7 +531,7 @@ async function run() {
               type="submit"
               form="waive-form"
               :label="t('subscriptions.waive.button')"
-              :disabled="!waiveReason.trim()"
+              :disabled="!waiveReason.trim() || !!waiveIssue"
               :loading="waiveBusy"
             />
           </div>

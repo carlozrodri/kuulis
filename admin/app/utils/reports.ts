@@ -23,6 +23,7 @@ export const reportCategoryIcon: Record<ReportCategory, string> = {
   lost_item: 'i-lucide-package-search',
   no_show: 'i-lucide-user-x',
   app_issue: 'i-lucide-smartphone',
+  payment: 'i-lucide-wallet',
   other: 'i-lucide-circle-help',
 }
 

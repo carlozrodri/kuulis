@@ -296,6 +296,8 @@ export interface AppConfig {
   approval_adjust_limit?: Decimal
   approval_fares?: boolean
   approval_broadcasts?: boolean
+  /** Doc 17: waiving or lowering a driver's monthly fee waits for a second person. */
+  approval_waivers?: boolean
   // ---- Remote control (doc 10). Maintenance and city pauses are edited on /app-status, not here. ----
   app_links?: AppLinks
   location_intervals?: LocationIntervals
@@ -688,6 +690,8 @@ export interface TopUp {
   created_at: string
   completed_at: string | null
   rejection_reason: string | null
+  /** Doc 17: the support ticket where the driver said the top-up did not arrive. */
+  dispute_report_id?: string | null
 }
 
 /** GET /admin/top-ups items: the top-up plus the driver (null while `unmatched`). */
@@ -743,6 +747,8 @@ export interface Charge {
   waived_reason: string | null
   /** Pending and past `due_at` (the driver is blocked). Computed by the panel when an older API omits it. */
   overdue?: boolean
+  /** Doc 17: the fee before an admin lowered it (null when it was never reduced). */
+  original_fee?: Decimal | null
 }
 
 /** GET /admin/subscriptions/charges items. */
@@ -846,6 +852,7 @@ export type ReportCategory
     | 'lost_item'
     | 'no_show'
     | 'app_issue'
+    | 'payment'
     | 'other'
 export const REPORT_CATEGORIES: ReportCategory[] = [
   'safety',
@@ -856,6 +863,7 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
   'lost_item',
   'no_show',
   'app_issue',
+  'payment',
   'other',
 ]
 export type ReportPriority = 'urgent' | 'normal'
@@ -1124,6 +1132,8 @@ export interface ReportAdminDetail extends ReportAdminRead {
   messages?: ReportMessageAdminRead[]
   help_article?: { id: string, slug: string, title: string } | null
   lost_item?: LostItemRead | null
+  /** Doc 17: the disputed top-up of a "my top-up did not arrive" ticket (category `payment`). */
+  top_up?: AdminTopUp | null
 }
 
 /** RideAdminRead (list shape of /admin/rides): the ride plus flat names of both parties. */
@@ -1287,6 +1297,17 @@ export interface SystemHealth {
     errors: Record<string, string>
   }
   alerts: { key: string, message: string, since: string }[]
+  /** Doc 17: the last daily ledger invariants check (null until the first one ran). */
+  ledger?: LedgerHealth | null
+}
+
+export interface LedgerHealth {
+  ok: boolean
+  checked_at: string
+  wallets: number
+  /** How many issues the check found. */
+  issues: number
+  first_issue: LedgerIssue | null
 }
 
 export interface AuditEntry {
@@ -2104,4 +2125,133 @@ export interface RiskSettings {
   fan_in_senders: number
   new_account_days: number
   rating_ring_rides: number
+}
+
+// ---- Payments hardening: closings, invariants, simulator (doc 17) ----
+
+export type LedgerIssueKind
+  = | 'balance_mismatch'
+    | 'last_entry_mismatch'
+    | 'negative_balance'
+    | 'duplicate_top_up'
+    | 'top_up_without_entry'
+    | 'fee_without_entry'
+
+/** One problem the invariants check found; the other keys depend on the kind. */
+export interface LedgerIssue {
+  kind: LedgerIssueKind | string
+  user_id?: string
+  wallet_id?: string
+  top_up_id?: string
+  charge_id?: string
+  /** duplicate_top_up: the Binance payment id credited more than once. */
+  id?: string
+  count?: number
+  balance?: Decimal
+  entries?: Decimal
+  balance_after?: Decimal
+  [key: string]: unknown
+}
+
+/** GET /admin/finance/invariants (null until the first check) and POST /admin/finance/invariants/run. */
+export interface InvariantsResult {
+  ok: boolean
+  checked_at: string
+  wallets: number
+  issues: LedgerIssue[]
+}
+
+export interface CountAmount {
+  count: number
+  amount: Decimal
+}
+
+/** What a closing freezes (also GET /admin/finance/closings/preview). */
+export interface ClosingTotals {
+  entries: Partial<Record<WalletEntryKind, { count: number, credits: Decimal, debits: Decimal }>>
+  top_ups: {
+    credited: CountAmount
+    credited_auto: CountAmount
+    credited_manual: CountAmount
+    unmatched: CountAmount
+  }
+  /** Fees billed this month (the 1st bills the month before), by status at closing time. */
+  charges: Partial<Record<ChargeStatus, { count: number, fees: Decimal }>>
+  fees_collected: Decimal
+  balances: { opening: Decimal, closing: Decimal, net: Decimal }
+}
+
+export interface StatementRowMissing {
+  id: string
+  amount: Decimal
+  at: string | null
+}
+
+export interface KuulisPaymentMissing {
+  top_up_id: string
+  id: string | null
+  amount: Decimal
+  status: TopUpStatus
+  reason: 'not_found' | 'no_reference'
+}
+
+export interface AmountMismatch {
+  top_up_id: string
+  id: string | null
+  amount: Decimal
+  status: TopUpStatus
+  binance_amount: Decimal
+}
+
+/** Binance Pay statement vs Kuulis top-ups for the month. */
+export interface ClosingDifferences {
+  statement_rows: number
+  statement_total: Decimal
+  kuulis_rows: number
+  kuulis_total: Decimal
+  matched: number
+  missing_in_kuulis: StatementRowMissing[]
+  missing_in_binance: KuulisPaymentMissing[]
+  amount_mismatch: AmountMismatch[]
+}
+
+export interface Closing {
+  month: Month
+  totals: ClosingTotals
+  hash: string
+  previous_hash: string | null
+  /** False: the stored closing no longer matches its hash (someone changed it). */
+  hash_ok: boolean
+  closed_by: UserBrief | null
+  closed_at: string
+  statement_uploaded_at: string | null
+  has_statement_file: boolean
+  differences: ClosingDifferences | null
+  has_differences: boolean
+  reconciled_at: string | null
+  reconciled_by: UserBrief | null
+  reconcile_note: string | null
+}
+
+export interface TierCount {
+  above: Decimal
+  fee: Decimal
+  drivers: number
+  total: Decimal
+}
+
+/** POST /admin/subscriptions/simulate. */
+export interface Simulation {
+  month: Month
+  drivers: number
+  referral_free: number
+  billed: Decimal
+  /** The current tiers reproduce exactly what the month billed. */
+  matches: boolean
+  current: TierCount[]
+  current_total: Decimal
+  proposed: TierCount[]
+  proposed_total: Decimal
+  /** proposed - current. */
+  difference: Decimal
 }

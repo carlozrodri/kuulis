@@ -324,46 +324,66 @@ def previous_month(today: date) -> date:
 
 
 async def monthly_summaries(today: date) -> int:
-    """Emails each driver with a charge for last month their rides, earnings and fee."""
+    """Emails each driver with a charge for last month their statement (doc 17): rides,
+    earnings, tier and fee, wallet movements and the closing balance."""
     from apps.config.services import get_app_config
-    from apps.rides.models import Ride, RideStatus
+    from apps.finance import statements
     from apps.subscriptions.models import Charge
+    from apps.wallet.models import EntryKind
     from apps.wallet.notify import month_label
-    from kuulis.core.calendar import CARACAS_TZ
 
     month = previous_month(today)
-    start = datetime(month.year, month.month, 1, tzinfo=CARACAS_TZ)
-    end = datetime(today.year, today.month, 1, tzinfo=CARACAS_TZ)
     sent = 0
     async with SessionLocal() as session:
         if not (await get_app_config(session)).notifications.monthly_summary:
             return 0
         rows = await session.execute(
-            select(Charge.user_id, Charge.earnings, Charge.fee, User.locale)
+            select(Charge.user_id, User.locale)
             .join(User, User.id == Charge.user_id)
             .where(Charge.month == month, User.is_active, User.deleted_at.is_(None))
         )
-        charges = rows.all()
-        for user_id, earnings, fee, locale in charges:
-            rides = await session.scalar(
-                select(func.count()).where(
-                    Ride.driver_id == user_id,
-                    Ride.status == RideStatus.COMPLETED,
-                    Ride.completed_at >= start,
-                    Ride.completed_at < end,
-                )
-            )
+        for user_id, locale in rows.all():
+            st = await statements.build(session, user_id, month)
+            moved = st.movements
             await send_user_email.kiq(
                 str(user_id),
                 "monthly_summary",
                 {
                     "month": month_label(month, locale),
-                    "rides": str(int(rides or 0)),
-                    "earnings": f"{earnings:.2f}",
-                    "fee": f"{fee:.2f}",
+                    "rides": str(st.trips),
+                    "earnings": f"{st.earned:.2f}",
+                    "tier": f"{st.tier.above:.2f}" if st.tier else "0.00",
+                    "fee": f"{st.fee:.2f}",
+                    "top_ups": f"{moved[EntryKind.TOP_UP]:.2f}",
+                    "promo": f"{moved[EntryKind.PROMO_CREDIT]:.2f}",
+                    "transfers_in": f"{moved[EntryKind.TRANSFER_IN]:.2f}",
+                    "transfers_out": f"{-moved[EntryKind.TRANSFER_OUT]:.2f}",
+                    "balance": f"{st.closing_balance:.2f}",
                 },
             )
             sent += 1
+    return sent
+
+
+async def run_monthly_once(now: datetime | None = None) -> int | None:
+    """Last month's statements, once its fees were charged (the subscription job marks it)."""
+    from apps.subscriptions import tasks as subscription_tasks
+    from kuulis.core.calendar import CARACAS_TZ, format_month
+    from kuulis.core.redis import redis_client
+
+    now = now or datetime.now(UTC)
+    today = now.astimezone(CARACAS_TZ).date()
+    label = format_month(previous_month(today))
+    if not await redis_client.exists(subscription_tasks._done_key(label)):
+        return None
+    if not await redis_client.set(_key("monthly", label), "1", nx=True, ex=60 * 86400):
+        return None
+    try:
+        sent = await monthly_summaries(today)
+    except Exception:
+        await redis_client.delete(_key("monthly", label))
+        raise
+    logger.info("Monthly statements for %s: %s emails", label, sent)
     return sent
 
 
@@ -378,11 +398,10 @@ async def run_daily_once(now: datetime | None = None) -> dict[str, int] | None:
         return None
     try:
         deleted, idle = await cleanup(now)
-        summaries = await monthly_summaries(today) if today.day == 1 else 0
     except Exception:
         await redis_client.delete(key)
         raise
-    result = {"deleted": deleted, "idle_devices": idle, "summaries": summaries}
+    result = {"deleted": deleted, "idle_devices": idle}
     logger.info("Notifications daily: %s", result)
     return result
 
@@ -398,6 +417,7 @@ async def loop() -> None:
                 last_receipts = time.monotonic()
                 await run_receipts_once()
             await run_daily_once()
+            await run_monthly_once()
             await stats.beat("notifications")
         except asyncio.CancelledError:
             raise

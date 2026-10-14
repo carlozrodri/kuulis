@@ -190,6 +190,43 @@ const suspendOpen = computed({
   },
 })
 
+// ---- Disputed top-up (doc 17) ------------------------------------------------------------------
+
+const topUp = computed(() => report.value?.top_up ?? null)
+/** What to look for in Top-ups: the driver's Binance transaction id, else the order reference. */
+const topUpSearch = computed(() => topUp.value?.transaction_id || topUp.value?.reference || '')
+const topUpConfirmOpen = ref(false)
+const topUpAmount = ref<number | null>(null)
+const topUpReference = ref('')
+function askConfirmTopUp() {
+  const amount = Number(topUp.value?.amount)
+  topUpAmount.value = Number.isFinite(amount) && amount > 0 ? amount : null
+  topUpReference.value = topUp.value?.transaction_id || topUp.value?.reference || ''
+  topUpConfirmOpen.value = true
+}
+async function confirmTopUp() {
+  const current = topUp.value
+  if (!current || topUpAmount.value === null || !(topUpAmount.value > 0)) return
+  busy.value = 'top-up'
+  try {
+    const reference = topUpReference.value.trim()
+    await request(`/admin/top-ups/${current.id}/confirm`, {
+      method: 'POST',
+      body: { amount: topUpAmount.value.toFixed(2), ...(reference ? { reference } : {}) },
+    })
+    toast.add({ title: t('support.topUp.done'), color: 'success' })
+    topUpConfirmOpen.value = false
+    await refresh()
+  }
+  catch (err) {
+    toast.add({ title: apiError(err), color: 'error' })
+  }
+  finally {
+    busy.value = null
+  }
+}
+const topUpMoneyFormat = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+
 // ---- Ride ---------------------------------------------------------------------------------------
 
 const ride = computed(() => report.value?.ride ?? null)
@@ -408,6 +445,105 @@ const rideDriver = computed(() => ride.value?.driver_name || personName(ride.val
                 :description="report.csat_comment || t('support.csatNoComment')"
               />
             </div>
+          </UCard>
+
+          <!-- Doc 17: "my top-up did not arrive" -->
+          <UCard v-if="topUp">
+            <template #header>
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <h2 class="font-semibold">
+                    {{ t('support.topUp.title') }}
+                  </h2>
+                  <UBadge
+                    :color="topUpStatusColor[topUp.status] ?? 'neutral'"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    {{ t(`topUps.statuses.${topUp.status}`, topUp.status) }}
+                  </UBadge>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <UButton
+                    v-if="topUpSearch && auth.can('top_ups.view')"
+                    :to="{ path: '/top-ups', query: { q: topUpSearch } }"
+                    size="sm"
+                    color="neutral"
+                    variant="outline"
+                    icon="i-lucide-search"
+                    :label="t('support.topUp.find')"
+                  />
+                  <UButton
+                    v-if="topUp.status === 'pending' && auth.can('top_ups.manage')"
+                    size="sm"
+                    icon="i-lucide-check"
+                    :label="t('support.topUp.confirm')"
+                    @click="askConfirmTopUp"
+                  />
+                </div>
+              </div>
+              <p class="text-sm text-(--ui-text-muted)">
+                {{ t('support.topUp.help') }}
+              </p>
+            </template>
+            <dl class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
+              <div>
+                <dt class="text-(--ui-text-muted)">
+                  {{ t('support.topUp.amount') }}
+                </dt>
+                <dd class="font-medium tabular-nums">
+                  {{ formatUsdt(topUp.amount, locale) }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-(--ui-text-muted)">
+                  {{ t('support.topUp.transactionId') }}
+                </dt>
+                <dd class="font-mono break-all">
+                  {{ topUp.transaction_id || '—' }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-(--ui-text-muted)">
+                  {{ t('support.topUp.reference') }}
+                </dt>
+                <dd class="font-mono break-all">
+                  {{ topUp.reference || '—' }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-(--ui-text-muted)">
+                  {{ t('support.topUp.createdAt') }}
+                </dt>
+                <dd>{{ formatDate(topUp.created_at, locale) }}</dd>
+              </div>
+              <div v-if="topUp.payer_binance_id || topUp.payer_name">
+                <dt class="text-(--ui-text-muted)">
+                  {{ t('support.topUp.payer') }}
+                </dt>
+                <dd>
+                  <span class="font-mono">{{ topUp.payer_binance_id }}</span>
+                  {{ topUp.payer_name }}
+                </dd>
+              </div>
+              <div
+                v-if="topUp.rejection_reason"
+                class="col-span-2"
+              >
+                <dt class="text-(--ui-text-muted)">
+                  {{ t('support.topUp.rejection') }}
+                </dt>
+                <dd class="break-words">
+                  {{ topUp.rejection_reason }}
+                </dd>
+              </div>
+            </dl>
+            <p
+              v-if="topUp.status !== 'completed' && auth.can('top_ups.view')"
+              class="mt-3 text-xs text-(--ui-text-muted)"
+            >
+              {{ t('support.topUp.findHelp') }}
+            </p>
           </UCard>
 
           <!-- Conversation (doc 13) -->
@@ -900,6 +1036,62 @@ const rideDriver = computed(() => ride.value?.driver_name || personName(ride.val
               :label="resolveKind ? t(`reports.resolve.${resolveKind}Confirm`) : ''"
               :disabled="!canResolve"
               :loading="busy === 'resolve'"
+            />
+          </div>
+        </template>
+      </UModal>
+
+      <UModal
+        v-model:open="topUpConfirmOpen"
+        :title="t('support.topUp.confirmTitle')"
+        :description="t('support.topUp.confirmHelp')"
+      >
+        <template #body>
+          <form
+            id="confirm-top-up-form"
+            class="space-y-4"
+            @submit.prevent="confirmTopUp"
+          >
+            <UFormField
+              :label="t('topUps.receivedAmount')"
+              :help="t('topUps.receivedAmountHelp')"
+              required
+            >
+              <UInputNumber
+                v-model="topUpAmount"
+                :min="0.01"
+                :max="100000"
+                :step="1"
+                :format-options="topUpMoneyFormat"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField
+              :label="t('topUps.reference')"
+              :help="t('topUps.referenceHelp')"
+            >
+              <UInput
+                v-model="topUpReference"
+                maxlength="64"
+                class="w-full font-mono"
+              />
+            </UFormField>
+          </form>
+        </template>
+        <template #footer>
+          <div class="flex w-full justify-end gap-2">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              :label="t('common.cancel')"
+              @click="topUpConfirmOpen = false"
+            />
+            <UButton
+              type="submit"
+              form="confirm-top-up-form"
+              :label="t('support.topUp.confirm')"
+              :disabled="topUpAmount === null || !(topUpAmount > 0)"
+              :loading="busy === 'top-up'"
             />
           </div>
         </template>

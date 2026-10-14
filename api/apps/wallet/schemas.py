@@ -59,6 +59,7 @@ class WalletEntryRead(BaseModel):
     description: str
     details: dict[str, Any]
     created_at: datetime
+    receipt_id: uuid.UUID | None = None  # top-ups and fees have a receipt (doc 17)
 
 
 class BinancePayIdWrite(BaseModel):
@@ -79,6 +80,9 @@ class TopUpInfo(BaseModel):
     account_name: str
     min_amount: MoneyStr
     automatic: bool
+    # Why top-ups are confirmed by hand right now, when automatic matching is configured:
+    # "binance_down" while reconciliation has been failing for more than 10 minutes (doc 17).
+    manual_reason: Literal["binance_down"] | None = None
 
 
 class TopUpCreate(BaseModel):
@@ -100,6 +104,23 @@ class TopUpRead(BaseModel):
     rejection_reason: str | None
     created_at: datetime
     completed_at: datetime | None
+    dispute_report_id: uuid.UUID | None = None
+
+
+class TopUpDispute(BaseModel):
+    """ "My top-up did not arrive" (doc 17): the Binance transaction id and a screenshot."""
+
+    transaction_id: str = Field(min_length=4, max_length=64)
+    attachments: list[str] = Field(min_length=1, max_length=3)
+    note: str | None = Field(default=None, max_length=500)
+
+    @field_validator("transaction_id")
+    @classmethod
+    def _id(cls, value: str) -> str:
+        value = "".join(value.split())
+        if len(value) < 4:
+            raise ValueError("too short")
+        return value
 
 
 class TopUpAdminRead(TopUpRead):

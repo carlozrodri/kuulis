@@ -27,10 +27,26 @@ LOCK_KEY = f"{settings.APP_ENV}:wallet:binance:lock"
 OVERLAP_MS = 10 * 60 * 1000  # re-read the last minutes: late entries; duplicates are ignored
 FIRST_LOOKBACK_MS = 24 * 3600 * 1000
 POLL_SECONDS = 60
+# Doc 17: past this without a good pass, top-ups go to manual review and an alert goes out.
+FAILING_AFTER_SECONDS = 10 * 60
 
 
 def enabled() -> bool:
     return bool(settings.BINANCE_API_KEY and settings.BINANCE_API_SECRET)
+
+
+async def failing() -> bool:
+    """Reconciliation is configured but has not completed a pass for 10 minutes (the loop beats
+    only after a good pass). Unknown (Redis down) counts as working."""
+    if not enabled():
+        return False
+    from apps.monitoring import stats
+
+    try:
+        beat = (await stats.heartbeats()).get("binance")
+    except Exception:
+        return False
+    return beat is None or time.time() - beat > FAILING_AFTER_SECONDS
 
 
 def _signed(params: dict) -> str:

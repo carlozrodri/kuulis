@@ -16,7 +16,7 @@ from apps.subscriptions.schemas import ChargeRead
 from apps.users import services as users
 from apps.users.dependencies import Can, CurrentUser, DBSession
 from apps.users.models import User
-from apps.wallet import services
+from apps.wallet import binance, receipts, services
 from apps.wallet.models import TopUp, TopUpStatus
 from apps.wallet.schemas import (
     Adjustment,
@@ -28,6 +28,7 @@ from apps.wallet.schemas import (
     TopUpAssign,
     TopUpConfirm,
     TopUpCreate,
+    TopUpDispute,
     TopUpInfo,
     TopUpRead,
     TransferAdminRead,
@@ -39,7 +40,6 @@ from apps.wallet.schemas import (
 from kuulis.core.exceptions import NotFoundError
 from kuulis.core.pagination import Page, PageParams, page_params
 from kuulis.core.rate_limit import limiter
-from kuulis.settings import settings
 
 router = APIRouter(prefix="/wallet", tags=["wallet"])
 admin_router = APIRouter(prefix="/admin", tags=["wallet"])
@@ -92,18 +92,29 @@ async def set_binance(data: BinancePayIdWrite, user: CurrentUser, session: DBSes
 @router.get("/me/entries", response_model=Page[WalletEntryRead])
 async def entries(user: CurrentUser, session: DBSession, params: Params) -> Page[WalletEntryRead]:
     rows, total = await services.list_entries(session, user.id, params)
-    return _page([WalletEntryRead.model_validate(r) for r in rows], total, params)
+    return _page(await _entry_reads(session, rows), total, params)
+
+
+async def _entry_reads(session: DBSession, rows: list) -> list[WalletEntryRead]:
+    found = await receipts.for_entries(session, [r.id for r in rows])
+    return [
+        WalletEntryRead.model_validate(r).model_copy(update={"receipt_id": found.get(r.id)})
+        for r in rows
+    ]
 
 
 @router.get("/top-up-info", response_model=TopUpInfo)
 async def top_up_info(user: CurrentUser, session: DBSession) -> TopUpInfo:
     await services.require_driver(session, user.id)
     config = await get_app_config(session)
+    failing = await binance.failing()
     return TopUpInfo(
         pay_id=config.topup_binance_pay_id,
         account_name=config.topup_account_name,
         min_amount=config.topup_min_amount,
-        automatic=bool(settings.BINANCE_API_KEY and settings.BINANCE_API_SECRET),
+        # While Binance fails the app offers "I paid" with a screenshot (doc 17).
+        automatic=binance.enabled() and not failing,
+        manual_reason="binance_down" if failing else None,
     )
 
 
@@ -120,6 +131,23 @@ async def request_top_up(data: TopUpCreate, user: CurrentUser, session: DBSessio
 async def my_top_ups(user: CurrentUser, session: DBSession, params: Params) -> Page[TopUpRead]:
     rows, total = await services.list_top_ups(session, params, user_id=user.id)
     return _page([TopUpRead.model_validate(t) for t, _ in rows], total, params)
+
+
+@router.post("/me/top-ups/{top_up_id}/dispute", response_model=TopUpRead, status_code=201)
+@limiter.limit("10/hour")
+async def dispute_top_up(
+    request: Request,
+    top_up_id: uuid.UUID,
+    data: TopUpDispute,
+    user: CurrentUser,
+    session: DBSession,
+) -> TopUpRead:
+    await services.dispute_top_up(
+        session, user, top_up_id, data.transaction_id, data.attachments, data.note
+    )
+    await session.commit()
+    top_up = await session.get(TopUp, top_up_id, populate_existing=True)
+    return TopUpRead.model_validate(top_up)
 
 
 @router.get("/recipients", response_model=Recipient)
@@ -234,7 +262,7 @@ async def admin_wallet(
         balance=wallet.balance if wallet else services.ZERO,
         binance_pay_id=wallet.binance_pay_id if wallet else None,
         sent_this_month=await services.sent_this_month(session, user_id),
-        entries=[WalletEntryRead.model_validate(r) for r in rows],
+        entries=await _entry_reads(session, rows),
         pending_charges=[subscriptions.charge_read(c) for c in summary.pending],
     )
 
@@ -244,7 +272,7 @@ async def admin_entries(
     user_id: uuid.UUID, _: Can("wallet.view"), session: DBSession, params: Params
 ) -> Page[WalletEntryRead]:
     rows, total = await services.list_entries(session, user_id, params)
-    return _page([WalletEntryRead.model_validate(r) for r in rows], total, params)
+    return _page(await _entry_reads(session, rows), total, params)
 
 
 @admin_router.post(

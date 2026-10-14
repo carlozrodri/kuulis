@@ -39,6 +39,16 @@ class Template:
     quote: str | None = None
 
 
+# Closing line of the emails that are also a receipt (doc 17). Without a company, not fiscal.
+RECEIPT_ES = (
+    "Recibo no fiscal N.º {receipt} · saldo después: {balance} USDT. "
+    "También lo ves en la app, en Billetera."
+)
+RECEIPT_EN = (
+    "Non-fiscal receipt No. {receipt} · balance after: {balance} USDT. "
+    "You can also see it in the app, under Wallet."
+)
+
 TEMPLATES: dict[str, Template] = {
     "verify": Template(
         "Confirmar correo",
@@ -252,13 +262,15 @@ TEMPLATES: dict[str, Template] = {
             "Recarga acreditada",
             "Sumamos {amount} USDT a tu billetera",
             ("Hola {name}, tu recarga ya está en tu billetera de Kuulis.",),
+            closing=(RECEIPT_ES,),
         ),
         Text(
             "Top-up credited",
             "We added {amount} USDT to your wallet",
             ("Hi {name}, your top-up is in your Kuulis wallet now.",),
+            closing=(RECEIPT_EN,),
         ),
-        {"name": "Luis", "amount": "10.00"},
+        {"name": "Luis", "amount": "10.00", "receipt": "000123", "balance": "14.50"},
     ),
     "fee_paid": Template(
         "Recibo de cuota",
@@ -271,6 +283,7 @@ TEMPLATES: dict[str, Template] = {
                 "Kuulis no cobra comisión por viaje: solo esta cuota en los meses en que "
                 "trabajas. ¡Gracias!",
             ),
+            closing=(RECEIPT_ES,),
         ),
         Text(
             "Receipt for your {month} fee",
@@ -280,8 +293,15 @@ TEMPLATES: dict[str, Template] = {
                 "Kuulis takes no commission per ride: only this fee in the months you work. "
                 "Thank you!",
             ),
+            closing=(RECEIPT_EN,),
         ),
-        {"name": "Luis", "fee": "5.00", "month": "septiembre 2026"},
+        {
+            "name": "Luis",
+            "fee": "5.00",
+            "month": "septiembre 2026",
+            "receipt": "000124",
+            "balance": "9.50",
+        },
         {"month": "September 2026"},
     ),
     "fee_pending": Template(
@@ -307,32 +327,46 @@ TEMPLATES: dict[str, Template] = {
         {"month": "September 2026", "due": "October 5"},
     ),
     "monthly_summary": Template(
-        "Resumen mensual del motorizado",
-        "El día 1, el resumen del mes anterior.",
+        "Estado de cuenta mensual",
+        "El día 1, apenas se cobran las cuotas: el estado de cuenta del mes anterior.",
         Text(
-            "Tu mes en Kuulis: {month}",
+            "Tu estado de cuenta de {month}",
             "Tu mes en Kuulis",
             (
-                "Hola {name}, en {month} hiciste {rides} viajes y ganaste {earnings} USD.",
-                "Cuota del mes: {fee} USDT.",
-                "¡Gracias por manejar con Kuulis!",
+                "Hola {name}, en {month} hiciste {rides} viajes y ganaste {earnings} USD "
+                "según la app.",
+                "Tramo: más de {tier} USD · cuota del mes: {fee} USDT.",
+                "Billetera: recargas {top_ups} · créditos de promoción {promo} · "
+                "transferencias recibidas {transfers_in} y enviadas {transfers_out} USDT.",
+                "Saldo al cierre del mes: {balance} USDT.",
             ),
+            closing=("El detalle está en la app: Billetera → Estado de cuenta.",),
         ),
         Text(
-            "Your month in Kuulis: {month}",
+            "Your {month} statement",
             "Your month in Kuulis",
             (
-                "Hi {name}, in {month} you did {rides} rides and earned {earnings} USD.",
-                "Fee for the month: {fee} USDT.",
-                "Thank you for driving with Kuulis!",
+                "Hi {name}, in {month} you did {rides} rides and earned {earnings} USD "
+                "according to the app.",
+                "Tier: above {tier} USD · fee for the month: {fee} USDT.",
+                "Wallet: top-ups {top_ups} · promotion credits {promo} · transfers received "
+                "{transfers_in} and sent {transfers_out} USDT.",
+                "Balance at the end of the month: {balance} USDT.",
             ),
+            closing=("The details are in the app: Wallet → Statement.",),
         ),
         {
             "name": "Luis",
             "month": "septiembre 2026",
             "rides": "84",
             "earnings": "312.50",
-            "fee": "5.00",
+            "tier": "300.00",
+            "fee": "15.00",
+            "top_ups": "20.00",
+            "promo": "6.40",
+            "transfers_in": "0.00",
+            "transfers_out": "5.00",
+            "balance": "11.90",
         },
         {"month": "September 2026"},
     ),

@@ -1,6 +1,7 @@
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
+from itertools import pairwise
 from typing import Annotated, Self
 
 from pydantic import (
@@ -47,16 +48,72 @@ class Tier(BaseModel):
     ]
 
 
+def check_tiers(tiers: list[Tier]) -> None:
+    if tiers[0].above != 0:
+        raise ValueError("the first tier must start at 0")
+    if any(b.above <= a.above for a, b in pairwise(tiers)):
+        raise ValueError("tiers must be sorted by 'above' without repeats")
+
+
 class ScheduleCreate(BaseModel):
     effective_month: Month
     tiers: list[Tier] = Field(min_length=1, max_length=50)
 
     @model_validator(mode="after")
     def _ordered(self) -> Self:
-        if self.tiers[0].above != 0:
-            raise ValueError("the first tier must start at 0")
-        if any(b.above <= a.above for a, b in zip(self.tiers, self.tiers[1:], strict=False)):
-            raise ValueError("tiers must be sorted by 'above' without repeats")
+        check_tiers(self.tiers)
+        return self
+
+
+class SimulateRequest(BaseModel):
+    """Doc 17: last month's fees with the current tiers and with ``tiers`` (proposed)."""
+
+    month: Month | None = None  # default: last month
+    tiers: list[Tier] | None = Field(default=None, min_length=1, max_length=50)
+
+    @model_validator(mode="after")
+    def _ordered(self) -> Self:
+        if self.tiers:
+            check_tiers(self.tiers)
+        return self
+
+
+class TierCountRead(BaseModel):
+    above: Annotated[Decimal, MoneyStr]
+    fee: Annotated[Decimal, MoneyStr]
+    drivers: int
+    total: Annotated[Decimal, MoneyStr]
+
+
+class SimulationRead(BaseModel):
+    month: Month
+    drivers: int
+    referral_free: int
+    billed: Annotated[Decimal, MoneyStr]
+    # True when the current tiers reproduce exactly what the month billed.
+    matches: bool
+    current: list[TierCountRead]
+    current_total: Annotated[Decimal, MoneyStr]
+    proposed: list[TierCountRead]
+    proposed_total: Annotated[Decimal, MoneyStr]
+    difference: Annotated[Decimal, MoneyStr]  # proposed - current
+
+
+class WaiveBody(BaseModel):
+    """Waive (``fee`` 0, the default) or lower a fee, with the reason (doc 17)."""
+
+    reason: str = Field(min_length=1, max_length=500)
+    fee: Annotated[
+        Decimal,
+        Field(ge=Decimal("0"), le=Decimal("1000"), decimal_places=2, allow_inf_nan=False),
+        AfterValidator(_cents),
+    ] = Decimal("0.00")
+
+    @model_validator(mode="after")
+    def _reason(self) -> Self:
+        self.reason = self.reason.strip()
+        if not self.reason:
+            raise ValueError("reason must not be blank")
         return self
 
 
@@ -86,6 +143,7 @@ class ChargeRead(BaseModel):
     paid_at: datetime | None
     waived_reason: str | None
     overdue: bool = False
+    original_fee: Annotated[Decimal, MoneyStr] | None = None  # before a reduction (doc 17)
 
 
 class ChargeAdminRead(ChargeRead):

@@ -59,6 +59,7 @@ async def test_top_up_request_confirm_reject(client, admin_headers, staff_header
         "account_name": "Kuulis",
         "min_amount": "5.00",
         "automatic": False,
+        "manual_reason": None,
     }
     low = await client.post(f"{API}/wallet/me/top-ups", json={"amount": "4"}, headers=luis.headers)
     assert low.status_code == 400 and low.json()["error"]["code"] == "amount_too_low"

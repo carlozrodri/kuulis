@@ -453,6 +453,8 @@ class AppConfig(BaseModel):
     # Fare and fee schedule changes, and notifications to a whole role or everyone.
     approval_fares: bool = True
     approval_broadcasts: bool = True
+    # Waiving or lowering a driver's monthly fee (doc 17).
+    approval_waivers: bool = True
 
     # --- Remote control (doc 10) ----------------------------------------------------------------
     # maintenance and area_pauses change only through PUT /admin/app/status (not in the update).
@@ -547,6 +549,7 @@ class AppConfigUpdate(BaseModel):
     approval_adjust_limit: Money | None = None
     approval_fares: bool | None = None
     approval_broadcasts: bool | None = None
+    approval_waivers: bool | None = None
     app_links: AppLinks | None = None
     location_intervals: LocationIntervals | None = None
     safety: SafetySettings | None = None

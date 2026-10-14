@@ -17,8 +17,16 @@ from sqlalchemy.orm import aliased
 from apps.config.schemas import AppConfig
 from apps.drivers.models import DriverProfile, DriverStatus
 from apps.users.models import User
-from apps.wallet import notify
-from apps.wallet.models import EntryKind, TopUp, TopUpMethod, TopUpStatus, Wallet, WalletEntry
+from apps.wallet import notify, receipts
+from apps.wallet.models import (
+    EntryKind,
+    ReceiptKind,
+    TopUp,
+    TopUpMethod,
+    TopUpStatus,
+    Wallet,
+    WalletEntry,
+)
 from apps.wallet.schemas import TransferLimit
 from kuulis.core.calendar import local_now, month_bounds, month_start
 from kuulis.core.exceptions import AppError, ConflictError, NotFoundError, PermissionDeniedError
@@ -401,7 +409,15 @@ async def _complete(
     top_up.entry_id = entry.id
     top_up.completed_at = datetime.now(UTC)
     top_up.reviewed_by_id = reviewer.id if reviewer else None
-    await notify.send(session, user_id, "top_up_credited", amount=f"{amount:.2f}")
+    reference = top_up.transaction_id or top_up.reference
+    await receipts.issue(session, entry, user_id, ReceiptKind.TOP_UP, reference=reference)
+    await notify.send(
+        session,
+        user_id,
+        "top_up_credited",
+        amount=f"{amount:.2f}",
+        **await receipts.email_values(session, entry.id),
+    )
     return top_up
 
 
@@ -553,3 +569,82 @@ async def adjust(
         entry = await post_entry(session, user_id, EntryKind.ADJUSTMENT, amount, **kwargs)
     await notify.send(session, user_id, "adjustment", amount=f"{amount:+.2f}", reason=reason)
     return entry
+
+
+# --- Disputes (doc 17) -------------------------------------------------------------------------
+
+
+class DisputeNotAllowedError(ConflictError):
+    code = "top_up_dispute_not_allowed"
+    message = "Only pending or rejected top-ups can be disputed"
+
+
+class DisputeOpenError(ConflictError):
+    code = "top_up_dispute_open"
+    message = "This top-up already has an open claim"
+
+
+async def dispute_top_up(
+    session: AsyncSession,
+    user: User,
+    top_up_id: uuid.UUID,
+    transaction_id: str,
+    attachments: list[str],
+    note: str | None,
+):
+    """ "My top-up did not arrive": an urgent Payment ticket in Support with the Binance
+    transaction id and the screenshot; staff confirm or assign the top-up from it."""
+    from apps.moderation import services as moderation
+    from apps.moderation.models import OPEN_STATUSES, Report, ReportCategory, ReportPriority
+    from apps.support import conversation
+
+    await require_driver(session, user.id)
+    top_up = await _locked_top_up(session, top_up_id)
+    if top_up.user_id != user.id:
+        raise TopUpNotFoundError()
+    if top_up.status not in (TopUpStatus.PENDING, TopUpStatus.REJECTED):
+        raise DisputeNotAllowedError(details={"status": top_up.status.value})
+    if top_up.dispute_report_id is not None:
+        status = await session.scalar(
+            select(Report.status).where(Report.id == top_up.dispute_report_id)
+        )
+        if status in OPEN_STATUSES:
+            raise DisputeOpenError(details={"report_id": str(top_up.dispute_report_id)})
+    en = user.locale == "en"
+    lines = [
+        ("My top-up did not arrive" if en else "No me llegó mi recarga")
+        + f": {top_up.amount:.2f} USDT",
+        ("Binance transaction id" if en else "ID de transacción de Binance")
+        + f": {transaction_id}",
+    ]
+    if top_up.reference and top_up.reference != transaction_id:
+        lines.append(("Reference typed" if en else "Referencia escrita") + f": {top_up.reference}")
+    if note:
+        lines += ["", note]
+    report = await moderation.create_report(
+        session,
+        user,
+        ReportCategory.PAYMENT,
+        "\n".join(lines),
+        None,
+        attachments=attachments,
+    )
+    report.priority = ReportPriority.URGENT
+    report.tags = ["recarga"]
+    config = await _config(session)
+    conversation.reprioritized(report, config)
+    if not top_up.reference:
+        top_up.reference = transaction_id
+    top_up.dispute_report_id = report.id
+    await session.flush()
+    return report
+
+
+async def _config(session: AsyncSession) -> AppConfig:
+    from apps.config.services import get_app_config
+
+    return await get_app_config(session)
+
+
+async def top_up_for_report(session: AsyncSession, report_id: uuid.UUID) -> TopUp | None:
+    return await session.scalar(select(TopUp).where(TopUp.dispute_report_id == report_id))

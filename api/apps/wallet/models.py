@@ -3,7 +3,18 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import CheckConstraint, DateTime, Enum, ForeignKey, Index, Numeric, String, text
+from sqlalchemy import (
+    BigInteger,
+    CheckConstraint,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Index,
+    Numeric,
+    Sequence,
+    String,
+    text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -28,6 +39,11 @@ class TopUpStatus(enum.StrEnum):
 
 class TopUpMethod(enum.StrEnum):
     BINANCE_PAY = "binance_pay"
+
+
+class ReceiptKind(enum.StrEnum):
+    TOP_UP = "top_up"
+    SUBSCRIPTION_FEE = "subscription_fee"
 
 
 class Wallet(BaseModel):
@@ -118,3 +134,37 @@ class TopUp(BaseModel):
         ForeignKey("users.id", ondelete="SET NULL")
     )
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # The driver's last "my top-up did not arrive" ticket (doc 17), in Support.
+    dispute_report_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("reports.id", ondelete="SET NULL")
+    )
+
+
+RECEIPT_NUMBER = Sequence("wallet_receipt_number_seq")
+
+
+class Receipt(BaseModel):
+    """A non-fiscal receipt (doc 17) for a credited top-up or a paid fee. ``number`` is a
+    correlative across every driver; the receipt is written with its ledger entry and never
+    changes."""
+
+    __tablename__ = "wallet_receipts"
+
+    number: Mapped[int] = mapped_column(
+        BigInteger, RECEIPT_NUMBER, server_default=RECEIPT_NUMBER.next_value(), unique=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    entry_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("wallet_entries.id", ondelete="CASCADE"), unique=True
+    )
+    kind: Mapped[ReceiptKind] = mapped_column(
+        Enum(ReceiptKind, name="receipt_kind", values_callable=lambda e: [m.value for m in e])
+    )
+    amount: Mapped[Decimal] = mapped_column(Numeric(12, 2))  # positive
+    balance_after: Mapped[Decimal] = mapped_column(Numeric(12, 2))
+    # "Recarga Binance Pay" / "Cuota de septiembre 2026", in the driver's language at issue time.
+    concept: Mapped[str] = mapped_column(String(200))
+    reference: Mapped[str | None] = mapped_column(String(64))
+    issued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
