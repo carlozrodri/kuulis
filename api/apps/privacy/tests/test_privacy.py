@@ -347,14 +347,16 @@ async def test_retention(client, passenger, recorder, monkeypatch):
 
 async def test_consents(client, user_headers):
     me = (await client.get(f"{API}/users/me", headers=user_headers)).json()
-    assert me["consents"] == []
+    # Anonymous usage data is on until the user opts out (doc 19); the rest needs a yes.
+    assert me["consents"] == ["usage_data"]
     url = f"{API}/users/me/consents"
     body = {"kind": "background_location", "granted": True}
     assert (await client.put(url, json=body, headers=user_headers)).json() == [
-        "background_location"
+        "background_location",
+        "usage_data",
     ]
     withdrawn = await client.put(url, json=body | {"granted": False}, headers=user_headers)
-    assert withdrawn.json() == []
+    assert withdrawn.json() == ["usage_data"]
     bad = await client.put(url, json={"kind": "camera", "granted": True}, headers=user_headers)
     assert bad.status_code == 422
 

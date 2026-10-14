@@ -9,6 +9,7 @@ import { Button, Card, ErrorText, ListRow, Notice, StatusPill, Txt } from '@/com
 import { StepScreen } from '@/features/driver/StepScreen';
 import { useAppConfig, useDriverProfile, useSubmitDriver } from '@/hooks/useDriver';
 import { apiErrorMessage } from '@/i18n';
+import { track } from '@/lib/analytics';
 import { formatPhoneLocal, isDocumentDone, isoToDisplayDate, requirementChecklist } from '@/lib/driver';
 import { space } from '@/theme';
 
@@ -60,6 +61,7 @@ export default function ReviewStep() {
     setError(undefined);
     try {
       await submit.mutateAsync();
+      track('driver_onboarding_step', { step: 'submitted' });
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
       router.dismissTo('/');
     } catch (e) {

@@ -129,3 +129,4 @@ export { default as BookOpen } from 'lucide-react-native/icons/book-open';
 export { default as PackageSearch } from 'lucide-react-native/icons/package-search';
 export { default as Timer } from 'lucide-react-native/icons/timer';
 export { default as Percent } from 'lucide-react-native/icons/percent';
+export { default as ChartNoAxesColumn } from 'lucide-react-native/icons/chart-no-axes-column';

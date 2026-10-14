@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, RefreshControl, StyleSheet, View } from 'react-native';
 
@@ -12,6 +12,7 @@ import { apiErrorMessage } from '@/i18n';
 import { selectionHaptic } from '@/lib/feedback';
 import { articleLink } from '@/lib/support';
 import { radius, space, useTheme } from '@/theme';
+import { track } from '@/lib/analytics';
 
 import { openArticle } from './components';
 
@@ -35,6 +36,9 @@ export function HelpArticleScreen() {
   const feedback = useHelpFeedback();
   const [answer, setAnswer] = useState<boolean | null>(null);
   const data = article.data;
+  useEffect(() => {
+    if (data?.slug) track('help_article_viewed', { slug: data.slug });
+  }, [data?.slug]);
 
   const vote = (helpful: boolean) => {
     if (!data || answer !== null) return;

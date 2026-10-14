@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 
@@ -53,6 +53,7 @@ import {
   topUpAmountError,
 } from "@/lib/wallet";
 import { radius, space, useTheme } from "@/theme";
+import { track } from "@/lib/analytics";
 
 import { BinanceDownNotice } from "./BinanceDownNotice";
 import { CopyValue, FlowHeader, leaveFlow, Steps } from "./components";
@@ -90,6 +91,7 @@ export function TopUpScreen() {
   const binanceAuto = useFlag("binance_auto");
   const [editingId, setEditingId] = useState(false);
   const [step, setStep] = useState<Exclude<Step, "binance">>("pay");
+  useEffect(() => track("topup_started"), []);
 
   const loading = wallet.isPending || info.isPending;
   const error = wallet.error ?? info.error;
@@ -593,6 +595,7 @@ function NotifyStep({
       { amount: value.toFixed(2), ...(ref ? { reference: ref } : {}) },
       {
         onSuccess: () => {
+          track("topup_completed", { amount: value });
           confirmHaptic();
           onSent();
         },

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native';
 
@@ -5,6 +6,7 @@ import { Download, Sparkles, X } from '@/components/icons';
 import { Card, IconButton, IconTile, Txt } from '@/components/ui';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { useCanRestart, useJsUpdate } from '@/hooks/useJsUpdate';
+import { trackOnce } from '@/lib/analytics';
 import { formatMegabytes } from '@/lib/appVersion';
 import { space } from '@/theme';
 
@@ -19,7 +21,11 @@ import { InstallControls } from './UpdateControls';
 export function UpdateBanner({ style }: { style?: StyleProp<ViewStyle> }) {
   const { t } = useTranslation();
   const { latest, available, required, dismissed, dismiss } = useAppUpdate();
-  if (!available || !latest || (!required && dismissed)) return <JsUpdateBanner style={style} />;
+  const shown = available && !!latest && (required || !dismissed);
+  useEffect(() => {
+    if (shown && latest) trackOnce(`apk:${latest.version}:${required}`, 'update_prompt_shown', { kind: required ? 'required' : 'optional' });
+  }, [shown, latest, required]);
+  if (!shown || !latest) return <JsUpdateBanner style={style} />;
   return (
     <Card tone="tint" style={[styles.card, style]}>
       <View style={styles.row}>
@@ -47,7 +53,11 @@ function JsUpdateBanner({ style }: { style?: StyleProp<ViewStyle> }) {
   const { t } = useTranslation();
   const js = useJsUpdate();
   const { allowed } = useCanRestart(js.pending && !js.dismissed);
-  if (!js.pending || js.dismissed || !allowed) return null;
+  const shown = js.pending && !js.dismissed && allowed;
+  useEffect(() => {
+    if (shown) trackOnce('ota', 'update_prompt_shown', { kind: 'ota' });
+  }, [shown]);
+  if (!shown) return null;
   return (
     <Card tone="tint" style={[styles.card, style]}>
       <View style={styles.row}>

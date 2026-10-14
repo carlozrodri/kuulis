@@ -30,6 +30,7 @@ import { isActiveStatus, isNoShow, isReassigning, rideRole, rideRoleStrict } fro
 import type { DriverLocationEvent, DriverState, Offer, Ride, RideMessage } from '@/lib/types';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
+import { track } from '@/lib/analytics';
 
 import { bumpUnread, chatOpen, routedRides } from './store';
 
@@ -81,6 +82,8 @@ export function RideSync() {
         heavyHaptic();
         showToast(t('ride.toast.reassigning'), 'danger');
       } else if (ride.status === 'driver_assigned') {
+        const waited = ride.assigned_at ? (Date.parse(ride.assigned_at) - Date.parse(ride.requested_at)) / 1000 : NaN;
+        track('ride_matched', Number.isFinite(waited) ? { wait_s: Math.max(0, Math.round(waited)) } : {});
         confirmHaptic();
         showToast(t('ride.toast.assigned', { name: ride.driver?.first_name ?? '' }), 'success');
       } else if (ride.status === 'driver_arrived') {
@@ -94,6 +97,8 @@ export function RideSync() {
         showToast(t('ride.toast.adminCancelled'), 'danger');
       } else if (ride.status === 'no_drivers') {
         showToast(t('ride.toast.noDrivers'), 'danger');
+      } else if (ride.status === 'completed') {
+        track('ride_completed', { role: 'passenger' });
       }
     } else if (ride.status === 'cancelled_by_passenger' || ride.status === 'cancelled_by_admin') {
       heavyHaptic();

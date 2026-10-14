@@ -13,6 +13,9 @@
 - Reports you make or that others make about you.
 - Device: model, system, app version, notification token, IP address and error logs.
 - Acceptance of these texts: version, date, IP and platform.
+- App usage data: which screens you open and which steps you complete (for example "quote shown" or "ride
+  requested"), with the platform, app version and an approximate 1 km area. It does not include your email,
+  phone, messages or exact location. You can turn it off (see section 6).
 
 **Also, from drivers**
 - National ID, RIF, phone, date of birth, licence, medical certificate, vehicle details and photos and a selfie
@@ -25,7 +28,9 @@
   the map and charging the driver subscription.
 - Safety: verifying drivers, handling reports, preventing fraud and suspending accounts that break the rules.
 - Talking to you: ride updates, account emails and service notifications.
-- Improving the app: aggregated statistics and error diagnostics.
+- Improving the app: aggregated statistics (where people drop out of sign-up or of a request, how many ride
+  again, which areas and hours lack drivers) and error diagnostics. Usage data is stored on our own servers; we
+  do not use third-party analytics tools.
 - Complying with the law and requests from competent authorities.
 
 We do not sell your data or use it for third-party advertising.
@@ -47,6 +52,7 @@ We do not sell your data or use it for third-party advertising.
 | Rejected driver documents | 30 days |
 | Inbox notifications | 90 days |
 | Technical and error logs | 14 to 30 days |
+| App usage data | 13 months |
 | Rides, wallet entries and audit log | 5 years, anonymised if you delete your account |
 
 ## 6. Your rights
@@ -55,6 +61,8 @@ We do not sell your data or use it for third-party advertising.
 - **Delete your account** from Profile → Security. You have 30 days to change your mind by signing in again.
   After that we erase or anonymise your personal data; rides and wallet entries are kept without identifying
   you, for accounting and safety. Any wallet balance is lost.
+- **Stop sharing usage data** from Profile → Settings → Privacy → "Share anonymous usage data". It is on by
+  default; once off, the app stops sending it.
 - **Withdraw device permissions** (location, notifications, camera) from your phone settings.
 - Write to [contact email] for any other request.
 

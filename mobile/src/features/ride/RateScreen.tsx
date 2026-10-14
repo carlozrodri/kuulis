@@ -16,6 +16,7 @@ import { amountToPay, hasDiscount } from '@/lib/money';
 import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
 import { fonts, space, useTheme } from '@/theme';
+import { track } from '@/lib/analytics';
 
 import { Avatar, PAYMENT_ICONS, PlaceRows, StarInput } from './components';
 
@@ -69,6 +70,7 @@ export function RateScreen() {
       { id: ride.id, stars, tags, comment: comment.trim() || undefined },
       {
         onSuccess: () => {
+          track('rating_submitted', { role, stars });
           confirmHaptic();
           showToast(t('rating.thanks'), 'success');
           leave();

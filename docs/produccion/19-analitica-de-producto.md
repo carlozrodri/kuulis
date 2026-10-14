@@ -65,3 +65,54 @@ servicios caros.
 
 ## Preguntas para Carlos
 1. ¿Datos de uso activados por defecto con opción de excluirse? Recomendado: sí.
+   **Decidido** (recomendado): activados por defecto; se desactivan en Perfil → Ajustes → Privacidad.
+
+## Cómo quedó (2026-10-14)
+### API
+- **Eventos** (`apps/analytics/events.py`): catálogo cerrado de 16 eventos con el tipo de cada propiedad
+  (`EVENTS`). Lo que no está en el catálogo se descarta; los textos que parecen un correo o un teléfono se
+  descartan, los UUID pasan a `:id` y los números largos a `:n`. La ubicación solo viaja como celda de ~1 km
+  (`"floor(lat*100):floor(lng*100)"`, igual en la app, en Python y en SQL) y la API deduce la ciudad de la celda.
+  Un test recorre el catálogo y prueba que ningún evento guarda correo, teléfono ni coordenadas.
+- `POST /analytics/events`: lote de hasta 100, 30 por minuto, con o sin sesión (`anon_id` del dispositivo),
+  responde 202. Eventos de más de 7 días se descartan y las fechas futuras se recortan a la hora del servidor.
+- **Exclusión**: nuevo permiso `usage_data` en `/users/me/consents`, activado por defecto
+  (`CONSENT_DEFAULTS`). Si el usuario lo apaga, la API descarta sus eventos aunque una app vieja los envíe
+  (respuesta cacheada 1 día en Redis y olvidada al cambiar). La exportación de datos incluye sus eventos y el
+  borrado de cuenta los elimina.
+- **Tablas**: `analytics_events` particionada por mes (`occurred_at`) con partición `default` de respaldo;
+  `driver_online_sessions` (conexión y desconexión de cada motorizado); `supply_hours` (minutos de motorizado
+  por celda y hora); `analytics_cohorts` (resumen diario de embudos y retención).
+- **Worker** (`apps/analytics/tasks.py`, latido `product_analytics` en Monitoreo): cada minuto compara los
+  motorizados conectados en Redis con las sesiones abiertas y suma un minuto de oferta a su celda; cada día
+  crea las particiones del mes y los dos siguientes, borra lo de más de 13 meses y recalcula 26 semanas de
+  cohortes. También se puede recalcular desde el admin.
+- **Reportes** `GET /admin/analytics/funnels|retention|supply-demand|promotions|drivers` y
+  `GET /admin/analytics/{reporte}.csv`. Permisos `analytics.view` y `analytics.export` (auditado).
+
+### Admin
+- **Operación → Analítica**, con filtro de rango (o mes) y ciudad, botones Exportar CSV y Recalcular:
+  - **Embudos**: pasajero (registro → primer pedido → primer viaje), motorizado (solicitud → moto →
+    documentos → enviada → aprobado → primer viaje → primera cuota) con el paso donde más se abandona
+    resaltado, pantallas del onboarding y cotización → pedido → emparejado → completado.
+  - **Retención**: cohortes semanales de pasajeros y motorizados en las semanas 1, 2, 4 y 8 desde el primer
+    viaje. Una celda solo se muestra cuando esa semana ya terminó para toda la cohorte.
+  - **Oferta y demanda**: mapa de calor por celda de pedidos sin motorizado, cotizaciones sin pedido, pedidos y
+    horas de motorizado conectado, filtrable por hora del día; gráficos por hora y tabla de las zonas peores.
+  - **Promociones**: viajes, costo, costo por viaje, pasajeros nuevos y su retención a 30 días.
+  - **Motorizados**: distribución de ganancias del mes, cuántos caen en cada tramo de cuota y utilización
+    (horas en viaje sobre horas conectado).
+
+### App (OTA)
+- `src/lib/analytics.ts`: `track()` con cola local en archivo (máx. 500), envío cada 30 s y al pasar a segundo
+  plano, `anon_id` propio del dispositivo. Si falla, reintenta luego sin molestar al usuario.
+- Eventos conectados en registro, búsqueda, cotización, pedido, emparejado, viaje completado (pasajero y
+  motorizado), calificación, recarga, reporte, ayuda, avisos de actualización, pantallas vistas y cada paso del
+  onboarding del motorizado.
+- Perfil → Ajustes → Privacidad → "Compartir datos de uso anónimos". Al apagarlo se vacía la cola y se deja de
+  enviar.
+
+### Privacidad
+- `privacy.es.md` y `privacy.en.md` describen los datos de uso, la retención de 13 meses y cómo excluirse. En
+  QA y producción el texto vigente es el publicado en la base: hay que publicar la nueva versión desde
+  Admin → Legal (no requiere volver a aceptar).

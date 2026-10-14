@@ -15,6 +15,9 @@ contacto].
 - Dispositivo: modelo, sistema, versión de la app, token de notificaciones, dirección IP y registros de
   errores.
 - Aceptación de estos textos: versión, fecha, IP y plataforma.
+- Datos de uso de la app: qué pantallas abres y qué pasos completas (por ejemplo, "cotización vista" o "viaje
+  pedido"), con la plataforma, la versión de la app y una zona aproximada de 1 km. No incluyen tu correo, tu
+  teléfono, mensajes ni tu ubicación exacta. Puedes desactivarlos (ver sección 6).
 
 **Además, de los motorizados**
 - Cédula, RIF, teléfono, fecha de nacimiento, licencia, certificado médico, datos y fotos del vehículo y una
@@ -28,7 +31,9 @@ contacto].
 - Seguridad: verificar a los motorizados, atender reportes, prevenir fraudes y suspender cuentas que incumplan
   las normas.
 - Comunicarnos contigo: avisos del viaje, correos de la cuenta y notificaciones de servicio.
-- Mejorar la app: estadísticas agregadas y diagnóstico de errores.
+- Mejorar la app: estadísticas agregadas (dónde se abandona el registro o el pedido, cuántos vuelven a viajar,
+  en qué zonas y horas faltan motorizados) y diagnóstico de errores. Los datos de uso se guardan en nuestros
+  propios servidores; no usamos herramientas de analítica de terceros.
 - Cumplir la ley y atender requerimientos de autoridades competentes.
 
 No vendemos tus datos ni los usamos para publicidad de terceros.
@@ -51,6 +56,7 @@ No vendemos tus datos ni los usamos para publicidad de terceros.
 | Documentos de motorizados rechazados | 30 días |
 | Notificaciones de la bandeja | 90 días |
 | Registros técnicos y de errores | 14 a 30 días |
+| Datos de uso de la app | 13 meses |
 | Viajes, movimientos de billetera y auditoría | 5 años, anonimizados si eliminas tu cuenta |
 
 ## 6. Tus derechos
@@ -59,6 +65,8 @@ No vendemos tus datos ni los usamos para publicidad de terceros.
 - **Eliminar tu cuenta** desde Perfil → Seguridad. Tienes 30 días para arrepentirte entrando de nuevo. Después
   borramos o anonimizamos tus datos personales; los viajes y movimientos se conservan sin identificarte, por
   contabilidad y seguridad. El saldo de la billetera se pierde.
+- **Dejar de compartir datos de uso** desde Perfil → Ajustes → Privacidad → "Compartir datos de uso
+  anónimos". Viene activado; al desactivarlo la app deja de enviarlos.
 - **Retirar permisos** del dispositivo (ubicación, notificaciones, cámara) desde los ajustes del teléfono.
 - Escribirnos a [correo de contacto] para cualquier otra solicitud.
 

@@ -61,6 +61,7 @@ def expected_loops() -> dict[str, int]:
         "quality": 5 * 60,  # beats every minute, recomputes every 10 min
         "risk": 5 * 60,  # beats every minute
         "finance": 5 * 60,  # beats every minute, checks the ledger once a day
+        "product_analytics": 5 * 60,  # samples supply every minute, cohorts once a day
     }
     if settings.RATES_ENABLED:
         loops["rates"] = 10 * 60  # checks every minute which source is due

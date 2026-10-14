@@ -42,7 +42,15 @@ function render() {
   markerLayers.clear()
 
   for (const rect of props.rectangles) {
-    L.rectangle(rect.bounds, { color: rect.color, weight: 2, fillOpacity: 0.05, dashArray: '6 6', interactive: false }).addTo(layer)
+    const shape = L.rectangle(rect.bounds, {
+      color: rect.color,
+      weight: rect.solid ? 1 : 2,
+      fillOpacity: rect.fillOpacity ?? 0.05,
+      dashArray: rect.solid ? undefined : '6 6',
+      interactive: !!rect.label,
+    })
+    if (rect.label) shape.bindTooltip(tooltipContent(rect.label), { direction: 'top' })
+    shape.addTo(layer)
   }
   for (const line of props.lines) {
     if (line.points.length < 2) continue

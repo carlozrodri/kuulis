@@ -51,6 +51,10 @@ async def set_consent(
     """Records an explicit permission given (or withdrawn) in the app; answers those in force."""
     await services.record_consent(session, user, data.kind, data.granted, request)
     await session.commit()
+    if data.kind == "usage_data":
+        from apps.analytics.events import forget_opt_out
+
+        await forget_opt_out(user.id)
     return await services.consents(session, user.id)
 
 

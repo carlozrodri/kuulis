@@ -3,6 +3,7 @@ import { type QueryClient, useInfiniteQuery, useMutation, useQuery, useQueryClie
 import { routedRides } from '@/features/ride/store';
 import { ApiError, api } from '@/lib/api';
 import { isActiveStatus, isTerminalStatus, mergeRide } from '@/lib/ride';
+import { track } from '@/lib/analytics';
 import type {
   CancelRideInput,
   DriverState,
@@ -328,7 +329,10 @@ export function useDriverRideAction() {
     // Doc 11: "start" carries the passenger's PIN when the ride requires one.
     mutationFn: ({ id, action, pin }: { id: string; action: 'arrive' | 'start' | 'complete'; pin?: string }) =>
       api<Ride>(`/rides/${id}/${action}`, { method: 'POST', body: pin ? { pin } : undefined }),
-    onSuccess: (ride) => applyRide(queryClient, ride),
+    onSuccess: (ride, { action }) => {
+      applyRide(queryClient, ride);
+      if (action === 'complete') track('ride_completed', { role: 'driver' });
+    },
     onError: () => void queryClient.invalidateQueries({ queryKey: rideKeys.all }),
   });
 }

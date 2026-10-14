@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
-ConsentKind = Literal["background_location"]
+ConsentKind = Literal["background_location", "usage_data"]
 
 
 class ConsentUpdate(BaseModel):

@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import type { ReactElement } from 'react';
+import { type ReactElement, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshControl, type RefreshControlProps, StyleSheet, View } from 'react-native';
 
@@ -32,6 +32,7 @@ import { AnnouncementBanners } from '@/features/control/AnnouncementBanners';
 import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { useAppConfig, useDriverProfile } from '@/hooks/useDriver';
 import { apiErrorMessage } from '@/i18n';
+import { trackOnce } from '@/lib/analytics';
 import { documentChecklist, nextDriverStep, requirementChecklist } from '@/lib/driver';
 import type { DriverProfile } from '@/lib/types';
 import { elevation, radius, space, useTheme } from '@/theme';
@@ -83,6 +84,7 @@ function DriverIntro({ profile, refresh }: { profile: DriverProfile | null; refr
   const step = nextDriverStep(profile, config);
   const started = !!profile;
   const minYear = config.vehicle_min_year[config.enabled_vehicle_types[0] ?? 'moto'];
+  useEffect(() => trackOnce('driver_intro', 'driver_onboarding_step', { step: 'intro' }), []);
 
   return (
     <Screen tabBar refreshControl={refresh}>

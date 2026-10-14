@@ -6,6 +6,7 @@ import { Download } from '@/components/icons';
 import { Card, IconTile, Screen, Txt } from '@/components/ui';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { useActiveRide } from '@/hooks/useRides';
+import { trackOnce } from '@/lib/analytics';
 import { appVersion, formatMegabytes } from '@/lib/appVersion';
 import { isActiveStatus } from '@/lib/ride';
 import { space } from '@/theme';
@@ -26,6 +27,7 @@ export function UpdateGate() {
 
   useEffect(() => {
     if (!blocking) return;
+    trackOnce('apk:gate', 'update_prompt_shown', { kind: 'required' });
     // Android back would only reveal the screens underneath.
     const sub = BackHandler.addEventListener('hardwareBackPress', () => true);
     return () => sub.remove();
