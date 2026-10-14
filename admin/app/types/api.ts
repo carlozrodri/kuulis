@@ -307,6 +307,8 @@ export interface AppConfig {
   support?: SupportSettings
   // ---- Notifications (doc 14). ----
   notifications?: NotificationSettings
+  // ---- Cancellations and quality (doc 15). ----
+  quality?: QualitySettings
 }
 
 // ---- Phase 1B: rides (docs/api/phase-1b.md) ----
@@ -443,6 +445,10 @@ export interface Ride {
   /** Rates frozen when the ride was requested (Bs per 1 USD). */
   rates?: Record<RateSource, Decimal | null> | null
   total_ves?: VesAmount | null
+  // ---- Doc 15. Optional so the panel still works against an older API. ----
+  cancel_reason_code?: CancelReasonCode | null
+  /** Drivers who cancelled after accepting (the ride went back to searching). */
+  reassign_count?: number
 }
 
 export interface RideMessage {
@@ -482,6 +488,9 @@ export interface AdminRide extends Ride {
   /** Real path of the driver: [lat, lng, unix seconds]. Empty until the ride ends. */
   track?: [number, number, number][]
   safety_alerts?: RideSafetyAlert[]
+  // ---- Doc 15. ----
+  reassigned_from_driver_id?: string | null
+  cancellations?: RideCancellation[]
 }
 
 /** GET /admin/drivers/online. */
@@ -1821,4 +1830,128 @@ export interface NotificationSettings {
   inbox_retention_days: number
   device_idle_days: number
   monthly_summary: boolean
+}
+
+// ---- Doc 15: cancellations and service quality ----
+
+export const PASSENGER_CANCEL_REASONS = ['driver_late', 'changed_plans', 'driver_asked', 'vehicle_mismatch', 'wrong_pickup', 'other'] as const
+export const DRIVER_CANCEL_REASONS = ['no_show', 'wrong_address', 'no_helmet', 'vehicle_problem', 'safety_concern', 'other'] as const
+export type CancelReasonCode = typeof PASSENGER_CANCEL_REASONS[number] | typeof DRIVER_CANCEL_REASONS[number]
+export type CancelSide = 'passenger' | 'driver'
+export const CANCEL_SIDES: CancelSide[] = ['passenger', 'driver']
+
+/** One cancellation of a ride; a driver's sends the ride back to searching (`reassigned`). */
+export interface RideCancellation {
+  id: string
+  user_id: string
+  user_name: string
+  side: CancelSide
+  reason_code: CancelReasonCode | null
+  reason: string | null
+  /** Ride status when it happened. */
+  stage: RideStatus
+  /** Whether it counts against the person's rate (not in the passenger's grace period, not a no-show). */
+  counted: boolean
+  reassigned: boolean
+  created_at: string
+}
+
+export const QUALITY_LEVELS = ['ok', 'warn', 'low_priority', 'review'] as const
+export type QualityLevel = typeof QUALITY_LEVELS[number]
+export type QualityRole = 'driver' | 'passenger'
+export type PauseReason = 'cancel_burst' | 'decline_streak' | 'no_shows'
+export type QualityReason = 'cancel_rate' | 'rating' | 'no_shows'
+
+/** Rates over the configured window (null: nothing to divide by yet). */
+export interface QualityStats {
+  offers: number
+  accepted: number
+  rides: number
+  cancels: number
+  no_shows: number
+  completed: number
+  /** 0..1 */
+  acceptance_rate: number | null
+  cancel_rate: number | null
+  rating_avg: number | null
+  rating_count: number
+  level: QualityLevel
+  reasons: QualityReason[]
+}
+
+/** GET /admin/quality/users: people below a threshold or paused now, worst first. */
+export interface QualityRow extends QualityStats {
+  user_id: string
+  role: QualityRole
+  name: string
+  email: string
+  driver_profile_id: string | null
+  computed_at: string
+  paused_until: string | null
+}
+
+export interface QualityWeek {
+  /** Monday of the week (YYYY-MM-DD). */
+  week: Day
+  offers: number
+  accepted: number
+  acceptance_rate: number | null
+  driver_cancels: number
+  driver_cancel_rate: number | null
+  passenger_rides: number
+  passenger_cancels: number
+  passenger_cancel_rate: number | null
+  no_shows: number
+}
+
+export interface QualityPause {
+  id: string
+  role: QualityRole
+  reason: PauseReason
+  created_at: string
+  until: string
+  lifted_at: string | null
+  lifted_by_id: string | null
+}
+
+/** GET /admin/quality/users/{user_id}: live rates for both roles, the last 8 weeks and the pauses. */
+export interface QualityDetail {
+  user_id: string
+  /** null when the person does not drive. */
+  driver: QualityStats | null
+  passenger: QualityStats
+  /** Oldest first. */
+  weeks: QualityWeek[]
+  pauses: QualityPause[]
+  window_days: number
+}
+
+/** GET /admin/quality/cancellations. */
+export interface CancellationCount {
+  side: CancelSide
+  reason_code: CancelReasonCode | null
+  total: number
+  counted: number
+  reassigned: number
+}
+
+/** config.quality (doc 15). Rates and the dispatch weight are 0..1 fractions. */
+export interface QualitySettings {
+  pickup_wait_minutes: number
+  passenger_cancel_grace_s: number
+  window_days: number
+  /** 0 turns the rule off. */
+  driver_cancel_burst: number
+  driver_decline_streak: number
+  driver_pause_minutes: number
+  driver_cancel_warn: number
+  driver_cancel_low_priority: number
+  driver_cancel_review: number
+  min_rides: number
+  passenger_no_show_warn: number
+  passenger_no_show_pause: number
+  passenger_pause_hours: number
+  rating_review_below: number
+  rating_min_count: number
+  dispatch_quality_weight: number
 }

@@ -32,7 +32,8 @@
     "supportMetrics": "Support metrics",
     "help": "Help center",
     "campaigns": "Campaigns",
-    "emailTemplates": "Email templates"
+    "emailTemplates": "Email templates",
+    "quality": "Quality"
   },
   "navGroups": {
     "operations": "Operations",
@@ -172,7 +173,9 @@
       "finance": "Finance",
       "system": "System",
       "releases": "App versions",
-      "app_control": "App control"
+      "app_control": "App control",
+      "quality": "Quality",
+      "safety": "Safety"
     },
     "permissions": {
       "users": {
@@ -252,6 +255,14 @@
       },
       "help": {
         "manage": "Help center"
+      },
+      "quality": {
+        "view": "See service quality",
+        "manage": "Lift automatic pauses"
+      },
+      "safety": {
+        "view": "See safety alerts",
+        "manage": "Handle safety alerts"
       }
     }
   },
@@ -402,7 +413,8 @@
     "file_too_large": "The file is too large",
     "campaign_not_found": "We could not find that campaign",
     "campaign_not_editable": "That campaign was already sent or cancelled: it cannot change",
-    "email_template_not_found": "We could not find that template"
+    "email_template_not_found": "We could not find that template",
+    "pause_not_active": "That pause already ended or was lifted."
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -549,7 +561,10 @@
       "supportNumber": "Support: values must be between {min} and {max}",
       "supportPromise": "Support: the response promise has at most {max} characters",
       "quietHours": "Quiet hours must be HH:MM",
-      "notificationNumber": "Notifications: values must be between {min} and {max}"
+      "notificationNumber": "Notifications: values must be between {min} and {max}",
+      "qualityNumber": "Quality: values must be between {min} and {max}",
+      "qualityCancelOrder": "Quality: cancellation thresholds must go up (warning, lower priority, review)",
+      "qualityNoShowOrder": "Quality: the no-show warning cannot be higher than the pause"
     },
     "fares": {
       "title": "Fares",
@@ -754,6 +769,53 @@
       },
       "monthlySummary": "Monthly summary email to drivers",
       "monthlySummaryHelp": "On the 1st of each month every driver gets an email with last month's rides and earnings."
+    },
+    "quality": {
+      "title": "Service quality",
+      "help": "How long to wait for the passenger, when a cancellation counts and what happens past the thresholds. Consequences never cost money: warnings, short pauses and a lower place in dispatch.",
+      "sections": {
+        "pickup": "Pickup",
+        "drivers": "Driver rates",
+        "driverPauses": "Driver pauses",
+        "passengers": "Passengers",
+        "general": "General"
+      },
+      "numbers": {
+        "pickup_wait_minutes": "Wait for the passenger (minutes)",
+        "passenger_cancel_grace_s": "Cancellation grace (seconds)",
+        "window_days": "Rate window (days)",
+        "driver_cancel_warn": "Warning from (%)",
+        "driver_cancel_low_priority": "Lower priority from (%)",
+        "driver_cancel_review": "Review from (%)",
+        "min_rides": "Minimum rides to measure",
+        "rating_review_below": "Review with a rating under",
+        "rating_min_count": "Minimum ratings",
+        "driver_cancel_burst": "Cancellations in a row",
+        "driver_decline_streak": "Offers declined in a row",
+        "driver_pause_minutes": "Pause (minutes)",
+        "passenger_no_show_warn": "Warning at no-shows",
+        "passenger_no_show_pause": "Pause at no-shows",
+        "passenger_pause_hours": "Pause (hours)",
+        "dispatch_quality_weight": "Weight in dispatch (%)"
+      },
+      "numbersHelp": {
+        "pickup_wait_minutes": "From the driver's arrival; then they may mark a no-show. Between {min} and {max}.",
+        "passenger_cancel_grace_s": "A passenger cancelling this soon after a driver accepts does not count. Between {min} and {max}.",
+        "window_days": "Rates use the rides of these last days. Between {min} and {max}.",
+        "driver_cancel_warn": "Cancellations over accepted rides: the driver gets a warning. Between {min} and {max}.",
+        "driver_cancel_low_priority": "Gets offers after better-rated drivers. Between {min} and {max}.",
+        "driver_cancel_review": "Shows in Quality for review. Between {min} and {max}.",
+        "min_rides": "Accepted rides in the window before rates apply. Between {min} and {max}.",
+        "rating_review_below": "With at least the minimum ratings. Between {min} and {max}.",
+        "rating_min_count": "Ratings in the window before the average is looked at. Between {min} and {max}.",
+        "driver_cancel_burst": "Within an hour: automatic pause. 0 = off. Between {min} and {max}.",
+        "driver_decline_streak": "Declined or ignored without accepting any: automatic pause. 0 = off. Between {min} and {max}.",
+        "driver_pause_minutes": "How long the driver's pause lasts. Between {min} and {max}.",
+        "passenger_no_show_warn": "In the window: the passenger gets a warning. 0 = off. Between {min} and {max}.",
+        "passenger_no_show_pause": "In the window: they cannot request rides for a while. 0 = off. Between {min} and {max}.",
+        "passenger_pause_hours": "How long the passenger's pause lasts. Between {min} and {max}.",
+        "dispatch_quality_weight": "How much rating and acceptance move a driver when offering rides: the worst driver counts as up to this much farther away. 0 = distance only. Between {min} and {max}."
+      }
     }
   },
   "paymentMethods": {
@@ -884,6 +946,21 @@
       "pinOk": "Start PIN required, no wrong tries",
       "pinFailures": "Wrong PIN {n} times",
       "open": "Open"
+    },
+    "reasonCode": "Reason picked",
+    "reassigned": "Reassigned {n} time | Reassigned {n} times",
+    "cancellations": {
+      "title": "Cancellations",
+      "help": "Every cancellation of the ride. When the driver cancels, the ride looks for another one.",
+      "who": "Who",
+      "reason": "Reason",
+      "stage": "When",
+      "counted": "Counts",
+      "countedHelp": "Whether it counts in their cancellation rate (grace-period cancellations and no-shows do not).",
+      "reassignedLabel": "Reassigned",
+      "yes": "Yes",
+      "no": "No",
+      "at": "Time"
     }
   },
   "live": {
@@ -1767,6 +1844,9 @@
         "create": "Created an announcement",
         "update": "Edited an announcement",
         "delete": "Deleted an announcement"
+      },
+      "quality": {
+        "pause_lift": "Lifted an automatic pause"
       }
     },
     "entities": {
@@ -1793,7 +1873,8 @@
       "app_update": "JavaScript update",
       "feature_flag": "Feature",
       "announcement": "Announcement",
-      "driver_check": "Re-verification"
+      "driver_check": "Re-verification",
+      "quality_pause": "Automatic pause"
     }
   },
   "team": {
@@ -2936,5 +3017,96 @@
     "phone": "Phone",
     "frameTitle": "Preview of the {name} email",
     "sample": "Names, amounts and dates are samples."
+  },
+  "quality": {
+    "help": "People below the thresholds or paused now, worst first. Recomputed every 10 minutes.",
+    "roles": {
+      "driver": "Drivers",
+      "passenger": "Passengers"
+    },
+    "asRole": {
+      "driver": "As a driver",
+      "passenger": "As a passenger"
+    },
+    "levels": {
+      "ok": "Fine",
+      "warn": "Warning",
+      "low_priority": "Lower priority",
+      "review": "Review"
+    },
+    "allLevels": "All levels",
+    "level": "Level",
+    "search": "Search by name or email",
+    "person": "Person",
+    "cancelRate": "Cancellations",
+    "acceptanceRate": "Acceptance",
+    "rating": "Rating",
+    "noShows": "No-shows",
+    "completed": "Completed",
+    "reasonsLabel": "Why",
+    "pausedUntil": "Paused until",
+    "cancelsOf": "{n} of {total}",
+    "acceptedOf": "{n} of {total} offers",
+    "ratingCount": "no ratings | 1 rating | {n} ratings",
+    "total": "nobody | 1 person | {n} people",
+    "empty": "Nobody below the thresholds",
+    "reasons": {
+      "cancel_rate": "Cancels a lot",
+      "rating": "Low rating",
+      "no_shows": "Does not show up"
+    },
+    "pauseReasons": {
+      "cancel_burst": "Many cancellations in a row",
+      "decline_streak": "Declined many offers in a row",
+      "no_shows": "Did not show up several times"
+    },
+    "reasonCodes": {
+      "driver_late": "Driver took too long",
+      "changed_plans": "Changed plans",
+      "driver_asked": "Driver asked to cancel",
+      "vehicle_mismatch": "Vehicle didn't match",
+      "wrong_pickup": "Wrong pickup",
+      "other": "Other",
+      "no_show": "No-show",
+      "wrong_address": "Wrong address",
+      "no_helmet": "Passenger without helmet",
+      "vehicle_problem": "Vehicle problem",
+      "safety_concern": "Safety concern",
+      "none": "No reason"
+    },
+    "sides": {
+      "passenger": "Passenger",
+      "driver": "Driver"
+    },
+    "cancellations": {
+      "title": "Cancellations by reason",
+      "help": "\"Counted\" add to the canceller's rate; \"Reassigned\" went back to look for another driver.",
+      "bySide": {
+        "passenger": "Cancelled by the passenger",
+        "driver": "Cancelled by the driver"
+      },
+      "reason": "Reason",
+      "total": "Total",
+      "counted": "Counted",
+      "reassigned": "Reassigned",
+      "sum": "Total",
+      "empty": "No cancellations in this period"
+    },
+    "card": {
+      "title": "Quality",
+      "window": "Last {n} days",
+      "trend": "Last 8 weeks",
+      "weekOf": "Week of {day}",
+      "pauses": "Automatic pauses",
+      "noPauses": "No pauses",
+      "active": "Paused",
+      "until": "Until {date}",
+      "liftedAt": "Lifted {date}",
+      "ended": "Ended {date}",
+      "lift": "Lift pause",
+      "liftConfirm": "Lift this pause? The person can go online or request rides right away.",
+      "liftDone": "Pause lifted",
+      "notDriver": "Not a driver"
+    }
   }
 }

@@ -4,13 +4,14 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { ChevronDown, CircleX, MessageCircle, SearchX, Share2, ShieldCheck } from '@/components/icons';
+import { ChevronDown, CircleX, Clock, MessageCircle, RefreshCw, SearchX, Share2, ShieldCheck, Timer, UserX } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { type MapInsets, MapSheetLayout } from '@/components/MapSheetLayout';
 import { DiscountNote, VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
-import { Button, EmptyState, IconButton, ProgressSteps, StatusPill, Txt } from '@/components/ui';
+import { Button, EmptyState, IconButton, Notice, ProgressSteps, StatusPill, Txt } from '@/components/ui';
 import { useFlag } from '@/hooks/useBootstrap';
+import { rememberPauseFromError } from '@/hooks/useQuality';
 import { applyRide, requestAgain, useActiveRide, useCancelRide, useRide } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
 import { apiErrorMessage } from '@/i18n';
@@ -23,6 +24,9 @@ import {
   formatClock,
   formatDuration,
   formatFare,
+  isNoShow,
+  isReassigning,
+  pickupWait,
   secondsSince,
 } from '@/lib/ride';
 import { useStore } from '@/lib/store';
@@ -129,13 +133,16 @@ function useCancelFlow(ride: Ride) {
   const sheet = (
     <CancelSheet
       visible={open}
+      ride={ride}
       role="passenger"
+      loading={cancel.isPending}
       onClose={() => setOpen(false)}
-      onCancel={(reason) =>
+      onConfirm={(input) =>
         cancel.mutate(
-          { id: ride.id, reason },
+          { id: ride.id, ...input },
           {
             onSuccess: () => {
+              setOpen(false);
               showToast(t('ride.cancelled'));
               goHome();
             },
@@ -173,16 +180,23 @@ function SearchingSheet({ ride }: { ride: Ride }) {
   const { t } = useTranslation();
   const now = useNow(1000);
   const cancel = useCancelFlow(ride);
+  // Doc 15: the driver cancelled after accepting and the same ride is looking for another one.
+  const reassigning = isReassigning(ride);
   return (
     <>
+      {reassigning ? (
+        <Notice tone="warning" icon={RefreshCw}>
+          {t('ride.reassigning.notice')}
+        </Notice>
+      ) : null}
       <View style={{ gap: 4 }}>
         <View style={styles.titleRow}>
           <Txt variant="heading" accessibilityRole="header" style={{ flex: 1 }}>
-            {t('ride.searching.title')}
+            {reassigning ? t('ride.reassigning.title') : t('ride.searching.title')}
           </Txt>
           <StatusPill label={formatClock(secondsSince(ride.requested_at, now))} tone="primary" dot />
         </View>
-        <Txt color="muted">{t('ride.searching.body')}</Txt>
+        <Txt color="muted">{reassigning ? t('ride.reassigning.body') : t('ride.searching.body')}</Txt>
       </View>
       <ProgressSteps total={4} current={1} />
       <PlaceRows pickup={ride.pickup} dropoff={ride.dropoff} compact />
@@ -235,6 +249,7 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
         <Txt color="muted">{subtitle}</Txt>
       </View>
       <ProgressSteps total={4} current={ride.status === 'driver_assigned' ? 2 : ride.status === 'driver_arrived' ? 3 : 4} />
+      {ride.status === 'driver_arrived' ? <WaitingCounter ride={ride} /> : null}
       {ride.start_pin && ride.status !== 'in_progress' ? <PinCard pin={ride.start_pin} /> : null}
 
       <View style={[styles.driverCard, { backgroundColor: theme.background }]}>
@@ -296,6 +311,8 @@ function EndedSheet({ ride }: { ride: Ride }) {
     } catch (error) {
       // 403 account_suspended: refresh the user so home shows the suspension.
       handleSuspended(error);
+      // 403 temporarily_paused (doc 15): home and the quote screen show the pause too.
+      rememberPauseFromError('passenger', error);
       showToast(apiErrorMessage(error), 'danger');
     } finally {
       setRetrying(false);
@@ -306,6 +323,20 @@ function EndedSheet({ ride }: { ride: Ride }) {
     return (
       // The ride navigator opens the (mandatory) rating right after this.
       <EmptyState icon={ShieldCheck} title={t('ride.completed.title')} body={t('ride.completed.body', { fare: formatFare(amountToPay(ride)) })} />
+    );
+  }
+
+  // Doc 15: the driver waited at the pickup point and the passenger did not come.
+  if (isNoShow(ride)) {
+    return (
+      <>
+        <EmptyState icon={UserX} title={t('ride.noShow.title')} body={t('ride.noShow.body')} />
+        <Notice tone="warning" icon={Clock}>
+          {t('ride.noShow.warning')}
+        </Notice>
+        <Button title={t('ride.noShow.retry')} loading={retrying} onPress={() => void retry()} />
+        <Button title={t('ride.backHome')} variant="ghost" onPress={goHome} />
+      </>
     );
   }
 
@@ -336,7 +367,37 @@ function EndedSheet({ ride }: { ride: Ride }) {
   );
 }
 
+/** "Tu motorizado te espera: 3:12", counting up from the arrival (doc 15). */
+function WaitingCounter({ ride }: { ride: Ride }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const now = useNow(1000);
+  const wait = pickupWait(ride, now);
+  const fg = wait.over ? theme.warning : theme.scheme === 'dark' ? theme.primary : theme.primaryPressed;
+  return (
+    <View
+      accessible
+      accessibilityRole="timer"
+      accessibilityLabel={t('ride.waiting.a11y', { time: formatClock(wait.waited) })}
+      style={[styles.waiting, { backgroundColor: wait.over ? theme.warningSoft : theme.surfaceAlt }]}>
+      <Timer size={22} color={fg} strokeWidth={2.2} />
+      <View style={{ flex: 1 }}>
+        <Txt variant="bodyStrong">{t('ride.waiting.label')}</Txt>
+        {wait.over ? (
+          <Txt variant="caption" color="muted">
+            {t('ride.waiting.over')}
+          </Txt>
+        ) : null}
+      </View>
+      <Txt variant="heading" tabular style={{ color: fg }}>
+        {formatClock(wait.waited)}
+      </Txt>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  waiting: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderRadius: radius.tile, paddingHorizontal: space.md, paddingVertical: space.sm },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.lg, gap: space.md },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.xs },

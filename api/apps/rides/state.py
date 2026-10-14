@@ -106,6 +106,16 @@ class PinAttemptsExceededError(AppError):
     message = "Too many wrong PINs: call support or cancel the ride"
 
 
+class CancelReasonInvalidError(AppError):
+    code = "cancel_reason_invalid"
+    message = "That reason does not apply to you"
+
+
+class NoShowTooEarlyError(ConflictError):
+    code = "no_show_too_early"
+    message = "Wait a little longer before marking the passenger as a no-show"
+
+
 # --- Locking and transitions -------------------------------------------------------------------
 
 

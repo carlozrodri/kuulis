@@ -57,6 +57,7 @@ def expected_loops() -> dict[str, int]:
         "driver_expirations": 3600,  # checks every 10 min, works once a day
         "support_sla": 5 * 60,  # every minute
         "notifications": 5 * 60,  # every 30 s (campaigns, receipts, daily cleanup)
+        "quality": 5 * 60,  # beats every minute, recomputes every 10 min
     }
     if settings.RATES_ENABLED:
         loops["rates"] = 10 * 60  # checks every minute which source is due

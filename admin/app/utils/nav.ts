@@ -30,6 +30,7 @@ export const NAV: NavEntry[] = [
   { key: 'rides', icon: 'i-lucide-route', to: '/rides', permission: 'rides.view', group: 'operations' },
   { key: 'live', icon: 'i-lucide-radar', to: '/live', permission: 'live.view', group: 'operations' },
   { key: 'safety', icon: 'i-lucide-siren', to: '/safety', permission: 'safety.view', group: 'operations' },
+  { key: 'quality', icon: 'i-lucide-gauge', to: '/quality', permission: 'quality.view', group: 'operations' },
   { key: 'users', icon: 'i-lucide-users', to: '/users', permission: 'users.view', group: 'people' },
   { key: 'drivers', icon: 'i-lucide-bike', to: '/drivers', permission: 'drivers.view', group: 'people' },
   { key: 'driverChecks', icon: 'i-lucide-scan-face', to: '/drivers/checks', permission: 'drivers.view', group: 'people' },

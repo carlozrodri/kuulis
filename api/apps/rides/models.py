@@ -4,6 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     DateTime,
     Enum,
@@ -74,8 +75,10 @@ RIDE_TRANSITIONS: dict[RideStatus, frozenset[RideStatus]] = {
             RideStatus.NO_DRIVERS,
         }
     ),
+    # Back to SEARCHING: the driver cancelled after accepting and another one is found (doc 15).
     RideStatus.DRIVER_ASSIGNED: frozenset(
         {
+            RideStatus.SEARCHING,
             RideStatus.DRIVER_ARRIVED,
             RideStatus.CANCELLED_BY_PASSENGER,
             RideStatus.CANCELLED_BY_DRIVER,
@@ -84,6 +87,7 @@ RIDE_TRANSITIONS: dict[RideStatus, frozenset[RideStatus]] = {
     ),
     RideStatus.DRIVER_ARRIVED: frozenset(
         {
+            RideStatus.SEARCHING,
             RideStatus.IN_PROGRESS,
             RideStatus.CANCELLED_BY_PASSENGER,
             RideStatus.CANCELLED_BY_DRIVER,
@@ -96,6 +100,52 @@ RIDE_TRANSITIONS: dict[RideStatus, frozenset[RideStatus]] = {
 
 def _status_list(statuses: frozenset[RideStatus]) -> str:
     return ", ".join(f"'{s.value}'" for s in sorted(statuses))
+
+
+class CancelSide(enum.StrEnum):
+    PASSENGER = "passenger"
+    DRIVER = "driver"
+
+
+class CancelReason(enum.StrEnum):
+    """Why a ride was cancelled (doc 15); the free text stays in ``cancel_reason``."""
+
+    # Passenger
+    DRIVER_LATE = "driver_late"
+    CHANGED_PLANS = "changed_plans"
+    DRIVER_ASKED = "driver_asked"
+    VEHICLE_MISMATCH = "vehicle_mismatch"  # also opens a vehicle_mismatch report
+    WRONG_PICKUP = "wrong_pickup"
+    # Driver
+    NO_SHOW = "no_show"  # after the wait; ends the ride and does not count against the driver
+    WRONG_ADDRESS = "wrong_address"
+    NO_HELMET = "no_helmet"
+    VEHICLE_PROBLEM = "vehicle_problem"
+    SAFETY_CONCERN = "safety_concern"
+    # Both
+    OTHER = "other"
+
+
+PASSENGER_REASONS = frozenset(
+    {
+        CancelReason.DRIVER_LATE,
+        CancelReason.CHANGED_PLANS,
+        CancelReason.DRIVER_ASKED,
+        CancelReason.VEHICLE_MISMATCH,
+        CancelReason.WRONG_PICKUP,
+        CancelReason.OTHER,
+    }
+)
+DRIVER_REASONS = frozenset(
+    {
+        CancelReason.NO_SHOW,
+        CancelReason.WRONG_ADDRESS,
+        CancelReason.NO_HELMET,
+        CancelReason.VEHICLE_PROBLEM,
+        CancelReason.SAFETY_CONCERN,
+        CancelReason.OTHER,
+    }
+)
 
 
 class OfferStatus(enum.StrEnum):
@@ -175,6 +225,9 @@ class Ride(BaseModel):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cancel_reason: Mapped[str | None] = mapped_column(Text)
+    cancel_reason_code: Mapped[CancelReason | None] = mapped_column(
+        _enum(CancelReason, "cancel_reason")
+    )
     cancelled_by_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL")
     )
@@ -183,6 +236,12 @@ class Ride(BaseModel):
     # None when the city does not ask for it.
     start_pin: Mapped[str | None] = mapped_column(String(4))
     pin_failures: Mapped[int] = mapped_column(SmallInteger, default=0, server_default=text("0"))
+
+    # Doc 15: drivers who cancelled after accepting; the ride went back to searching each time.
+    reassign_count: Mapped[int] = mapped_column(SmallInteger, default=0, server_default=text("0"))
+    reassigned_from_driver_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL")
+    )
 
     rated_by_passenger: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
     rated_by_driver: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
@@ -242,3 +301,30 @@ class Rating(BaseModel):
     stars: Mapped[int] = mapped_column(SmallInteger)
     tags: Mapped[list[str]] = mapped_column(ARRAY(String(32)), default=list)
     comment: Mapped[str | None] = mapped_column(Text)
+
+
+class RideCancellation(BaseModel):
+    """Every cancellation by a participant, including a driver's cancellation that sent the ride
+    back to searching (doc 15). Quality rates are counted from here."""
+
+    __tablename__ = "ride_cancellations"
+    __table_args__ = (
+        Index("ix_ride_cancellations_user_created", "user_id", "created_at"),
+        Index("ix_ride_cancellations_passenger_reason", "passenger_id", "reason_code"),
+    )
+
+    ride_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("rides.id", ondelete="CASCADE"), index=True
+    )
+    # Who cancelled, and the ride's passenger (no-shows count against them).
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    passenger_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    side: Mapped[CancelSide] = mapped_column(_enum(CancelSide, "cancel_side"))
+    reason_code: Mapped[CancelReason | None] = mapped_column(_enum(CancelReason, "cancel_reason"))
+    reason: Mapped[str | None] = mapped_column(Text)
+    # The ride's status when it was cancelled (searching, driver_assigned, driver_arrived).
+    stage: Mapped[RideStatus] = mapped_column(_enum(RideStatus, "ride_status"))
+    # False inside the passenger's grace period, for a valid no-show, a safety concern or a
+    # moto that did not match: those never count against whoever cancelled.
+    counted: Mapped[bool] = mapped_column(Boolean)
+    reassigned: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))

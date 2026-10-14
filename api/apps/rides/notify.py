@@ -35,6 +35,14 @@ TEMPLATES: dict[str, dict[str, tuple[str, str]]] = {
         "es": ("Viaje cancelado", "El motorizado canceló el viaje. Puedes pedir otro."),
         "en": ("Ride cancelled", "The driver cancelled the ride. You can request another one."),
     },
+    "reassigning": {
+        "es": ("Buscando otro motorizado", "Tu motorizado canceló. Ya estamos buscando otro."),
+        "en": ("Finding another driver", "Your driver cancelled. We are already finding another."),
+    },
+    "no_show": {
+        "es": ("Viaje cancelado", "{name} te esperó y no llegaste al punto de recogida."),
+        "en": ("Ride cancelled", "{name} waited but you did not come to the pickup point."),
+    },
     "cancelled_by_admin": {
         "es": ("Viaje cancelado", "Kuulis canceló el viaje."),
         "en": ("Ride cancelled", "Kuulis cancelled the ride."),

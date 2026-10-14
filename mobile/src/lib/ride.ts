@@ -2,7 +2,7 @@
  * Pure ride logic (no React, no network) so it can be unit tested.
  * Contract: docs/api/phase-1b.md.
  */
-import type { LatLng, PaymentMethod, Ride, RideStatus } from "./types";
+import type { CancelReasonCode, LatLng, PaymentMethod, Ride, RideStatus } from "./types";
 
 // ── Coordinates ──
 
@@ -295,7 +295,7 @@ export function rideRole(
 
 /**
  * Applies a newer server snapshot over a cached ride. Ignores snapshots that would move the ride backwards
- * (out-of-order WS vs. HTTP responses), except terminal statuses which always win.
+ * (out-of-order WS vs. HTTP responses), except terminal statuses which always win and a reassignment (doc 15).
  */
 export function mergeRide(
   current: Ride | null | undefined,
@@ -303,6 +303,12 @@ export function mergeRide(
 ): Ride {
   if (!current || current.id !== incoming.id) return incoming;
   if (isTerminalStatus(incoming.status)) return incoming;
+  // Doc 15: the driver cancelled and the ride went back to searching. A newer reassignment is the truth
+  // (and its first snapshot has no driver nor location yet).
+  if ((incoming.reassign_count ?? 0) > (current.reassign_count ?? 0) && !isTerminalStatus(current.status)) {
+    return incoming;
+  }
+  if ((incoming.reassign_count ?? 0) < (current.reassign_count ?? 0)) return current;
   if (isTerminalStatus(current.status)) return current;
   if (rideStep(incoming.status) < rideStep(current.status)) {
     return {
@@ -332,22 +338,71 @@ export const RATING_TAGS = {
   driver: ["on_time", "respectful", "ready_at_pickup"],
 } as const;
 
+/**
+ * Doc 15: the reasons each side picks when cancelling, sent as `reason_code`. While still searching the
+ * passenger only sees the ones that make sense without a driver. "No se presentó" (`no_show`) is not in the
+ * driver's list: it has its own button once the wait is over.
+ */
 export const CANCEL_REASONS = {
-  passenger: [
-    "wait_too_long",
-    "driver_not_moving",
-    "changed_plans",
-    "wrong_pickup",
-    "other",
-  ],
-  driver: [
-    "passenger_no_show",
-    "wrong_pickup",
-    "unsafe_location",
-    "vehicle_problem",
-    "other",
-  ],
-} as const;
+  passenger: ["driver_late", "changed_plans", "driver_asked", "vehicle_mismatch", "wrong_pickup", "other"],
+  searching: ["changed_plans", "wrong_pickup", "other"],
+  driver: ["wrong_address", "no_helmet", "vehicle_problem", "safety_concern", "other"],
+} as const satisfies Record<string, readonly CancelReasonCode[]>;
+
+export type CancelSheetKind = keyof typeof CANCEL_REASONS;
+
+/** Which list the cancel sheet shows. */
+export function cancelSheetKind(
+  ride: Pick<Ride, "status" | "driver">,
+  role: "passenger" | "driver",
+): CancelSheetKind {
+  if (role === "driver") return "driver";
+  return ride.status === "searching" || !ride.driver ? "searching" : "passenger";
+}
+
+/**
+ * True when a passenger cancelling now counts toward their record: a driver accepted and the free minutes
+ * after that (`cancel_free_until`) are over.
+ */
+export function passengerCancelCounts(
+  ride: Pick<Ride, "status" | "driver" | "cancel_free_until">,
+  now = Date.now(),
+): boolean {
+  if (!ride.driver || (ride.status !== "driver_assigned" && ride.status !== "driver_arrived")) return false;
+  if (!ride.cancel_free_until) return false;
+  const until = Date.parse(ride.cancel_free_until);
+  return !Number.isNaN(until) && now > until;
+}
+
+/** The driver cancelled after accepting and the ride is looking for another one. */
+export const isReassigning = (ride: Pick<Ride, "status" | "reassign_count">) =>
+  ride.status === "searching" && (ride.reassign_count ?? 0) > 0;
+
+/** Ended because the passenger did not come to the pickup point. */
+export const isNoShow = (ride: Pick<Ride, "status" | "cancel_reason_code">) =>
+  ride.status === "cancelled_by_driver" && ride.cancel_reason_code === "no_show";
+
+export type PickupWait = {
+  /** Seconds since the driver arrived. */
+  waited: number;
+  /** Seconds until "No se presentó" is allowed (0 once it is). */
+  left: number;
+  /** The wait is over: the driver may mark the passenger as a no-show. */
+  over: boolean;
+};
+
+/** How long the driver has been waiting at the pickup point, and how long until the wait is over. */
+export function pickupWait(
+  ride: Pick<Ride, "arrived_at" | "no_show_at">,
+  now = Date.now(),
+): PickupWait {
+  const left = secondsUntil(ride.no_show_at, now);
+  return {
+    waited: secondsSince(ride.arrived_at, now),
+    left,
+    over: !!ride.no_show_at && left === 0,
+  };
+}
 
 // ── External navigation ──
 

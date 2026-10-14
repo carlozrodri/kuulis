@@ -34,6 +34,8 @@ from apps.drivers.models import DriverProfile, DriverStatus, Vehicle, VehicleSta
 from apps.geo.clients import estimate_route
 from apps.moderation import services as moderation
 from apps.monitoring import stats
+from apps.quality import services as quality
+from apps.quality.models import QualityRole
 from apps.realtime.manager import publish
 from apps.rides import events, presence
 from apps.rides.models import (
@@ -136,13 +138,15 @@ async def _eligible(
     )
     busy |= await subscriptions.overdue_user_ids(session, list(approved))  # unpaid fee
     busy |= await moderation.suspended_user_ids(session, list(approved))
+    busy |= await quality.paused_user_ids(session, list(approved), QualityRole.DRIVER)
     return {str(u) for u in approved - busy}
 
 
 async def _pick_driver(
     session: AsyncSession, ride: Ride, config: AppConfig
 ) -> tuple[str, presence.Location] | None:
-    """Nearest eligible driver, searching the configured radii in order."""
+    """Nearest eligible driver, searching the configured radii in order. Inside a radius,
+    rating and acceptance move drivers a little (doc 15: ``quality.dispatch_quality_weight``)."""
     offered = await session.scalars(select(RideOffer.driver_id).where(RideOffer.ride_id == ride.id))
     seen = {str(u) for u in offered} | {str(ride.passenger_id)}
     ttl = int(config.offer_timeout_seconds + OFFER_GRACE.total_seconds()) + 5
@@ -154,14 +158,19 @@ async def _pick_driver(
             radius,
             CANDIDATES_PER_RADIUS + len(seen),
         )
-        candidates = [uid for uid, _ in found if uid not in seen]
+        distances = {uid: dist for uid, dist in found if uid not in seen}
+        candidates = list(distances)
         seen.update(candidates)
         if not candidates:
             continue
         locations = await presence.get_locations(candidates)
         candidates = [u for u in candidates if u in locations and locations[u].fresh]
         eligible = await _eligible(session, candidates, ride.vehicle_type)
-        for uid in candidates:  # nearest first
+        factors = await quality.dispatch_factors(
+            session, [uuid.UUID(u) for u in candidates if u in eligible], config.quality
+        )
+        candidates.sort(key=lambda u: distances[u] * factors.get(uuid.UUID(u), 1.0))
+        for uid in candidates:  # nearest first, adjusted by quality
             if uid in eligible and await presence.reserve_offer(uid, ride.id, ttl):
                 return uid, locations[uid]
     return None
@@ -242,6 +251,13 @@ async def advance(ride_id: uuid.UUID) -> None:
 async def _after_expired(offer: RideOffer) -> None:
     await presence.release_offer(offer.driver_id, offer.ride_id)
     await events.emit_offer_cancelled(offer.driver_id, offer.ride_id)
+    # An ignored offer counts like a declined one for the pause (doc 15).
+    try:
+        async with SessionLocal() as session:
+            config = await get_app_config(session)
+            await quality.after_offer_missed(session, offer.driver_id, config.quality)
+    except Exception:
+        logger.exception("Quality check failed for driver %s", offer.driver_id)
 
 
 # --- Background loop (inside each worker process) ----------------------------------------------

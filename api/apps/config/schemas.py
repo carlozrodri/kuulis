@@ -250,6 +250,54 @@ class NotificationSettings(BaseModel):
     monthly_summary: bool = True
 
 
+class QualitySettings(BaseModel):
+    """Cancellations and service quality (doc 15). Consequences never cost money: warnings,
+    short pauses and a lower place in dispatch."""
+
+    # The driver may mark "no se presentó" this long after arriving (the counter both apps show).
+    pickup_wait_minutes: int = Field(default=5, ge=1, le=30)
+    # A passenger cancellation this soon after a driver accepts does not count.
+    passenger_cancel_grace_s: int = Field(default=120, ge=0, le=900)
+    # Rates use rides of the last this many days.
+    window_days: int = Field(default=30, ge=7, le=180)
+    # Driver: this many counted cancellations in an hour, or this many offers declined or
+    # ignored in a row, pause them for ``driver_pause_minutes`` (0 turns the rule off).
+    driver_cancel_burst: int = Field(default=3, ge=0, le=20)
+    driver_decline_streak: int = Field(default=5, ge=0, le=50)
+    driver_pause_minutes: int = Field(default=15, ge=1, le=240)
+    # Driver cancellation rate (share of accepted rides): warning, lower dispatch priority,
+    # then review in the admin. Only once they have ``min_rides`` accepted rides in the window.
+    driver_cancel_warn: float = Field(default=0.15, ge=0, le=1)
+    driver_cancel_low_priority: float = Field(default=0.25, ge=0, le=1)
+    driver_cancel_review: float = Field(default=0.35, ge=0, le=1)
+    min_rides: int = Field(default=10, ge=1, le=200)
+    # Passenger no-shows in the window: warning, then a pause to request rides.
+    passenger_no_show_warn: int = Field(default=2, ge=0, le=50)
+    passenger_no_show_pause: int = Field(default=3, ge=0, le=50)
+    passenger_pause_hours: int = Field(default=24, ge=1, le=720)
+    # Average rating under this with at least ``rating_min_count`` ratings: review in the admin.
+    rating_review_below: float = Field(default=4.3, ge=1, le=5)
+    rating_min_count: int = Field(default=20, ge=1, le=500)
+    # How much rating and acceptance move a driver in dispatch, on top of distance (0: off).
+    # A driver with the worst score is treated as up to this share farther away.
+    dispatch_quality_weight: float = Field(default=0.2, ge=0, le=1)
+
+    @model_validator(mode="after")
+    def _ordered(self) -> Self:
+        if not (
+            self.driver_cancel_warn <= self.driver_cancel_low_priority <= self.driver_cancel_review
+        ):
+            raise ValueError(
+                "driver cancellation thresholds must go warn <= low priority <= review"
+            )
+        if (
+            self.passenger_no_show_pause
+            and self.passenger_no_show_warn > self.passenger_no_show_pause
+        ):
+            raise ValueError("passenger_no_show_warn must be <= passenger_no_show_pause")
+        return self
+
+
 class VerificationSettings(BaseModel):
     """Ongoing driver verification (doc 12): expiring documents, the random live selfie,
     re-verification after reports and the optional induction."""
@@ -392,6 +440,9 @@ class AppConfig(BaseModel):
     # --- Notifications (doc 14) ---------------------------------------------------------------
     notifications: NotificationSettings = Field(default_factory=NotificationSettings)
 
+    # --- Cancellations and quality (doc 15) -----------------------------------------------------
+    quality: QualitySettings = Field(default_factory=QualitySettings)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -466,6 +517,7 @@ class AppConfigUpdate(BaseModel):
     verification: VerificationSettings | None = None
     support: SupportSettings | None = None
     notifications: NotificationSettings | None = None
+    quality: QualitySettings | None = None
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

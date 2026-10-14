@@ -86,6 +86,9 @@ construir. Las preguntas de cada documento están en su sección final.
 - **14** hecho (2026-10-13): cada push abre su pantalla, canales de Android por tipo, preferencias y horario
   silencioso, campañas segmentadas y programadas con resultados, emails con la marca y limpieza diaria.
   Pendiente: sonido propio de la oferta (necesita APK) y Web Push (espera a la PWA).
+- **15** hecho (2026-10-13): motivos de cancelación, espera de 5 min y "no se presentó", reasignación automática
+  cuando el motorizado cancela, tasas por persona, avisos, pausas cortas y prioridad en el despacho, sin cobrar
+  dinero. Página Calidad en el admin y "Mi calidad" en la app del motorizado.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

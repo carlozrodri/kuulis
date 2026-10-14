@@ -355,7 +355,7 @@ async def scrub(session: AsyncSession, user: User, was_suspended: bool) -> list[
     storage keys to delete after the commit."""
     from apps.auth.models import UserTotp
     from apps.legal.models import LegalAcceptance
-    from apps.rides.models import Rating, Ride, RideMessage
+    from apps.rides.models import Rating, Ride, RideCancellation, RideMessage
     from apps.wallet.models import TopUp, Wallet, WalletEntry
 
     session.add(
@@ -387,6 +387,13 @@ async def scrub(session: AsyncSession, user: User, was_suspended: bool) -> list[
         .values(vehicle=Ride.vehicle.op("-")("plate"))
     )
     await session.execute(update(Rating).where(Rating.rater_id == user.id).values(comment=None))
+    # Free text they typed when cancelling (the reason code stays for the quality rates).
+    await session.execute(
+        update(Ride).where(Ride.cancelled_by_id == user.id).values(cancel_reason=None)
+    )
+    await session.execute(
+        update(RideCancellation).where(RideCancellation.user_id == user.id).values(reason=None)
+    )
     await session.execute(
         update(TopUp)
         .where(TopUp.user_id == user.id)

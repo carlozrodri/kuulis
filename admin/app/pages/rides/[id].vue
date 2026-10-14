@@ -137,6 +137,18 @@ function raterRole(rating: RideRating): 'passenger' | 'driver' | 'other' {
 const messages = computed(() => [...(ride.value?.messages ?? [])].sort((a, b) => a.created_at.localeCompare(b.created_at)))
 const offers = computed(() => ride.value?.offers ?? [])
 
+// ---- Cancellations (doc 15) -----------------------------------------------------------------
+
+// The reason picked in the app (when there is one) and the free text, which older rides use alone.
+const cancelReasonText = computed(() => {
+  const r = ride.value
+  if (!r) return ''
+  const code = r.cancel_reason_code ? t(cancelReasonKey(r.cancel_reason_code)) : null
+  const text = r.cancel_reason ? label(`rides.cancelReasons.${r.cancel_reason}`, r.cancel_reason) : null
+  return [code, text].filter(Boolean).join(' · ')
+})
+const cancellations = computed(() => [...(ride.value?.cancellations ?? [])].sort((a, b) => a.created_at.localeCompare(b.created_at)))
+
 const offerStatusColor = (value: string) =>
   (({ accepted: 'success', declined: 'error', expired: 'neutral', pending: 'warning', cancelled: 'neutral' } as const)[value] ?? 'neutral')
 
@@ -191,6 +203,14 @@ async function confirmCancel() {
           >
             {{ label(`rides.statuses.${ride.status}`, ride.status) }}
           </UBadge>
+          <UBadge
+            v-if="ride?.reassign_count"
+            color="warning"
+            variant="subtle"
+            icon="i-lucide-repeat"
+          >
+            {{ t('rides.reassigned', ride.reassign_count) }}
+          </UBadge>
         </template>
         <template #right>
           <UButton
@@ -226,13 +246,13 @@ async function confirmCancel() {
         class="grid gap-6 lg:grid-cols-3"
       >
         <UAlert
-          v-if="ride.cancel_reason"
+          v-if="cancelReasonText"
           class="lg:col-span-3"
           color="warning"
           variant="subtle"
           icon="i-lucide-message-square-warning"
           :title="t('rides.cancelReason')"
-          :description="te(`rides.cancelReasons.${ride.cancel_reason}`) ? t(`rides.cancelReasons.${ride.cancel_reason}`) : ride.cancel_reason"
+          :description="cancelReasonText"
         />
 
         <!-- Main column -->
@@ -440,6 +460,91 @@ async function confirmCancel() {
                       >
                         {{ label(`rides.offers.statuses.${offer.status}`, offer.status) }}
                       </UBadge>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </UCard>
+
+          <UCard v-if="cancellations.length">
+            <template #header>
+              <h2 class="font-semibold">
+                {{ t('rides.cancellations.title') }}
+              </h2>
+              <p class="text-sm text-(--ui-text-muted)">
+                {{ t('rides.cancellations.help') }}
+              </p>
+            </template>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="text-(--ui-text-muted)">
+                  <tr>
+                    <th class="py-2 pr-4 font-medium">
+                      {{ t('rides.cancellations.who') }}
+                    </th>
+                    <th class="py-2 pr-4 font-medium">
+                      {{ t('rides.cancellations.reason') }}
+                    </th>
+                    <th class="py-2 pr-4 font-medium">
+                      {{ t('rides.cancellations.stage') }}
+                    </th>
+                    <th
+                      class="py-2 pr-4 font-medium"
+                      :title="t('rides.cancellations.countedHelp')"
+                    >
+                      {{ t('rides.cancellations.counted') }}
+                    </th>
+                    <th class="py-2 pr-4 font-medium">
+                      {{ t('rides.cancellations.reassignedLabel') }}
+                    </th>
+                    <th class="py-2 font-medium">
+                      {{ t('rides.cancellations.at') }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-(--ui-border)">
+                  <tr
+                    v-for="item in cancellations"
+                    :key="item.id"
+                  >
+                    <td class="py-2 pr-4">
+                      <NuxtLink
+                        :to="`/users/${item.user_id}`"
+                        class="text-primary hover:underline"
+                      >
+                        {{ item.user_name || item.user_id.slice(0, 8) }}
+                      </NuxtLink>
+                      <p class="text-xs text-(--ui-text-muted)">
+                        {{ t(`quality.sides.${item.side}`) }}
+                      </p>
+                    </td>
+                    <td class="py-2 pr-4">
+                      {{ t(cancelReasonKey(item.reason_code)) }}
+                      <p
+                        v-if="item.reason"
+                        class="text-xs break-words text-(--ui-text-muted)"
+                      >
+                        {{ item.reason }}
+                      </p>
+                    </td>
+                    <td class="py-2 pr-4">
+                      {{ label(`rides.statuses.${item.stage}`, item.stage) }}
+                    </td>
+                    <td class="py-2 pr-4">
+                      <UBadge
+                        :color="item.counted ? 'warning' : 'neutral'"
+                        variant="subtle"
+                        size="sm"
+                      >
+                        {{ t(item.counted ? 'rides.cancellations.yes' : 'rides.cancellations.no') }}
+                      </UBadge>
+                    </td>
+                    <td class="py-2 pr-4">
+                      {{ t(item.reassigned ? 'rides.cancellations.yes' : 'rides.cancellations.no') }}
+                    </td>
+                    <td class="py-2 whitespace-nowrap">
+                      {{ formatTime(item.created_at, locale) }}
                     </td>
                   </tr>
                 </tbody>

@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Bell,
   Bike,
+  Gauge,
   Gift,
   IdCard,
   type Icon,
@@ -36,6 +37,7 @@ const KIND_ICON: Record<NotificationKind, { icon: Icon; tone: Tone }> = {
   account: { icon: User, tone: 'neutral' },
   documents: { icon: IdCard, tone: 'primary' },
   referral: { icon: Gift, tone: 'accent' },
+  quality: { icon: Gauge, tone: 'warning' },
   general: { icon: Bell, tone: 'neutral' },
 };
 

@@ -706,7 +706,10 @@
     "lost_item_not_found": "No hay un objeto olvidado en este viaje.",
     "lost_item_exists": "Ya avisaste por un objeto en este viaje.",
     "lost_item_too_late": "Ya pasó el tiempo para avisar al motorizado. Escríbenos y te ayudamos.",
-    "lost_item_answered": "Ya respondiste por este objeto."
+    "lost_item_answered": "Ya respondiste por este objeto.",
+    "temporarily_paused": "Tu cuenta está en pausa {{until}}.",
+    "no_show_too_early": "Todavía no termina el tiempo de espera.",
+    "cancel_reason_invalid": "Ese motivo no aplica para este viaje. Elige otro."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -863,29 +866,72 @@
       "arrived": "Tu motorizado llegó al punto de recogida",
       "driverCancelled": "Tu motorizado canceló el viaje",
       "noDrivers": "No encontramos motorizados disponibles",
-      "adminCancelled": "El equipo de Kuulis canceló el viaje"
+      "adminCancelled": "El equipo de Kuulis canceló el viaje",
+      "reassigning": "Tu motorizado canceló. Buscando otro motorizado…",
+      "noShow": "Tu motorizado esperó y no llegaste"
     },
     "adminCancelled": {
       "title": "Kuulis canceló este viaje",
       "body": "Nuestro equipo de soporte canceló el viaje. Si lo necesitas, puedes pedir otra moto ahora mismo."
     },
-    "reportProblem": "Reportar un problema"
+    "reportProblem": "Reportar un problema",
+    "reassigning": {
+      "title": "Buscando otro motorizado",
+      "notice": "Tu motorizado canceló. Buscando otro motorizado…",
+      "body": "Tu viaje sigue en pie con el mismo precio. Te avisamos apenas otro motorizado acepte."
+    },
+    "waiting": {
+      "label": "Tu motorizado te espera",
+      "a11y": "Tu motorizado te espera: {{time}}",
+      "over": "Ya pasó el tiempo de espera. Acércate al punto de recogida o el viaje podría cancelarse."
+    },
+    "noShow": {
+      "title": "Tu motorizado esperó y no llegaste",
+      "body": "El viaje se canceló porque no llegaste al punto de recogida a tiempo.",
+      "warning": "Si pasa varias veces, tu cuenta puede quedar en pausa por un tiempo.",
+      "retry": "Pedir otra moto"
+    }
   },
   "cancel": {
     "title": "¿Por qué cancelas?",
-    "subtitlePassenger": "Tu respuesta nos ayuda a mejorar el servicio.",
-    "subtitleDriver": "Cancelar seguido afecta tu reputación. Cuéntanos qué pasó.",
     "reasonLabel": "Motivo de cancelación: {{reason}}",
     "reason": {
       "wait_too_long": "La espera es muy larga",
       "driver_not_moving": "El motorizado no avanza",
       "changed_plans": "Cambié de planes",
-      "wrong_pickup": "El punto de recogida está mal",
+      "wrong_pickup": "Puse mal la dirección",
       "passenger_no_show": "El pasajero no apareció",
       "unsafe_location": "La zona no es segura",
       "vehicle_problem": "Problema con la moto",
-      "other": "Otro motivo"
-    }
+      "other": "Otro motivo",
+      "driver_late": "Tardó mucho",
+      "driver_asked": "El motorizado me pidió cancelar",
+      "vehicle_mismatch": "La moto no coincide",
+      "wrong_address": "Dirección incorrecta",
+      "no_helmet": "Pasajero sin casco",
+      "safety_concern": "No me siento seguro",
+      "no_show": "No se presentó"
+    },
+    "searchingTitle": "¿Cancelar la búsqueda?",
+    "subtitle": {
+      "passenger": "Tu respuesta nos ayuda a mejorar el servicio.",
+      "searching": "Si quieres, cuéntanos por qué.",
+      "driver": "Elige el motivo. Al pasajero le buscamos otro motorizado de inmediato."
+    },
+    "hint": {
+      "vehicle_mismatch": "Abrimos un reporte para revisarlo. No cuenta en tu contra.",
+      "safety_concern": "No cuenta en tu tasa de cancelación."
+    },
+    "details": "Cuéntanos más (opcional)",
+    "detailsOther": "¿Qué pasó? (opcional)",
+    "detailsPlaceholder": "Escribe aquí…",
+    "countsWarning": "Cancelar muchas veces puede pausar tu cuenta.",
+    "freeFor": "Puedes cancelar sin que cuente durante {{time}}",
+    "driverNote": "Cancelar cuenta en tu tasa de cancelación. Si cancelas seguido recibirás menos viajes.",
+    "pickReason": "Elige un motivo para continuar",
+    "keepSearching": "Seguir buscando",
+    "keepRide": "Seguir con el viaje",
+    "keepDriving": "Volver al viaje"
   },
   "safety": {
     "title": "Tu seguridad",
@@ -1108,6 +1154,22 @@
       "creditedToast": "Kuulis te acreditó {{discount}} en tu billetera por la promoción",
       "creditedTitle": "+ {{discount}} en tu billetera",
       "creditedBody": "El pasajero usó la promoción {{name}} y te pagó {{total}}. Kuulis te reintegra el descuento."
+    },
+    "cancel": {
+      "done": "Viaje cancelado. Al pasajero le buscamos otro motorizado."
+    },
+    "wait": {
+      "label": "Esperando al pasajero",
+      "a11y": "Llevas {{time}} esperando al pasajero",
+      "hint": "Avísale por el chat que ya llegaste.",
+      "left": "Podrás marcar «No se presentó» en {{time}}",
+      "over": "Si {{name}} no aparece, puedes marcar que no se presentó."
+    },
+    "noShow": {
+      "button": "No se presentó",
+      "confirmTitle": "¿{{name}} no se presentó?",
+      "confirmBody": "El viaje se cancela y no cuenta en tu tasa de cancelación.",
+      "done": "Listo. El viaje se canceló y no cuenta en tu contra."
     }
   },
   "money": {
@@ -1983,6 +2045,105 @@
         "has_it": "Respondiste que lo tienes. El chat ya se cerró.",
         "not_found": "Respondiste que no lo tienes. Gracias por revisar."
       }
+    }
+  },
+  "quality": {
+    "title": "Mi calidad",
+    "subtitle": "Tus números de los últimos {{days}} días y cómo se calculan.",
+    "subtitleLoading": "Tus tasas de aceptación y cancelación y tu calificación.",
+    "level": {
+      "ok": {
+        "pill": "Todo en orden",
+        "title": "Vas muy bien",
+        "body": "Recibes viajes con normalidad. Sigue aceptando y completando tus viajes."
+      },
+      "warn": {
+        "pill": "Atención",
+        "title": "Cuidado con las cancelaciones",
+        "body": "Cancelas más del {{warn}} de los viajes que aceptas. Si llegas a {{low}} recibirás menos viajes."
+      },
+      "low_priority": {
+        "pill": "Menos viajes",
+        "title": "Estás recibiendo menos viajes",
+        "body": "Por ahora los viajes van primero a otros motorizados. Cuando bajes de {{low}} vuelves a la normalidad."
+      },
+      "review": {
+        "pill": "En revisión",
+        "title": "Tu cuenta está en revisión",
+        "body": "Nuestro equipo revisará tu cuenta. Si tienes dudas, escríbenos desde Ayuda y reportes."
+      }
+    },
+    "reasonsLabel": "Por:",
+    "reason": {
+      "cancel_rate": "Cancelaciones",
+      "rating": "Calificación",
+      "no_shows": "No presentados"
+    },
+    "metric": {
+      "acceptance": "Aceptación",
+      "acceptanceDetail_one": "{{accepted}} de {{count}} oferta",
+      "acceptanceDetail_other": "{{accepted}} de {{count}} ofertas",
+      "cancellation": "Cancelación",
+      "cancellationDetail_one": "{{cancels}} de {{count}} viaje aceptado",
+      "cancellationDetail_other": "{{cancels}} de {{count}} viajes aceptados",
+      "rating": "Calificación",
+      "ratingDetail_one": "{{count}} calificación",
+      "ratingDetail_other": "{{count}} calificaciones",
+      "noRatings": "Aún sin calificaciones",
+      "rides": "Viajes",
+      "ridesDetail_one": "{{count}} completado",
+      "ridesDetail_other": "{{count}} completados"
+    },
+    "meter": {
+      "title": "Tu tasa de cancelación",
+      "a11y": "Tasa de cancelación {{rate}}. Te avisamos desde {{warn}} y desde {{low}} recibes menos viajes.",
+      "legend": "Desde {{warn}} te avisamos; desde {{low}} recibes menos viajes.",
+      "notYet": "La medimos desde {{min}} viajes aceptados. Llevas {{count}}."
+    },
+    "rules": {
+      "title": "Cómo funciona",
+      "cancelTitle": "Cancelaciones",
+      "cancelBody": "Si cancelas más del {{warn}} de los viajes que aceptas en {{days}} días te avisamos; desde {{low}} recibes menos viajes y desde {{review}} revisamos tu cuenta. Empezamos a medir desde {{min}} viajes aceptados.",
+      "pauseTitle": "Desconexiones automáticas",
+      "pause": {
+        "both": "Si rechazas {{declines}} ofertas seguidas o cancelas {{cancels}} viajes en una hora te desconectamos {{minutes}} minutos.",
+        "declines": "Si rechazas {{declines}} ofertas seguidas te desconectamos {{minutes}} minutos.",
+        "cancels": "Si cancelas {{cancels}} viajes en una hora te desconectamos {{minutes}} minutos.",
+        "none": "Por ahora no desconectamos a nadie de forma automática."
+      },
+      "waitTitle": "Espera en la recogida",
+      "waitBody": "Al llegar, espera al pasajero {{minutes}} minutos. Si no aparece, toca «No se presentó»: el viaje se cancela y no cuenta en tu contra.",
+      "ratingTitle": "Calificación",
+      "ratingBody": "Si tu promedio baja de {{min}} (con al menos {{count}} calificaciones) revisamos tu cuenta.",
+      "safetyTitle": "Tu seguridad primero",
+      "safetyBody": "Cancelar por «No me siento seguro» no cuenta en tu tasa. Al pasajero le buscamos otro motorizado."
+    },
+    "pause": {
+      "driverTitle": "Pausa temporal",
+      "driverBody": "Te desconectamos un momento para no hacer esperar a los pasajeros.",
+      "countdownLabel": "Podrás conectarte en",
+      "countdownA11y": "Te desconectamos un momento para no hacer esperar a los pasajeros. Podrás conectarte en {{time}}",
+      "passengerTitle": "Tu cuenta está en pausa",
+      "passengerBody": "Por ahora no puedes pedir viajes.",
+      "untilLabel": "Podrás pedir de nuevo",
+      "passengerHint": "Cuando termine la pausa podrás pedir viajes como siempre.",
+      "why": "Por qué",
+      "reason": {
+        "cancel_burst": "Cancelaste varios viajes en poco tiempo.",
+        "decline_streak": "Rechazaste varias ofertas seguidas.",
+        "no_shows": "Varios motorizados te esperaron y no llegaste al punto de recogida."
+      },
+      "seeQuality": "Ver mi calidad",
+      "untilToday": "hasta las {{time}}",
+      "untilDate": "hasta el {{date}} a las {{time}}",
+      "generic": "Tu cuenta está en pausa por un momento. Inténtalo más tarde.",
+      "toast": "Te desconectamos por un momento. En Inicio ves cuándo puedes volver.",
+      "liftedToast": "Ya puedes conectarte de nuevo."
+    },
+    "profile": {
+      "hint": "Aceptación {{acceptance}} · Cancelación {{cancellation}}",
+      "hintLoading": "Tus tasas y cómo mejorarlas",
+      "paused": "En pausa: podrás conectarte pronto"
     }
   }
 }

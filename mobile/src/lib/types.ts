@@ -421,6 +421,103 @@ export interface Ride {
   // Doc 11: the driver types the passenger's PIN to start; only the passenger receives `start_pin`.
   pin_required?: boolean;
   start_pin?: string | null;
+  // Doc 15 (optional: older servers do not send them).
+  /** Stable code of why it was cancelled (`no_show`, `wrong_address`…); `cancel_reason` is the free text. */
+  cancel_reason_code?: CancelReasonCode | null;
+  /** Drivers who cancelled after accepting: the ride went back to `searching` this many times. */
+  reassign_count?: number;
+  /** While `driver_arrived`: when the wait is over and the driver may mark "No se presentó". */
+  no_show_at?: string | null;
+  /** While a driver is assigned: the passenger can cancel without it counting until then. */
+  cancel_free_until?: string | null;
+}
+
+// ── Doc 15: cancellations and quality ──
+
+export type PassengerCancelReason =
+  | "driver_late"
+  | "changed_plans"
+  | "driver_asked"
+  | "vehicle_mismatch"
+  | "wrong_pickup"
+  | "other";
+
+export type DriverCancelReason =
+  | "no_show"
+  | "wrong_address"
+  | "no_helmet"
+  | "vehicle_problem"
+  | "safety_concern"
+  | "other";
+
+export type CancelReasonCode = PassengerCancelReason | DriverCancelReason;
+
+/** POST /rides/{id}/cancel. */
+export interface CancelRideInput {
+  reason_code?: CancelReasonCode;
+  /** Free text, up to 500 characters. */
+  reason?: string;
+}
+
+export type PauseReason = "cancel_burst" | "decline_streak" | "no_shows";
+
+/** `details` of a 403 temporarily_paused (going online, quote, ride request). */
+export interface TemporarilyPausedDetails {
+  until: string;
+  reason: PauseReason;
+}
+
+/** A quality pause in force for one side of the account. */
+export interface QualityPause {
+  until: string;
+  reason: PauseReason | null;
+}
+
+/** WS `quality.paused`: `until` null means the team lifted it. */
+export interface QualityPausedEvent {
+  role: "driver" | "passenger";
+  reason: PauseReason | null;
+  until: string | null;
+}
+
+export type QualityLevel = "ok" | "warn" | "low_priority" | "review";
+
+/** The rules behind the driver's level, from the remote configuration. */
+export interface QualityThresholds {
+  window_days: number;
+  min_rides: number;
+  /** Cancellation rates (0..1). */
+  cancel_warn: number;
+  cancel_low_priority: number;
+  cancel_review: number;
+  rating_review_below: number;
+  rating_min_count: number;
+  /** Cancellations within an hour that pause the driver (0: off). */
+  cancel_burst: number;
+  /** Offers declined in a row that pause the driver (0: off). */
+  decline_streak: number;
+  pause_minutes: number;
+  pickup_wait_minutes: number;
+}
+
+/** GET /drivers/me/quality: rates over the last `window_days` days (null: nothing to divide by yet). */
+export interface DriverQuality {
+  offers: number;
+  accepted: number;
+  rides: number;
+  cancels: number;
+  no_shows: number;
+  completed: number;
+  acceptance_rate: number | null;
+  cancel_rate: number | null;
+  rating_avg: number | null;
+  rating_count: number;
+  level: QualityLevel;
+  /** What pulls the level down: "cancel_rate", "rating", "no_shows". */
+  reasons: string[];
+  thresholds: QualityThresholds;
+  paused_until: string | null;
+  pause_reason: PauseReason | null;
 }
 
 export interface Offer {

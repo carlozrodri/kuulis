@@ -10,7 +10,14 @@ from apps.drivers.models import VehicleType
 from apps.geo.schemas import Place, Point
 from apps.promotions.schemas import PromotionBrief
 from apps.rates.schemas import FrozenRates, VesAmount
-from apps.rides.models import OfferStatus, PaymentMethod, RatingRole, RideStatus
+from apps.rides.models import (
+    CancelReason,
+    CancelSide,
+    OfferStatus,
+    PaymentMethod,
+    RatingRole,
+    RideStatus,
+)
 
 # Amounts travel as 2-decimal strings ("2.40") so clients never do float math with money.
 MoneyStr = Annotated[Decimal, PlainSerializer(lambda v: f"{v:.2f}", return_type=str)]
@@ -62,6 +69,8 @@ class RideCreate(BaseModel):
 
 class CancelRequest(BaseModel):
     reason: str | None = Field(default=None, max_length=500)
+    # Doc 15. Optional so older apps keep working; ``no_show`` needs the wait to be over.
+    reason_code: CancelReason | None = None
 
     @field_validator("reason")
     @classmethod
@@ -145,10 +154,17 @@ class RideRead(BaseModel):
     completed_at: datetime | None
     cancelled_at: datetime | None
     cancel_reason: str | None
+    cancel_reason_code: CancelReason | None = None
     my_rating: RatingRead | None
     # Start PIN (doc 11): the driver must type it to start; only the passenger receives the code.
     pin_required: bool = False
     start_pin: str | None = None
+    # Doc 15: drivers who cancelled after accepting (the ride went back to searching).
+    reassign_count: int = 0
+    # When the driver may mark "no se presentó" (arrived_at + the configured wait).
+    no_show_at: datetime | None = None
+    # Until then the passenger may cancel without it counting.
+    cancel_free_until: datetime | None = None
 
 
 class OfferPassenger(BaseModel):
@@ -237,6 +253,7 @@ class RideAdminRead(RideRead):
     driver_profile_id: uuid.UUID | None
     cancelled_by_id: uuid.UUID | None
     pin_failures: int = 0
+    reassigned_from_driver_id: uuid.UUID | None = None
 
 
 class RatingAdminRead(RatingRead):
@@ -274,6 +291,23 @@ class RideSafetyAlert(BaseModel):
     outcome: str | None
 
 
+class CancellationAdminRead(BaseModel):
+    """One cancellation of the ride (doc 15); a driver's sends the ride back to searching."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    user_id: uuid.UUID
+    user_name: str = ""
+    side: CancelSide
+    reason_code: CancelReason | None
+    reason: str | None
+    stage: RideStatus
+    counted: bool
+    reassigned: bool
+    created_at: datetime
+
+
 class RideAdminDetail(RideAdminRead):
     messages: list[MessageRead]
     ratings: list[RatingAdminRead]
@@ -281,6 +315,7 @@ class RideAdminDetail(RideAdminRead):
     # The driver's real path, [[lat, lng, unix_seconds], ...] (empty until the ride ends).
     track: list[list[float]] = Field(default_factory=list)
     safety_alerts: list[RideSafetyAlert] = Field(default_factory=list)
+    cancellations: list[CancellationAdminRead] = Field(default_factory=list)
 
 
 class StartRequest(BaseModel):

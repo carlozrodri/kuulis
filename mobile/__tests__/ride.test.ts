@@ -1,7 +1,9 @@
 import { describe, expect, it } from "@jest/globals";
 
 import {
+  CANCEL_REASONS,
   canDriverCancel,
+  cancelSheetKind,
   canPassengerCancel,
   countdownProgress,
   decodePolyline,
@@ -19,9 +21,13 @@ import {
   inServiceArea,
   isActiveStatus,
   isChatOpen,
+  isNoShow,
+  isReassigning,
   isTerminalStatus,
   mergeRide,
   nextDriverAction,
+  passengerCancelCounts,
+  pickupWait,
   placeFromGeo,
   rideRole,
   rideRoleStrict,
@@ -314,5 +320,79 @@ describe("ride state", () => {
       mergeRide(cancelled, { ...base, status: "in_progress" } as Ride).status,
     ).toBe("cancelled_by_driver");
     expect(mergeRide(undefined, base)).toBe(base);
+  });
+
+  it("follows a reassignment back to searching and ignores the old driver's late snapshots", () => {
+    const searching = {
+      ...base,
+      status: "searching",
+      driver: null,
+      driver_location: null,
+      reassign_count: 1,
+    } as Ride;
+    const merged = mergeRide({ ...base, reassign_count: 0 } as Ride, searching);
+    expect(merged.status).toBe("searching");
+    expect(merged.driver).toBeNull();
+    expect(merged.driver_location).toBeNull();
+    expect(mergeRide(merged, { ...base, reassign_count: 0 } as Ride)).toBe(merged);
+    // The next driver accepts: forward as usual.
+    expect(mergeRide(merged, { ...base, reassign_count: 1 } as Ride).status).toBe("driver_assigned");
+  });
+});
+
+describe("doc 15: cancellations", () => {
+  const NOW = Date.parse("2026-10-13T15:00:00Z");
+  const ride = (fields: Partial<Ride>) =>
+    ({ id: "r1", status: "driver_assigned", driver: { id: "d" }, ...fields }) as Ride;
+
+  it("lists each side's reasons", () => {
+    expect(CANCEL_REASONS.passenger).toEqual([
+      "driver_late",
+      "changed_plans",
+      "driver_asked",
+      "vehicle_mismatch",
+      "wrong_pickup",
+      "other",
+    ]);
+    expect(CANCEL_REASONS.driver).toEqual(["wrong_address", "no_helmet", "vehicle_problem", "safety_concern", "other"]);
+    // "No se presentó" has its own button.
+    expect(CANCEL_REASONS.driver).not.toContain("no_show");
+    expect(CANCEL_REASONS.searching).not.toContain("driver_late");
+  });
+
+  it("picks the sheet for the side and the stage", () => {
+    expect(cancelSheetKind(ride({}), "passenger")).toBe("passenger");
+    expect(cancelSheetKind(ride({ status: "searching", driver: null }), "passenger")).toBe("searching");
+    expect(cancelSheetKind(ride({}), "driver")).toBe("driver");
+  });
+
+  it("warns the passenger only after the free minutes", () => {
+    const free = ride({ cancel_free_until: "2026-10-13T15:01:00Z" });
+    expect(passengerCancelCounts(free, NOW)).toBe(false);
+    expect(passengerCancelCounts(free, Date.parse("2026-10-13T15:02:00Z"))).toBe(true);
+    expect(passengerCancelCounts(ride({ status: "driver_arrived", cancel_free_until: "2026-10-13T14:00:00Z" }), NOW)).toBe(true);
+    expect(passengerCancelCounts(ride({ status: "searching", driver: null, cancel_free_until: null }), NOW)).toBe(false);
+    // Older servers do not send it: no warning.
+    expect(passengerCancelCounts(ride({}), NOW)).toBe(false);
+  });
+
+  it("recognizes a reassignment and a no-show", () => {
+    expect(isReassigning(ride({ status: "searching", reassign_count: 1 }))).toBe(true);
+    expect(isReassigning(ride({ status: "searching", reassign_count: 0 }))).toBe(false);
+    expect(isReassigning(ride({ status: "searching" }))).toBe(false);
+    expect(isNoShow(ride({ status: "cancelled_by_driver", cancel_reason_code: "no_show" }))).toBe(true);
+    expect(isNoShow(ride({ status: "cancelled_by_driver", cancel_reason_code: null }))).toBe(false);
+  });
+
+  it("times the wait at the pickup point", () => {
+    const arrived = ride({
+      status: "driver_arrived",
+      arrived_at: "2026-10-13T14:57:00Z",
+      no_show_at: "2026-10-13T15:02:00Z",
+    });
+    expect(pickupWait(arrived, NOW)).toEqual({ waited: 180, left: 120, over: false });
+    expect(pickupWait(arrived, Date.parse("2026-10-13T15:02:00Z"))).toEqual({ waited: 300, left: 0, over: true });
+    // Older servers: the counter still runs, the button never enables.
+    expect(pickupWait(ride({ arrived_at: "2026-10-13T14:57:00Z", no_show_at: null }), NOW).over).toBe(false);
   });
 });

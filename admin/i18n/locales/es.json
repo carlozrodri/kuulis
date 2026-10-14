@@ -32,7 +32,8 @@
     "supportMetrics": "Métricas de soporte",
     "help": "Centro de ayuda",
     "campaigns": "Campañas",
-    "emailTemplates": "Plantillas de email"
+    "emailTemplates": "Plantillas de email",
+    "quality": "Calidad"
   },
   "navGroups": {
     "operations": "Operación",
@@ -172,7 +173,9 @@
       "finance": "Finanzas",
       "system": "Sistema",
       "releases": "Versiones de la app",
-      "app_control": "Control de la app"
+      "app_control": "Control de la app",
+      "quality": "Calidad",
+      "safety": "Seguridad"
     },
     "permissions": {
       "users": {
@@ -252,6 +255,14 @@
       },
       "help": {
         "manage": "Centro de ayuda"
+      },
+      "quality": {
+        "view": "Ver la calidad del servicio",
+        "manage": "Levantar pausas automáticas"
+      },
+      "safety": {
+        "view": "Ver las alertas de seguridad",
+        "manage": "Atender las alertas de seguridad"
       }
     }
   },
@@ -402,7 +413,8 @@
     "file_too_large": "El archivo es demasiado grande",
     "campaign_not_found": "No encontramos esa campaña",
     "campaign_not_editable": "Esa campaña ya salió o se canceló: no se puede cambiar",
-    "email_template_not_found": "No encontramos esa plantilla"
+    "email_template_not_found": "No encontramos esa plantilla",
+    "pause_not_active": "Esa pausa ya terminó o la levantaron."
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -549,7 +561,10 @@
       "supportNumber": "Soporte: los valores deben estar entre {min} y {max}",
       "supportPromise": "Soporte: la promesa de respuesta tiene máximo {max} caracteres",
       "quietHours": "El horario silencioso debe ser HH:MM",
-      "notificationNumber": "Notificaciones: los valores deben estar entre {min} y {max}"
+      "notificationNumber": "Notificaciones: los valores deben estar entre {min} y {max}",
+      "qualityNumber": "Calidad: los valores deben estar entre {min} y {max}",
+      "qualityCancelOrder": "Calidad: los umbrales de cancelación deben ir de menor a mayor (aviso, menor prioridad, revisar)",
+      "qualityNoShowOrder": "Calidad: el aviso por \"no se presentó\" no puede ser mayor que la pausa"
     },
     "fares": {
       "title": "Tarifas",
@@ -754,6 +769,53 @@
       },
       "monthlySummary": "Resumen mensual por email a los motorizados",
       "monthlySummaryHelp": "El día 1 de cada mes cada motorizado recibe un email con sus viajes y ganancias del mes anterior."
+    },
+    "quality": {
+      "title": "Calidad del servicio",
+      "help": "Cuánto se espera al pasajero, cuándo cuenta una cancelación y qué pasa al pasar los umbrales. Las consecuencias nunca cuestan dinero: avisos, pausas cortas y menor prioridad en el despacho.",
+      "sections": {
+        "pickup": "Recogida",
+        "drivers": "Tasas de los motorizados",
+        "driverPauses": "Pausas de los motorizados",
+        "passengers": "Pasajeros",
+        "general": "General"
+      },
+      "numbers": {
+        "pickup_wait_minutes": "Espera al pasajero (minutos)",
+        "passenger_cancel_grace_s": "Gracia para cancelar (segundos)",
+        "window_days": "Periodo de las tasas (días)",
+        "driver_cancel_warn": "Aviso desde (%)",
+        "driver_cancel_low_priority": "Menor prioridad desde (%)",
+        "driver_cancel_review": "Revisar desde (%)",
+        "min_rides": "Viajes mínimos para medir",
+        "rating_review_below": "Revisar con calificación menor a",
+        "rating_min_count": "Calificaciones mínimas",
+        "driver_cancel_burst": "Cancelaciones seguidas",
+        "driver_decline_streak": "Ofertas rechazadas seguidas",
+        "driver_pause_minutes": "Pausa (minutos)",
+        "passenger_no_show_warn": "Aviso con \"no se presentó\"",
+        "passenger_no_show_pause": "Pausa con \"no se presentó\"",
+        "passenger_pause_hours": "Pausa (horas)",
+        "dispatch_quality_weight": "Peso en el despacho (%)"
+      },
+      "numbersHelp": {
+        "pickup_wait_minutes": "Desde que llega el motorizado; después puede marcar \"no se presentó\". Entre {min} y {max}.",
+        "passenger_cancel_grace_s": "Si el pasajero cancela antes de este tiempo desde que aceptan, no cuenta. Entre {min} y {max}.",
+        "window_days": "Las tasas usan los viajes de estos últimos días. Entre {min} y {max}.",
+        "driver_cancel_warn": "Cancelaciones sobre viajes aceptados: el motorizado recibe un aviso. Entre {min} y {max}.",
+        "driver_cancel_low_priority": "Recibe ofertas después de los motorizados mejor calificados. Entre {min} y {max}.",
+        "driver_cancel_review": "Aparece en Calidad para revisarlo. Entre {min} y {max}.",
+        "min_rides": "Viajes aceptados en el periodo antes de aplicar las tasas. Entre {min} y {max}.",
+        "rating_review_below": "Con al menos las calificaciones mínimas. Entre {min} y {max}.",
+        "rating_min_count": "Calificaciones en el periodo antes de mirar el promedio. Entre {min} y {max}.",
+        "driver_cancel_burst": "En una hora: pausa automática. 0 = desactivado. Entre {min} y {max}.",
+        "driver_decline_streak": "Rechazadas o ignoradas sin aceptar ninguna: pausa automática. 0 = desactivado. Entre {min} y {max}.",
+        "driver_pause_minutes": "Cuánto dura la pausa del motorizado. Entre {min} y {max}.",
+        "passenger_no_show_warn": "En el periodo: el pasajero recibe un aviso. 0 = desactivado. Entre {min} y {max}.",
+        "passenger_no_show_pause": "En el periodo: no puede pedir viajes por un tiempo. 0 = desactivado. Entre {min} y {max}.",
+        "passenger_pause_hours": "Cuánto dura la pausa del pasajero. Entre {min} y {max}.",
+        "dispatch_quality_weight": "Cuánto mueven la calificación y la aceptación al ofrecer viajes: el peor motorizado cuenta como hasta este porcentaje más lejos. 0 = solo distancia. Entre {min} y {max}."
+      }
     }
   },
   "paymentMethods": {
@@ -884,6 +946,21 @@
       "pinOk": "Con PIN de inicio, sin intentos fallidos",
       "pinFailures": "PIN incorrecto {n} veces",
       "open": "Abrir"
+    },
+    "reasonCode": "Motivo elegido",
+    "reassigned": "Reasignado {n} vez | Reasignado {n} veces",
+    "cancellations": {
+      "title": "Cancelaciones",
+      "help": "Cada cancelación del viaje. Cuando cancela el motorizado, el viaje vuelve a buscar otro.",
+      "who": "Quién",
+      "reason": "Motivo",
+      "stage": "Cuándo",
+      "counted": "Cuenta",
+      "countedHelp": "Si cuenta en su tasa de cancelación (no cuentan las del periodo de gracia ni los \"no se presentó\").",
+      "reassignedLabel": "Reasignado",
+      "yes": "Sí",
+      "no": "No",
+      "at": "Hora"
     }
   },
   "live": {
@@ -1767,6 +1844,9 @@
         "create": "Creó un anuncio",
         "update": "Editó un anuncio",
         "delete": "Borró un anuncio"
+      },
+      "quality": {
+        "pause_lift": "Levantó una pausa automática"
       }
     },
     "entities": {
@@ -1793,7 +1873,8 @@
       "app_update": "Actualización de JavaScript",
       "feature_flag": "Función",
       "announcement": "Anuncio",
-      "driver_check": "Reverificación"
+      "driver_check": "Reverificación",
+      "quality_pause": "Pausa automática"
     }
   },
   "team": {
@@ -2936,5 +3017,96 @@
     "phone": "Teléfono",
     "frameTitle": "Vista previa del email {name}",
     "sample": "Los nombres, montos y fechas son de ejemplo."
+  },
+  "quality": {
+    "help": "Personas por debajo de los umbrales o en pausa ahora, de peor a mejor. Se recalcula cada 10 minutos.",
+    "roles": {
+      "driver": "Motorizados",
+      "passenger": "Pasajeros"
+    },
+    "asRole": {
+      "driver": "Como motorizado",
+      "passenger": "Como pasajero"
+    },
+    "levels": {
+      "ok": "Bien",
+      "warn": "Aviso",
+      "low_priority": "Menor prioridad",
+      "review": "Revisar"
+    },
+    "allLevels": "Todos los niveles",
+    "level": "Nivel",
+    "search": "Buscar por nombre o correo",
+    "person": "Persona",
+    "cancelRate": "Cancelaciones",
+    "acceptanceRate": "Aceptación",
+    "rating": "Calificación",
+    "noShows": "No se presentó",
+    "completed": "Completados",
+    "reasonsLabel": "Por qué",
+    "pausedUntil": "En pausa hasta",
+    "cancelsOf": "{n} de {total}",
+    "acceptedOf": "{n} de {total} ofertas",
+    "ratingCount": "sin calificaciones | 1 calificación | {n} calificaciones",
+    "total": "nadie | 1 persona | {n} personas",
+    "empty": "Nadie por debajo de los umbrales",
+    "reasons": {
+      "cancel_rate": "Cancela mucho",
+      "rating": "Calificación baja",
+      "no_shows": "No se presenta"
+    },
+    "pauseReasons": {
+      "cancel_burst": "Muchas cancelaciones seguidas",
+      "decline_streak": "Rechazó muchas ofertas seguidas",
+      "no_shows": "No se presentó varias veces"
+    },
+    "reasonCodes": {
+      "driver_late": "Tardó mucho",
+      "changed_plans": "Cambió de planes",
+      "driver_asked": "El motorizado pidió cancelar",
+      "vehicle_mismatch": "La moto no coincide",
+      "wrong_pickup": "Dirección mal puesta",
+      "other": "Otro",
+      "no_show": "No se presentó",
+      "wrong_address": "Dirección incorrecta",
+      "no_helmet": "Pasajero sin casco",
+      "vehicle_problem": "Problema con la moto",
+      "safety_concern": "No se sintió seguro",
+      "none": "Sin motivo"
+    },
+    "sides": {
+      "passenger": "Pasajero",
+      "driver": "Motorizado"
+    },
+    "cancellations": {
+      "title": "Cancelaciones por motivo",
+      "help": "\"Cuentan\" suman en la tasa de quien cancela; \"Reasignadas\" volvieron a buscar otro motorizado.",
+      "bySide": {
+        "passenger": "Las cancela el pasajero",
+        "driver": "Las cancela el motorizado"
+      },
+      "reason": "Motivo",
+      "total": "Total",
+      "counted": "Cuentan",
+      "reassigned": "Reasignadas",
+      "sum": "Total",
+      "empty": "Sin cancelaciones en el periodo"
+    },
+    "card": {
+      "title": "Calidad",
+      "window": "Últimos {n} días",
+      "trend": "Últimas 8 semanas",
+      "weekOf": "Semana del {day}",
+      "pauses": "Pausas automáticas",
+      "noPauses": "Sin pausas",
+      "active": "En pausa",
+      "until": "Hasta {date}",
+      "liftedAt": "Levantada {date}",
+      "ended": "Terminó {date}",
+      "lift": "Levantar pausa",
+      "liftConfirm": "¿Levantar esta pausa? La persona podrá conectarse o pedir viajes de inmediato.",
+      "liftDone": "Pausa levantada",
+      "notDriver": "No es motorizado"
+    }
   }
 }

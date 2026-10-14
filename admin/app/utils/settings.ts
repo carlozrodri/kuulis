@@ -1,4 +1,4 @@
-import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, NotificationSettings, PaymentMethod, RateSource, SafetySettings, ServiceArea, SupportSettings, VehicleType, VerificationSettings } from '~/types/api'
+import type { AppConfig, AppLinks, DocumentKind, LocationIntervals, NotificationSettings, PaymentMethod, QualitySettings, RateSource, SafetySettings, ServiceArea, SupportSettings, VehicleType, VerificationSettings } from '~/types/api'
 import { DOCUMENT_KINDS, PAYMENT_METHODS, RATE_SOURCES, VEHICLE_TYPES } from '~/types/api'
 
 /** Editable copy of AppConfig: decimals as numbers so they bind to numeric inputs. */
@@ -40,6 +40,8 @@ export interface SettingsForm {
   verification: VerificationSettings
   support: SupportSettings
   notifications: NotificationSettings
+  /** Rates and the dispatch weight as percentages (15 = 0.15 in the API), see QUALITY_PERCENT_FIELDS. */
+  quality: QualitySettings
 }
 
 export const FARE_FIELDS = ['base', 'per_km', 'per_minute', 'minimum'] as const
@@ -111,6 +113,39 @@ export type NotificationNumber = keyof typeof NOTIFICATION_LIMITS
 export const NOTIFICATION_NUMBERS = Object.keys(NOTIFICATION_LIMITS) as NotificationNumber[]
 export const NOTICE_DAYS_MAX = 120
 export const NOTICE_DAYS_COUNT = 5
+/** Doc 15: quality limits (same as the API validation; percentages here, fractions in the API). */
+export const QUALITY_LIMITS = {
+  pickup_wait_minutes: [1, 30],
+  passenger_cancel_grace_s: [0, 900],
+  window_days: [7, 180],
+  driver_cancel_warn: [0, 100],
+  driver_cancel_low_priority: [0, 100],
+  driver_cancel_review: [0, 100],
+  min_rides: [1, 200],
+  rating_review_below: [1, 5],
+  rating_min_count: [1, 500],
+  driver_cancel_burst: [0, 20],
+  driver_decline_streak: [0, 50],
+  driver_pause_minutes: [1, 240],
+  passenger_no_show_warn: [0, 50],
+  passenger_no_show_pause: [0, 50],
+  passenger_pause_hours: [1, 720],
+  dispatch_quality_weight: [0, 100],
+} as const
+export type QualityNumber = keyof typeof QUALITY_LIMITS
+export const QUALITY_PERCENT_FIELDS: QualityNumber[] = ['driver_cancel_warn', 'driver_cancel_low_priority', 'driver_cancel_review', 'dispatch_quality_weight']
+/** How the settings card groups the fields. */
+export const QUALITY_SECTIONS: { key: 'pickup' | 'drivers' | 'driverPauses' | 'passengers' | 'general', fields: QualityNumber[] }[] = [
+  { key: 'pickup', fields: ['pickup_wait_minutes', 'passenger_cancel_grace_s'] },
+  { key: 'drivers', fields: ['driver_cancel_warn', 'driver_cancel_low_priority', 'driver_cancel_review', 'min_rides', 'rating_review_below', 'rating_min_count'] },
+  { key: 'driverPauses', fields: ['driver_cancel_burst', 'driver_decline_streak', 'driver_pause_minutes'] },
+  { key: 'passengers', fields: ['passenger_no_show_warn', 'passenger_no_show_pause', 'passenger_pause_hours'] },
+  { key: 'general', fields: ['window_days', 'dispatch_quality_weight'] },
+]
+// 0.15 ↔ 15, without float noise (0.07 * 100 = 7.000000000000001).
+const toPercent = (fraction: number) => Math.round(fraction * 10_000) / 100
+const fromPercent = (percent: number) => Math.round(Number(percent) * 100) / 10_000
+
 /** Selfie and moto photos are taken on the spot: they never expire nor are optional. */
 export const PAPER_DOCUMENTS: DocumentKind[] = DOCUMENT_KINDS.filter(k => k !== 'selfie' && k !== 'vehicle_photo')
 
@@ -199,6 +234,24 @@ export function defaultSettings(): SettingsForm {
       device_idle_days: 60,
       monthly_summary: true,
     },
+    quality: {
+      pickup_wait_minutes: 5,
+      passenger_cancel_grace_s: 120,
+      window_days: 30,
+      driver_cancel_burst: 3,
+      driver_decline_streak: 5,
+      driver_pause_minutes: 15,
+      driver_cancel_warn: 15,
+      driver_cancel_low_priority: 25,
+      driver_cancel_review: 35,
+      min_rides: 10,
+      passenger_no_show_warn: 2,
+      passenger_no_show_pause: 3,
+      passenger_pause_hours: 24,
+      rating_review_below: 4.3,
+      rating_min_count: 20,
+      dispatch_quality_weight: 20,
+    },
   }
 }
 
@@ -275,7 +328,18 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
     },
     support: { ...d.support, ...config.support },
     notifications: { ...d.notifications, ...config.notifications },
+    quality: qualityFromConfig(config.quality, d.quality),
   }
+}
+
+function qualityFromConfig(quality: Partial<QualitySettings> | undefined, defaults: QualitySettings): QualitySettings {
+  const form = { ...defaults }
+  for (const key of Object.keys(QUALITY_LIMITS) as QualityNumber[]) {
+    const value = quality?.[key]
+    if (value === undefined || value === null) continue
+    form[key] = QUALITY_PERCENT_FIELDS.includes(key) ? toPercent(num(value, 0)) : num(value, defaults[key])
+  }
+  return form
 }
 
 /** Serializes the form back to the API shape (decimals as 2-decimal strings, lists in catalogue order). */
@@ -352,6 +416,11 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
       response_promise_en: form.support.response_promise_en.trim(),
     },
     notifications: { ...form.notifications },
+    quality: Object.fromEntries((Object.keys(QUALITY_LIMITS) as QualityNumber[]).map((key) => {
+      const value = Number(form.quality[key])
+      if (QUALITY_PERCENT_FIELDS.includes(key)) return [key, fromPercent(value)]
+      return [key, key === 'rating_review_below' ? Math.round(value * 10) / 10 : value]
+    })) as unknown as QualitySettings,
   }
 }
 
@@ -483,6 +552,23 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
     if (!between(Number(form.notifications[key]), min, max)) {
       issues.push({ key: 'notificationNumber', params: { min, max } })
     }
+  }
+  for (const key of Object.keys(QUALITY_LIMITS) as QualityNumber[]) {
+    const [min, max] = QUALITY_LIMITS[key]
+    const value = Number(form.quality[key])
+    // The rating threshold and the percentages may have decimals; the rest are whole numbers.
+    const ok = key === 'rating_review_below' || QUALITY_PERCENT_FIELDS.includes(key) ? Number.isFinite(value) && value >= min && value <= max : between(value, min, max)
+    if (!ok) {
+      issues.push({ key: 'qualityNumber', params: { min, max } })
+      break
+    }
+  }
+  const q = form.quality
+  if (!(q.driver_cancel_warn <= q.driver_cancel_low_priority && q.driver_cancel_low_priority <= q.driver_cancel_review)) {
+    issues.push({ key: 'qualityCancelOrder' })
+  }
+  if (q.passenger_no_show_pause && q.passenger_no_show_warn > q.passenger_no_show_pause) {
+    issues.push({ key: 'qualityNoShowOrder' })
   }
   return issues
 }

@@ -24,6 +24,7 @@ from apps.notifications.models import Notification
 from apps.rides.tests.conftest import Actor, make_driver
 from conftest import set_config
 from kuulis.core import storage
+from kuulis.core.calendar import local_now
 from kuulis.core.db import SessionLocal
 from kuulis.core.redis import redis_client
 
@@ -43,7 +44,8 @@ def fake_storage(monkeypatch):
 
 
 def _today() -> date:
-    return datetime.now(UTC).date()
+    """The Caracas date, the one the API checks expiry against."""
+    return local_now().date()
 
 
 async def _driver(client, email="luis@example.com", **documents) -> Actor:

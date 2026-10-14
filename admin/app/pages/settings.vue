@@ -1233,6 +1233,45 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           </div>
         </UCard>
 
+        <!-- Doc 15: cancellations and service quality -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.quality.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.quality.help') }}
+            </p>
+          </template>
+          <div class="space-y-6">
+            <div
+              v-for="section in QUALITY_SECTIONS"
+              :key="section.key"
+            >
+              <h3 class="mb-2 text-sm font-medium">
+                {{ t(`settings.quality.sections.${section.key}`) }}
+              </h3>
+              <div class="grid gap-4 sm:grid-cols-3">
+                <UFormField
+                  v-for="key in section.fields"
+                  :key="key"
+                  :label="t(`settings.quality.numbers.${key}`)"
+                  :help="t(`settings.quality.numbersHelp.${key}`, { min: QUALITY_LIMITS[key][0], max: QUALITY_LIMITS[key][1] })"
+                >
+                  <UInputNumber
+                    v-model="form.quality[key]"
+                    :min="QUALITY_LIMITS[key][0]"
+                    :max="QUALITY_LIMITS[key][1]"
+                    :step="key === 'rating_review_below' ? 0.1 : 1"
+                    :format-options="QUALITY_PERCENT_FIELDS.includes(key) || key === 'rating_review_below' ? { maximumFractionDigits: 1 } : undefined"
+                    :disabled="readOnly"
+                  />
+                </UFormField>
+              </div>
+            </div>
+          </div>
+        </UCard>
+
         <UAlert
           v-if="!readOnly && dirty && issues.length"
           color="error"

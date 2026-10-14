@@ -25,6 +25,8 @@ from apps.notifications.router import router as notifications_router
 from apps.places.router import router as places_router
 from apps.privacy.router import router as privacy_router
 from apps.promotions.router import admin_router as promotions_admin_router
+from apps.quality.router import admin_router as quality_admin_router
+from apps.quality.router import router as quality_router
 from apps.rates.router import router as rates_router
 from apps.realtime.router import router as realtime_router
 from apps.referrals.router import router as referrals_router
@@ -96,6 +98,8 @@ api_v1.include_router(staff_public_router)
 api_v1.include_router(client_errors_router)
 api_v1.include_router(monitoring_router)
 api_v1.include_router(safety_admin_router)
+api_v1.include_router(quality_router)
+api_v1.include_router(quality_admin_router)
 
 root = APIRouter()
 root.include_router(health_router)

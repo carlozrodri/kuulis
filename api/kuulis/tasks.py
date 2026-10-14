@@ -25,6 +25,7 @@ TASK_MODULES = [
     "apps.safety.tasks",
     "apps.drivers.tasks",
     "apps.support.tasks",
+    "apps.quality.tasks",
 ]
 
 if settings.APP_ENV == "test":
