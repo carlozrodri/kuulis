@@ -1,0 +1,6 @@
+# New terms published in QA (doc 07): tick both boxes and continue.
+appId: ${APP_ID || 'uk.top8.kuulis.qa'}
+---
+- tapOn: "Leí y acepto estos textos"
+- tapOn: "Soy mayor de 18 años"
+- tapOn: "Aceptar y continuar"

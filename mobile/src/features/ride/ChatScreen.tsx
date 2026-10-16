@@ -18,7 +18,7 @@ import { Backpack, ChevronLeft, MessageCircle, Send } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { EmptyState, IconButton, Notice, Txt } from '@/components/ui';
 import { useFlag } from '@/hooks/useBootstrap';
-import { useLostItem, useRide, useRideMessages, useSendMessage } from '@/hooks/useRides';
+import { useLostItem, useQueuedActions, useRide, useRideMessages, useSendMessage } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { ApiError } from '@/lib/api';
 import { selectionHaptic } from '@/lib/feedback';
@@ -74,7 +74,18 @@ export function ChatScreen() {
   const chatUntil = lostItem?.chat_until
     ? new Date(lostItem.chat_until).toLocaleString(i18n.language, { weekday: 'long', hour: 'numeric', minute: '2-digit' })
     : null;
-  const items = useMemo(() => [...(messages.data ?? [])].reverse(), [messages.data]);
+  // Doc 20: messages written without signal show as "Enviando…" until the queue sends them.
+  const queued = useQueuedActions(id, 'message');
+  const items = useMemo(() => {
+    const pending: RideMessage[] = queued.map((item) => ({
+      id: `queued-${item.id}`,
+      ride_id: item.rideId,
+      sender_id: user?.id ?? '',
+      text: (item.body as { text?: string } | undefined)?.text ?? '',
+      created_at: new Date(item.createdAt).toISOString(),
+    }));
+    return [...(messages.data ?? []), ...pending].reverse();
+  }, [messages.data, queued, user?.id]);
 
   const submit = (value: string) => {
     const body = value.trim();
@@ -91,6 +102,7 @@ export function ChatScreen() {
 
   const renderItem = ({ item }: { item: RideMessage }) => {
     const mine = item.sender_id === user?.id;
+    const sending = item.id.startsWith('queued-');
     return (
       <View style={[styles.bubbleRow, { justifyContent: mine ? 'flex-end' : 'flex-start' }]}>
         <View
@@ -102,7 +114,9 @@ export function ChatScreen() {
           ]}>
           <Txt style={{ color: mine ? theme.onPrimary : theme.text }}>{item.text}</Txt>
           <Txt variant="micro" style={{ color: mine ? theme.onPrimary : theme.muted, opacity: 0.75, alignSelf: 'flex-end' }}>
-            {new Date(item.created_at).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })}
+            {sending
+              ? t('offline.sending')
+              : new Date(item.created_at).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })}
           </Txt>
         </View>
       </View>

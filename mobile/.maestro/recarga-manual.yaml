@@ -1,0 +1,25 @@
+# Driver: manual top-up ("Ya pagué") with a fake order id; it stays "Por confirmar" for an admin.
+appId: ${APP_ID || 'uk.top8.kuulis.qa'}
+---
+- runFlow:
+    file: common/login.yaml
+    env:
+      EMAIL: ${DRIVER_EMAIL}
+      PASSWORD: ${DRIVER_PASSWORD}
+      MODE: "Motorizado"
+- tapOn: "Billetera"
+- tapOn: "Recargar"
+- extendedWaitUntil:
+    visible: "Ya pagué"
+    timeout: 15000
+- tapOn: "Ya pagué"
+- tapOn:
+    text: ".*ID de la orden.*|.*orden.*"
+    index: 0
+- inputText: ${'E2E' + Date.now()}
+- hideKeyboard
+- tapOn:
+    text: "Enviar.*|ENVIAR.*"
+- extendedWaitUntil:
+    visible: "Por confirmar"
+    timeout: 20000

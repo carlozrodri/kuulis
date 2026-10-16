@@ -717,7 +717,30 @@
     "top_up_dispute_not_allowed": "Esta recarga ya no se puede reclamar: ya fue acreditada o está en revisión.",
     "top_up_dispute_open": "Ya hay un reclamo abierto por esta recarga. Síguelo en la conversación con soporte.",
     "top_up_not_found": "No encontramos esa recarga.",
-    "amount_too_low": "La recarga mínima es {{min_amount}} USDT"
+    "amount_too_low": "La recarga mínima es {{min_amount}} USDT",
+    "bad_request": "No pudimos procesar la solicitud. Inténtalo de nuevo.",
+    "conflict": "Esto ya existe o cambió hace un momento. Actualiza e inténtalo de nuevo.",
+    "not_found": "No encontramos lo que buscas.",
+    "http_404": "No encontramos lo que buscas.",
+    "http_405": "Esta acción no está disponible. Actualiza la app.",
+    "not_authenticated": "Tu sesión se cerró. Inicia sesión de nuevo.",
+    "token_expired": "Tu sesión se cerró. Inicia sesión de nuevo.",
+    "token_invalid": "Tu sesión se cerró. Inicia sesión de nuevo.",
+    "token_revoked": "Cerraste esta sesión desde otro teléfono. Inicia sesión de nuevo.",
+    "token_used": "Este enlace ya se usó. Pide uno nuevo.",
+    "permission_denied": "No tienes permiso para hacer esto.",
+    "not_implemented": "Esto todavía no está disponible.",
+    "service_unavailable": "El servicio no está disponible en este momento. Inténtalo en unos minutos.",
+    "invalid_avatar_key": "No pudimos guardar la foto. Súbela de nuevo.",
+    "not_a_driver": "Esta opción es solo para motorizados.",
+    "notification_not_found": "Esta notificación ya no existe.",
+    "user_not_found": "No encontramos a esa persona.",
+    "no_release": "Todavía no hay una versión para descargar.",
+    "not_dismissible": "Este aviso no se puede cerrar.",
+    "client_id_required": "No pudimos identificar este teléfono. Reinicia la app.",
+    "idempotency_in_progress": "Todavía estamos enviando esto. Espera un momento.",
+    "idempotency_key_invalid": "No pudimos enviar esto. Inténtalo de nuevo.",
+    "idempotency_key_reused": "No pudimos enviar esto. Inténtalo de nuevo."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -1178,7 +1201,8 @@
       "confirmTitle": "¿{{name}} no se presentó?",
       "confirmBody": "El viaje se cancela y no cuenta en tu tasa de cancelación.",
       "done": "Listo. El viaje se canceló y no cuenta en tu contra."
-    }
+    },
+    "retrying": "Sin señal: lo reintentamos solo, no hace falta tocar de nuevo."
   },
   "money": {
     "rate": {
@@ -2248,6 +2272,28 @@
     "mockLocation": {
       "title": "Ubicación simulada",
       "body": "Desactiva la ubicación simulada para recibir viajes"
+    }
+  },
+  "offline": {
+    "sending": "Enviando…",
+    "ratingQueued": "Sin conexión: tu calificación se enviará cuando vuelva la señal.",
+    "requestNeedsInternet": "Sin conexión. Para pedir un viaje necesitas internet.",
+    "failed": {
+      "ride_step": "No se pudo actualizar el viaje.",
+      "message": "No se envió tu mensaje.",
+      "rating": "No se envió tu calificación."
+    }
+  },
+  "signal": {
+    "data": {
+      "good": "Señal buena",
+      "weak": "Señal débil",
+      "none": "Sin señal"
+    },
+    "gps": {
+      "good": "GPS bien",
+      "weak": "GPS impreciso",
+      "none": "Sin GPS"
     }
   }
 }

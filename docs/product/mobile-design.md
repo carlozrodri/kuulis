@@ -86,7 +86,7 @@ bienvenida y motorizado). Es la fuente visual; los valores de abajo son la fuent
 | `text` | `#14201B` | `#E7EFEB` | Texto principal |
 | `muted` | `#5B6A63` | `#9AADA4` | Texto secundario |
 | `border` | `#DCE6E0` | `#23322B` | Bordes y separadores |
-| `success` / `warning` / `danger` / `info` | `#15803D` / `#B45309` / `#B42318` / `#1D4ED8` | `#4ADE80` / `#FBBF24` / `#F87171` / `#60A5FA` | Estados |
+| `success` / `warning` / `danger` / `info` | `#147A3A` / `#B45309` / `#B42318` / `#1D4ED8` | `#4ADE80` / `#FBBF24` / `#F87171` / `#60A5FA` | Estados |
 
 ### Tipografía y forma
 - Fuente **Plus Jakarta Sans** (Google Fonts, vía `@expo-google-fonts/plus-jakarta-sans`).

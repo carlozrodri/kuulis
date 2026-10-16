@@ -65,6 +65,7 @@ export { default as ChevronDown } from 'lucide-react-native/icons/chevron-down';
 export { default as CircleDot } from 'lucide-react-native/icons/circle-dot';
 export { default as Banknote } from 'lucide-react-native/icons/banknote';
 export { default as WifiOff } from 'lucide-react-native/icons/wifi-off';
+export { default as Wifi } from 'lucide-react-native/icons/wifi';
 export { default as Siren } from 'lucide-react-native/icons/siren';
 export { default as SearchX } from 'lucide-react-native/icons/search-x';
 export { default as Zap } from 'lucide-react-native/icons/zap';

@@ -262,6 +262,8 @@ export function Button({
   const inactive = disabled || loading;
   const palette = buttonPalette(theme, variant, !!disabled);
   const height = size === 'lg' ? 68 : size === 'sm' ? 40 : 56;
+  // Doc 20: every touch target reaches at least 48 dp (the small button grows its touch area, not its look).
+  const hitSlop = height < MIN_TOUCH ? (MIN_TOUCH - height) / 2 : undefined;
   const uppercase = variant === 'primary' || variant === 'accent' || (variant === 'danger' && size !== 'sm');
 
   return (
@@ -271,6 +273,7 @@ export function Button({
       accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled: !!inactive, busy: !!loading }}
       disabled={inactive}
+      hitSlop={hitSlop}
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
@@ -460,6 +463,7 @@ export function Chip({
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: !!selected }}
+      hitSlop={(MIN_TOUCH - CHIP_HEIGHT) / 2}
       onPress={onPress}
       style={({ pressed }) => [
         styles.chip,
@@ -730,6 +734,10 @@ export function Sheet({
   );
 }
 
+/** Smallest touch area (Android's 48 dp, doc 20); the driver's ride actions are 68. */
+export const MIN_TOUCH = 48;
+const CHIP_HEIGHT = 40;
+
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   footer: { paddingHorizontal: space.lg, paddingTop: space.sm, gap: space.xs },
@@ -771,7 +779,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: radius.chip,
     paddingHorizontal: 14,
-    minHeight: 40,
+    minHeight: CHIP_HEIGHT,
   },
   tile: { alignItems: 'center', justifyContent: 'center' },
   progress: { flexDirection: 'row', gap: 6 },

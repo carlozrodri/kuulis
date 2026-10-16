@@ -40,6 +40,8 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
 
 ## Mobile
 - [ ] Manejo de toque en notificación push (navegar a la pantalla correspondiente).
-- [ ] Tests de componentes.
+- [x] Tests de componentes (doc 20, React Native Testing Library).
+- [ ] Medir los presupuestos de rendimiento del doc 20 en los teléfonos de la matriz y correr los flujos de
+      Maestro (`mobile/README.md` → Calidad).
 - [ ] Enlace de invitación con el código ya puesto cuando la app esté en las tiendas (hoy el mensaje
       de WhatsApp lleva solo el código).

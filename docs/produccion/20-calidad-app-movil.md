@@ -74,3 +74,46 @@ Sin cambios.
 
 ## Preguntas para Carlos
 1. ¿Qué teléfonos usan los motorizados que conoces? Ayuda a fijar la matriz de pruebas.
+   **Supuesto** mientras tanto: Samsung Galaxy A03 Core / A04e o Redmi A2 (gama baja, 2–3 GB), Galaxy A14/A15
+   (media) y un Galaxy A54 o Pixel (reciente), más un emulador Android 11 Go de 2 GB. Está en `mobile/README.md`.
+
+## Cómo quedó (2026-10-16)
+### API
+- **Idempotency-Key** (`kuulis/core/idempotency.py`): middleware ASGI antes de los límites de uso, para
+  `POST /rides`, las acciones del viaje (aceptar, rechazar, llegué, iniciar, finalizar, cancelar), mensajes del
+  chat, calificaciones, recargas, reclamos de recarga y transferencias. La primera respuesta 2xx se guarda en
+  Redis 24 h por usuario (clave = usuario + ruta + llave); el reintento la recibe igual con
+  `Idempotent-Replayed: true` sin volver a ejecutar nada. Misma llave mientras corre: 409
+  `idempotency_in_progress`; misma llave con otro cuerpo: 422 `idempotency_key_reused`. Los errores no se
+  guardan y si Redis falla la petición pasa sin llave. Tests en `apps/rides/tests/test_idempotency.py`.
+- **Códigos de error**: `python manage.py error-codes` lee el código (AST) y escribe los 203 `code` a
+  `mobile/src/i18n/api-error-codes.json`. Un test de la API falla si el archivo no está al día.
+
+### App
+- **Sin conexión**: caché persistente de React Query en un archivo (historial, detalle de viajes, billetera,
+  perfil del motorizado, lugares, configuración; 7 días; nunca el viaje activo). La sesión ya no se cierra al
+  abrir sin señal: entra con el último perfil y lo vuelve a leer al volver la red. React Query pausa las
+  peticiones sin red en vez de mostrar errores.
+- **Cola de acciones** (`lib/outbox.ts`): llegué / iniciar / finalizar, mensajes y calificaciones se guardan en
+  un archivo con su `Idempotency-Key` y se envían en orden al volver la señal, al volver a la app y con
+  reintentos (1 s → 30 s). El motorizado ve "Enviando…" o "Sin señal: lo reintentamos solo" en el botón; el
+  chat muestra los mensajes pendientes como "Enviando…"; la calificación sin señal dice que se enviará luego.
+  Un rechazo de la API (PIN incorrecto, viaje ya cambiado) termina la acción y se muestra.
+- Pedir viaje, cancelar, recargas, reclamos y transferencias reintentan con la misma llave (`apiOnce`). Sin
+  conexión no se piden viajes: el botón queda desactivado con un aviso.
+- **Señal y GPS** en la pantalla de conducir: dos indicadores (bien / débil / sin) según la red, el canal en
+  vivo y la precisión y antigüedad del GPS.
+- **Accesibilidad**: test de contraste AA de todos los pares texto/fondo en claro y oscuro (se oscurecieron
+  `success` a `#147A3A` y el texto deshabilitado a `#53615B` en claro); toques de al menos 48 dp en botones
+  pequeños y chips.
+- **Errores amables**: 23 textos nuevos es/en; los códigos del panel admin quedan listados aparte.
+- **Tests**: React Native Testing Library para conducir (llegué, finalizar sin señal sin duplicar, rechazo),
+  calificar (con y sin señal), datos personales del motorizado y billetera sin conexión; más tests de la cola,
+  la caché y los indicadores. Flujos de Maestro en `mobile/.maestro/` (registro, viaje completo con dos
+  dispositivos, sin señal al finalizar, recarga manual, reporte).
+- **Medido** (2026-10-16): el bundle JS de Android (Hermes) pesa 4,9 MB y los recursos 1,6 MB (cada OTA ≈ 6,3
+  MB).
+
+### Pendiente (necesita teléfonos reales)
+- Medir arranque, memoria, fps, datos y batería en la matriz con los comandos de `mobile/README.md`.
+- Correr los flujos de Maestro (aquí no hay emulador) y la revisión con TalkBack y letra al 200 %.

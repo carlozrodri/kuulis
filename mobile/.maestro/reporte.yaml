@@ -1,0 +1,27 @@
+# Passenger: report a general problem from Profile → Help.
+appId: ${APP_ID || 'uk.top8.kuulis.qa'}
+---
+- runFlow:
+    file: common/login.yaml
+    env:
+      EMAIL: ${PASSENGER_EMAIL}
+      PASSWORD: ${PASSENGER_PASSWORD}
+      MODE: "Pasajero"
+- tapOn: "Perfil"
+- scrollUntilVisible:
+    element: "Ayuda y reportes"
+- tapOn: "Ayuda y reportes"
+- tapOn: "Reportar un problema"
+- tapOn:
+    text: ".*Otro.*"
+    index: 0
+- tapOn:
+    text: ".*Describe.*|.*Cuéntanos.*"
+    index: 0
+- inputText: "Prueba automática de Maestro, ignorar."
+- hideKeyboard
+- tapOn: "Enviar reporte"
+- extendedWaitUntil:
+    visible:
+      text: ".*recibimos.*|.*Recibimos.*"
+    timeout: 20000

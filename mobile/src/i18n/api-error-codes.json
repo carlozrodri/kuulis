@@ -1,0 +1,658 @@
+{
+  "codes": {
+    "account_disabled": [
+      "apps/users/services.py"
+    ],
+    "account_fee_pending": [
+      "apps/users/services.py"
+    ],
+    "account_open_reports": [
+      "apps/users/services.py"
+    ],
+    "account_ride_active": [
+      "apps/users/services.py"
+    ],
+    "account_suspended": [
+      "apps/moderation/services.py"
+    ],
+    "admin_mfa_required": [
+      "apps/auth/router.py",
+      "apps/users/dependencies.py"
+    ],
+    "admin_required": [
+      "apps/auth/router.py"
+    ],
+    "alert_closed": [
+      "apps/safety/services.py"
+    ],
+    "alert_not_found": [
+      "apps/safety/services.py"
+    ],
+    "amount_too_low": [
+      "apps/wallet/services.py"
+    ],
+    "app_update_required": [
+      "apps/releases/services.py"
+    ],
+    "approval_closed": [
+      "apps/approvals/services.py"
+    ],
+    "approval_not_found": [
+      "apps/approvals/services.py"
+    ],
+    "approval_own_request": [
+      "apps/approvals/services.py"
+    ],
+    "area_not_found": [
+      "apps/analytics/services.py"
+    ],
+    "assignee_invalid": [
+      "apps/moderation/services.py"
+    ],
+    "attachment_invalid": [
+      "apps/support/conversation.py"
+    ],
+    "bad_request": [
+      "(built-in)",
+      "kuulis/core/exceptions.py"
+    ],
+    "binance_pay_id_taken": [
+      "apps/wallet/services.py"
+    ],
+    "blocked_identifier_not_found": [
+      "apps/risk/services.py"
+    ],
+    "budget_below_committed": [
+      "apps/promotions/services.py"
+    ],
+    "build_not_found": [
+      "apps/releases/services.py"
+    ],
+    "campaign_not_editable": [
+      "apps/notifications/campaigns.py"
+    ],
+    "campaign_not_found": [
+      "apps/notifications/campaigns.py"
+    ],
+    "cancel_reason_invalid": [
+      "apps/rides/state.py"
+    ],
+    "canned_not_found": [
+      "apps/support/services.py"
+    ],
+    "cannot_ban_staff": [
+      "apps/risk/services.py"
+    ],
+    "cannot_suspend_staff": [
+      "apps/moderation/services.py"
+    ],
+    "captcha_invalid": [
+      "apps/support/services.py"
+    ],
+    "charge_not_found": [
+      "apps/subscriptions/services.py"
+    ],
+    "charge_not_pending": [
+      "apps/subscriptions/services.py"
+    ],
+    "chat_closed": [
+      "apps/rides/state.py"
+    ],
+    "check_files_invalid": [
+      "apps/drivers/verification.py"
+    ],
+    "check_files_missing": [
+      "apps/drivers/verification.py"
+    ],
+    "check_not_found": [
+      "apps/drivers/verification.py"
+    ],
+    "check_not_pending": [
+      "apps/drivers/verification.py"
+    ],
+    "check_not_requested": [
+      "apps/drivers/verification.py"
+    ],
+    "client_id_required": [
+      "apps/control/router.py"
+    ],
+    "closing_not_found": [
+      "apps/finance/services.py"
+    ],
+    "closing_out_of_order": [
+      "apps/finance/services.py"
+    ],
+    "closing_reconciled": [
+      "apps/finance/services.py"
+    ],
+    "conflict": [
+      "kuulis/core/exceptions.py"
+    ],
+    "contact_not_found": [
+      "apps/safety/services.py"
+    ],
+    "csat_already_given": [
+      "apps/moderation/router.py"
+    ],
+    "document_already_expired": [
+      "apps/drivers/services.py"
+    ],
+    "document_already_registered": [
+      "apps/drivers/services.py"
+    ],
+    "document_expired": [
+      "apps/drivers/verification.py"
+    ],
+    "document_key_invalid": [
+      "apps/drivers/services.py",
+      "apps/drivers/verification.py"
+    ],
+    "document_not_found": [
+      "apps/drivers/services.py",
+      "apps/drivers/verification.py"
+    ],
+    "document_not_uploaded": [
+      "apps/drivers/services.py",
+      "apps/drivers/verification.py"
+    ],
+    "driver_documents_rejected": [
+      "apps/drivers/services.py"
+    ],
+    "driver_invalid_status": [
+      "apps/drivers/services.py"
+    ],
+    "driver_invalid_transition": [
+      "apps/drivers/services.py"
+    ],
+    "driver_not_approved": [
+      "apps/drivers/checks.py",
+      "apps/drivers/verification.py",
+      "apps/rides/state.py"
+    ],
+    "driver_not_editable": [
+      "apps/drivers/services.py"
+    ],
+    "driver_not_found": [
+      "apps/drivers/services.py"
+    ],
+    "driver_requirements_missing": [
+      "apps/drivers/services.py"
+    ],
+    "email_taken": [
+      "apps/staff/services.py",
+      "apps/users/services.py"
+    ],
+    "email_template_not_found": [
+      "apps/notifications/router.py"
+    ],
+    "expiry_confirmed": [
+      "apps/drivers/verification.py"
+    ],
+    "expiry_required": [
+      "apps/drivers/services.py",
+      "apps/drivers/verification.py"
+    ],
+    "export_too_soon": [
+      "apps/privacy/services.py"
+    ],
+    "feature_disabled": [
+      "apps/control/services.py"
+    ],
+    "fee_not_lower": [
+      "apps/subscriptions/services.py"
+    ],
+    "file_too_large": [
+      "apps/drivers/services.py",
+      "apps/drivers/verification.py",
+      "apps/files/router.py"
+    ],
+    "file_type_not_allowed": [
+      "apps/drivers/services.py",
+      "apps/drivers/verification.py",
+      "apps/files/router.py"
+    ],
+    "flag_not_found": [
+      "apps/control/services.py"
+    ],
+    "help_article_not_found": [
+      "apps/support/services.py"
+    ],
+    "help_slug_taken": [
+      "apps/support/services.py"
+    ],
+    "http_404": [
+      "(built-in)"
+    ],
+    "http_405": [
+      "(built-in)"
+    ],
+    "http_429": [
+      "(built-in)"
+    ],
+    "idempotency_in_progress": [
+      "(built-in)"
+    ],
+    "idempotency_key_invalid": [
+      "(built-in)"
+    ],
+    "idempotency_key_reused": [
+      "(built-in)"
+    ],
+    "induction_required": [
+      "apps/drivers/services.py"
+    ],
+    "insufficient_balance": [
+      "apps/wallet/services.py"
+    ],
+    "invalid_avatar_key": [
+      "apps/users/services.py"
+    ],
+    "invalid_credentials": [
+      "apps/users/services.py"
+    ],
+    "invalid_update_request": [
+      "apps/updates/services.py"
+    ],
+    "invite_invalid": [
+      "apps/staff/services.py"
+    ],
+    "legal_acceptance_required": [
+      "apps/legal/services.py"
+    ],
+    "legal_document_not_found": [
+      "apps/legal/services.py"
+    ],
+    "login_locked": [
+      "apps/auth/lockout.py"
+    ],
+    "lost_item_answered": [
+      "apps/support/services.py"
+    ],
+    "lost_item_exists": [
+      "apps/support/services.py"
+    ],
+    "lost_item_not_found": [
+      "apps/support/services.py"
+    ],
+    "lost_item_too_late": [
+      "apps/support/services.py"
+    ],
+    "mock_location": [
+      "apps/risk/services.py"
+    ],
+    "month_already_closed": [
+      "apps/finance/services.py"
+    ],
+    "month_invalid": [
+      "apps/analytics/router.py"
+    ],
+    "month_not_closed": [
+      "apps/subscriptions/services.py"
+    ],
+    "month_open": [
+      "apps/finance/services.py"
+    ],
+    "national_id_taken": [
+      "apps/drivers/services.py"
+    ],
+    "no_active_sos": [
+      "apps/safety/services.py"
+    ],
+    "no_release": [
+      "apps/releases/router.py"
+    ],
+    "no_show_too_early": [
+      "apps/rides/state.py"
+    ],
+    "not_a_driver": [
+      "apps/wallet/services.py"
+    ],
+    "not_authenticated": [
+      "kuulis/core/exceptions.py"
+    ],
+    "not_dismissible": [
+      "apps/control/services.py"
+    ],
+    "not_found": [
+      "kuulis/core/exceptions.py"
+    ],
+    "not_implemented": [
+      "kuulis/core/exceptions.py"
+    ],
+    "not_ride_participant": [
+      "apps/moderation/services.py",
+      "apps/support/services.py"
+    ],
+    "not_staff": [
+      "apps/drivers/checks.py"
+    ],
+    "not_suspended": [
+      "apps/moderation/services.py"
+    ],
+    "notification_not_found": [
+      "apps/notifications/services.py"
+    ],
+    "offer_expired": [
+      "apps/rides/state.py"
+    ],
+    "outside_service_area": [
+      "apps/rides/state.py"
+    ],
+    "password_too_common": [
+      "apps/users/passwords.py"
+    ],
+    "pause_not_active": [
+      "apps/quality/services.py"
+    ],
+    "pause_not_found": [
+      "apps/quality/services.py"
+    ],
+    "payment_method_invalid": [
+      "apps/rides/state.py"
+    ],
+    "permission_denied": [
+      "kuulis/core/exceptions.py"
+    ],
+    "pin_attempts_exceeded": [
+      "apps/rides/state.py"
+    ],
+    "pin_invalid": [
+      "apps/rides/state.py"
+    ],
+    "place_not_found": [
+      "apps/places/services.py"
+    ],
+    "plate_taken": [
+      "apps/drivers/services.py"
+    ],
+    "promotion_code_taken": [
+      "apps/promotions/services.py"
+    ],
+    "promotion_invalid": [
+      "apps/promotions/services.py"
+    ],
+    "promotion_not_found": [
+      "apps/promotions/services.py"
+    ],
+    "promotion_unavailable": [
+      "apps/promotions/services.py"
+    ],
+    "quote_expired": [
+      "apps/rides/state.py"
+    ],
+    "range_invalid": [
+      "apps/analytics/services.py"
+    ],
+    "rate_limited": [
+      "(built-in)"
+    ],
+    "rating_already_submitted": [
+      "apps/rides/state.py"
+    ],
+    "rating_required": [
+      "apps/rides/state.py"
+    ],
+    "reauth_required": [
+      "apps/users/dependencies.py"
+    ],
+    "receipt_not_found": [
+      "apps/wallet/receipts.py"
+    ],
+    "recipient_not_found": [
+      "apps/wallet/services.py"
+    ],
+    "reconcile_note_required": [
+      "apps/finance/services.py"
+    ],
+    "referral_already_used": [
+      "apps/referrals/services.py"
+    ],
+    "referral_closed": [
+      "apps/referrals/services.py"
+    ],
+    "referral_code_invalid": [
+      "apps/referrals/services.py"
+    ],
+    "referral_driver_only": [
+      "apps/referrals/services.py"
+    ],
+    "referral_own_code": [
+      "apps/referrals/services.py"
+    ],
+    "registration_blocked": [
+      "apps/risk/services.py"
+    ],
+    "release_exists": [
+      "apps/releases/services.py"
+    ],
+    "report_already_open": [
+      "apps/moderation/services.py"
+    ],
+    "report_closed": [
+      "apps/moderation/services.py",
+      "apps/support/conversation.py"
+    ],
+    "report_not_closed": [
+      "apps/moderation/router.py",
+      "apps/moderation/services.py"
+    ],
+    "report_not_found": [
+      "apps/moderation/services.py"
+    ],
+    "ride_active": [
+      "apps/rides/state.py"
+    ],
+    "ride_already_active": [
+      "apps/rides/state.py"
+    ],
+    "ride_invalid_transition": [
+      "apps/rides/state.py"
+    ],
+    "ride_not_completed": [
+      "apps/rides/state.py",
+      "apps/support/services.py"
+    ],
+    "ride_not_found": [
+      "apps/rides/state.py"
+    ],
+    "ride_taken": [
+      "apps/rides/state.py"
+    ],
+    "ride_without_driver": [
+      "apps/moderation/services.py",
+      "apps/support/services.py"
+    ],
+    "risk_hold_not_found": [
+      "apps/risk/services.py"
+    ],
+    "risk_hold_not_held": [
+      "apps/risk/services.py"
+    ],
+    "risk_signal_not_found": [
+      "apps/risk/services.py"
+    ],
+    "schedule_exists": [
+      "apps/subscriptions/services.py"
+    ],
+    "schedule_month_invalid": [
+      "apps/subscriptions/services.py"
+    ],
+    "self_demotion": [
+      "apps/staff/services.py",
+      "apps/users/router.py"
+    ],
+    "selfie_required": [
+      "apps/drivers/verification.py"
+    ],
+    "service_paused": [
+      "apps/control/services.py"
+    ],
+    "service_unavailable": [
+      "kuulis/core/exceptions.py"
+    ],
+    "session_not_found": [
+      "apps/auth/services.py"
+    ],
+    "share_closed": [
+      "apps/safety/services.py"
+    ],
+    "share_expired": [
+      "apps/safety/services.py"
+    ],
+    "share_not_found": [
+      "apps/safety/services.py"
+    ],
+    "social_provider_disabled": [
+      "apps/auth/social.py"
+    ],
+    "social_provider_unavailable": [
+      "apps/auth/social.py"
+    ],
+    "social_token_invalid": [
+      "apps/auth/services.py",
+      "apps/auth/social.py"
+    ],
+    "sos_closed": [
+      "apps/safety/services.py"
+    ],
+    "staff_not_found": [
+      "apps/staff/services.py"
+    ],
+    "staff_role_exists": [
+      "apps/staff/services.py"
+    ],
+    "staff_role_not_found": [
+      "apps/staff/services.py"
+    ],
+    "statement_invalid": [
+      "apps/finance/services.py"
+    ],
+    "statement_not_found": [
+      "apps/finance/router.py"
+    ],
+    "storage_disabled": [
+      "kuulis/core/storage.py"
+    ],
+    "storage_unavailable": [
+      "apps/releases/services.py",
+      "apps/updates/services.py"
+    ],
+    "subscription_overdue": [
+      "apps/subscriptions/services.py"
+    ],
+    "suspension_until_invalid": [
+      "apps/moderation/services.py"
+    ],
+    "temporarily_paused": [
+      "apps/quality/services.py"
+    ],
+    "token_expired": [
+      "kuulis/core/security.py"
+    ],
+    "token_invalid": [
+      "apps/users/dependencies.py",
+      "kuulis/core/security.py"
+    ],
+    "token_revoked": [
+      "apps/auth/services.py",
+      "apps/users/dependencies.py"
+    ],
+    "token_used": [
+      "apps/auth/services.py"
+    ],
+    "too_many_contacts": [
+      "apps/safety/services.py"
+    ],
+    "too_many_documents": [
+      "apps/drivers/services.py"
+    ],
+    "too_many_open_reports": [
+      "apps/moderation/services.py"
+    ],
+    "too_many_pending_top_ups": [
+      "apps/wallet/services.py"
+    ],
+    "too_many_places": [
+      "apps/places/services.py"
+    ],
+    "top_up_dispute_not_allowed": [
+      "apps/wallet/services.py"
+    ],
+    "top_up_dispute_open": [
+      "apps/wallet/services.py"
+    ],
+    "top_up_invalid_status": [
+      "apps/wallet/services.py"
+    ],
+    "top_up_not_found": [
+      "apps/wallet/services.py"
+    ],
+    "totp_challenge_expired": [
+      "apps/auth/totp.py"
+    ],
+    "totp_invalid": [
+      "apps/auth/totp.py"
+    ],
+    "transfer_limit_exceeded": [
+      "apps/wallet/services.py"
+    ],
+    "transfer_to_self": [
+      "apps/wallet/services.py"
+    ],
+    "transfers_frozen": [
+      "apps/risk/services.py"
+    ],
+    "update_candidate_not_found": [
+      "apps/updates/services.py"
+    ],
+    "update_exists": [
+      "apps/updates/services.py"
+    ],
+    "update_not_current": [
+      "apps/updates/services.py"
+    ],
+    "updates_signing_disabled": [
+      "apps/updates/services.py"
+    ],
+    "user_inactive": [
+      "apps/auth/services.py",
+      "apps/auth/totp.py",
+      "apps/users/dependencies.py"
+    ],
+    "user_not_found": [
+      "apps/control/router.py",
+      "apps/moderation/services.py",
+      "apps/quality/services.py",
+      "apps/risk/services.py",
+      "apps/users/services.py",
+      "apps/wallet/router.py"
+    ],
+    "validation_error": [
+      "(built-in)",
+      "apps/config/services.py",
+      "apps/control/services.py",
+      "apps/finance/router.py",
+      "apps/promotions/services.py",
+      "apps/subscriptions/router.py"
+    ],
+    "vehicle_change_not_found": [
+      "apps/drivers/verification.py"
+    ],
+    "vehicle_change_pending": [
+      "apps/drivers/verification.py"
+    ],
+    "vehicle_same_plate": [
+      "apps/drivers/verification.py"
+    ],
+    "vehicle_too_old": [
+      "apps/drivers/services.py"
+    ],
+    "vehicle_type_not_enabled": [
+      "apps/drivers/services.py",
+      "apps/rides/services.py"
+    ],
+    "vehicle_year_invalid": [
+      "apps/drivers/services.py"
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+# Sign-up with a new e-mail every run, then the mode screen.
+appId: ${APP_ID || 'uk.top8.kuulis.qa'}
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+    permissions:
+      location: allow
+      notifications: allow
+- evalScript: ${output.email = 'e2e+' + Date.now() + '@kuulis.test'}
+- extendedWaitUntil:
+    visible: "Regístrate"
+    timeout: 20000
+- tapOn: "Regístrate"
+- tapOn: "Nombre y apellido"
+- inputText: "Prueba Maestro"
+- tapOn: "Correo"
+- inputText: ${output.email}
+- tapOn: "Contraseña"
+- inputText: "Kuulis-e2e-2026"
+- hideKeyboard
+- tapOn:
+    text: "Acepto los.*"
+- tapOn: "Crear cuenta"
+- extendedWaitUntil:
+    visible: "¿Cómo quieres usar Kuulis hoy?"
+    timeout: 15000
+- tapOn: "Pasajero"
+- assertVisible: "¿A dónde vamos?"

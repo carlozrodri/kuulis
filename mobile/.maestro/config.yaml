@@ -1,0 +1,6 @@
+# Maestro (https://maestro.dev), doc 20: end-to-end flows against QA with the QA build installed
+# (uk.top8.kuulis.qa). How to run them: mobile/README.md → "Pruebas E2E con Maestro".
+flows:
+  - "*.yaml"
+excludeTags:
+  - two-devices

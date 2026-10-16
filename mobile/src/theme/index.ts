@@ -20,7 +20,7 @@ const light = {
   muted: '#5B6A63',
   border: '#DCE6E0',
   divider: '#EDF2EF',
-  success: '#15803D',
+  success: '#147A3A',
   warning: '#B45309',
   danger: '#B42318',
   info: '#1D4ED8',
@@ -39,7 +39,7 @@ const light = {
   heroShade: '#0B6A4C',
   onHero: '#FFFFFF',
   disabled: '#DCE6E0',
-  onDisabled: '#5B6A63',
+  onDisabled: '#53615B',
   shadow: '#14201B',
   backdrop: 'rgba(11, 19, 16, 0.45)',
 };
