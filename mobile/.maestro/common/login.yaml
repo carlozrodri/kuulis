@@ -1,0 +1,25 @@
+# Signs in with ${EMAIL} / ${PASSWORD} from a clean install and picks ${MODE} ("Pasajero" or "Motorizado").
+appId: ${APP_ID || 'uk.top8.kuulis.qa'}
+---
+- launchApp:
+    clearState: true
+    permissions:
+      location: allow
+      notifications: allow
+- extendedWaitUntil:
+    visible: "Entrar"
+    timeout: 20000
+- tapOn: "Correo"
+- inputText: ${EMAIL}
+- tapOn: "Contraseña"
+- inputText: ${PASSWORD}
+- hideKeyboard
+- tapOn: "Entrar"
+- runFlow:
+    when:
+      visible: "Aceptar y continuar"
+    file: accept-legal.yaml
+- extendedWaitUntil:
+    visible: "¿Cómo quieres usar Kuulis hoy?"
+    timeout: 15000
+- tapOn: ${MODE}

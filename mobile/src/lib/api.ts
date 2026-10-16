@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 
 import { APP_VERSION_HEADERS } from './appVersion';
 import { config } from './config';
-import { deviceHeaders, deviceModelHeaders } from './deviceId';
+import { deviceHeaders, deviceModelHeaders, randomId } from './deviceId';
 import { secureStorage } from './storage';
 import type { TokenPair } from './types';
 
@@ -163,4 +163,28 @@ export async function api<T>(path: string, options: RequestOptions = {}, retried
   }
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * A write that must happen once (doc 20: request a ride, top-ups, transfers): sent with an Idempotency-Key and
+ * tried again with the same key when no answer arrives, so a lost answer never creates a second one.
+ */
+export async function apiOnce<T>(path: string, options: RequestOptions = {}, retries = 2): Promise<T> {
+  const key = randomId();
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await api<T>(path, {
+        method: 'POST',
+        ...options,
+        headers: { ...(options.headers as Record<string, string> | undefined), 'Idempotency-Key': key },
+      });
+    } catch (error) {
+      const retryable =
+        !(error instanceof ApiError) || error.status >= 500 || error.code === 'idempotency_in_progress';
+      if (!retryable || attempt >= retries) throw error;
+      await sleep(1000 * (attempt + 1));
+    }
+  }
 }

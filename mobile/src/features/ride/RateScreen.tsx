@@ -69,10 +69,11 @@ export function RateScreen() {
     rate.mutate(
       { id: ride.id, stars, tags, comment: comment.trim() || undefined },
       {
-        onSuccess: () => {
+        onSuccess: (result) => {
           track('rating_submitted', { role, stars });
           confirmHaptic();
-          showToast(t('rating.thanks'), 'success');
+          // Doc 20: without signal it stays queued and is sent when the network comes back.
+          showToast(result.status === 'queued' ? t('offline.ratingQueued') : t('rating.thanks'), 'success');
           leave();
         },
         onError: (error) => {

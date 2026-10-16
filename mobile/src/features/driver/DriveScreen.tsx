@@ -10,6 +10,7 @@ import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, EmptyState, IconButton, ProgressSteps, StatusPill, Txt } from '@/components/ui';
+import { SignalIndicator } from '@/features/driver/SignalIndicator';
 import { Avatar, PAYMENT_ICONS, RatingBadge, RoundAction } from '@/features/ride/components';
 import { CancelSheet, useNow } from '@/features/ride/RideSheets';
 import { chatUnread } from '@/features/ride/store';
@@ -19,7 +20,7 @@ import { useFirstRideTips } from '@/features/safety/SafetyTips';
 import { SosButton } from '@/features/safety/SosButton';
 import { useFlag } from '@/hooks/useBootstrap';
 import { useUserLocation } from '@/hooks/useLocation';
-import { rideKeys, useActiveRide, useCancelRide, useDriverRideAction, useRide } from '@/hooks/useRides';
+import { rideKeys, useActiveRide, useCancelRide, useDriverRideAction, useQueuedActions, useRide } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { ApiError } from '@/lib/api';
 import { confirmHaptic, heavyHaptic } from '@/lib/feedback';
@@ -67,6 +68,8 @@ export function DriveScreen() {
   const rideId = params.id || active.data?.id;
   const { data: ride, isError, error } = useRide(rideId);
   const action = useDriverRideAction();
+  // Doc 20: a step still in the queue (no signal, or sent before the app was closed) shows "Enviando…".
+  const queuedSteps = useQueuedActions(rideId, 'ride_step');
   const cancel = useCancelRide();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
@@ -103,8 +106,11 @@ export function DriveScreen() {
   const collect = formatFare(amountToPay(ride));
   const credit = hasDiscount(ride) ? formatFare(ride.discount) : null;
 
+  const sending = action.isPending || queuedSteps.length > 0;
+  const retrying = queuedSteps.some((item) => item.attempts > 0);
+
   const run = () => {
-    if (!next) return;
+    if (!next || sending) return;
     const go = () =>
       action.mutate(
         { id: ride.id, action: next },
@@ -169,17 +175,25 @@ export function DriveScreen() {
         ended ? (
           <Button title={t('ride.backHome')} onPress={goHome} />
         ) : (
-          <Button
-            title={t(`drive.action.${next}`)}
-            size="lg"
-            icon={next === 'arrive' ? MapPin : next === 'start' ? Power : Flag}
-            variant={next === 'complete' ? 'accent' : 'primary'}
-            loading={action.isPending}
-            onPress={run}
-          />
+          <View style={{ gap: space.xs }}>
+            {sending ? (
+              <Txt variant="caption" color="muted" align="center">
+                {retrying ? t('drive.retrying') : t('offline.sending')}
+              </Txt>
+            ) : null}
+            <Button
+              title={t(`drive.action.${next}`)}
+              size="lg"
+              icon={next === 'arrive' ? MapPin : next === 'start' ? Power : Flag}
+              variant={next === 'complete' ? 'accent' : 'primary'}
+              loading={sending}
+              onPress={run}
+            />
+          </View>
         )
       }>
       <ProgressSteps total={3} current={ride.status === 'driver_assigned' ? 1 : ride.status === 'driver_arrived' ? 2 : 3} />
+      {!ended ? <SignalIndicator /> : null}
       <View style={{ gap: 2 }}>
         <Txt variant="heading" accessibilityRole="header">
           {title}

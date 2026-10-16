@@ -5,6 +5,7 @@ import { ConnectionBanner } from '@/components/ConnectionBanner';
 import { ToastHost } from '@/components/Toast';
 import { MaintenanceGate } from '@/features/control/MaintenanceScreen';
 import { NotificationOpener } from '@/features/notifications/NotificationOpener';
+import { OutboxSync } from '@/features/offline/OutboxSync';
 import { DriverController, RideNavigator, RideSync } from '@/features/ride/RideController';
 import { SafetyController } from '@/features/safety/SafetyController';
 import { UpdateGate } from '@/features/update/UpdateGate';
@@ -71,6 +72,8 @@ export default function AppLayout() {
         {/* Remote control (doc 10): maintenance, city pauses, feature flags, banners and remote settings. */}
         <BootstrapSync />
         <RideSync />
+        {/* Doc 20: ride actions, messages and ratings sent without signal go out when it comes back. */}
+        <OutboxSync />
         {/* Doc 15: temporary pauses for quality (quality.paused) and "Mi calidad" refreshes. */}
         <QualitySync />
         <RideNavigator />

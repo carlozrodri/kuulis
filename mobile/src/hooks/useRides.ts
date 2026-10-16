@@ -1,7 +1,11 @@
 import { type QueryClient, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 import { routedRides } from '@/features/ride/store';
-import { ApiError, api } from '@/lib/api';
+import { outbox } from '@/lib/actionQueue';
+import { ApiError, api, apiOnce } from '@/lib/api';
+import type { OutboxItem, OutboxKind } from '@/lib/outbox';
+import { useStore } from '@/lib/store';
 import { isActiveStatus, isTerminalStatus, mergeRide } from '@/lib/ride';
 import { track } from '@/lib/analytics';
 import type {
@@ -102,7 +106,11 @@ export function useActiveRide(enabled = true) {
 export function usePendingRating(enabled = true) {
   return useQuery({
     queryKey: rideKeys.pendingRating,
-    queryFn: () => api<Ride | null>('/rides/pending-rating'),
+    queryFn: async () => {
+      const ride = await api<Ride | null>('/rides/pending-rating');
+      // Rated offline and still in the queue: do not ask again.
+      return ride && hasQueued(ride.id, 'rating') ? null : ride;
+    },
     enabled,
     staleTime: 60_000,
   });
@@ -279,11 +287,25 @@ export function useQuote(
 
 // ── Mutations ──
 
+/** How long the chat and the rating screen wait for an answer before saying it will be sent later. */
+const MESSAGE_WAIT_MS = 4000;
+const RATING_WAIT_MS = 6000;
+
+function hasQueued(rideId: string, kind: OutboxKind): boolean {
+  return outbox.store.get().some((item) => item.rideId === rideId && item.kind === kind);
+}
+
+/** Actions of this ride still in the queue (doc 20): "Enviando…" on the drive screen and in the chat. */
+export function useQueuedActions(rideId: string | undefined, kind: OutboxKind): OutboxItem[] {
+  const items = useStore(outbox.store);
+  return useMemo(() => items.filter((item) => item.rideId === rideId && item.kind === kind), [items, rideId, kind]);
+}
+
 export function useRequestRide() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: { quote_id: string; payment_method: PaymentMethod }) =>
-      api<Ride>('/rides', { method: 'POST', body: input }),
+      apiOnce<Ride>('/rides', { body: input }),
     onSuccess: (ride) => {
       // The requesting screen opens the ride itself.
       routedRides.add(ride.id);
@@ -299,8 +321,7 @@ export function useRequestRide() {
 export async function requestAgain(ride: Ride, attempt = 0): Promise<Ride> {
   const quote = await fetchQuote(ride.pickup, ride.dropoff, ride.vehicle_type);
   try {
-    return await api<Ride>('/rides', {
-      method: 'POST',
+    return await apiOnce<Ride>('/rides', {
       body: { quote_id: quote.quote_id, payment_method: ride.payment_method },
     });
   } catch (error) {
@@ -314,8 +335,7 @@ export function useCancelRide() {
   return useMutation({
     // Doc 15: `reason_code` from the cancel sheet, `reason` the optional free text.
     mutationFn: ({ id, reason_code, reason }: { id: string } & CancelRideInput) =>
-      api<Ride>(`/rides/${id}/cancel`, {
-        method: 'POST',
+      apiOnce<Ride>(`/rides/${id}/cancel`, {
         body: { ...(reason_code ? { reason_code } : {}), ...(reason?.trim() ? { reason: reason.trim() } : {}) },
       }),
     onSuccess: (ride) => applyRide(queryClient, ride),
@@ -327,8 +347,17 @@ export function useDriverRideAction() {
   const queryClient = useQueryClient();
   return useMutation({
     // Doc 11: "start" carries the passenger's PIN when the ride requires one.
-    mutationFn: ({ id, action, pin }: { id: string; action: 'arrive' | 'start' | 'complete'; pin?: string }) =>
-      api<Ride>(`/rides/${id}/${action}`, { method: 'POST', body: pin ? { pin } : undefined }),
+    // Runs offline too: the queue (not React Query) waits for the network.
+    networkMode: 'always',
+    // Doc 20: queued with an Idempotency-Key and retried until the API answers (no signal at the
+    // drop-off must not lose "Terminar", nor finish the ride twice). Pending while it is being sent.
+    mutationFn: async ({ id, action, pin }: { id: string; action: 'arrive' | 'start' | 'complete'; pin?: string }) => {
+      const result = await outbox.enqueue(
+        { kind: 'ride_step', rideId: id, path: `/rides/${id}/${action}`, body: pin ? { pin } : undefined },
+        Infinity,
+      );
+      return (result as { data: Ride }).data;
+    },
     onSuccess: (ride, { action }) => {
       applyRide(queryClient, ride);
       if (action === 'complete') track('ride_completed', { role: 'driver' });
@@ -340,16 +369,25 @@ export function useDriverRideAction() {
 export function useSendMessage(rideId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (text: string) => api<RideMessage>(`/rides/${rideId}/messages`, { method: 'POST', body: { text } }),
-    onSuccess: (message) => applyMessage(queryClient, message),
+    // Runs offline too: the queue (not React Query) waits for the network.
+    networkMode: 'always',
+    // Doc 20: without signal the message waits in the queue (shown as "Enviando…") and goes out later.
+    mutationFn: (text: string) =>
+      outbox.enqueue({ kind: 'message', rideId, path: `/rides/${rideId}/messages`, body: { text } }, MESSAGE_WAIT_MS),
+    onSuccess: (result) => {
+      if (result.status === 'sent') applyMessage(queryClient, result.data as RideMessage);
+    },
   });
 }
 
 export function useRateRide() {
   const queryClient = useQueryClient();
   return useMutation({
+    // Runs offline too: the queue (not React Query) waits for the network.
+    networkMode: 'always',
+    // Doc 20: a rating given without signal is sent when the network comes back (`queued`).
     mutationFn: ({ id, ...body }: { id: string; stars: number; tags: string[]; comment?: string }) =>
-      api(`/rides/${id}/rating`, { method: 'POST', body }),
+      outbox.enqueue({ kind: 'rating', rideId: id, path: `/rides/${id}/rating`, body }, RATING_WAIT_MS),
     onSuccess: () => {
       queryClient.setQueryData(rideKeys.pendingRating, null);
       void queryClient.invalidateQueries({ queryKey: rideKeys.pendingRating });

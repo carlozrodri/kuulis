@@ -7,6 +7,7 @@ python manage.py makemigrations "add orders"
 python manage.py createsuperuser --email admin@example.com
 python manage.py worker | scheduler
 python manage.py shell
+python manage.py error-codes
 """
 
 import asyncio
@@ -49,6 +50,21 @@ def worker(workers: int = 2) -> None:
     from kuulis.tasks import TASK_MODULES
 
     _run(["taskiq", "worker", "kuulis.tasks:broker", *TASK_MODULES, "--workers", str(workers)])
+
+
+@cli.command("error-codes")
+def error_codes(check: bool = False) -> None:
+    """Write every API error code to the app's i18n folder (doc 20); --check only compares."""
+    from kuulis.core.error_codes import EXPORT_PATH, render
+
+    current = EXPORT_PATH.read_text() if EXPORT_PATH.exists() else ""
+    if check:
+        if current != render():
+            typer.echo(f"{EXPORT_PATH} is out of date: run python manage.py error-codes")
+            raise typer.Exit(1)
+        return
+    EXPORT_PATH.write_text(render())
+    typer.echo(f"Wrote {EXPORT_PATH}")
 
 
 @cli.command()

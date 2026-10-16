@@ -717,7 +717,30 @@
     "top_up_dispute_not_allowed": "This top-up can't be claimed anymore: it was already credited or is under review.",
     "top_up_dispute_open": "There's already an open claim for this top-up. Follow it in the support conversation.",
     "top_up_not_found": "We couldn't find that top-up.",
-    "amount_too_low": "The minimum top-up is {{min_amount}} USDT"
+    "amount_too_low": "The minimum top-up is {{min_amount}} USDT",
+    "bad_request": "We couldn't process the request. Try again.",
+    "conflict": "This already exists or just changed. Refresh and try again.",
+    "not_found": "We couldn't find what you're looking for.",
+    "http_404": "We couldn't find what you're looking for.",
+    "http_405": "This action isn't available. Update the app.",
+    "not_authenticated": "Your session ended. Sign in again.",
+    "token_expired": "Your session ended. Sign in again.",
+    "token_invalid": "Your session ended. Sign in again.",
+    "token_revoked": "This session was closed from another phone. Sign in again.",
+    "token_used": "This link was already used. Ask for a new one.",
+    "permission_denied": "You don't have permission to do this.",
+    "not_implemented": "This isn't available yet.",
+    "service_unavailable": "The service isn't available right now. Try again in a few minutes.",
+    "invalid_avatar_key": "We couldn't save the photo. Upload it again.",
+    "not_a_driver": "This option is for drivers only.",
+    "notification_not_found": "This notification no longer exists.",
+    "user_not_found": "We couldn't find that person.",
+    "no_release": "There's no version to download yet.",
+    "not_dismissible": "This notice can't be closed.",
+    "client_id_required": "We couldn't identify this phone. Restart the app.",
+    "idempotency_in_progress": "We're still sending this. Wait a moment.",
+    "idempotency_key_invalid": "We couldn't send this. Try again.",
+    "idempotency_key_reused": "We couldn't send this. Try again."
   },
   "map": {
     "recenter": "Recenter map"
@@ -1178,7 +1201,8 @@
       "confirmTitle": "{{name}} didn't show up?",
       "confirmBody": "The ride is cancelled and doesn't count toward your cancellation rate.",
       "done": "Done. The ride was cancelled and doesn't count against you."
-    }
+    },
+    "retrying": "No signal: we keep retrying, no need to tap again."
   },
   "money": {
     "rate": {
@@ -2248,6 +2272,28 @@
     "mockLocation": {
       "title": "Simulated location",
       "body": "Turn off the simulated location to receive rides"
+    }
+  },
+  "offline": {
+    "sending": "Sending…",
+    "ratingQueued": "No connection: your rating will be sent when the signal is back.",
+    "requestNeedsInternet": "No connection. You need internet to request a ride.",
+    "failed": {
+      "ride_step": "The ride couldn't be updated.",
+      "message": "Your message wasn't sent.",
+      "rating": "Your rating wasn't sent."
+    }
+  },
+  "signal": {
+    "data": {
+      "good": "Good signal",
+      "weak": "Weak signal",
+      "none": "No signal"
+    },
+    "gps": {
+      "good": "GPS OK",
+      "weak": "GPS imprecise",
+      "none": "No GPS"
     }
   }
 }

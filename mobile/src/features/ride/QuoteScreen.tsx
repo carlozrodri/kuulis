@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
-import { BadgePercent, Bike, ChevronLeft, CircleX, Clock, TicketPercent, X, Zap } from '@/components/icons';
+import { BadgePercent, Bike, ChevronLeft, CircleX, Clock, TicketPercent, WifiOff, X, Zap } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
 import { VesTiles } from '@/components/Money';
@@ -16,6 +16,7 @@ import { PausePanel } from '@/features/quality/PausePanel';
 import { useBootstrap, useFlag } from '@/hooks/useBootstrap';
 import { useAppConfig } from '@/hooks/useDriver';
 import { rememberPauseFromError, useQualityPause } from '@/hooks/useQuality';
+import { useIsOffline } from '@/hooks/useOnline';
 import { fetchQuote, quoteKey, rideKeys, useQuote, useRequestRide } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
 import { apiErrorMessage } from '@/i18n';
@@ -64,6 +65,8 @@ export function QuoteScreen() {
   const qualityPause = useQualityPause('passenger');
   const quote = useQuote(draft.pickup, draft.dropoff, 'moto', promoCode, !paused && !qualityPause);
   const request = useRequestRide();
+  // Doc 20: rides are never queued offline; the button waits for the network.
+  const offline = useIsOffline();
   const [now, setNow] = useState(() => Date.now());
   const { suspension, handleError: handleSuspended } = useSuspension();
 
@@ -219,7 +222,7 @@ export function QuoteScreen() {
             title={quote.data ? t('quote.request', { fare }) : t('quote.request', { fare: '…' })}
             icon={Bike}
             loading={request.isPending}
-            disabled={!quote.data || !payment || quote.isFetching}
+            disabled={!quote.data || !payment || quote.isFetching || offline}
             accessibilityHint={!payment ? t('quote.choosePayment') : undefined}
             onPress={() => void submit()}
           />
@@ -232,6 +235,12 @@ export function QuoteScreen() {
         onPressPickup={() => router.push({ pathname: '/ride/search', params: { field: 'pickup' } })}
         onPressDropoff={() => router.push({ pathname: '/ride/search', params: { field: 'dropoff' } })}
       />
+
+      {offline ? (
+        <Notice tone="warning" icon={WifiOff}>
+          {t('offline.requestNeedsInternet')}
+        </Notice>
+      ) : null}
 
       {suspendedBy ? (
         <SuspendedPanel suspension={suspendedBy} variant="passenger" />

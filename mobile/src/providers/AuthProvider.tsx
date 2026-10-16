@@ -1,9 +1,13 @@
+import NetInfo from '@react-native-community/netinfo';
 import { useQueryClient } from '@tanstack/react-query';
 import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import i18n from '@/i18n';
 import { track } from '@/lib/analytics';
-import { api, setLegalRequiredHandler, setSessionExpiredHandler, tokens } from '@/lib/api';
+import { outbox } from '@/lib/actionQueue';
+import { api, ApiError, setLegalRequiredHandler, setSessionExpiredHandler, tokens } from '@/lib/api';
+import { localFile } from '@/lib/localFile';
+import { queryPersister } from '@/lib/queryPersistence';
 import { googleSignOut } from '@/lib/social';
 import type { AuthResponse, User } from '@/lib/types';
 
@@ -20,6 +24,19 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+/** The last profile seen, so the app opens signed in without signal (doc 20). */
+const USER_FILE = 'user.json';
+
+export async function readCachedUser(): Promise<User | null> {
+  const raw = await localFile.read(USER_FILE);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as User;
+  } catch {
+    return null;
+  }
+}
 
 /** A social sign-in that created the account just now counts as a sign-up (doc 19). */
 function trackSocialSignup(data: AuthResponse, method: 'google' | 'apple') {
@@ -38,9 +55,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (data.user.locale !== i18n.language) await i18n.changeLanguage(data.user.locale);
   }, []);
 
+  // Opened offline with the saved profile: it is read again once the network is back.
+  const [stale, setStale] = useState(false);
+
   const clear = useCallback(async () => {
     await tokens.clear();
     queryClient.clear();
+    // Nothing of this account stays on the phone for the next one.
+    await Promise.all([queryPersister.removeClient(), localFile.write(USER_FILE, ''), outbox.clear()]);
     setUser(null);
   }, [queryClient]);
 
@@ -53,13 +75,38 @@ export function AuthProvider({ children }: PropsWithChildren) {
       try {
         const { refreshToken } = await tokens.load();
         if (refreshToken) setUser(await api<User>('/users/me'));
-      } catch {
-        await clear();
+      } catch (error) {
+        // No signal (or the server failing) is not a closed session: open with the last profile, keep the tokens.
+        const unreachable = !(error instanceof ApiError) || error.status >= 500;
+        const cached = unreachable ? await readCachedUser() : null;
+        if (cached) {
+          setUser(cached);
+          setStale(true);
+        } else {
+          await clear();
+        }
       } finally {
         setIsLoading(false);
       }
     })();
   }, [clear]);
+
+  useEffect(() => {
+    if (user) void localFile.write(USER_FILE, JSON.stringify(user));
+  }, [user]);
+
+  useEffect(() => {
+    if (!stale) return;
+    return NetInfo.addEventListener((state) => {
+      if (!state.isConnected || state.isInternetReachable === false) return;
+      setStale(false);
+      api<User>('/users/me')
+        .then(setUser)
+        // A 401 here already closed the session (api() calls the expired handler); anything else keeps the
+        // saved profile until the next start.
+        .catch(() => undefined);
+    });
+  }, [stale]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

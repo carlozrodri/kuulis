@@ -8,7 +8,7 @@ import {
 
 import { reportKeys } from "@/hooks/useReports";
 import { rideKeys } from "@/hooks/useRides";
-import { ApiError, api } from "@/lib/api";
+import { ApiError, api, apiOnce } from "@/lib/api";
 import type {
   Charge,
   Page,
@@ -208,7 +208,7 @@ export function useNotifyTopUp() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: { amount: string; reference?: string }) =>
-      api<TopUp>("/wallet/me/top-ups", { method: "POST", body: input }),
+      apiOnce<TopUp>("/wallet/me/top-ups", { body: input }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: walletKeys.topUps });
       // With automatic matching the payment may already be credited.
@@ -233,7 +233,7 @@ export function useTransfer() {
       amount: string;
       note?: string;
     }) =>
-      api<WalletEntry>("/wallet/me/transfers", { method: "POST", body: input }),
+      apiOnce<WalletEntry>("/wallet/me/transfers", { body: input }),
     onSuccess: () => refreshWallet(queryClient),
     // A rejected transfer means our balance or limit was stale.
     onError: () =>
@@ -269,17 +269,13 @@ export function useDisputeTopUp() {
     }) => {
       let id = topUpId;
       if (!id) {
-        const created = await api<TopUp>("/wallet/me/top-ups", {
-          method: "POST",
+        const created = await apiOnce<TopUp>("/wallet/me/top-ups", {
           body: { amount, reference: body.transaction_id },
         });
         onCreated?.(created);
         id = created.id;
       }
-      return api<TopUp>(`/wallet/me/top-ups/${id}/dispute`, {
-        method: "POST",
-        body,
-      });
+      return apiOnce<TopUp>(`/wallet/me/top-ups/${id}/dispute`, { body });
     },
     onSettled: () => {
       // Also after an error: a top-up may have been created before the claim failed.

@@ -8,7 +8,9 @@ import { PlusJakartaSans_500Medium } from '@expo-google-fonts/plus-jakarta-sans/
 import { PlusJakartaSans_600SemiBold } from '@expo-google-fonts/plus-jakarta-sans/600SemiBold';
 import { PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans/700Bold';
 import { PlusJakartaSans_800ExtraBold } from '@expo-google-fonts/plus-jakarta-sans/800ExtraBold';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import NetInfo from '@react-native-community/netinfo';
+import { onlineManager, QueryClient } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { useFonts } from 'expo-font';
 import { Stack, usePathname, type ErrorBoundaryProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -22,6 +24,13 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { setAnalyticsEnabled, startAnalytics, track } from '@/lib/analytics';
 import { screenName, usageAllowed } from '@/lib/analyticsCore';
 import { installCrashReporting, reportError, setCrashRoute } from '@/lib/crashReport';
+import {
+  keepPersistedQueries,
+  PERSIST_BUSTER,
+  PERSIST_MAX_AGE,
+  queryPersister,
+  shouldPersistQuery,
+} from '@/lib/queryPersistence';
 import { AuthProvider, useAuth } from '@/providers/AuthProvider';
 import { ModeProvider, useMode } from '@/providers/ModeProvider';
 import { loadThemePreference, useTheme } from '@/theme';
@@ -30,6 +39,10 @@ import { loadThemePreference, useTheme } from '@/theme';
 installCrashReporting();
 // Anonymous usage events (doc 19), off when the user opted out in Profile.
 startAnalytics();
+// React Query pauses requests without signal (and resumes them) instead of failing and showing errors (doc 20).
+onlineManager.setEventListener((setOnline) =>
+  NetInfo.addEventListener((state) => setOnline(state.isConnected !== false && state.isInternetReachable !== false)),
+);
 // Light / dark chosen in Profile (read while the splash is still up).
 void loadThemePreference();
 
@@ -96,11 +109,21 @@ export default function RootLayout() {
     PlusJakartaSans_700Bold,
     PlusJakartaSans_800ExtraBold,
   });
-  const [queryClient] = useState(
-    () => new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 1 } } }),
-  );
+  const [queryClient] = useState(() => {
+    const client = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 1 } } });
+    keepPersistedQueries(client);
+    return client;
+  });
   return (
-    <QueryClientProvider client={queryClient}>
+    // History, wallet and profile data are kept on the phone and shown when it opens offline (doc 20).
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister: queryPersister,
+        maxAge: PERSIST_MAX_AGE,
+        buster: PERSIST_BUSTER,
+        dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
+      }}>
       <AuthProvider>
         <ModeProvider>
           <StatusBar style="auto" />
@@ -108,7 +131,7 @@ export default function RootLayout() {
           <RootNavigator fontsReady={fontsLoaded || !!fontError} />
         </ModeProvider>
       </AuthProvider>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
 

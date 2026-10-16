@@ -1,0 +1,39 @@
+# Passenger half of the full ride (run with motorizado-viaje.yaml on a second device: scripts/viaje-completo.sh).
+# Needs PASSENGER_EMAIL / PASSENGER_PASSWORD of a QA account and a driver online near Plaza Altamira.
+appId: ${APP_ID || 'uk.top8.kuulis.qa'}
+tags:
+  - two-devices
+---
+- runFlow:
+    file: common/login.yaml
+    env:
+      EMAIL: ${PASSENGER_EMAIL}
+      PASSWORD: ${PASSENGER_PASSWORD}
+      MODE: "Pasajero"
+- tapOn: "¿A dónde vamos?"
+- inputText: "Centro Comercial Sambil"
+- extendedWaitUntil:
+    visible:
+      text: ".*Sambil.*"
+    timeout: 15000
+- tapOn:
+    text: ".*Sambil.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      text: "PEDIR MOTO.*"
+    timeout: 20000
+- tapOn:
+    text: "Pedir moto.*"
+- extendedWaitUntil:
+    visible: "Motorizado en camino"
+    timeout: 90000
+- extendedWaitUntil:
+    visible: "En viaje"
+    timeout: 180000
+- extendedWaitUntil:
+    visible: "Enviar calificación"
+    timeout: 180000
+- tapOn: "5 estrellas"
+- tapOn: "Enviar calificación"
+- assertVisible: "¡Gracias por calificar!"

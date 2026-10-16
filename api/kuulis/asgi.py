@@ -17,6 +17,7 @@ from apps.monitoring import tasks as monitoring
 from apps.realtime.manager import manager
 from kuulis.core.db import engine
 from kuulis.core.exceptions import register_exception_handlers
+from kuulis.core.idempotency import IdempotencyMiddleware
 from kuulis.core.logging import configure_logging
 from kuulis.core.middleware import (
     RequestContextMiddleware,
@@ -69,6 +70,8 @@ def create_app() -> FastAPI:
 
     # Middleware order: last added runs first.
     app.add_middleware(SlowAPIASGIMiddleware)
+    # Before the rate limits: a replayed answer (doc 20) does not count as a new request.
+    app.add_middleware(IdempotencyMiddleware)
     app.add_middleware(GZipMiddleware, minimum_size=1024)
     app.add_middleware(
         CORSMiddleware,

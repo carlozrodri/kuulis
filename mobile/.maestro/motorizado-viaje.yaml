@@ -1,0 +1,47 @@
+# Driver half of the full ride. DRIVER_EMAIL / DRIVER_PASSWORD: an approved QA driver with no overdue fee.
+# The start PIN (doc 11) is read from the QA API with the passenger's account (scripts/start-pin.js).
+appId: ${APP_ID || 'uk.top8.kuulis.qa'}
+tags:
+  - two-devices
+---
+- runFlow:
+    file: common/login.yaml
+    env:
+      EMAIL: ${DRIVER_EMAIL}
+      PASSWORD: ${DRIVER_PASSWORD}
+      MODE: "Motorizado"
+- setLocation:
+    latitude: 10.4905
+    longitude: -66.8540
+- tapOn: "Conectarme"
+- extendedWaitUntil:
+    visible: "Nueva solicitud"
+    timeout: 120000
+- tapOn: "Aceptar"
+- extendedWaitUntil:
+    visible: "Llegué"
+    timeout: 20000
+- tapOn: "Llegué"
+- extendedWaitUntil:
+    visible: "Iniciar viaje"
+    timeout: 20000
+- tapOn: "Iniciar viaje"
+- runScript:
+    file: scripts/start-pin.js
+    env:
+      API_URL: ${API_URL || 'https://kuulis-qa.top8.uk/api/v1'}
+      PASSENGER_EMAIL: ${PASSENGER_EMAIL}
+      PASSENGER_PASSWORD: ${PASSENGER_PASSWORD}
+- inputText: ${output.pin}
+- extendedWaitUntil:
+    visible: "Finalizar viaje"
+    timeout: 20000
+- tapOn: "Finalizar viaje"
+- tapOn:
+    text: "FINALIZAR VIAJE|Finalizar viaje"
+    index: 1
+- extendedWaitUntil:
+    visible: "Enviar calificación"
+    timeout: 30000
+- tapOn: "5 estrellas"
+- tapOn: "Enviar calificación"

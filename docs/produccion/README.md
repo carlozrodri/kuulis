@@ -101,6 +101,10 @@ construir. Las preguntas de cada documento están en su sección final.
 - **19** hecho (2026-10-14): eventos de producto propios con exclusión en Perfil, embudos de pasajero y
   motorizado, retención por cohortes, mapa de oferta y demanda por hora, promociones, economía del motorizado
   y exportación a CSV. Página Analítica en el admin. El 18 se canceló.
+- **20** hecho en código (2026-10-16): `Idempotency-Key` en viajes y billetera, caché sin conexión y sesión
+  que no se cierra sin señal, cola de acciones del viaje, chat y calificación con reintento, indicadores de
+  señal y GPS, contraste AA, test de traducción de todos los códigos de error, tests de pantallas y flujos de
+  Maestro. Faltan las mediciones en teléfonos reales y correr Maestro.
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

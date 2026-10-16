@@ -1,0 +1,20 @@
+# Doc 20 acceptance: a driver without signal for a minute at the drop-off finishes the ride once.
+# Run on an emulator (airplane mode is toggled with adb) during a ride already "En viaje".
+appId: ${APP_ID || 'uk.top8.kuulis.qa'}
+tags:
+  - two-devices
+---
+- assertVisible: "Finalizar viaje"
+- setAirplaneMode: enabled
+- tapOn: "Finalizar viaje"
+- tapOn:
+    text: "FINALIZAR VIAJE|Finalizar viaje"
+    index: 1
+- assertVisible:
+    text: "Sin señal.*"
+- waitForAnimationToEnd:
+    timeout: 60000
+- setAirplaneMode: disabled
+- extendedWaitUntil:
+    visible: "Enviar calificación"
+    timeout: 60000
