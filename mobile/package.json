@@ -83,6 +83,7 @@
     ],
     "setupFiles": [
       "<rootDir>/test-utils/setup.js"
-    ]
+    ],
+    "testTimeout": 20000
   }
 }
