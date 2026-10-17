@@ -46,4 +46,5 @@ Carlos respondió «apruebo todo»: vale la opción recomendada de cada pregunta
 | M1 · Fundamentos | Hecho 2026-10-17 (ver 06 §2) |
 | M2 · Marco | Hecho 2026-10-17 (ver 07 M2) |
 | M5 · Idiomas en URL y SEO por idioma | Hecho 2026-10-17 (ver 07 M5) |
-| M3 · Inicio | Siguiente |
+| M3 · Inicio: hero y precio claro | Primer paso hecho 2026-10-17; faltan las capturas de la app (ver 07 M3) |
+| M4 · Inicio: resto de secciones | Siguiente |

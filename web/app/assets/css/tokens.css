@@ -28,10 +28,6 @@
     --band-ink: #14201b;
     --on-band: #fff;
 
-    /* Legacy hero gradient, removed when the home page is redesigned (M3) */
-    --hero: var(--primary);
-    --hero-shade: var(--primary-deep);
-
     /* Focus ring: an ink outline around a yellow inner ring, visible on light, green and ink backgrounds */
     --focus-inner: var(--accent);
     --focus-outer: var(--text);
@@ -107,8 +103,6 @@
       --success-soft: #12301f;
       --band-brand: #0c4a37;
       --band-ink: #0b1310;
-      --hero: #0c4a37;
-      --hero-shade: #072e22;
       --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 35%);
     }
   }
