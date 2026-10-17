@@ -1,0 +1,54 @@
+/* Containers, sections and full-bleed color bands (docs/website-redesign/02 §3). */
+@layer layout {
+  .container {
+    width: 100%;
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .container-wide {
+    width: 100%;
+    max-width: var(--container-wide);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+
+  .narrow {
+    max-width: 760px;
+  }
+
+  .section {
+    padding: var(--space-8) 0;
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 720px) {
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Bands: on green or ink the primary button turns yellow (yellow is never used on light backgrounds). */
+  .band-brand,
+  .band-ink {
+    color: var(--on-band);
+    --focus-outer: var(--on-band);
+  }
+
+  .band-brand {
+    background: var(--band-brand);
+  }
+
+  .band-ink {
+    background: var(--band-ink);
+  }
+}

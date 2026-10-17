@@ -27,13 +27,21 @@ web/app/assets/css/
 | Grupo | Tokens |
 | --- | --- |
 | Color (alias semánticos) | `--field-brand: var(--primary)`, `--field-brand-deep: #0A5C43` (hoy `--hero-shade`), `--field-ink: var(--text)`, `--on-field: #fff`, `--focus-inner: var(--text)`, `--focus-outer: var(--accent)` |
-| Tipografía | `--step--1` … `--step-6` y `--step-hero-number` (valores de 02 §4), `--leading-tight 1.05`, `--leading-body 1.55`, `--tracking-display -0.045em` |
+| Tipografía | `--font-display`, `--font-h1`, `--font-h2`, `--font-h3`, `--font-lead`, `--font-body`, `--font-small`, `--font-label`, `--font-number` (valores de 02 §4), `--leading-*`, `--tracking-*`. (En M1 se cambió el nombre `--step-*` por nombres de rol, más fáciles de leer.) |
 | Espacio | `--space-1` (4 px) … `--space-10` (160 px) en múltiplos de 4; `--section-y: clamp(64px, 8vw, 128px)`; `--gutter: clamp(16px, 4vw, 32px)` |
 | Forma | `--radius-sm 12px`, `--radius-md 20px` (= `--radius` actual), `--radius-lg 28px`, `--radius-pill 999px` |
 | Movimiento | `--dur-fast 120ms`, `--dur-base 200ms`, `--dur-slow 320ms`, `--ease-out cubic-bezier(.2,.7,.2,1)` |
 
 `--hero` y `--hero-shade` se mantienen como alias durante la transición para no romper páginas aún no migradas, y
 se eliminan en el último milestone.
+
+**Hecho en M1 (2026-10-17):** capas y tokens en `web/app/assets/css/`; los `h1`–`h3` de las páginas actuales
+conservan sus tamaños (las secciones rediseñadas usan los tokens nuevos); `text-wrap: balance` **no** se aplica
+por defecto porque en titulares de dos frases («Tu moto en minutos. Sin comisión por viaje.») corta peor: se usará
+caso por caso en `Headline`; `text-wrap: pretty` sí en párrafos. Bandas `.band-brand` / `.band-ink` listas (el
+botón principal pasa a amarillo dentro de ellas). Cara de respaldo «Plus Jakarta Sans Fallback» (Arial/Roboto con
+`size-adjust` 104,8 %, `ascent-override` 99,3 %, `descent-override` 21 %, medidos en el navegador) y precarga del
+subconjunto latino de la fuente.
 
 ## 3. Componentes
 | Componente | Nuevo / cambia | Responsabilidad |
