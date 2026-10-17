@@ -18,7 +18,10 @@ const items = computed(() => [
 </script>
 
 <template>
-  <section class="section faq">
+  <section
+    v-reveal
+    class="section faq"
+  >
     <div class="container narrow">
       <BrandHeadline :text="t('home.faq.title')" />
       <FaqList :items="items" />

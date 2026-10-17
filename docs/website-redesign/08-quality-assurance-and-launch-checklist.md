@@ -14,28 +14,31 @@ verificar (p. ej. Safari real o un lector de pantalla), se escribe «no verifica
 - [ ] Cada sección cumple el «trabajo» que le asigna 03.
 
 ## 2. Responsive
-- [ ] Sin desbordamiento horizontal a 320, 360, 414, 768, 1024, 1440, 1920 px (`scrollWidth <= innerWidth`, e2e).
-- [ ] El menú móvil es un panel propio, no la nav de escritorio comprimida.
-- [ ] Zoom al 200 % usable (WCAG 1.4.10).
-- [ ] Imágenes con recortes dirigidos (no recortes automáticos que corten lo importante).
-- [ ] Objetivos táctiles ≥ 44 px en móvil.
+- [x] Sin desbordamiento horizontal a 320, 360, 414, 768, 1024, 1440, 1920 px (`scrollWidth <= innerWidth`, e2e). M9: `polish.spec.ts`, 8 páginas × 2 idiomas × 7 anchos.
+- [x] El menú móvil es un panel propio, no la nav de escritorio comprimida (M2, `frame.spec.ts`).
+- [x] Zoom al 200 % usable (WCAG 1.4.10): equivale a 640–720 px CSS en un portátil, cubierto por los anchos de 414 y 768 sin scroll lateral.
+- [ ] Imágenes con recortes dirigidos (no recortes automáticos que corten lo importante). Pendiente de las capturas A1/A2 (M8).
+- [x] Objetivos táctiles ≥ 44 px en móvil, salvo enlaces dentro de una frase (WCAG 2.5.8). M9: logotipos, enlaces del pie y del menú, «Leer las normas»; e2e a 360 px.
 
 ## 3. Idiomas
-- [ ] Test de paridad de claves `es.json` / `en.json` en verde.
-- [ ] Ningún texto en español en la versión inglesa ni al revés (recorrido e2e buscando una lista de palabras
-      testigo, más revisión manual).
-- [ ] Títulos, descripciones, OG, `alt` y `aria-label` traducidos.
-- [ ] `<html lang>` correcto en cada idioma.
-- [ ] El selector lleva a la página equivalente y conserva la query.
+- [x] Test de paridad de claves `es.json` / `en.json` en verde (`tests/i18n.test.ts`).
+- [x] Ningún texto en español en la versión inglesa ni al revés (recorrido e2e buscando una lista de palabras
+      testigo, más revisión manual). M9: «English pages show no Spanish»; los textos legales vienen del API en español a propósito.
+- [x] Títulos, descripciones, OG, `alt` y `aria-label` traducidos (OG por idioma desde M8).
+- [x] `<html lang>` correcto en cada idioma (`smoke.spec.ts`).
+- [x] El selector lleva a la página equivalente y conserva la query (`i18n.spec.ts`).
 - [ ] El inglés pasó la revisión de calidad nativa (03 §9); el español, la de Carlos.
 
 ## 4. Accesibilidad (WCAG 2.2 AA)
-- [ ] axe sin violaciones `serious` ni `critical` en todas las páginas, es y en, claro y oscuro.
+- [x] axe sin violaciones `serious` ni `critical` en todas las páginas, es y en, claro y oscuro. M9: el modo oscuro
+      entra en `polish.spec.ts` y axe se ejecuta con todas las secciones ya visibles.
 - [ ] Recorrido solo con teclado de cada página: orden lógico, foco siempre visible, menú con Escape.
-- [ ] Contrastes de la tabla de 00 §3 recalculados con los colores finales.
-- [ ] Un `h1` por página y jerarquía sin saltos.
-- [ ] `prefers-reduced-motion`: ninguna animación (comprobado emulando la preferencia en Playwright).
-- [ ] Lector de pantalla: TalkBack en Android (si Carlos puede) — si no, «no verificado».
+- [x] Contrastes de la tabla de 00 §3 recalculados con los colores finales: `tests/contrast.test.ts` lee
+      `tokens.css` (claro y oscuro). M9 corrigió dos pares: `--on-band-soft` 78 % → 90 % (3,8 → 4,5 sobre verde) y
+      `--success` `#15803D` → `#137A3A` (4,3 → 4,6 sobre su fondo).
+- [x] Un `h1` por página y jerarquía sin saltos (`smoke.spec.ts`, `polish.spec.ts`).
+- [x] `prefers-reduced-motion`: ninguna animación (comprobado emulando la preferencia en Playwright: `document.getAnimations()` vacío y ninguna sección esperando).
+- [ ] Lector de pantalla: TalkBack en Android (si Carlos puede) — si no, «no verificado». M9: no verificado.
 
 ## 5. SEO
 - [ ] Título y descripción únicos por página e idioma.

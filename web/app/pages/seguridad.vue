@@ -68,6 +68,7 @@ const phases = computed<{ key: string, rows: Row[] }[]>(() => [
       <section
         v-for="(phase, index) in phases"
         :key="phase.key"
+        v-reveal
         class="phase"
         :class="{ last: index === phases.length - 1 }"
         :aria-labelledby="`phase-${phase.key}`"
@@ -233,8 +234,10 @@ h3 {
 }
 
 .more {
-  display: inline-block;
-  margin-top: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--space-1);
   color: var(--primary);
   font-weight: 700;
 }

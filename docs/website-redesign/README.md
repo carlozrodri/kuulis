@@ -51,3 +51,5 @@ Carlos respondió «apruebo todo»: vale la opción recomendada de cada pregunta
 | M6 · Motorizados y Seguridad | Hecho 2026-10-17 (ver 07 M6) |
 | M7 · Descargar y páginas secundarias | Hecho 2026-10-17 (ver 07 M7) |
 | M8 · Producción e integración de assets | En parte 2026-10-17: imágenes para compartir; faltan capturas de la app (ver 07 M8) |
+| M9 · Movimiento, responsive fino y accesibilidad | Hecho 2026-10-17; TalkBack no verificado (ver 07 M9) |
+| M10 · Verificación final y salida | Siguiente |

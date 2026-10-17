@@ -6,7 +6,10 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <section class="section price">
+  <section
+    v-reveal
+    class="section price"
+  >
     <div class="container-wide grid-price">
       <div class="intro">
         <BrandHeadline :text="t('home.price.title')" />

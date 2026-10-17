@@ -138,4 +138,32 @@
   .tabular {
     font-variant-numeric: tabular-nums;
   }
+
+  /* v-reveal (plugins/reveal.ts): the section's content, not its color field, rises and fades in once. */
+  .reveal > * {
+    transition: opacity var(--dur-slow) ease-out, transform var(--dur-slow) ease-out;
+  }
+
+  .reveal-pending > * {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  @media print {
+    .reveal-pending > * {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* An answer that opens fades in (04 §6, animation 6). */
+  details[open] > :not(summary) {
+    animation: details-open 160ms ease-out;
+  }
+
+  @keyframes details-open {
+    from {
+      opacity: 0;
+    }
+  }
 }

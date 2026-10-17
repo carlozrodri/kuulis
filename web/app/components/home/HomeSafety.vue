@@ -16,7 +16,10 @@ const rows = computed(() => [
 </script>
 
 <template>
-  <section class="section safety">
+  <section
+    v-reveal
+    class="section safety"
+  >
     <div class="container-wide grid-safety">
       <div class="intro">
         <BrandHeadline :text="t('home.safety.title')" />
@@ -105,6 +108,9 @@ p {
 }
 
 .more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--primary);
   font-weight: 700;
 }

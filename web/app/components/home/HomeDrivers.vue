@@ -9,7 +9,10 @@ const max = computed(() => maxFee(props.site?.fee_tiers))
 </script>
 
 <template>
-  <section class="drivers band-ink">
+  <section
+    v-reveal
+    class="drivers band-ink"
+  >
     <div class="container-wide grid-drivers">
       <div class="copy">
         <p

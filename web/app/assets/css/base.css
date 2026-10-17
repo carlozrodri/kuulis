@@ -42,6 +42,9 @@
     line-height: var(--leading-heading);
     letter-spacing: -0.02em;
     margin: 0 0 0.5em;
+    /* No headline ends on a lone word ("Lo que cobras es / tuyo."); balance is avoided on purpose, it splits
+       two-sentence headlines in the middle. */
+    text-wrap: pretty;
   }
 
   /* Current page sizes; the redesigned sections use --font-display, --font-h1 and --font-h2. */

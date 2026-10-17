@@ -10,7 +10,10 @@ const stops = computed(() => [1, 2, 3].map(n => ({
 </script>
 
 <template>
-  <section class="section how">
+  <section
+    v-reveal
+    class="section how"
+  >
     <div class="container-wide">
       <BrandHeadline :text="t('home.how.title')" />
       <RouteStops :items="stops" />

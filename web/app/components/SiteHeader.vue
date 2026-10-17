@@ -224,6 +224,9 @@ onBeforeUnmount(() => {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--primary);
   text-decoration: none;
   margin-right: auto;
@@ -369,6 +372,9 @@ onBeforeUnmount(() => {
 }
 
 .panel-foot a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--on-band);
   font-weight: 600;
 }
