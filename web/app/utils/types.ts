@@ -75,7 +75,8 @@ export interface HelpArticle extends HelpArticleSummary {
 
 /** The parts of GET /config/public the website reads (the rest is for the apps). */
 export interface PublicConfig {
-  app_links?: { support_whatsapp?: string, support_email?: string }
+  app_links?: { support_whatsapp?: string, support_email?: string, emergency_number?: string }
+  safety?: { pin_areas?: string[] }
   support?: { response_promise_es?: string, response_promise_en?: string }
 }
 

@@ -77,7 +77,7 @@ Reglas para todos los milestones:
   el Ávila; `HomePrice` en filas con `PaymentChips` de `/public/site`. Se quitó la tarjeta inventada del hero
   («Luis está en camino», $2.40) y la sección de tres tarjetas de pasajeros (el punto de seguridad vuelve en M4).
   La cabecera lleva el verde del hero (sólido, no transparente, para que sin JS se lea en todo el sitio) y pasa
-  a clara cuando `#hero-end` queda debajo. Lighthouse móvil local: rendimiento 92–96, accesibilidad 100, LCP
+  a clara cuando el hero (`#hero`) queda por encima de ella. Lighthouse móvil local: rendimiento 92–96, accesibilidad 100, LCP
   2,2–2,4 s, CLS 0, 222 KB. Segundo paso: la captura de cotización en `PhoneFrame` en el hero y en precio claro,
   cuando Carlos pase las capturas (05 A1).
 
@@ -92,6 +92,18 @@ Reglas para todos los milestones:
 - **Validación:** V + test unitario de `{max}` y estados sin datos (API simulada) + e2e + axe + Lighthouse.
 - **Depende de:** M3.
 - **Riesgos:** texto de seguridad que prometa algo no verificado → checklist de 08 §6 antes del PR.
+- **Hecho (2026-10-17):** `HomeHow` (tres paradas sobre la ruta, la última con el punto), `HomeDrivers` en
+  campo tinta (el «0 %» en amarillo, tope `{max}` = la cuota más alta de `/public/site`, `FeeTable` en tarjeta),
+  `HomeSafety` (cuatro filas con `LineIcon` y `BrandPinDigits` con dígitos de ejemplo rotulados como tales),
+  `HomeFaq` (`<details>`, respuesta de iPhone de 03 §5.6, edad mínima y año de moto desde la API) y
+  `HomeDownload` en verde, donde el footer hace subir el Ávila (meta `endsOnBrand`). Verificado en el código de la
+  app y la API: aprobación del motorizado antes de conectarse, PIN de inicio (`safety.pin_areas`, hoy Caracas),
+  enlace en vivo (`/v`, flag `share_live_link`), SOS que llama al número de emergencia (`app_links`, 911) y
+  luego deja enviar el enlace a los contactos de confianza, calificación tras el viaje. Por eso el texto del SOS
+  dice «llama al 911; después envías tu ubicación en vivo» (no que avisa solo). La fila del PIN nombra las
+  ciudades de la configuración y desaparece sin ellas. Sin enlace a `/seguridad` hasta el M6. La cabecera ahora
+  observa el hero entero (`#hero`), así también vuelve a clara tras un salto a un ancla. Lighthouse móvil local:
+  rendimiento 92, accesibilidad 100, LCP 2,2–2,3 s, CLS ≤ 0,002, 233 KB.
 
 ## M5 · Idiomas en URL y SEO por idioma
 - **Objetivo:** inglés indexable con URLs propias (si se aprueba la pregunta 1).

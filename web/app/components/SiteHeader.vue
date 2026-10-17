@@ -2,7 +2,7 @@
 // Site header (docs/website-redesign/04 §2–§3): logo, main links and the download button; below 960 px the
 // links move to a full-screen menu that keeps focus inside, closes with Escape and returns focus to its button.
 // On a page that starts with a green hero (page meta `heroHeader`), the header wears the hero's green until the
-// hero's end (#hero-end) scrolls under it, then turns solid light: an IntersectionObserver, no scroll listener.
+// hero (#hero) has scrolled out from under it, then turns solid light: an IntersectionObserver, no scroll listener.
 // Its green is solid, not transparent, so without JavaScript it is still readable over every section.
 const open = defineModel<boolean>('open', { default: false })
 const { t, locale } = useI18n()
@@ -27,12 +27,14 @@ let observer: IntersectionObserver | undefined
 function watchHero() {
   observer?.disconnect()
   heroPassed.value = false
-  const end = document.getElementById('hero-end')
-  if (!route.meta.heroHeader || !end) return
+  const hero = document.getElementById('hero')
+  if (!route.meta.heroHeader || !hero) return
+  // The hero starts at the top, so it stops intersecting (the area below the header) only once it is above it,
+  // also after a jump to an anchor.
   observer = new IntersectionObserver(([entry]) => {
-    heroPassed.value = !!entry && !entry.isIntersecting && entry.boundingClientRect.top < 80
+    heroPassed.value = !!entry && !entry.isIntersecting
   }, { rootMargin: '-72px 0px 0px 0px' })
-  observer.observe(end)
+  observer.observe(hero)
 }
 
 const toggle = ref<HTMLButtonElement>()
