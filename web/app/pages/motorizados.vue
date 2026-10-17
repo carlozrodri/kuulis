@@ -25,12 +25,12 @@ const photos = computed(() => site.value?.driver.vehicle_photo_min_count ?? 0)
         <p class="lead">
           {{ t('drivers.lead', { months: freeMonths }) }}
         </p>
-        <NuxtLink
+        <NuxtLinkLocale
           to="/descargar"
           class="btn btn-primary"
         >
           {{ t('drivers.cta') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </section>
 

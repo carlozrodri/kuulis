@@ -20,7 +20,7 @@ useSeoMeta({ title: () => t('legal.metaTitle'), description: () => t('legal.meta
         {{ t('legal.lead') }}
       </p>
       <div class="list">
-        <NuxtLink
+        <NuxtLinkLocale
           v-for="doc in docs ?? []"
           :key="doc.kind"
           :to="`/legal/${doc.kind}`"
@@ -31,7 +31,7 @@ useSeoMeta({ title: () => t('legal.metaTitle'), description: () => t('legal.meta
             <span class="muted small">{{ t('legal.version', { version: doc.version, date: formatDay(doc.published_at, locale) }) }}</span>
           </span>
           <span aria-hidden="true">→</span>
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </div>
   </section>

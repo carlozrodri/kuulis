@@ -11,7 +11,7 @@ const external = (href: string) => /^https?:\/\//i.test(href)
     :key="index"
   >
     <template v-if="span.href">
-      <NuxtLink
+      <NuxtLinkLocale
         v-if="span.href.startsWith('/')"
         :to="span.href"
       >
@@ -19,7 +19,7 @@ const external = (href: string) => /^https?:\/\//i.test(href)
         <template v-else>
           {{ span.text }}
         </template>
-      </NuxtLink>
+      </NuxtLinkLocale>
       <a
         v-else
         :href="span.href"

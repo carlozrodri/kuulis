@@ -99,6 +99,17 @@ Reglas para todos los milestones:
 - **Depende de:** M2 (puede ir antes de M3/M4 si conviene).
 - **Riesgos:** romper enlaces de emails o de la app → el middleware y los tests cubren las 4 rutas de utilidad;
   rollback = revertir el PR.
+- **Hecho (2026-10-17):** español en `/`, inglés en `/en` con `/en/drivers`, `/en/download`, `/en/help`,
+  `/en/contact` (la tabla vive en `web/i18n/pages.ts` y la usan el router y el sitemap). Solo la portada redirige:
+  a la última elección (cookie) o, en la primera visita, al idioma del navegador. El selector es un enlace a la
+  misma página en el otro idioma, con la query. Los enlaces sin prefijo de emails y app (`/verify-email`,
+  `/reset-password`, `/v/…`, `/i/…`) van a `/en/…` si la cookie es `en` o, sin cookie, si el navegador prefiere
+  inglés (como hacía la web antes); el token no se toca. Canonical, `hreflang` (es-VE, en, x-default) y
+  `og:locale`/`og:url` salen de `composables/useLocaleSeo.ts` con `NUXT_PUBLIC_SITE_URL`, en vez de
+  `useLocaleHead`, para no necesitar una variable de entorno nueva en Coolify; las páginas privadas no los llevan.
+  Sitemap con alternates y artículos de ayuda por idioma; `robots.txt` bloquea también las variantes `/en`.
+  Pruebas: `tests/i18n.test.ts` (paridad de claves, rutas) y `tests/e2e/i18n.spec.ts`. Falta la prueba manual de
+  un email de verificación y uno de reset en QA, después de fusionar.
 
 ## M6 · Motorizados y Seguridad
 - **Objetivo:** las dos páginas de público específico.

@@ -78,7 +78,8 @@ Un sitio público, rápido y bonito, que sea la casa de Kuulis fuera de la app: 
 ## Cómo quedó
 ### Parte 1 (2026-10-11)
 - App `web/`: Nuxt 4 con SSR, CSS propio (sin librería de componentes), Plus Jakarta Sans, colores Verde Ávila
-  con modo oscuro, español e inglés (cookie `kuulis_locale`, sin prefijo en la URL). Unos 85 KB de JavaScript
+  con modo oscuro, español e inglés (cookie `kuulis_locale`, sin prefijo en la URL; desde el rediseño M5, 2026-10-17, el inglés
+  vive en `/en` con rutas propias, ver `docs/website-redesign/07` M5). Unos 85 KB de JavaScript
   comprimido en total.
 - Páginas: **Inicio**, **Motorizados** (requisitos y tramos de la cuota leídos de la API), **Descargar** («muy
   pronto» hasta que 09 publique el APK; aviso para iPhone), **Legal** (los textos de 07 con su versión),

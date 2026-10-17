@@ -69,37 +69,37 @@ onBeforeUnmount(() => {
 <template>
   <header class="header">
     <div class="container-wide bar">
-      <NuxtLink
+      <NuxtLinkLocale
         to="/"
         class="brand"
         aria-label="Kuulis"
       >
         <KuulisWordmark :size="28" />
-      </NuxtLink>
+      </NuxtLinkLocale>
 
       <nav
         class="nav"
         :aria-label="t('nav.label')"
       >
-        <NuxtLink
+        <NuxtLinkLocale
           v-for="link in links"
           :key="link.to"
           :to="link.to"
           class="nav-link"
         >
           {{ link.label }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </nav>
 
       <div class="actions">
         <LanguageSwitch class="desktop-only" />
-        <NuxtLink
+        <NuxtLinkLocale
           to="/descargar"
           class="btn btn-primary cta"
         >
           <span class="desktop-only">{{ t('nav.getApp') }}</span>
           <span class="mobile-only">{{ t('nav.download') }}</span>
-        </NuxtLink>
+        </NuxtLinkLocale>
         <button
           ref="toggle"
           type="button"
@@ -127,17 +127,17 @@ onBeforeUnmount(() => {
             v-for="link in menuLinks"
             :key="link.to"
           >
-            <NuxtLink :to="link.to">
+            <NuxtLinkLocale :to="link.to">
               {{ link.label }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
         </ul>
       </nav>
       <div class="panel-foot">
         <LanguageSwitch />
-        <NuxtLink to="/legal">
+        <NuxtLinkLocale to="/legal">
           {{ t('nav.legal') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </div>
   </header>

@@ -1,3 +1,5 @@
+import { LOCALIZED_PAGES } from './i18n/pages'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   // Public website (doc 08): server rendered for fast first paint on slow Android phones and for
@@ -63,11 +65,14 @@ export default defineNuxtConfig({
         ].join('; '),
       },
     },
-    // Pages that act on a one-time token: never cached, never indexed.
+    // Pages that act on a one-time token: never cached, never indexed (also their English variants).
     '/verify-email': { headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } },
     '/reset-password': { headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } },
+    '/en/verify-email': { headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } },
+    '/en/reset-password': { headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } },
     // Live ride links (doc 11): private, change every few seconds.
     '/v/**': { headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } },
+    '/en/v/**': { headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } },
   },
   compatibilityDate: '2026-10-01',
 
@@ -82,13 +87,19 @@ export default defineNuxtConfig({
   typescript: { strict: true },
   eslint: { config: { stylistic: true } },
 
+  // Spanish at /, English at /en with English paths (docs/website-redesign/06 §4), so both get indexed. Only the
+  // root redirects by language: to the visitor's last choice (kuulis_locale cookie) or, on a first visit, to the
+  // browser's language. Links from emails and the app have no prefix; middleware/utility-locale.global.ts sends
+  // them to the right language.
   i18n: {
     defaultLocale: 'es',
-    strategy: 'no_prefix',
+    strategy: 'prefix_except_default',
+    customRoutes: 'config',
+    pages: LOCALIZED_PAGES,
     locales: [
       { code: 'es', language: 'es-VE', name: 'Español', file: 'es.json' },
-      { code: 'en', language: 'en-US', name: 'English', file: 'en.json' },
+      { code: 'en', language: 'en', name: 'English', file: 'en.json' },
     ],
-    detectBrowserLanguage: { useCookie: true, cookieKey: 'kuulis_locale', fallbackLocale: 'es' },
+    detectBrowserLanguage: { useCookie: true, cookieKey: 'kuulis_locale', redirectOn: 'root', alwaysRedirect: true, fallbackLocale: 'es' },
   },
 })

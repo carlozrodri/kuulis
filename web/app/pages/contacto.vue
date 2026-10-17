@@ -153,12 +153,12 @@ function again() {
           {{ t('contact.doneSpam') }}
         </p>
         <div class="actions">
-          <NuxtLink
+          <NuxtLinkLocale
             to="/ayuda"
             class="btn btn-primary"
           >
             {{ t('contact.helpLink') }}
-          </NuxtLink>
+          </NuxtLinkLocale>
           <button
             type="button"
             class="btn btn-ghost"
@@ -270,7 +270,9 @@ function again() {
           </button>
           <p class="muted small privacy">
             {{ t('contact.privacy') }}
-            <NuxtLink to="/legal/privacy">{{ t('legal.kinds.privacy') }}</NuxtLink>.
+            <NuxtLinkLocale to="/legal/privacy">
+              {{ t('legal.kinds.privacy') }}
+            </NuxtLinkLocale>.
           </p>
         </form>
 

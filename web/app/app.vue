@@ -10,6 +10,7 @@ useHead({
 })
 // Link previews (WhatsApp, Telegram) need an absolute image URL.
 useSeoMeta({ ogImage: `${siteUrl.replace(/\/$/, '')}/og.png` })
+useLocaleSeo()
 </script>
 
 <template>

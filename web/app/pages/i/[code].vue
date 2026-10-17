@@ -47,12 +47,12 @@ async function copy() {
         <p class="muted">
           {{ t('invite.invalidBody') }}
         </p>
-        <NuxtLink
+        <NuxtLinkLocale
           class="btn btn-primary"
           to="/motorizados"
         >
           {{ t('invite.drivers') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
 
       <template v-else>
@@ -97,12 +97,12 @@ async function copy() {
         </ol>
 
         <div class="actions">
-          <NuxtLink
+          <NuxtLinkLocale
             class="btn btn-accent"
             to="/descargar"
           >
             {{ t('invite.download') }}
-          </NuxtLink>
+          </NuxtLinkLocale>
           <a
             class="btn btn-ghost"
             :href="appInviteLink(invite.code)"
@@ -110,9 +110,9 @@ async function copy() {
         </div>
         <p class="muted small">
           {{ t('invite.more') }}
-          <NuxtLink to="/motorizados">
+          <NuxtLinkLocale to="/motorizados">
             {{ t('invite.drivers') }}
-          </NuxtLink>
+          </NuxtLinkLocale>
         </p>
       </template>
     </div>

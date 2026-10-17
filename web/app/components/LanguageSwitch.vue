@@ -1,17 +1,18 @@
 <script setup lang="ts">
-// Switches to the other language and remembers it in the kuulis_locale cookie. Shows the other language's
-// name in that language ("English" / "Español"), so its visible text and its accessible name match (WCAG 2.5.3).
-// With language URLs (redesign M5) this becomes a link to the same page in the other language.
-const { t, locale, setLocale } = useI18n()
+// A link to the same page in the other language (redesign M5), query included. It shows the other language's name
+// in that language ("English" / "Español"), so its visible text and its accessible name match (WCAG 2.5.3).
+// Following it stores the choice in the kuulis_locale cookie, so the root page opens in that language next time.
+const { t, locale } = useI18n()
+const switchLocalePath = useSwitchLocalePath()
 const other = computed(() => (locale.value === 'es' ? 'en' : 'es'))
 </script>
 
 <template>
-  <button
-    type="button"
+  <NuxtLink
     class="lang"
+    :to="switchLocalePath(other)"
     :lang="other"
-    @click="setLocale(other)"
+    :hreflang="other"
   >
     <svg
       viewBox="0 0 24 24"
@@ -25,7 +26,7 @@ const other = computed(() => (locale.value === 'es' ? 'en' : 'es'))
       <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
     </svg>
     {{ t('nav.otherLanguage') }}
-  </button>
+  </NuxtLink>
 </template>
 
 <style scoped>
@@ -35,14 +36,11 @@ const other = computed(() => (locale.value === 'es' ? 'en' : 'es'))
   gap: var(--space-2);
   min-height: 44px;
   padding: 0 var(--space-2);
-  border: 0;
   border-radius: var(--radius-pill);
-  background: transparent;
   color: inherit;
-  font: inherit;
   font-weight: 600;
   font-size: var(--font-small);
-  cursor: pointer;
+  text-decoration: none;
 }
 
 svg {

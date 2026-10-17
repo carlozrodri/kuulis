@@ -2,10 +2,8 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 // The site frame (docs/website-redesign/07 M2): the mobile menu keeps focus inside, makes the page inert, closes
-// with Escape and on navigation; the language button switches the language; every footer link exists.
-test.beforeEach(async ({ context, baseURL }) => {
-  await context.addCookies([{ name: 'kuulis_locale', value: 'es', url: baseURL! }])
-})
+// with Escape and on navigation; every footer link exists. The language link is covered by i18n.spec.ts.
+test.use({ locale: 'es-VE' })
 
 test('mobile menu: focus trap, inert page, Escape and close on navigation', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 })
@@ -38,18 +36,6 @@ test('mobile menu: focus trap, inert page, Escape and close on navigation', asyn
   await page.locator('#mobile-menu a[href="/ayuda"]').click()
   await page.waitForURL('**/ayuda')
   await expect(toggle).toHaveAttribute('aria-expanded', 'false')
-})
-
-test('language button switches to English and back', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 })
-  await page.goto('/', { waitUntil: 'networkidle' })
-  const button = page.locator('header button.lang.desktop-only')
-  await expect(button).toHaveText('English')
-  await button.click()
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
-  await expect(button).toHaveText('Español')
-  await button.click()
-  await expect(page.locator('html')).toHaveAttribute('lang', 'es')
 })
 
 test('every footer link answers 200', async ({ page, request }) => {

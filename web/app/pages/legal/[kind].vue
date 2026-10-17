@@ -31,10 +31,12 @@ useSeoMeta({
     class="section"
   >
     <article class="container narrow">
-      <NuxtLink
+      <NuxtLinkLocale
         to="/legal"
         class="back"
-      >← {{ t('legal.title') }}</NuxtLink>
+      >
+        ← {{ t('legal.title') }}
+      </NuxtLinkLocale>
       <h1>{{ doc.title }}</h1>
       <p class="muted">
         {{ t('legal.version', { version: doc.version, date: formatDay(doc.published_at, locale) }) }}

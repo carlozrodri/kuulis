@@ -45,4 +45,5 @@ Carlos respondió «apruebo todo»: vale la opción recomendada de cada pregunta
 | M0 · Línea base | Hecho 2026-10-17 (ver 00 §9) |
 | M1 · Fundamentos | Hecho 2026-10-17 (ver 06 §2) |
 | M2 · Marco | Hecho 2026-10-17 (ver 07 M2) |
-| M5 · Idiomas en URL y SEO por idioma | Siguiente |
+| M5 · Idiomas en URL y SEO por idioma | Hecho 2026-10-17 (ver 07 M5) |
+| M3 · Inicio | Siguiente |
