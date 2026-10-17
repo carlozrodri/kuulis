@@ -29,6 +29,9 @@ const paymentMethods = computed(() => site.value?.payment_methods ?? [])
     />
     <HomeSafety />
     <HomeFaq :site="site ?? null" />
-    <HomeDownload />
+    <DownloadBand
+      :title="t('home.final.title')"
+      :body="t('home.final.body')"
+    />
   </div>
 </template>

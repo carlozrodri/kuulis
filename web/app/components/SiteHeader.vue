@@ -1,20 +1,23 @@
 <script setup lang="ts">
 // Site header (docs/website-redesign/04 §2–§3): logo, main links and the download button; below 960 px the
 // links move to a full-screen menu that keeps focus inside, closes with Escape and returns focus to its button.
-// On a page that starts with a green hero (page meta `heroHeader`), the header wears the hero's green until the
-// hero (#hero) has scrolled out from under it, then turns solid light: an IntersectionObserver, no scroll listener.
-// Its green is solid, not transparent, so without JavaScript it is still readable over every section.
+// On a page that starts with a green hero (page meta `heroHeader`, or `heroHeader: 'ink'` for an ink one), the
+// header wears the hero's color until the hero (#hero) has scrolled out from under it, then turns solid light: an
+// IntersectionObserver, no scroll listener. Its color is solid, not transparent, so without JavaScript it is still
+// readable over every section.
 const open = defineModel<boolean>('open', { default: false })
 const { t, locale } = useI18n()
 const route = useRoute()
 
 const links = computed(() => [
   { to: '/motorizados', label: t('nav.drivers') },
+  { to: '/seguridad', label: t('nav.safety') },
   { to: '/ayuda', label: t('nav.help') },
 ])
 const menuLinks = computed(() => [
   { to: '/', label: t('nav.home') },
   { to: '/motorizados', label: t('nav.drivers') },
+  { to: '/seguridad', label: t('nav.safety') },
   { to: '/descargar', label: t('nav.download') },
   { to: '/ayuda', label: t('nav.help') },
   { to: '/contacto', label: t('nav.contact') },
@@ -95,7 +98,7 @@ onBeforeUnmount(() => {
 <template>
   <header
     class="header"
-    :class="{ 'on-hero': onHero }"
+    :class="{ 'on-hero': onHero, 'on-ink': onHero && route.meta.heroHeader === 'ink' }"
   >
     <div class="container-wide bar">
       <NuxtLinkLocale
@@ -188,6 +191,11 @@ onBeforeUnmount(() => {
   border-bottom-color: var(--band-brand);
   color: var(--on-band);
   --focus-outer: var(--on-band);
+}
+
+.header.on-ink {
+  background: var(--band-ink);
+  border-bottom-color: var(--band-ink);
 }
 
 .on-hero .brand,

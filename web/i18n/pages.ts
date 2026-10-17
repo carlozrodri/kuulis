@@ -5,6 +5,7 @@
  */
 export const LOCALIZED_PAGES = {
   'motorizados': { es: '/motorizados', en: '/drivers' },
+  'seguridad': { es: '/seguridad', en: '/safety' },
   'descargar': { es: '/descargar', en: '/download' },
   'ayuda': { es: '/ayuda', en: '/help' },
   'ayuda-slug': { es: '/ayuda/[slug]', en: '/help/[slug]' },

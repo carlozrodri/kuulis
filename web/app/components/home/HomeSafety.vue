@@ -43,6 +43,12 @@ const rows = computed(() => [
           </div>
         </li>
       </ul>
+      <NuxtLinkLocale
+        to="/seguridad"
+        class="more"
+      >
+        {{ t('home.safety.more') }}
+      </NuxtLinkLocale>
     </div>
   </section>
 </template>
@@ -98,11 +104,25 @@ p {
   color: var(--muted);
 }
 
+.more {
+  color: var(--primary);
+  font-weight: 700;
+}
+
 @media (min-width: 960px) {
   .grid-safety {
     grid-template-columns: 5fr 6fr;
     column-gap: var(--space-9);
     align-items: start;
+  }
+
+  .intro {
+    grid-row: span 2;
+  }
+
+  .more {
+    grid-column: 2;
+    margin-top: calc(-1 * var(--space-5));
   }
 }
 </style>

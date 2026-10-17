@@ -11,7 +11,8 @@
     "getApp": "Descargar la app",
     "menuOpen": "Abrir menú",
     "menuClose": "Cerrar menú",
-    "otherLanguage": "English"
+    "otherLanguage": "English",
+    "safety": "Seguridad"
   },
   "footer": {
     "tagline": "Viajes en moto por Caracas. Sin comisión por viaje.",
@@ -134,15 +135,15 @@
         "body": "Lo mantienes pulsado y llama al {number}; después envías tu ubicación en vivo a tus contactos de confianza."
       },
       "pinLabel": "Ejemplo de PIN de inicio",
-      "pinCaption": "Ejemplo: cada viaje tiene su propio PIN."
+      "pinCaption": "Ejemplo: cada viaje tiene su propio PIN.",
+      "more": "Cómo te cuidamos en cada viaje"
     }
   },
   "drivers": {
     "metaTitle": "Maneja con Kuulis · Sin comisión por viaje",
-    "metaDescription": "Gana con tu moto sin dar comisión por cada viaje. Requisitos, cuota mensual y cómo registrarte.",
-    "eyebrow": "Motorizados",
-    "title": "Gana con tu moto, sin comisión por viaje",
-    "lead": "Tú pones el tiempo y la moto; Kuulis te trae los viajes. Lo que te pagan los pasajeros es tuyo. Los primeros {months} meses son gratis.",
+    "metaDescription": "Lo que cobras es tuyo: Kuulis no cobra comisión por viaje. Requisitos, cuota mensual con un ejemplo y cómo registrarte.",
+    "title": "Lo que cobras es tuyo.",
+    "lead": "Kuulis no cobra comisión por viaje. Tú pones la moto y el tiempo; nosotros te traemos los viajes.",
     "cta": "Descargar la app",
     "why": {
       "commission": {
@@ -150,19 +151,20 @@
         "body": "No descontamos nada de tus viajes. El pasajero te paga directo, como acuerden."
       },
       "free": {
-        "title": "{months} meses gratis",
+        "title": "{months} meses gratis desde tu primer viaje",
         "body": "Empiezas sin pagar nada. Después, una cuota pequeña solo los meses en que trabajas."
       },
       "direct": {
-        "title": "Tú decides cuándo",
+        "title": "Tú decides cuándo te conectas",
         "body": "Te conectas cuando quieres y recibes viajes cerca de ti."
       }
     },
     "requirements": {
-      "title": "Requisitos",
+      "title": "Lo que necesitas.",
       "age": "Tener {age} años o más",
       "year": "Moto del año {year} o más nueva",
-      "phone": "Un teléfono Android con datos y GPS"
+      "phone": "Un teléfono Android con datos y GPS",
+      "review": "Revisamos tus documentos antes de que puedas conectarte."
     },
     "documents": {
       "id_card": "Cédula de identidad",
@@ -174,15 +176,44 @@
       "vehicle_photo": "{n} fotos de tu moto"
     },
     "fees": {
-      "title": "Cuota mensual",
-      "body": "Se calcula con lo que ganaste en el mes y se paga desde tu billetera Kuulis. Los primeros {months} meses son gratis."
+      "title": "Tu cuota, con números.",
+      "body": "La cuota se calcula con lo que ganaste en el mes.",
+      "bodyNoData": "La cuota es pequeña y se calcula con lo que ganaste en el mes. Ve la tabla actual en la app.",
+      "example": "Ejemplo: si en un mes ganas {earned}, pagas {fee}. Te quedan {rest}.",
+      "exampleFree": "Ejemplo: si en un mes ganas {earned}, no pagas nada.",
+      "note": "Se paga desde tu billetera Kuulis. Si un mes no tienes viajes, no pagas nada. Los primeros {months} meses son gratis."
     },
     "steps": {
-      "title": "Cómo registrarte",
+      "title": "Cómo registrarte.",
       "step1": "Descarga la app y crea tu cuenta.",
       "step2": "En Perfil, cambia a modo motorizado y completa tu solicitud.",
       "step3": "Sube tus documentos y las fotos de tu moto.",
       "step4": "Revisamos tu solicitud y te avisamos cuando puedas conectarte."
+    },
+    "zero": "0 %",
+    "zeroLabel": "de comisión por viaje",
+    "faq": {
+      "title": "Preguntas de motorizados.",
+      "free": {
+        "q": "¿Desde cuándo cuentan los meses gratis?",
+        "a": "Desde tu primer viaje completado, no desde que te registras. Son {months} meses."
+      },
+      "idle": {
+        "q": "¿Qué pasa si un mes no trabajo?",
+        "a": "No pagas nada. La cuota solo se cobra en los meses en que tienes viajes."
+      },
+      "paid": {
+        "q": "¿Cómo cobro los viajes?",
+        "a": "El pasajero te paga directo, con el método que acuerden. Kuulis no se queda con nada de ese pago."
+      },
+      "fee": {
+        "q": "¿Cómo pago la cuota?",
+        "a": "Desde tu billetera Kuulis. Si no te alcanza, la cuota queda pendiente y se cobra cuando recargues."
+      }
+    },
+    "final": {
+      "title": "Tu moto, tus horas, tu dinero.",
+      "body": "Descarga la app, cambia a modo motorizado en tu perfil y envía tu solicitud. Te avisamos cuando esté aprobada."
     }
   },
   "download": {
@@ -406,5 +437,75 @@
     "binance": "Binance",
     "zelle": "Zelle",
     "cash_ves": "Efectivo Bs"
+  },
+  "safety": {
+    "metaTitle": "Seguridad en Kuulis · Antes, durante y después del viaje",
+    "metaDescription": "Motorizados verificados, PIN de inicio, viaje en vivo, botón SOS y calificaciones. Lo que hace la app de Kuulis para que viajes tranquilo.",
+    "title": "Viajar tranquilo también es parte del viaje.",
+    "lead": "Esto es lo que hace la app antes, durante y después de cada viaje. Solo contamos lo que ya funciona.",
+    "before": {
+      "title": "Antes",
+      "verified": {
+        "title": "Motorizados verificados",
+        "body": "Revisamos sus documentos y su moto antes de que puedan conectarse. Sin aprobación, no reciben viajes."
+      },
+      "identity": {
+        "title": "Sabes quién viene",
+        "body": "Ves su nombre, su foto, su calificación y la moto: marca, modelo, color y placa."
+      }
+    },
+    "during": {
+      "title": "Durante",
+      "pin": {
+        "title": "PIN de inicio",
+        "body": "En {cities}, el viaje no empieza hasta que le dices tu PIN al motorizado."
+      },
+      "live": {
+        "title": "Viaje en vivo",
+        "body": "Compartes un enlace y tu gente ve el viaje en el mapa hasta que llegues. Si guardas contactos de confianza, la app te ofrece avisarles en cuanto se asigna el motorizado."
+      },
+      "chat": {
+        "title": "Chat dentro de la app",
+        "body": "Hablas con el motorizado por el chat del viaje."
+      },
+      "other": {
+        "title": "Pedir para otra persona",
+        "body": "Si el viaje es para alguien más, le envías su propio enlace, con el PIN del viaje cuando aplica."
+      },
+      "checkin": {
+        "title": "¿Todo bien?",
+        "body": "Si el viaje se detiene mucho tiempo o se desvía de la ruta, la app les pregunta a los dos si todo está bien."
+      }
+    },
+    "trouble": {
+      "title": "Si algo pasa",
+      "sos": {
+        "title": "Botón SOS",
+        "body": "Lo mantienes pulsado y la app llama al {number}. Después envías tu ubicación en vivo a tus contactos de confianza, uno a uno, con un toque."
+      },
+      "report": {
+        "title": "Reportar un problema",
+        "body": "Desde el historial de viajes reportas un problema o avisas de un objeto perdido, y le preguntamos al motorizado."
+      }
+    },
+    "after": {
+      "title": "Después",
+      "rating": {
+        "title": "Calificación de los dos lados",
+        "body": "Al terminar, tú calificas al motorizado y el motorizado te califica a ti."
+      },
+      "community": {
+        "title": "Normas de la comunidad",
+        "body": "Las mismas reglas para pasajeros y motorizados.",
+        "link": "Leer las normas"
+      }
+    },
+    "pinLabel": "Ejemplo de PIN de inicio",
+    "pinCaption": "Ejemplo: cada viaje tiene su propio PIN.",
+    "notice": "Kuulis no reemplaza a los servicios de emergencia. Si estás en peligro, llama al {number}.",
+    "final": {
+      "title": "Viaja con alguien que sabe dónde estás.",
+      "body": "Descarga la app, guarda tus contactos de confianza y pide tu primer viaje."
+    }
   }
 }

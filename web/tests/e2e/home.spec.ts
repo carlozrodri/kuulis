@@ -21,7 +21,7 @@ test('the header is green over the hero and light after it', async ({ page }) =>
   await expect(header).not.toHaveClass(/on-hero/)
   await page.mouse.wheel(0, -1200)
   await expect(header).toHaveClass(/on-hero/)
-  await page.goto('/motorizados', { waitUntil: 'networkidle' })
+  await page.goto('/ayuda', { waitUntil: 'networkidle' })
   await expect(header).not.toHaveClass(/on-hero/)
 })
 

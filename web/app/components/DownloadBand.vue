@@ -1,5 +1,7 @@
 <script setup lang="ts">
 // The last stop (docs/website-redesign/03 §5.7): the download, on the green field where the route ends in the dot.
+// Every page that ends with it sets page meta `endsOnBrand`, so the footer's Ávila rises from this field.
+defineProps<{ title: string, body: string }>()
 const { t } = useI18n()
 </script>
 
@@ -7,9 +9,9 @@ const { t } = useI18n()
   <section class="download band-brand">
     <div class="container-wide grid-download">
       <div>
-        <BrandHeadline :text="t('home.final.title')" />
+        <BrandHeadline :text="title" />
         <p class="body">
-          {{ t('home.final.body') }}
+          {{ body }}
         </p>
         <NuxtLinkLocale
           to="/descargar"

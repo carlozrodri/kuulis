@@ -21,13 +21,7 @@ const items = computed(() => [
   <section class="section faq">
     <div class="container narrow">
       <BrandHeadline :text="t('home.faq.title')" />
-      <details
-        v-for="item in items"
-        :key="item.key"
-      >
-        <summary>{{ item.q }}</summary>
-        <p>{{ item.a }}</p>
-      </details>
+      <FaqList :items="items" />
       <p class="more">
         {{ t('home.faq.more') }}
         <NuxtLinkLocale to="/ayuda">
@@ -47,52 +41,6 @@ const items = computed(() => [
   margin: 0 0 var(--space-6);
   font-size: var(--font-h2);
   letter-spacing: var(--tracking-heading);
-}
-
-details {
-  border-top: 1px solid var(--border);
-}
-
-details:last-of-type {
-  border-bottom: 1px solid var(--border);
-}
-
-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  min-height: 56px;
-  padding: var(--space-4) 0;
-  font-size: 1.125rem;
-  font-weight: 700;
-  cursor: pointer;
-  list-style: none;
-}
-
-summary::-webkit-details-marker {
-  display: none;
-}
-
-/* A plus that turns into a minus. */
-summary::after {
-  content: '+';
-  flex: none;
-  color: var(--primary);
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-details[open] summary::after {
-  content: '−';
-}
-
-details p {
-  margin: 0;
-  padding: 0 0 var(--space-5);
-  color: var(--muted);
-  max-width: 62ch;
 }
 
 .more {

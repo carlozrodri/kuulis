@@ -1,7 +1,7 @@
 import { englishPath } from '../../i18n/pages'
 
 // Every public page in both languages, each <url> listing its alternates (docs/website-redesign/06 §5).
-const PAGES = ['/', '/motorizados', '/descargar', '/ayuda', '/contacto', '/legal', '/legal/terms', '/legal/privacy', '/legal/community', '/legal/driver_terms', '/legal/wallet']
+const PAGES = ['/', '/motorizados', '/seguridad', '/descargar', '/ayuda', '/contacto', '/legal', '/legal/terms', '/legal/privacy', '/legal/community', '/legal/driver_terms', '/legal/wallet']
   .map(path => ({ es: path, en: englishPath(path) }))
 
 /** Published help articles (doc 13) in each language, so search engines find them; none when the API is down. */
