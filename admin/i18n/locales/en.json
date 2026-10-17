@@ -8,6 +8,7 @@
     "settings": "Settings",
     "rides": "Rides",
     "live": "Live",
+    "zones": "Zones",
     "safety": "Safety",
     "rates": "Rates",
     "promotions": "Promotions",
@@ -180,7 +181,8 @@
       "quality": "Quality",
       "safety": "Safety",
       "risk": "Risk",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "zones": "Zones"
     },
     "permissions": {
       "users": {
@@ -277,6 +279,10 @@
       "analytics": {
         "view": "See product analytics",
         "export": "Export analytics CSV"
+      },
+      "zones": {
+        "view": "View zones and cities",
+        "manage": "Create and edit zones and city polygons"
       }
     }
   },
@@ -442,7 +448,11 @@
     "closing_reconciled": "That closing is already reconciled.",
     "reconcile_note_required": "Upload the Binance statement first and, if there are differences, explain them in the note.",
     "statement_not_found": "There is no stored file for that month.",
-    "fee_not_lower": "The new fee must be lower than the current one ({fee})."
+    "fee_not_lower": "The new fee must be lower than the current one ({fee}).",
+    "zone_not_found": "The zone does not exist",
+    "city_not_found": "The city does not exist",
+    "zone_invalid": "The zone is not valid",
+    "geojson_invalid": "The GeoJSON is not valid"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -634,7 +644,8 @@
       "name": "City",
       "namePlaceholder": "e.g. Caracas",
       "add": "Add city",
-      "remove": "Remove city"
+      "remove": "Remove city",
+      "polygon": "This city has a polygon (edited in Zones): the box is computed from it."
     },
     "dispatch": {
       "title": "Dispatch",
@@ -1063,7 +1074,15 @@
     "lastSeen": "seen {ago}",
     "secondsAgo": "{n} s ago",
     "minutesAgo": "{n} min ago",
-    "city": "City"
+    "city": "City",
+    "demand": "Demand",
+    "demandCell": "{requests} requests · {unmatched} without a driver · {drivers} drivers",
+    "demandDisabled": "The demand map is turned off in the settings.",
+    "demandLevels": {
+      "1": "Some demand",
+      "2": "Demand",
+      "3": "High demand"
+    }
   },
   "rates": {
     "sources": {
@@ -3690,6 +3709,149 @@
       "tiersHelp": "With this month's earnings and the fee tiers that apply to it.",
       "earnedAbove": "Earned above",
       "fee": "Fee"
+    }
+  },
+  "zones": {
+    "help": "City polygons and zones with rules: surge, restricted (no pickups or drop-offs) and suggested pickup points. Only active zones within their validity count.",
+    "allCities": "All cities",
+    "allKinds": "All types",
+    "city": "City",
+    "kind": "Type",
+    "kinds": {
+      "surge": "Surge",
+      "restricted": "Restricted",
+      "pickup": "Pickup point"
+    },
+    "kindHelp": {
+      "surge": "Surge for rides starting inside the zone. The higher of this and the global surge applies.",
+      "restricted": "No pickups or no drop-offs inside the zone. The passenger sees the message and the nearest suggested exit.",
+      "pickup": "When requesting inside the zone, the app suggests the nearest pickup point."
+    },
+    "statuses": {
+      "inForce": "In force",
+      "inactive": "Inactive",
+      "scheduled": "Scheduled",
+      "expired": "Expired"
+    },
+    "allDay": "all day",
+    "pointsCount": "no points | 1 point | {n} points",
+    "listTitle": "Zones ({n})",
+    "empty": "No zones match these filters.",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "new": "New zone",
+    "create": "Create zone",
+    "editTitle": "Edit zone",
+    "created": "Zone created",
+    "updated": "Zone saved",
+    "deleted": "Zone deleted",
+    "deleteTitle": "Delete zone",
+    "deleteBody": "Delete the zone “{name}”? Its rules stop applying right away.",
+    "validity": "Valid: {from} → {to}",
+    "cityLegend": "City",
+    "export": "Export GeoJSON",
+    "fixErrors": "Check the zone",
+    "errors": {
+      "name": "Enter a name.",
+      "city": "Choose the city.",
+      "polygonShort": "Draw the polygon on the map: at least 3 vertices.",
+      "polygonLong": "The polygon takes at most {max} vertices.",
+      "polygonCrosses": "The polygon's edges cross: move or delete vertices.",
+      "dates": "The end of the validity must be after the start.",
+      "multiplier": "The multiplier goes from 1.00 to 3.00.",
+      "hoursBoth": "Set both start and end, or leave both empty for all day.",
+      "hours": "Hours must be HH:MM.",
+      "hoursSame": "Start and end cannot be the same.",
+      "restrictNothing": "Tick at least one restriction: pickup or drop-off.",
+      "pointsNone": "Add at least one pickup point on the map.",
+      "pointsMany": "At most {points} points.",
+      "pointName": "Every point needs a name."
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "E.g. Sambil Mall",
+      "vertices": "Polygon: no vertices | Polygon: 1 vertex | Polygon: {n} vertices",
+      "active": "Active",
+      "activeHelp": "Turn it off to suspend its rules without deleting it.",
+      "startsAt": "From",
+      "endsAt": "Until",
+      "validityHelp": "Empty: no limit. Your browser's time ({zone}).",
+      "rules": "Rules",
+      "multiplier": "Multiplier",
+      "multiplierHelp": "1.20 = +20% on the fare. From 1.00 to 3.00.",
+      "days": "Days",
+      "daysHelp": "No days ticked: every day.",
+      "start": "Start",
+      "end": "End",
+      "hoursHelp": "No hours: all day. Caracas time.",
+      "noPickup": "No pickups",
+      "noDropoff": "No drop-offs",
+      "message": "Message for the passenger",
+      "messageHelp": "Shown when choosing a pickup or destination inside the zone.",
+      "points": "Pickup points",
+      "exits": "Suggested exits (optional)",
+      "noPoints": "Turn on “Add points” and click the map.",
+      "pointName": "Point name",
+      "pointN": "Point {n}",
+      "removePoint": "Remove point"
+    },
+    "map": {
+      "draw": "Polygon",
+      "addPoints": "Add points",
+      "undo": "Undo",
+      "clear": "Clear all",
+      "vertexHint": "Drag to move, click to delete",
+      "hint": {
+        "vertices": "Click the map to add a vertex. Drag a vertex to move it; click it to delete it.",
+        "points": "Click the map to add a point. Drag a point to move it.",
+        "pick": "Click the map to choose where to simulate the peak."
+      }
+    },
+    "cities": {
+      "title": "Cities",
+      "box": "Box",
+      "polygon": "Polygon",
+      "polygonN": "Polygon · {n} vertices",
+      "edit": "Polygon of {city}",
+      "help": "With a polygon, the city only accepts pickups inside it; the box is recomputed as the rectangle around it.",
+      "convert": "Turn the box into a polygon",
+      "save": "Save polygon",
+      "toBox": "Back to the box",
+      "toBoxConfirm": "Remove the polygon of {city} and use its box again?",
+      "saved": "Polygon of {city} saved",
+      "boxRestored": "{city} uses its box again"
+    },
+    "import": {
+      "button": "Import",
+      "title": "Import GeoJSON",
+      "help": "A FeatureCollection like the one this panel exports. Zones with an existing id are updated; the rest are created.",
+      "choose": "Choose file",
+      "noFile": "No file chosen",
+      "replace": "Replace",
+      "replaceHelp": "First deletes the zones of the cities in the file.",
+      "run": "Import",
+      "close": "Close",
+      "notJson": "The file is not valid JSON.",
+      "result": "Imported: {cities} cities, {created} zones created, {updated} updated.",
+      "skipped": "{n} items were skipped:",
+      "feature": "Item {n}"
+    },
+    "simulate": {
+      "button": "Simulate demand",
+      "title": "Simulate a demand peak",
+      "help": "Outside production only. Adds fake requests at a point to test the demand map in the app and the panel.",
+      "at": "Point: {lat}, {lng}",
+      "pickPoint": "Click the map to choose the point.",
+      "requests": "Requests",
+      "unmatched": "Without a driver",
+      "run": "Simulate",
+      "done": "Peak simulated",
+      "unavailable": "Simulation is not available in this environment.",
+      "result": "The demand map has {n} cells.",
+      "disabled": "The demand map is turned off in the settings.",
+      "cell": "{requests} requests · {unmatched} without a driver",
+      "point": "Simulated peak"
     }
   }
 }

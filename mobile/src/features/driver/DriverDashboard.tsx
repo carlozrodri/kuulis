@@ -39,6 +39,7 @@ import { nextDueAt, pendingTotal, shortfall, subscriptionState } from '@/lib/wal
 import { useAuth } from '@/providers/AuthProvider';
 import { elevation, radius, space, useTheme } from '@/theme';
 
+import { DemandBanner, DemandLegend, DemandToggle, useDemandMap } from './DemandLayer';
 import { connectRequest } from './store';
 import { OnlineBlockSheet, VerificationBanner } from './VerificationNotices';
 
@@ -90,7 +91,9 @@ export function DriverDashboard() {
   const active = useActiveRide();
   const goOnline = useGoOnline();
   const goOffline = useGoOffline();
-  const { permission } = useUserLocation();
+  const { permission, position } = useUserLocation();
+  // Doc 21: the "Demanda" layer (cells by level, legend and the nearest hot spot).
+  const demand = useDemandMap(position);
   const [locating, setLocating] = useState(false);
   const { suspension, handleError: handleSuspended } = useSuspension();
   // Android shares the position from the background while online; elsewhere the app must stay on screen.
@@ -213,7 +216,7 @@ export function DriverDashboard() {
 
   return (
     <MapSheetLayout
-      map={(insets) => <RideMap insets={insets} followUser showUser />}
+      map={(insets) => <RideMap insets={insets} followUser showUser areas={demand.areas} focus={demand.focus} />}
       topBar={
         <View style={{ gap: space.sm }} pointerEvents="box-none">
           {summary ? <EarningsCard summary={summary} blocked={blocked} /> : null}
@@ -222,7 +225,11 @@ export function DriverDashboard() {
               <LiveDot online={online} />
               <Txt variant="bodyStrong">{online ? t('drive.home.onlineChip') : t('drive.home.offlineChip')}</Txt>
             </View>
+            {demand.showToggle ? (
+              <DemandToggle on={demand.on} available={demand.available} onChange={demand.setOn} />
+            ) : null}
           </View>
+          {demand.on && demand.enabled ? <DemandLegend /> : null}
           <AnnouncementBanners />
         </View>
       }>
@@ -249,6 +256,10 @@ export function DriverDashboard() {
               <Txt color="muted">{online ? t('drive.home.onlineBody') : t('driver.home.offlineBody')}</Txt>
             </View>
           )}
+
+          {demand.hot && !suspended ? (
+            <DemandBanner name={demand.hot.name} distance={demand.hot.distance_m} onPress={() => demand.showOnMap(demand.hot!.point)} />
+          ) : null}
 
           {activeRide ? (
             <Card tone="tint" onPress={() => router.push({ pathname: '/drive', params: { id: activeRide.id } })} style={styles.activeCard}>
@@ -380,7 +391,7 @@ const styles = StyleSheet.create({
     paddingRight: space.xs,
     paddingVertical: space.xs,
   },
-  topRow: { flexDirection: 'row' },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
   statusChip: {
     flexDirection: 'row',
     alignItems: 'center',

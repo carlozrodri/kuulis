@@ -434,6 +434,8 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
       max_lat: Number(area.max_lat),
       min_lng: Number(area.min_lng),
       max_lng: Number(area.max_lng),
+      // Doc 21: the polygon is edited on the zones page; keep it when the settings are saved.
+      ...(area.polygon !== undefined ? { polygon: area.polygon } : {}),
     })),
     offer_timeout_seconds: form.offer_timeout_seconds,
     search_radius_m: form.search_radius_m.map(Number),

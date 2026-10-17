@@ -194,6 +194,7 @@ async def preferences_read(session: AsyncSession, user_id: uuid.UUID) -> Prefere
     return PreferencesRead(
         marketing_push=row.marketing_push,
         marketing_email=row.marketing_email,
+        demand_alerts=row.demand_alerts is not False,
         quiet_start=row.quiet_start or settings.quiet_start,
         quiet_end=row.quiet_end or settings.quiet_end,
         default_quiet_start=settings.quiet_start,

@@ -198,3 +198,27 @@ async def reverse(lat: float, lng: float) -> GeoResult:
     result = GeoResult(name=item.name, address=item.address, lat=lat, lng=lng)
     await cache_set(cache_key, result.model_dump(), REVERSE_CACHE_TTL)
     return result
+
+
+async def area_name(lat: float, lng: float) -> str | None:
+    """The neighbourhood or town around a point ("Chacao"), for the demand map (doc 21)."""
+    if not settings.PHOTON_URL:
+        return None
+    cache_key = f"geo:area:{lat:.3f}:{lng:.3f}"  # ~100 m; names barely change
+    cached = await cache_get(cache_key)
+    if cached is not None:
+        return cached or None
+    try:
+        response = await http().get(
+            f"{settings.PHOTON_URL.rstrip('/')}/reverse",
+            params={"lat": f"{lat:.6f}", "lon": f"{lng:.6f}", "limit": 1},
+        )
+        response.raise_for_status()
+        features = response.json().get("features") or []
+        props = (features[0].get("properties") or {}) if features else {}
+    except (httpx.HTTPError, ValueError, AttributeError, IndexError):
+        logger.warning("Photon area name failed", exc_info=True)
+        return None
+    name = props.get("district") or props.get("locality") or props.get("city") or ""
+    await cache_set(cache_key, name, 30 * 24 * 3600)
+    return name or None

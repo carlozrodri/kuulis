@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { AppConfig, OnlineDriver, Page, Ride, ServiceArea } from '~/types/api'
-import type { MapLine, MapMarker, MapRectangle } from '~/utils/geo'
+import type { AppConfig, DemandSnapshot, OnlineDriver, Page, Ride, ServiceArea } from '~/types/api'
+import type { MapLine, MapMarker, MapPolygon, MapRectangle } from '~/utils/geo'
 
 definePageMeta({ permission: 'live.view' })
 
@@ -11,6 +11,8 @@ const apiError = useApiError()
 const REFRESH_MS = 10_000
 /** Drivers stop receiving offers after 60 s without a location update (docs/api/phase-1b.md). */
 const STALE_MS = 60_000
+/** Doc 21: the demand cells are recomputed every minute. */
+const DEMAND_REFRESH_MS = 60_000
 
 const drivers = ref<OnlineDriver[]>([])
 const rides = ref<Ride[]>([])
@@ -49,6 +51,7 @@ function asList<T>(value: T[] | Page<T> | null | undefined): T[] {
 let timer: ReturnType<typeof setInterval> | undefined
 function onVisibility() {
   if (document.visibilityState === 'visible' && autoRefresh.value) load()
+  if (document.visibilityState === 'visible' && showDemand.value) loadDemand()
 }
 onMounted(() => {
   load()
@@ -64,7 +67,44 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   clearInterval(timer)
+  clearInterval(demandTimer)
   document.removeEventListener('visibilitychange', onVisibility)
+})
+
+// ---- Demand (doc 21) ------------------------------------------------------------------------
+
+const showDemand = ref(false)
+const demand = ref<DemandSnapshot | null>(null)
+const demandError = ref<string | null>(null)
+const demandLoading = ref(false)
+let demandTimer: ReturnType<typeof setInterval> | undefined
+
+async function loadDemand() {
+  if (demandLoading.value) return
+  demandLoading.value = true
+  try {
+    demand.value = await request<DemandSnapshot>('/admin/zones/demand')
+    demandError.value = null
+  }
+  catch (err) {
+    demandError.value = apiError(err)
+  }
+  finally {
+    demandLoading.value = false
+  }
+}
+
+watch(showDemand, (on) => {
+  clearInterval(demandTimer)
+  demandError.value = null
+  if (!on) {
+    demand.value = null
+    return
+  }
+  loadDemand()
+  demandTimer = setInterval(() => {
+    if (document.visibilityState === 'visible') loadDemand()
+  }, DEMAND_REFRESH_MS)
 })
 
 const isStale = (driver: OnlineDriver) =>
@@ -180,6 +220,23 @@ const rectangles = computed<MapRectangle[]>(() => {
   return [{ id: 'area', bounds: [[a.min_lat, a.min_lng], [a.max_lat, a.max_lng]], color: MAP_COLORS.serviceArea }]
 })
 
+const demandPolygons = computed<MapPolygon[]>(() => {
+  if (!showDemand.value || !demand.value?.enabled) return []
+  return (demand.value.cells ?? [])
+    .filter(cell => inArea(cell.center[0], cell.center[1]))
+    .map(cell => ({
+      id: `cell:${cell.cell}`,
+      points: cell.boundary,
+      color: DEMAND_COLORS[cell.level] ?? DEMAND_COLORS[1],
+      weight: 1,
+      fillOpacity: 0.3,
+      label: [
+        cell.name,
+        t('live.demandCell', { requests: cell.requests, unmatched: cell.unmatched, drivers: cell.drivers ?? '—' }),
+      ].filter(Boolean).join(' · '),
+    }))
+})
+
 const tabs = computed(() => [
   { label: t('live.activeRides', { n: rides.value.length }), value: 'rides' },
   { label: t('live.onlineDrivers', { n: drivers.value.length }), value: 'drivers' },
@@ -214,6 +271,11 @@ const sortedDrivers = computed(() =>
             {{ t('live.updatedAt', { time: formatTime(lastUpdated.toISOString(), locale) }) }}
           </span>
           <USwitch
+            v-model="showDemand"
+            :label="t('live.demand')"
+            size="sm"
+          />
+          <USwitch
             v-model="autoRefresh"
             :label="t('live.autoRefresh')"
             size="sm"
@@ -237,6 +299,20 @@ const sortedDrivers = computed(() =>
         variant="subtle"
         icon="i-lucide-circle-alert"
         :title="loadError"
+      />
+      <UAlert
+        v-if="showDemand && demandError"
+        color="error"
+        variant="subtle"
+        icon="i-lucide-circle-alert"
+        :title="demandError"
+      />
+      <UAlert
+        v-else-if="showDemand && demand && !demand.enabled"
+        color="neutral"
+        variant="subtle"
+        icon="i-lucide-info"
+        :title="t('live.demandDisabled')"
       />
 
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -281,6 +357,7 @@ const sortedDrivers = computed(() =>
             :markers="areaMarkers"
             :lines="lines"
             :rectangles="rectangles"
+            :polygons="demandPolygons"
             :selected="selected"
             fit="once"
             @select="select"
@@ -299,6 +376,16 @@ const sortedDrivers = computed(() =>
               class="size-3 rounded-full border-2"
               :style="{ borderColor: rideStatusHex.searching }"
             />{{ t('live.ridePickup') }}</span>
+            <template v-if="showDemand">
+              <span
+                v-for="level in ([1, 2, 3] as const)"
+                :key="level"
+                class="flex items-center gap-1"
+              ><span
+                class="size-2.5 rounded-sm"
+                :style="{ background: DEMAND_COLORS[level] }"
+              />{{ t(`live.demandLevels.${level}`) }}</span>
+            </template>
           </div>
         </div>
 

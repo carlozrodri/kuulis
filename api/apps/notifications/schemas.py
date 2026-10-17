@@ -72,6 +72,7 @@ class PreferencesRead(BaseModel):
 
     marketing_push: bool
     marketing_email: bool
+    demand_alerts: bool = True  # drivers: pushes when a zone nearby gets busy (doc 21)
     quiet_start: str
     quiet_end: str
     default_quiet_start: str
@@ -81,6 +82,7 @@ class PreferencesRead(BaseModel):
 class PreferencesUpdate(BaseModel):
     marketing_push: bool | None = None
     marketing_email: bool | None = None
+    demand_alerts: bool | None = None
     quiet_start: str | None = Field(default=None, pattern=HHMM)
     quiet_end: str | None = Field(default=None, pattern=HHMM)
 

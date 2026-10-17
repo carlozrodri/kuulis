@@ -84,6 +84,8 @@ from apps.subscriptions import services as subscriptions
 from apps.users.models import User
 from apps.wallet import services as wallet
 from apps.wallet.models import EntryKind
+from apps.zones import demand
+from apps.zones import services as zones
 from kuulis.core.exceptions import AppError
 from kuulis.core.pagination import PageParams, paginate
 from kuulis.core.redis import redis_client
@@ -169,11 +171,12 @@ def _ensure_participant(ride: Ride, user: User) -> None:
 
 
 def _check_area(config: AppConfig, *points: tuple[float, float]) -> str:
-    """Every point must fall inside one service area, the same one (no trips between cities).
-    Returns the area name."""
+    """Every point must fall inside a service area (its polygon when it has one, doc 21), the
+    pickup's city or one paired with it in ``intercity_pairs``. Returns the pickup's city."""
     area = config.area_at(*points[0])
     for lat, lng in points:
-        if area is None or not area.contains(lat, lng):
+        place = config.area_at(lat, lng)
+        if area is None or place is None or not config.intercity_allowed(area.name, place.name):
             raise OutsideServiceAreaError(details={"lat": lat, "lng": lng})
     assert area is not None
     return area.name
@@ -193,8 +196,17 @@ async def create_quote(session: AsyncSession, user: User, data: QuoteRequest) ->
         config, (data.pickup.lat, data.pickup.lng), (data.dropoff.lat, data.dropoff.lng)
     )
     control.ensure_open(config, area)
-    route = await geo.route(data.pickup.lat, data.pickup.lng, data.dropoff.lat, data.dropoff.lng)
-    fare, surge = pricing.quote_price(config, data.vehicle_type, route.distance_m, route.duration_s)
+    pickup, dropoff = (data.pickup.lat, data.pickup.lng), (data.dropoff.lat, data.dropoff.lng)
+    live = await zones.ensure_allowed(session, pickup, dropoff)
+    route = await geo.route(*pickup, *dropoff)
+    surge, surge_reason, surge_zone = zones.surge_for(config, live, *pickup)
+    fare = pricing.compute_fare(
+        config.fares[data.vehicle_type],
+        route.distance_m,
+        route.duration_s,
+        surge,
+        config.fare_rounding,
+    )
     promotion, discount = None, Decimal(0)
     who = Audience(ident=str(user.id), role="passenger", area=area)
     if await control.is_enabled(session, "promotions", who):
@@ -213,6 +225,8 @@ async def create_quote(session: AsyncSession, user: User, data: QuoteRequest) ->
         duration_s=route.duration_s,
         fare=fare,
         surge_multiplier=surge,
+        surge_reason=surge_reason,
+        surge_zone=surge_zone,
         discount=discount,
         total=total,
         promotion=PromotionBrief(id=promotion.id, name=promotion.name, code=promotion.code)
@@ -253,6 +267,10 @@ async def create_ride(session: AsyncSession, user: User, data: RideCreate) -> Ri
         config, (quote.pickup.lat, quote.pickup.lng), (quote.dropoff.lat, quote.dropoff.lng)
     )
     control.ensure_open(config, area)
+    # A zone may have changed since the quote (a restricted zone drawn meanwhile).
+    await zones.ensure_allowed(
+        session, (quote.pickup.lat, quote.pickup.lng), (quote.dropoff.lat, quote.dropoff.lng)
+    )
     if quote.promotion is not None:
         # Locks the promotion until the commit, so its budget cannot be overspent.
         await promotions.lock_for_ride(
@@ -294,6 +312,7 @@ async def create_ride(session: AsyncSession, user: User, data: RideCreate) -> Ri
         await session.rollback()
         raise RideAlreadyActiveError() from exc
     await redis_client.delete(QUOTE_PREFIX + data.quote_id)  # single use
+    await demand.record(demand.REQUESTS, ride.pickup_lat, ride.pickup_lng)
     await dispatch.kick(ride.id)
     await session.refresh(ride)
     return ride

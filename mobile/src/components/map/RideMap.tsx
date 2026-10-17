@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, StyleSheet, View } from 'react-native';
-import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
+import MapView, { Marker, Polygon, Polyline, type Region } from 'react-native-maps';
 
 import { Bike, LocateFixed } from '@/components/icons';
 import { IconButton } from '@/components/ui';
@@ -45,6 +45,8 @@ export function RideMap({
   onDragStart,
   recenterButton = true,
   recenterBottom,
+  areas,
+  focus,
   children,
 }: RideMapProps) {
   const theme = useTheme();
@@ -109,6 +111,16 @@ export function RideMap({
     });
   }, [ready, followUser, position]);
 
+  // Doc 21: "Ver en el mapa" on a demand banner. The user looking elsewhere stops the follow mode.
+  const focusKey = focus?.key;
+  useEffect(() => {
+    if (!ready || !focus) return;
+    userMoved.current = true;
+    mapRef.current?.animateCamera({ center: toCoordinate(focus.point), zoom: 14 }, { duration: 600 });
+    // Only a new key moves the camera.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, focusKey]);
+
   const recenter = () => {
     userMoved.current = false;
     if (followUser && position) {
@@ -148,6 +160,17 @@ export function RideMap({
           userMoved.current = true;
         }}
         onRegionChangeComplete={(region) => onCenterChange?.({ lat: region.latitude, lng: region.longitude })}>
+        {areas?.map((area) => (
+          <Polygon
+            key={area.id}
+            coordinates={area.coordinates.map(toCoordinate)}
+            fillColor={area.fill}
+            strokeColor={area.stroke}
+            strokeWidth={1.5}
+            tappable={false}
+            zIndex={0}
+          />
+        ))}
         {route && route.length > 1 ? (
           <>
             <Polyline coordinates={route} strokeColor={dark ? '#04140D' : '#0B6A4C'} strokeWidth={9} lineCap="round" lineJoin="round" zIndex={1} />

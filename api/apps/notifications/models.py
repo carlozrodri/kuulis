@@ -94,6 +94,8 @@ class NotificationPreference(BaseModel):
     )
     marketing_push: Mapped[bool] = mapped_column(default=True)
     marketing_email: Mapped[bool] = mapped_column(default=True)
+    # Drivers: "high demand near you" pushes (doc 21).
+    demand_alerts: Mapped[bool] = mapped_column(default=True, server_default=text("true"))
     # "HH:MM" Caracas time; None = the default window from the settings.
     quiet_start: Mapped[str | None] = mapped_column(String(5))
     quiet_end: Mapped[str | None] = mapped_column(String(5))

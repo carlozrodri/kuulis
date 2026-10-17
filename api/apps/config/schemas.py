@@ -2,7 +2,7 @@ import re
 from datetime import datetime, time
 from decimal import Decimal
 from itertools import pairwise
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import (
     AfterValidator,
@@ -16,6 +16,7 @@ from pydantic import (
 from apps.drivers.models import DocumentKind, VehicleType
 from apps.rates.models import RateSource
 from apps.rides.models import PaymentMethod
+from apps.zones import geometry
 
 MinYear = Annotated[int, Field(ge=1950, le=2100)]
 
@@ -92,12 +93,52 @@ class SurgeRule(BaseModel):
         return time.fromisoformat(self.end)
 
 
+LatLngPair = Annotated[list[float], Field(min_length=2, max_length=2)]
+Polygon = Annotated[list[LatLngPair], Field(min_length=3, max_length=300)]
+
+
+def check_polygon(value: list[list[float]] | None) -> list[list[float]] | None:
+    """Normalizes an open ring ``[[lat, lng], ...]`` and rejects crossing edges (doc 21)."""
+    if value is None:
+        return None
+    points = geometry.ring(value)
+    if reason := geometry.problem(points):
+        raise ValueError(reason)
+    return [[lat, lng] for lat, lng in points]
+
+
 class ServiceArea(BaseModel):
+    """A city. With ``polygon`` (doc 21) only the polygon counts and the box is the rectangle that
+    encloses it (search bias and centre); without it the box is the city, as before."""
+
     name: str = Field(default="Caracas", min_length=1, max_length=60)
     min_lat: float = Field(ge=-90, le=90)
     max_lat: float = Field(ge=-90, le=90)
     min_lng: float = Field(ge=-180, le=180)
     max_lng: float = Field(ge=-180, le=180)
+    polygon: Polygon | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _box_from_polygon(cls, data: Any) -> Any:
+        if isinstance(data, dict) and data.get("polygon"):
+            try:
+                points = geometry.ring(data["polygon"])
+                min_lat, max_lat, min_lng, max_lng = geometry.bbox(points)
+            except (TypeError, ValueError, IndexError):
+                return data  # the field validation explains what is wrong
+            data = data | {
+                "min_lat": min_lat,
+                "max_lat": max_lat,
+                "min_lng": min_lng,
+                "max_lng": max_lng,
+            }
+        return data
+
+    @field_validator("polygon")
+    @classmethod
+    def _polygon(cls, value: list[list[float]] | None) -> list[list[float]] | None:
+        return check_polygon(value)
 
     @model_validator(mode="after")
     def _ordered(self) -> Self:
@@ -106,7 +147,11 @@ class ServiceArea(BaseModel):
         return self
 
     def contains(self, lat: float, lng: float) -> bool:
-        return self.min_lat <= lat <= self.max_lat and self.min_lng <= lng <= self.max_lng
+        if not (self.min_lat <= lat <= self.max_lat and self.min_lng <= lng <= self.max_lng):
+            return False
+        if self.polygon is None:
+            return True
+        return geometry.contains([(p[0], p[1]) for p in self.polygon], lat, lng)
 
     @property
     def center(self) -> tuple[float, float]:
@@ -134,6 +179,28 @@ def _default_areas() -> list[ServiceArea]:
     return [
         ServiceArea(name="Caracas", min_lat=10.35, max_lat=10.56, min_lng=-67.10, max_lng=-66.70)
     ]
+
+
+class CityPair(BaseModel):
+    """Trips allowed between two cities, both ways (doc 21)."""
+
+    a: str = Field(min_length=1, max_length=60)
+    b: str = Field(min_length=1, max_length=60)
+
+    def joins(self, one: str, other: str) -> bool:
+        return {self.a, self.b} == {one, other}
+
+
+class DemandSettings(BaseModel):
+    """The drivers' demand map (doc 21): H3 cells counted over a sliding window."""
+
+    enabled: bool = True
+    window_minutes: int = Field(default=15, ge=5, le=60)
+    # Requests in the window from which a cell counts as busy (level 2, or 3 with unmatched).
+    hot_requests: int = Field(default=3, ge=1, le=100)
+    notify: bool = True
+    notify_radius_m: int = Field(default=3000, ge=500, le=20000)
+    notify_every_minutes: int = Field(default=30, ge=5, le=24 * 60)
 
 
 class Localized(BaseModel):
@@ -481,6 +548,10 @@ class AppConfig(BaseModel):
     # --- Anti-fraud (doc 16) ----------------------------------------------------------------------
     risk: RiskSettings = Field(default_factory=RiskSettings)
 
+    # --- Zones and demand (doc 21) --------------------------------------------------------------
+    intercity_pairs: list[CityPair] = Field(default_factory=list, max_length=50)
+    demand: DemandSettings = Field(default_factory=DemandSettings)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -498,7 +569,17 @@ class AppConfig(BaseModel):
             raise ValueError(f"fares missing for enabled vehicle types: {', '.join(missing)}")
         if self.search_timeout_seconds < self.offer_timeout_seconds:
             raise ValueError("search_timeout_seconds must be >= offer_timeout_seconds")
+        names = [a.name for a in self.service_areas]
+        unknown = sorted({n for p in self.intercity_pairs for n in (p.a, p.b)} - set(names))
+        if unknown:
+            raise ValueError(f"intercity_pairs name unknown cities: {', '.join(unknown)}")
         return self
+
+    def city_named(self, name: str) -> ServiceArea | None:
+        return next((a for a in self.service_areas if a.name == name), None)
+
+    def intercity_allowed(self, one: str, other: str) -> bool:
+        return one == other or any(p.joins(one, other) for p in self.intercity_pairs)
 
     def stale_minutes(self, source: RateSource) -> int:
         return self.rates_stale_minutes.get(source, 24 * 60)
@@ -558,6 +639,8 @@ class AppConfigUpdate(BaseModel):
     notifications: NotificationSettings | None = None
     quality: QualitySettings | None = None
     risk: RiskSettings | None = None
+    intercity_pairs: list[CityPair] | None = Field(default=None, max_length=50)
+    demand: DemandSettings | None = None
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

@@ -168,7 +168,10 @@
       "useDefault": "Use the recommended hours ({{start}} to {{end}})",
       "quietHint": "Between {{start}} and {{end}} (Caracas time) we don't send you promotions. Notices about your rides, your account and safety always arrive.",
       "quietOff": "Start and end are the same time, so you have no quiet hours.",
-      "caracasTime": "Caracas time"
+      "caracasTime": "Caracas time",
+      "driver": "As a driver",
+      "demandAlerts": "Demand alerts",
+      "demandAlertsHint": "We let you know when demand is high nearby while you are online (at most one every 30 minutes)."
     }
   },
   "profile": {
@@ -740,7 +743,9 @@
     "client_id_required": "We couldn't identify this phone. Restart the app.",
     "idempotency_in_progress": "We're still sending this. Wait a moment.",
     "idempotency_key_invalid": "We couldn't send this. Try again.",
-    "idempotency_key_reused": "We couldn't send this. Try again."
+    "idempotency_key_reused": "We couldn't send this. Try again.",
+    "pickup_restricted": "Passengers can’t be picked up in this area. Choose another pickup point.",
+    "dropoff_restricted": "Passengers can’t be dropped off in this area. Choose a nearby destination."
   },
   "map": {
     "recenter": "Recenter map"
@@ -826,7 +831,9 @@
         "first_ride_only": "This code is only for your first ride.",
         "not_eligible": "This code does not apply to this ride (area, vehicle or minimum fare)."
       }
-    }
+    },
+    "changePickup": "Change pickup point",
+    "zoneSurge": "High demand in this area: +{{percent}}%"
   },
   "ride": {
     "pickup": "Pickup",
@@ -2295,5 +2302,29 @@
       "weak": "GPS imprecise",
       "none": "No GPS"
     }
+  },
+  "demand": {
+    "layer": "Demand",
+    "layerHint": "Shows on the map where most requests are right now",
+    "unavailable": "The demand map is not available right now",
+    "legendTitle": "Demand legend",
+    "level": {
+      "1": "Some demand",
+      "2": "Demand",
+      "3": "High demand"
+    },
+    "hot": "High demand in {{name}}",
+    "away": "{{distance}} away",
+    "see": "View",
+    "showOnMap": "Centres the map on that area"
+  },
+  "zones": {
+    "restrictedTitle": "We can’t pick you up here",
+    "dropoffTitle": "We can’t drop you off here",
+    "nearest": "The nearest allowed point is {{name}}, {{distance}} away.",
+    "suggested": "Suggested pickup point: {{name}} ({{distance}} away)",
+    "use": "Use {{name}}",
+    "useHint": "Moves your pickup point there, {{distance}} away",
+    "moved": "We’ll pick you up at {{name}}"
   }
 }

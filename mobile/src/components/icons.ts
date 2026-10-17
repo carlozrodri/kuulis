@@ -131,3 +131,4 @@ export { default as PackageSearch } from 'lucide-react-native/icons/package-sear
 export { default as Timer } from 'lucide-react-native/icons/timer';
 export { default as Percent } from 'lucide-react-native/icons/percent';
 export { default as ChartNoAxesColumn } from 'lucide-react-native/icons/chart-no-axes-column';
+export { default as Flame } from 'lucide-react-native/icons/flame';

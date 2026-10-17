@@ -59,4 +59,22 @@ zonas restringidas), con geografía más precisa que una caja por ciudad.
 18 (carga del cálculo en tiempo real), 19 (datos históricos de demanda).
 
 ## Preguntas para Carlos
-1. ¿Recargo dinámico automático o solo manual por zona? Recomendado: manual por zona al principio.
+1. ~~¿Recargo dinámico automático o solo manual por zona?~~ **Decidido** (2026-10-11, Carlos aprobó las
+   recomendaciones): manual por zona al principio. El automático por demanda queda para cuando haya datos.
+
+## Implementación (2026-10-17)
+Contrato en [`docs/api/zonas.md`](../api/zonas.md).
+- **Polígonos sin PostGIS** (decisión técnica): ciudades y zonas guardan `[[lat, lng], ...]` y se comprueban en
+  Python (ray casting), sin instalar la extensión ni shapely. Las ciudades siguen en `service_areas` con un
+  `polygon` opcional; una ciudad sin polígono sigue usando su caja.
+- App `api/apps/zones`: tabla `zones` (recargo, restringida, punto de recogida) con vigencia, caché en Redis,
+  importar/exportar GeoJSON y permisos `zones.view`/`zones.manage` (rol Operaciones).
+- Cotización y pedido: `pickup_restricted` (con sugerencia), `dropoff_restricted`, recargo por zona con su motivo
+  (`surge_reason`, `surge_zone`) y viajes entre ciudades según `intercity_pairs`.
+- Demanda: celdas H3 de resolución 8 contadas en Redis (pedidos y sin motorizado, ventana de 15 min), mapa
+  recalculado cada minuto por el worker, evento `demand.updated` y aviso push "Mucha demanda en …" (máximo 1
+  cada 30 min, se apaga en preferencias). Nombre de la zona o del barrio vía Photon.
+- Admin: página Zonas (editor de polígonos, reglas, vigencia, GeoJSON, simulador de picos fuera de producción)
+  y capa de demanda en Viajes en vivo.
+- App: capa Demanda en conducir con leyenda y aviso; aviso de zona restringida, punto sugerido y texto del
+  recargo por zona para el pasajero.

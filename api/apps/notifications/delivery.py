@@ -44,6 +44,8 @@ def wanted_channel(data: dict[str, Any] | None) -> str:
     kind = payload_type(data)
     if kind == "ride":
         return "ride_offer" if (data or {}).get("event") == "offer" else "ride_updates"
+    if kind == "demand":  # busy zone near a driver (doc 21)
+        return "ride_updates"
     if kind == "safety":
         return "safety"
     if kind == "campaign":

@@ -2,7 +2,7 @@ import re
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, PlainSerializer, field_validator
 
@@ -53,6 +53,10 @@ class Quote(BaseModel):
     duration_s: int
     fare: MoneyStr
     surge_multiplier: MoneyStr
+    # Why there is a surge (doc 21): a zone ("Alta demanda en esta zona"), the hour or the
+    # manual multiplier; None without surge.
+    surge_reason: Literal["zone", "time", "manual"] | None = None
+    surge_zone: str | None = None
     discount: MoneyStr = Decimal("0.00")
     total: MoneyStr  # what the passenger pays: fare - discount
     promotion: PromotionBrief | None = None

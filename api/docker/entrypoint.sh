@@ -23,11 +23,11 @@ case "${PROCESS_TYPE:-api}" in
       --forwarded-allow-ips "${FORWARDED_ALLOW_IPS:-127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}"
     ;;
   worker)
-    exec taskiq worker kuulis.tasks:broker apps.users.tasks apps.notifications.tasks apps.rides.tasks apps.rates.tasks apps.wallet.tasks apps.monitoring.tasks apps.backups.tasks apps.files.metadata apps.privacy.tasks apps.safety.tasks apps.drivers.tasks apps.support.tasks apps.quality.tasks apps.risk.tasks apps.finance.tasks apps.analytics.tasks \
+    exec taskiq worker kuulis.tasks:broker apps.users.tasks apps.notifications.tasks apps.rides.tasks apps.rates.tasks apps.wallet.tasks apps.monitoring.tasks apps.backups.tasks apps.files.metadata apps.privacy.tasks apps.safety.tasks apps.drivers.tasks apps.support.tasks apps.quality.tasks apps.risk.tasks apps.finance.tasks apps.analytics.tasks apps.zones.tasks \
       --workers "${WORKER_CONCURRENCY:-2}" --max-async-tasks "${WORKER_MAX_ASYNC_TASKS:-100}"
     ;;
   scheduler)
-    exec taskiq scheduler kuulis.tasks:scheduler apps.users.tasks apps.notifications.tasks apps.rides.tasks apps.rates.tasks apps.wallet.tasks apps.monitoring.tasks apps.backups.tasks apps.files.metadata apps.privacy.tasks apps.safety.tasks apps.drivers.tasks apps.support.tasks apps.quality.tasks apps.risk.tasks apps.finance.tasks apps.analytics.tasks
+    exec taskiq scheduler kuulis.tasks:scheduler apps.users.tasks apps.notifications.tasks apps.rides.tasks apps.rates.tasks apps.wallet.tasks apps.monitoring.tasks apps.backups.tasks apps.files.metadata apps.privacy.tasks apps.safety.tasks apps.drivers.tasks apps.support.tasks apps.quality.tasks apps.risk.tasks apps.finance.tasks apps.analytics.tasks apps.zones.tasks
     ;;
   *)
     exec "$@"

@@ -49,6 +49,7 @@ from apps.rides.models import (
 from apps.rides.state import OFFER_GRACE, lock_ride, transition, utcnow
 from apps.subscriptions import services as subscriptions
 from apps.users.models import User
+from apps.zones import demand
 from kuulis.core.db import SessionLocal
 from kuulis.core.redis import redis_client
 from kuulis.settings import settings
@@ -205,6 +206,7 @@ async def advance(ride_id: uuid.UUID) -> None:
             transition(ride, RideStatus.NO_DRIVERS)
             await session.commit()
             await unschedule(ride.id)
+            await demand.record(demand.UNMATCHED, ride.pickup_lat, ride.pickup_lng)
             if expired is not None:
                 await _after_expired(expired)
             await events.emit_updated(session, ride)
