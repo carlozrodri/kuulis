@@ -244,6 +244,9 @@ async def serialize_rides(
             "my_rating": RatingRead.model_validate(mine) if mine else None,
             "pin_required": ride.start_pin is not None,
             "start_pin": _pin_for(ride, viewer_id),
+            "note": ride.note,
+            "rider_name": ride.rider_name,
+            "rider_phone": ride.rider_phone if admin or viewer_id == ride.passenger_id else None,
         }
         if admin:
             if driver is not None:
@@ -298,6 +301,7 @@ async def emit_updated(session: AsyncSession, ride: Ride) -> None:
             update={
                 "my_rating": RatingRead.model_validate(mine) if mine else None,
                 "start_pin": _pin_for(ride, user_id),
+                "rider_phone": ride.rider_phone if user_id == ride.passenger_id else None,
             }
         )
         await publish("ride.updated", payload.model_dump(mode="json"), user_ids=[str(user_id)])
@@ -381,6 +385,8 @@ async def build_offer(session: AsyncSession, ride: Ride, offer: RideOffer) -> Of
             photo_url=photo,
         ),
         expires_at=offer.expires_at,
+        note=ride.note,
+        rider_name=ride.rider_name,
     )
 
 

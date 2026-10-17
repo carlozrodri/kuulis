@@ -45,6 +45,7 @@ import { track } from '@/lib/analytics';
 
 import { PaymentChips, PlaceRows } from './components';
 import { PickupZoneNotice } from './PickupZoneNotice';
+import { RideExtras } from './RideExtras';
 import { loadSavedPayment, rideDraft, routedRides, setDraftPayment, setDraftPlace, setDraftPromoCode } from './store';
 
 const isPromoInvalid = (error: unknown) => error instanceof ApiError && error.code === 'promotion_invalid';
@@ -156,11 +157,16 @@ export function QuoteScreen() {
     try {
       let current = quote.data;
       if (secondsUntil(current.expires_at) <= 3) current = (await quote.refetch()).data ?? current;
-      const ride = await request.mutateAsync({ quote_id: current.quote_id, payment_method: payment });
+      const ride = await request.mutateAsync({
+        quote_id: current.quote_id,
+        payment_method: payment,
+        note: draft.note,
+        rider: draft.rider,
+      });
       track('ride_requested', { vehicle_type: 'moto', payment_method: payment, promo: hasDiscount(current) }, draft.pickup);
       routedRides.add(ride.id);
       confirmHaptic();
-      rideDraft.set((d) => ({ ...d, dropoff: null, promoCode: null }));
+      rideDraft.set((d) => ({ ...d, dropoff: null, promoCode: null, note: '', rider: null }));
       router.replace({ pathname: '/ride', params: { id: ride.id } });
     } catch (error) {
       if (handleSuspended(error)) return;
@@ -405,6 +411,8 @@ export function QuoteScreen() {
           </Txt>
         </View>
       ) : null}
+
+      {!quoteError && !blocked ? <RideExtras /> : null}
     </MapSheetLayout>
   );
 }

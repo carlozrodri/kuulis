@@ -11,7 +11,7 @@ import { VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, EmptyState, IconButton, ProgressSteps, StatusPill, Txt } from '@/components/ui';
 import { SignalIndicator } from '@/features/driver/SignalIndicator';
-import { Avatar, PAYMENT_ICONS, RatingBadge, RoundAction } from '@/features/ride/components';
+import { Avatar, PAYMENT_ICONS, RatingBadge, RideNote, RoundAction } from '@/features/ride/components';
 import { CancelSheet, useNow } from '@/features/ride/RideSheets';
 import { chatUnread } from '@/features/ride/store';
 import { PinPad } from '@/features/safety/PinPad';
@@ -141,13 +141,15 @@ export function DriveScreen() {
     } else go();
   };
 
+  // Doc 23: a ride requested for someone else is about the person riding.
+  const riderName = ride.rider_name?.trim().split(/\s+/)[0] || ride.passenger.first_name;
   const title =
     ride.status === 'driver_assigned'
-      ? t('drive.stage.toPickup', { name: ride.passenger.first_name })
+      ? t('drive.stage.toPickup', { name: riderName })
       : ride.status === 'driver_arrived'
-        ? t('drive.stage.waiting', { name: ride.passenger.first_name })
+        ? t('drive.stage.waiting', { name: riderName })
         : ride.status === 'in_progress'
-          ? t('drive.stage.toDropoff', { name: ride.passenger.first_name })
+          ? t('drive.stage.toDropoff', { name: riderName })
           : t(`ride.status.${ride.status}`);
 
   return (
@@ -241,6 +243,8 @@ export function DriveScreen() {
           />
         ) : null}
       </View>
+
+      {!ended ? <RideNote ride={ride} /> : null}
 
       <View style={[styles.collectBox, { backgroundColor: theme.surfaceAlt }]}>
         <View style={styles.collect}>

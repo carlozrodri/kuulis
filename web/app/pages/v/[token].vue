@@ -88,7 +88,7 @@ const vehicle = computed(() => {
 
         <div class="card">
           <p class="eyebrow">
-            {{ t('shared.following', { name: ride.passenger.first_name }) }}
+            {{ ride.for_rider ? t('shared.forRider', { name: ride.passenger.first_name }) : t('shared.following', { name: ride.passenger.first_name }) }}
           </p>
           <h1>{{ statusText }}</h1>
           <p
@@ -135,6 +135,25 @@ const vehicle = computed(() => {
             target="_blank"
             rel="noopener"
           >{{ t('shared.openMaps') }}</a>
+
+          <div
+            v-if="ride.start_pin"
+            class="pin"
+            role="note"
+          >
+            <p class="muted">
+              {{ t('shared.pinLabel') }}
+            </p>
+            <p
+              class="pin-code"
+              :aria-label="ride.start_pin.split('').join(' ')"
+            >
+              {{ ride.start_pin }}
+            </p>
+            <p class="muted small">
+              {{ t('shared.pinHelp') }}
+            </p>
+          </div>
 
           <div
             v-if="ride.driver"
@@ -216,6 +235,26 @@ h1 {
 
 .sos {
   margin-bottom: 16px;
+}
+
+.pin {
+  background: var(--surface-alt);
+  border-radius: 16px;
+  margin: 16px 0;
+  padding: 16px;
+  text-align: center;
+}
+
+.pin p {
+  margin: 0;
+}
+
+.pin-code {
+  font-size: 2.4rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  letter-spacing: 0.4em;
+  padding-left: 0.4em;
 }
 
 .map {

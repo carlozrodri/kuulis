@@ -2,7 +2,7 @@ import { Linking, Share } from 'react-native';
 
 import { createShareLink } from '@/hooks/useSafety';
 import { whatsappUrl } from '@/lib/profile';
-import { liveShareMessage } from '@/lib/safety';
+import { liveShareMessage, riderShareMessage } from '@/lib/safety';
 import type { Ride } from '@/lib/types';
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
@@ -25,5 +25,12 @@ export async function shareLive(ride: Ride, t: Translate, target: { phone?: stri
   const message = liveShareMessage(ride, link.url, t);
   if (target.sheet) await Share.share({ message }).catch(() => undefined);
   else await sendText(message, target.phone);
+  return link;
+}
+
+/** Doc 23: the ride was requested for someone else; WhatsApp to them with the live link (driver, plate, PIN). */
+export async function shareWithRider(ride: Ride, t: Translate) {
+  const link = await createShareLink(ride.id, true);
+  await sendText(riderShareMessage(ride, link.url, t), ride.rider_phone);
   return link;
 }

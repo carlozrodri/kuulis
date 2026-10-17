@@ -10,7 +10,8 @@
     "close": "Cerrar",
     "comingSoon": "Próximamente",
     "openSettings": "Abrir ajustes",
-    "error": "Algo salió mal, inténtalo de nuevo"
+    "error": "Algo salió mal, inténtalo de nuevo",
+    "cancel": "Cancelar"
   },
   "a11y": {
     "showPassword": "Mostrar contraseña",
@@ -113,7 +114,10 @@
       "details": "Ver detalle en la billetera"
     },
     "pendingFee": "Cuota de {{amount}} pendiente. Recarga antes del {{date}} para seguir recibiendo viajes.",
-    "pendingFeeNoDate": "Cuota de {{amount}} pendiente. Recarga para seguir recibiendo viajes."
+    "pendingFeeNoDate": "Cuota de {{amount}} pendiente. Recarga para seguir recibiendo viajes.",
+    "shortcuts": "Lugares guardados",
+    "shortcutHint": "Ver el precio para ir a {{name}}",
+    "addPlace": "Agregar lugar"
   },
   "notifications": {
     "empty": "No tienes notificaciones",
@@ -320,7 +324,10 @@
         "rejected_one": "{{count}} rechazado",
         "rejected_other": "{{count}} rechazados",
         "help": "Escríbele a soporte"
-      }
+      },
+      "compliments": "Cumplidos",
+      "complimentA11y": "{{name}}: {{count}}",
+      "complimentsHint": "Lo que más destacan los pasajeros al calificarte."
     },
     "saved": {
       "title": "Tus lugares",
@@ -343,7 +350,20 @@
       "savedToast": "Guardamos {{name}}",
       "options": "Opciones de {{name}}",
       "change": "Cambiar dirección",
-      "remove": "Quitar lugar"
+      "remove": "Quitar lugar",
+      "saveHere": "Guardar aquí",
+      "pinHint": "Mueve el mapa hasta el punto exacto",
+      "icon": "Ícono",
+      "icons": {
+        "star": "Estrella",
+        "heart": "Corazón",
+        "dumbbell": "Gimnasio",
+        "school": "Estudios",
+        "store": "Tienda",
+        "users": "Familia y amigos",
+        "utensils": "Restaurante",
+        "hospital": "Salud"
+      }
     },
     "contact": {
       "title": "Contactos de confianza",
@@ -762,7 +782,9 @@
     "idempotency_key_reused": "No pudimos enviar esto. Inténtalo de nuevo.",
     "pickup_restricted": "No se puede recoger pasajeros en esta zona. Elige otro punto de recogida.",
     "dropoff_restricted": "No se puede dejar pasajeros en esta zona. Elige otro destino cercano.",
-    "referral_program_closed": "El programa de invitaciones no está recibiendo códigos ahora."
+    "referral_program_closed": "El programa de invitaciones no está recibiendo códigos ahora.",
+    "receipt_unavailable": "El recibo está disponible cuando el viaje termina.",
+    "ride_not_for_rider": "Este viaje no se pidió para otra persona."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -805,7 +827,9 @@
     "dropoffTitle": "Destino",
     "moveMap": "Mueve el mapa para ubicar el punto",
     "confirmPickup": "Confirmar recogida",
-    "confirmDropoff": "Confirmar destino"
+    "confirmDropoff": "Confirmar destino",
+    "saveTitle": "Lugar a guardar",
+    "confirmSave": "Usar este punto"
   },
   "quote": {
     "moto": "Moto",
@@ -850,7 +874,29 @@
       }
     },
     "changePickup": "Cambiar punto de recogida",
-    "zoneSurge": "Alta demanda en esta zona: +{{percent}} %"
+    "zoneSurge": "Alta demanda en esta zona: +{{percent}} %",
+    "rider": {
+      "for": "Para {{name}}",
+      "me": "Para mí",
+      "someoneElse": "Toca para pedir para otra persona",
+      "clear": "Pedir para mí",
+      "title": "¿Para quién es?",
+      "name": "Nombre de quien viaja",
+      "phone": "Teléfono de quien viaja",
+      "phoneHint": "Le enviarás el viaje en vivo por WhatsApp.",
+      "save": "Listo",
+      "nameRequired": "Escribe el nombre de quien viaja.",
+      "phoneInvalid": "Revisa el teléfono (ej. 0414 123 4567)."
+    },
+    "note": {
+      "add": "Nota para el motorizado",
+      "title": "Nota para el motorizado",
+      "hint": "Ej.: estoy en la puerta del edificio azul",
+      "clear": "Quitar la nota",
+      "placeholder": "Estoy en la puerta del edificio azul",
+      "count": "{{count}}/{{max}}",
+      "save": "Guardar nota"
+    }
   },
   "ride": {
     "pickup": "Recogida",
@@ -1005,7 +1051,8 @@
     "addContactHint": "Para enviarles tus viajes con un toque",
     "live": {
       "message": "Sigue mi viaje en Kuulis en vivo: {{url}}\nMotorizado: {{driver}} · Placa {{plate}}\nVoy a: {{dropoff}}",
-      "sosMessage": "🚨 Activé el SOS en Kuulis y puedo necesitar ayuda. Mira dónde estoy en vivo: {{url}}\nMotorizado: {{driver}} · Placa {{plate}}\nIba a: {{dropoff}}"
+      "sosMessage": "🚨 Activé el SOS en Kuulis y puedo necesitar ayuda. Mira dónde estoy en vivo: {{url}}\nMotorizado: {{driver}} · Placa {{plate}}\nIba a: {{dropoff}}",
+      "riderMessage": "{{name}}, te pedí una moto en Kuulis. Síguela en vivo y mira el PIN para el motorizado: {{url}}\nMotorizado: {{driver}} · Placa {{plate}}\nDestino: {{dropoff}}"
     },
     "sos": {
       "short": "SOS",
@@ -2349,5 +2396,23 @@
     "use": "Usar {{name}}",
     "useHint": "Mueve tu punto de recogida ahí, a {{distance}}",
     "moved": "Te recogeremos en {{name}}"
+  },
+  "rideActions": {
+    "repeat": "Repetir",
+    "receipt": "Compartir recibo",
+    "save": "Guardar lugar",
+    "saveTitle": "Guardar el destino como",
+    "receiptTitle": "Recibo de viaje Kuulis N.º {{number}}",
+    "receiptTotal": "Total",
+    "receiptNonFiscal": "Pagado directamente al motorizado. No es una factura fiscal."
+  },
+  "rideNote": {
+    "rider": "Viaja: {{name}}",
+    "noteA11y": "Nota del pasajero: {{note}}",
+    "forTitle": "Este viaje es para {{name}}",
+    "sendBody": "Envíale el viaje en vivo: verá al motorizado, la placa y el PIN de inicio.",
+    "sentBody": "Le enviaste el viaje a {{name}}. Puedes reenviarlo si hace falta.",
+    "sendAgain": "Enviar de nuevo",
+    "send": "Enviar a {{name}} por WhatsApp"
   }
 }

@@ -43,3 +43,24 @@ async def test_other_places_limit(client, user_headers):
     response = await client.post(API, json=body, headers=user_headers)
     assert response.status_code == 409
     assert response.json()["error"]["code"] == "too_many_places"
+
+
+async def test_icon_only_for_other_places(client, user_headers):
+    url = "/api/v1/users/me/places"
+    base = {"address": "Av. Libertador", "lat": 10.49, "lng": -66.87}
+    gym = await client.post(
+        url,
+        json={**base, "kind": "other", "label": "Gym", "icon": "dumbbell"},
+        headers=user_headers,
+    )
+    assert gym.status_code == 201 and gym.json()["icon"] == "dumbbell"
+    changed = await client.patch(
+        f"{url}/{gym.json()['id']}", json={"icon": "heart"}, headers=user_headers
+    )
+    assert changed.json()["icon"] == "heart"
+    home = await client.post(
+        url, json={**base, "kind": "home", "icon": "heart"}, headers=user_headers
+    )
+    assert home.json()["icon"] is None
+    unknown = await client.post(url, json={**base, "icon": "rocket"}, headers=user_headers)
+    assert unknown.status_code == 422

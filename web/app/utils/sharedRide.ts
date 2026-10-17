@@ -39,6 +39,10 @@ export interface SharedRide {
   sos: boolean
   sos_location: LatLng | null
   updated_at: string
+  /** Doc 23: the link was sent to the person riding (the ride was requested for them). */
+  for_rider?: boolean
+  /** Start PIN to tell the driver, until the ride starts (only on links for the person riding). */
+  start_pin?: string | null
 }
 
 /** How often the page asks for the position again. */

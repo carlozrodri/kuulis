@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import {
   ArrowLeftRight,
+  Award,
   Bike,
   ChevronRight,
   FileText,
@@ -105,6 +106,8 @@ export function DriverProfile({
         </Section>
       ) : null}
 
+      {stats?.compliments?.length ? <ComplimentsSection compliments={stats.compliments} /> : null}
+
       <Section title={t('profile.driver.account')}>
         <SubscriptionRow />
         <Card style={{ paddingVertical: space.xxs }}>
@@ -131,6 +134,37 @@ export function DriverProfile({
         </Card>
       </Section>
     </>
+  );
+}
+
+/** Doc 23: compliments passengers gave ("Amable", "Casco limpio"), as badges with how many times. */
+function ComplimentsSection({ compliments }: { compliments: NonNullable<DriverStats['compliments']> }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  return (
+    <Section title={t('profile.driver.compliments')}>
+      <Card style={{ gap: space.sm }}>
+        <View style={styles.badges}>
+          {compliments.map(({ tag, count }) => (
+            <View
+              key={tag}
+              style={[styles.badge, { backgroundColor: theme.accentSoft }]}
+              accessibilityLabel={t('profile.driver.complimentA11y', { name: t(`rating.tag.${tag}`, { defaultValue: tag }), count })}>
+              <Award size={16} color={theme.onAccentSoft} strokeWidth={2.4} />
+              <Txt variant="label" style={{ color: theme.onAccentSoft }}>
+                {t(`rating.tag.${tag}`, { defaultValue: tag })}
+              </Txt>
+              <Txt variant="label" tabular style={{ color: theme.text }}>
+                {count}
+              </Txt>
+            </View>
+          ))}
+        </View>
+        <Txt variant="caption" color="muted">
+          {t('profile.driver.complimentsHint')}
+        </Txt>
+      </Card>
+    </Section>
   );
 }
 
@@ -279,6 +313,8 @@ function DocumentsRow({ driver }: { driver: Driver }) {
 }
 
 const styles = StyleSheet.create({
+  badges: { flexDirection: 'row', flexWrap: 'wrap', gap: space.xs },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 6 },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   vehicle: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   balance: {

@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowUpDown, ChevronLeft, LocateFixed, MapPin, MapPinned, SearchX, X } from '@/components/icons';
 import { IconButton, ListRow, Txt } from '@/components/ui';
 import { ServicePausedPanel } from '@/features/control/ServicePausedPanel';
-import { PLACE_ICONS } from '@/features/profile/PlacePickerScreen';
+import { placeIcon } from '@/features/profile/PlacePickerScreen';
 import { usePlaceName } from '@/features/profile/SavedPlaces';
 import { useSavedPlaces } from '@/hooks/useAccount';
 import { bootstrapStore, useBootstrap } from '@/hooks/useBootstrap';
@@ -181,7 +181,7 @@ export function SearchScreen() {
             {shortcuts.map((place, index) => (
               <ListRow
                 key={place.id}
-                icon={PLACE_ICONS[place.kind]}
+                icon={placeIcon(place)}
                 iconTone={place.kind === 'other' ? 'primary' : 'accent'}
                 title={placeName(place)}
                 subtitle={shortAddress(place.address)}

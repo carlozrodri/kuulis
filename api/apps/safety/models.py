@@ -51,6 +51,8 @@ class RideShareLink(BaseModel):
     token_hash: Mapped[str] = mapped_column(String(64), unique=True)
     created_by_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Doc 23: sent to the person riding (ride requested for someone else); it shows the start PIN.
+    for_rider: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
 
 
 class RideTrack(BaseModel):

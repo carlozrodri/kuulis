@@ -38,6 +38,7 @@ from apps.releases.router import router as releases_router
 from apps.rides.router import admin_drivers_router as rides_admin_drivers_router
 from apps.rides.router import admin_router as rides_admin_router
 from apps.rides.router import driver_router as rides_driver_router
+from apps.rides.router import public_router as rides_public_router
 from apps.rides.router import router as rides_router
 from apps.risk.router import admin_router as risk_admin_router
 from apps.safety.router import admin_router as safety_admin_router
@@ -63,6 +64,7 @@ api_v1 = APIRouter()
 # the same path matters for behaviour; apps/health/tests/test_urls.py checks none hides another.
 api_v1.include_router(rides_driver_router)
 api_v1.include_router(rides_router)
+api_v1.include_router(rides_public_router)
 api_v1.include_router(config_router)
 api_v1.include_router(users_router)
 api_v1.include_router(rates_router)

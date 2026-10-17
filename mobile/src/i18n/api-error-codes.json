@@ -408,7 +408,11 @@
       "apps/users/dependencies.py"
     ],
     "receipt_not_found": [
+      "apps/rides/receipt.py",
       "apps/wallet/receipts.py"
+    ],
+    "receipt_unavailable": [
+      "apps/rides/receipt.py"
     ],
     "recipient_not_found": [
       "apps/wallet/services.py"
@@ -475,6 +479,9 @@
     "ride_not_completed": [
       "apps/rides/state.py",
       "apps/support/services.py"
+    ],
+    "ride_not_for_rider": [
+      "apps/safety/services.py"
     ],
     "ride_not_found": [
       "apps/rides/state.py"

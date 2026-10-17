@@ -306,7 +306,7 @@ async def test_retention(client, passenger, recorder, monkeypatch):
         await session.execute(
             update(Ride)
             .where(Ride.id == uuid.UUID(ride_id))
-            .values(requested_at=old, polyline="abc")
+            .values(requested_at=old, polyline="abc", rider_phone="+584121234567", note="Portón")
         )
         await session.commit()
 
@@ -315,6 +315,7 @@ async def test_retention(client, passenger, recorder, monkeypatch):
     assert result == {
         "chat_messages": 1,
         "routes": 1,
+        "ride_details": 1,
         "tracks": 0,
         "rejected_documents": 1,
         "notifications": 1,

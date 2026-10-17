@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { HandCoins, Navigation, Route } from '@/components/icons';
+import { HandCoins, Navigation, Route, StickyNote, UserRound } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { Txt } from '@/components/ui';
 import { Avatar, CountdownRing, PAYMENT_ICONS, RatingBadge } from '@/features/ride/components';
@@ -131,6 +131,23 @@ export function IncomingOffer({ offer }: { offer: Offer | null }) {
               </Txt>
               <RatingBadge rating={offer.passenger.rating} />
             </View>
+            {offer.rider_name || offer.note ? (
+              // Doc 23: requested for someone else, and the passenger's note, before accepting.
+              <View style={styles.note}>
+                {offer.rider_name ? (
+                  <View style={styles.metaRow}>
+                    <UserRound size={16} color={c.accent} strokeWidth={2.4} />
+                    <Text style={styles.noteStrong}>{t('rideNote.rider', { name: offer.rider_name })}</Text>
+                  </View>
+                ) : null}
+                {offer.note ? (
+                  <View style={styles.metaRow}>
+                    <StickyNote size={16} color={c.accent} strokeWidth={2.4} />
+                    <Text style={styles.noteText}>“{offer.note}”</Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
             <View style={styles.metaRow}>
               <Navigation size={16} color={c.primary} strokeWidth={2.4} />
               <Text style={styles.meta}>
@@ -235,6 +252,9 @@ const styles = StyleSheet.create({
   card: { alignSelf: 'stretch', backgroundColor: c.surface, borderRadius: radius.card, padding: space.lg, gap: space.sm },
   passenger: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
+  note: { gap: 6, backgroundColor: c.surfaceAlt, borderRadius: radius.tile, paddingHorizontal: 12, paddingVertical: space.xs },
+  noteStrong: { fontFamily: fonts.bold, fontSize: 15, color: c.text, flex: 1 },
+  noteText: { fontFamily: fonts.semibold, fontSize: 15, color: c.text, flex: 1 },
   meta: { fontFamily: fonts.semibold, fontSize: 15, color: c.text },
   divider: { height: 1, backgroundColor: c.border, marginVertical: space.xs },
   placeRow: { flexDirection: 'row', alignItems: 'flex-start', gap: space.sm },

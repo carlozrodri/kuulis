@@ -12,8 +12,16 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.drivers.models import DriverProfile
-from apps.rides.models import Ride, RideStatus
-from apps.rides.schemas import DriverStats, FrequentPlace, PassengerStats, PeriodStats, StatsDay
+from apps.rides.models import Rating, RatingRole, Ride, RideStatus
+from apps.rides.schemas import (
+    PASSENGER_TAGS,
+    Compliment,
+    DriverStats,
+    FrequentPlace,
+    PassengerStats,
+    PeriodStats,
+    StatsDay,
+)
 from kuulis.core.calendar import CARACAS_TZ, add_months, days_bounds, local_now, month_start
 
 ZERO = Decimal("0.00")
@@ -56,6 +64,7 @@ async def driver_stats(session: AsyncSession, user_id: uuid.UUID) -> DriverStats
     rating = await session.scalar(
         select(DriverProfile.rating_avg).where(DriverProfile.user_id == user_id)
     )
+    compliments = await driver_compliments(session, user_id)
     yesterday = today - timedelta(days=1)
     by_day = {day: (n, total) for day, n, total in rows}
     return DriverStats(
@@ -74,7 +83,29 @@ async def driver_stats(session: AsyncSession, user_id: uuid.UUID) -> DriverStats
         ],
         total_rides=total_rides or 0,
         rating=float(rating) if rating is not None else None,
+        compliments=compliments,
     )
+
+
+async def driver_compliments(session: AsyncSession, user_id: uuid.UUID) -> list[Compliment]:
+    """Doc 23: how many times passengers gave each tag ("Muy amable", "Casco limpio")."""
+    tag = func.unnest(Rating.tags).label("tag")
+    tags = (
+        select(tag)
+        .where(
+            Rating.ratee_id == user_id,
+            Rating.rater_role == RatingRole.PASSENGER,
+            Rating.ignored.is_(False),
+        )
+        .subquery()
+    )
+    rows = await session.execute(
+        select(tags.c.tag, func.count())
+        .where(tags.c.tag.in_(PASSENGER_TAGS))
+        .group_by(tags.c.tag)
+        .order_by(func.count().desc(), tags.c.tag)
+    )
+    return [Compliment(tag=t, count=n) for t, n in rows]
 
 
 async def passenger_stats(session: AsyncSession, user_id: uuid.UUID) -> PassengerStats:

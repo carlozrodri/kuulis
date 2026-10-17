@@ -9,7 +9,8 @@ de primer nivel y que no requieren costos de operación.
 ## Estado actual
 - Buscar destino con Photon, fijar en el mapa, cotizar con equivalente en Bs (BCV y Binance), elegir método de
   pago y pago preferido, historial con recibos y **lugares frecuentes calculados** desde los viajes.
-- No hay lugares guardados con nombre (Casa, Trabajo), ni pedir para otra persona, ni programar, ni paradas.
+- ~~No hay lugares guardados con nombre (Casa, Trabajo), ni pedir para otra persona, ni programar, ni
+  paradas.~~ Hecho en 2026-10-17 salvo programar (decidido: no) y paradas (fuera). Ver Implementación.
 
 ## Alcance
 ### Incluye
@@ -59,4 +60,26 @@ de primer nivel y que no requieren costos de operación.
 11 para enviar el enlace en vivo a la persona que viaja.
 
 ## Preguntas para Carlos
-1. ¿Programar viajes entra? Recomendado: no al lanzar; medir primero.
+1. ~~¿Programar viajes entra?~~ **Decidido** (2026-10-11, Carlos aprobó las recomendaciones): no al lanzar;
+   medir primero. El punto 6 queda fuera.
+
+## Implementación (2026-10-17)
+Contrato en [`docs/api/mejoras-pasajero.md`](../api/mejoras-pasajero.md).
+- **Lugares guardados**: parte de lo que ya existía (`da5bb1e`: Casa, Trabajo y hasta 10 más, buscador con
+  guardados arriba). Se suma el ícono de los "otros" (8 a elegir), accesos de un toque en el inicio (Casa →
+  precio → Pedir; los que faltan invitan a agregarlos), guardar desde un viaje del historial y fijar el punto
+  en el mapa. El orden queda fijo (Casa, Trabajo, luego por fecha), así que no hizo falta `position`.
+- **Pedir para otra persona**: `rides.rider_name` y `rides.rider_phone`; los contactos de confianza se eligen
+  con un toque. El motorizado ve "Viaja: María" en la oferta y en el viaje, nunca el teléfono. Con el motorizado
+  asignado, el pasajero envía por WhatsApp un enlace en vivo para quien viaja (`for_rider`) que además muestra el
+  PIN de inicio.
+- **Nota para el motorizado** (`rides.note`, 140 caracteres) en la oferta, el viaje, el detalle y el admin.
+- **Repetir** desde el historial y el detalle: misma ruta, precio nuevo. "Intentar de nuevo" conserva nota y
+  persona.
+- **Recibo compartible**: imagen PNG generada en la API (con la fuente de la app) detrás de un enlace firmado,
+  con ruta, total en USD y en Bs a la tasa congelada, método de pago acordado y "no es factura fiscal". Se
+  comparte con texto desde el historial (pasajero y motorizado). Sin módulos nativos nuevos: sale por OTA.
+- **Cumplidos**: las etiquetas de la calificación (`ratings.tags`) se cuentan en `GET /drivers/me/stats`
+  (sin las calificaciones ignoradas por el doc 16) y se muestran como insignias en el perfil del motorizado.
+- Privacidad: quien viaja, su teléfono y la nota se borran a los 180 días (como la ruta) y al eliminar la
+  cuenta del pasajero; salen en "Descargar mis datos".

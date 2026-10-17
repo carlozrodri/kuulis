@@ -91,6 +91,15 @@ class ShareClosedError(ConflictError):
     message = "Only an active ride can be shared"
 
 
+# Until the ride starts the driver asks for the PIN (as apps.rides.events.PIN_STATUSES).
+_PIN_STATUSES = frozenset({RideStatus.DRIVER_ASSIGNED, RideStatus.DRIVER_ARRIVED})
+
+
+class NotForRiderError(ConflictError):
+    code = "ride_not_for_rider"
+    message = "This ride was not requested for someone else"
+
+
 class ShareNotFoundError(NotFoundError):
     code = "share_not_found"
     message = "This link does not exist"
@@ -206,7 +215,9 @@ async def _open_sos(session: AsyncSession, ride_id: uuid.UUID) -> SafetyAlert | 
     )
 
 
-async def _new_link(session: AsyncSession, ride: Ride, user: User) -> ShareLink:
+async def _new_link(
+    session: AsyncSession, ride: Ride, user: User, *, for_rider: bool = False
+) -> ShareLink:
     count = await session.scalar(
         select(func.count()).where(
             RideShareLink.ride_id == ride.id, RideShareLink.created_by_id == user.id
@@ -223,18 +234,26 @@ async def _new_link(session: AsyncSession, ride: Ride, user: User) -> ShareLink:
         if oldest is not None:
             await session.delete(oldest)
     token = secrets.token_urlsafe(16)  # 128 bits
-    session.add(RideShareLink(ride_id=ride.id, token_hash=_hash(token), created_by_id=user.id))
+    session.add(
+        RideShareLink(
+            ride_id=ride.id, token_hash=_hash(token), created_by_id=user.id, for_rider=for_rider
+        )
+    )
     return ShareLink(url=share_url(token), token=token)
 
 
-async def share(session: AsyncSession, user: User, ride_id: uuid.UUID) -> ShareLink:
+async def share(
+    session: AsyncSession, user: User, ride_id: uuid.UUID, *, for_rider: bool = False
+) -> ShareLink:
     ride = await _participant_ride(session, user, ride_id)
+    if for_rider and (user.id != ride.passenger_id or not ride.rider_name):
+        raise NotForRiderError()
     await control.ensure_enabled(
         session, "share_live_link", Audience(ident=str(user.id), role=_role(ride, user.id))
     )
     if ride.status not in ACTIVE_STATUSES and await _open_sos(session, ride.id) is None:
         raise ShareClosedError(details={"status": ride.status.value})
-    link = await _new_link(session, ride, user)
+    link = await _new_link(session, ride, user, for_rider=for_rider)
     await session.commit()
     return link
 
@@ -292,7 +311,12 @@ async def shared_ride(session: AsyncSession, token: str) -> SharedRide:
             "address": ride.dropoff_address,
         },
         polyline=ride.polyline,
-        passenger=SharedPerson(first_name=_first_name(passenger)),
+        # Requested for someone else (doc 23): the page is about the person riding.
+        passenger=SharedPerson(
+            first_name=(ride.rider_name or "").split()[0]
+            if ride.rider_name
+            else _first_name(passenger)
+        ),
         driver=driver_brief,
         vehicle=VehicleBrief.model_validate(ride.vehicle) if ride.vehicle else None,
         driver_location=location,
@@ -301,6 +325,8 @@ async def shared_ride(session: AsyncSession, token: str) -> SharedRide:
         sos=sos is not None,
         sos_location=sos_location,
         updated_at=utcnow(),
+        for_rider=link.for_rider,
+        start_pin=ride.start_pin if link.for_rider and ride.status in _PIN_STATUSES else None,
     )
 
 

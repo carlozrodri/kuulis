@@ -76,7 +76,7 @@ describe('quote: zones (doc 21)', () => {
 
   beforeEach(async () => {
     mockApi.mockReset();
-    rideDraft.set({ pickup: PICKUP, pickupIsCurrent: false, dropoff: DROPOFF, paymentMethod: 'cash_usd', promoCode: null });
+    rideDraft.set({ pickup: PICKUP, pickupIsCurrent: false, dropoff: DROPOFF, paymentMethod: 'cash_usd', promoCode: null, note: '', rider: null });
     await i18n.changeLanguage('es');
   });
 

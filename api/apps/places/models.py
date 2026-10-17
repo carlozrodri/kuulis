@@ -38,3 +38,5 @@ class SavedPlace(BaseModel):
     address: Mapped[str] = mapped_column(String(300))
     lat: Mapped[float] = mapped_column(Float)
     lng: Mapped[float] = mapped_column(Float)
+    # Doc 23: icon of an "other" place (schemas.PlaceIcon); home and work have their own.
+    icon: Mapped[str | None] = mapped_column(String(16))

@@ -5,6 +5,8 @@ Retention (``apply_retention``, run by ``apps.privacy.tasks`` once a day):
 - chat messages: 180 days, unless the ride has a report;
 - planned route of a ride: 180 days, unless the ride has a report;
 - real path of a ride (doc 11): 180 days, unless the ride has a report or a safety alert;
+- who a ride was requested for and the note for the driver (doc 23): 180 days, unless the ride
+  has a report;
 - rejected driver documents: 30 days after the review (file included);
 - inbox notifications: 90 days;
 - exports: the file is deleted when its link expires (24 h).
@@ -245,6 +247,11 @@ async def export_data(session: AsyncSession, user: User) -> dict[str, Any]:
             "fare_usd": _money(r.fare),
             "discount_usd": _money(r.discount),
             "payment_method": r.payment_method.value,
+            **(
+                {"note": r.note, "rider_name": r.rider_name, "rider_phone": r.rider_phone}
+                if r.passenger_id == user.id
+                else {}
+            ),
         }
         for r in rides
     ]
@@ -402,6 +409,10 @@ async def scrub(session: AsyncSession, user: User, was_suspended: bool) -> list[
             dropoff_lat=_rounded(Ride.dropoff_lat),
             dropoff_lng=_rounded(Ride.dropoff_lng),
             polyline=None,
+            # Doc 23: who they requested for and what they told the driver.
+            rider_name=None,
+            rider_phone=None,
+            note=None,
         )
     )
     # The driver's plate in the rides they drove.
@@ -490,6 +501,15 @@ async def apply_retention(session: AsyncSession, now: datetime | None = None) ->
         )
         .values(polyline=None)
     )
+    riders = await session.execute(
+        update(Ride)
+        .where(
+            or_(Ride.rider_phone.is_not(None), Ride.note.is_not(None)),
+            Ride.requested_at < now - timedelta(days=ROUTE_DAYS),
+            ~exists().where(Report.ride_id == Ride.id),
+        )
+        .values(rider_name=None, rider_phone=None, note=None)
+    )
     from apps.safety.models import RideTrack, SafetyAlert
 
     tracks = await session.execute(
@@ -527,6 +547,7 @@ async def apply_retention(session: AsyncSession, now: datetime | None = None) ->
     return {
         "chat_messages": chats.rowcount or 0,
         "routes": routes.rowcount or 0,
+        "ride_details": riders.rowcount or 0,
         "tracks": tracks.rowcount or 0,
         "rejected_documents": documents,
         "notifications": notifications.rowcount or 0,

@@ -1056,7 +1056,10 @@
       "yes": "Sí",
       "no": "No",
       "at": "Hora"
-    }
+    },
+    "rider": "Viaja",
+    "riderHelp": "Pedido para otra persona",
+    "note": "Nota para el motorizado"
   },
   "live": {
     "activeRides": "Viajes ({n})",

@@ -3,18 +3,19 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CircleX, Route } from '@/components/icons';
+import { CircleX, Repeat, Route } from '@/components/icons';
 import { Button, Card, EmptyState, Skeleton, StatusPill, TAB_BAR_SPACE, type Tone, Txt } from '@/components/ui';
 import { DriverStatsPanel } from '@/features/driver/DriverStatsPanel';
 import { useDriverStats, useRideHistory } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { amountToPay } from '@/lib/money';
-import { formatFare } from '@/lib/ride';
+import { formatFare, isActiveStatus } from '@/lib/ride';
 import type { Ride, RideStatus } from '@/lib/types';
 import { useMode } from '@/providers/ModeProvider';
 import { radius, space, useTheme } from '@/theme';
 
 import { PlaceRows } from './components';
+import { repeat } from './RideActions';
 
 export const STATUS_TONE: Record<RideStatus, Tone> = {
   searching: 'info',
@@ -56,7 +57,15 @@ export function HistoryScreen() {
           </Txt>
         </View>
         <PlaceRows pickup={item.pickup} dropoff={item.dropoff} compact />
-        <StatusPill label={t(`ride.status.${item.status}`)} tone={STATUS_TONE[item.status] ?? 'neutral'} />
+        <View style={styles.itemTop}>
+          <View style={{ flex: 1, alignItems: 'flex-start' }}>
+            <StatusPill label={t(`ride.status.${item.status}`)} tone={STATUS_TONE[item.status] ?? 'neutral'} />
+          </View>
+          {role === 'passenger' && !isActiveStatus(item.status) ? (
+            // Doc 23: same route again with one tap (a new price).
+            <Button title={t('rideActions.repeat')} icon={Repeat} variant="secondary" size="sm" style={styles.repeat} onPress={() => repeat(item)} />
+          ) : null}
+        </View>
       </Card>
     );
   };
@@ -115,4 +124,5 @@ export function HistoryScreen() {
 const styles = StyleSheet.create({
   item: { gap: space.sm, padding: space.md },
   itemTop: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  repeat: { marginTop: 0 },
 });

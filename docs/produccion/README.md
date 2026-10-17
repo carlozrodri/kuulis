@@ -112,6 +112,10 @@ construir. Las preguntas de cada documento están en su sección final.
   persona al mes, presupuesto, sin premio si comparten datos con quien invita, premio retenido con riesgo alto,
   página Referidos en el admin, progreso de cada invitado en la app y página web `/i/{código}`. Solo motorizados
   (decidido).
+- **23** hecho (2026-10-17): accesos a Casa y Trabajo en el inicio, íconos y guardar desde el historial o el mapa,
+  pedir para otra persona (el motorizado ve su nombre y ella recibe por WhatsApp el enlace en vivo con el PIN),
+  nota para el motorizado, repetir viaje, recibo en imagen con USD y Bs y cumplidos en el perfil del motorizado.
+  Programar viajes queda fuera (decidido).
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

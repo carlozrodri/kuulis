@@ -497,6 +497,10 @@ export interface AdminRide extends Ride {
   // ---- Doc 15. ----
   reassigned_from_driver_id?: string | null
   cancellations?: RideCancellation[]
+  // ---- Doc 23: requested for someone else, and the passenger's note for the driver. ----
+  rider_name?: string | null
+  rider_phone?: string | null
+  note?: string | null
 }
 
 /** GET /admin/drivers/online. */
