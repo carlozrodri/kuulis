@@ -60,23 +60,19 @@ const vehicle = computed(() => {
 </script>
 
 <template>
-  <section class="section">
-    <div class="container box">
-      <div
-        v-if="state === 'ended' || state === 'invalid' || (state === 'failed' && !ride)"
-        class="card"
-      >
-        <KuulisWordmark
-          :size="26"
-          class="mark"
-        />
-        <h1>{{ t(`shared.${state}Title`) }}</h1>
-        <p class="muted">
-          {{ t(`shared.${state}Body`) }}
-        </p>
-      </div>
+  <UtilityCard v-if="state === 'ended' || state === 'invalid' || (state === 'failed' && !ride)">
+    <h1>{{ t(`shared.${state}Title`) }}</h1>
+    <p class="muted">
+      {{ t(`shared.${state}Body`) }}
+    </p>
+  </UtilityCard>
 
-      <template v-else-if="ride">
+  <section
+    v-else
+    class="shared"
+  >
+    <div class="box">
+      <template v-if="ride">
         <p
           v-if="ride.sos"
           class="notice notice-danger sos"
@@ -87,7 +83,11 @@ const vehicle = computed(() => {
         </p>
 
         <div class="card">
-          <p class="eyebrow">
+          <p class="context">
+            <span
+              class="dot"
+              aria-hidden="true"
+            />
             {{ ride.for_rider ? t('shared.forRider', { name: ride.passenger.first_name }) : t('shared.following', { name: ride.passenger.first_name }) }}
           </p>
           <h1>{{ statusText }}</h1>
@@ -212,25 +212,38 @@ const vehicle = computed(() => {
 </template>
 
 <style scoped>
-.box {
-  max-width: 520px;
+.shared {
+  padding: clamp(24px, 6vw, 72px) var(--gutter) var(--section-y);
 }
 
-.mark {
-  color: var(--primary);
-  display: block;
-  margin-bottom: 24px;
+.box {
+  max-width: 520px;
+  margin: 0 auto;
 }
 
 h1 {
-  font-size: 1.6rem;
-  margin: 4px 0;
+  margin: var(--space-1) 0;
+  font-size: var(--font-h2);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
 }
 
-.eyebrow {
-  color: var(--primary);
-  font-weight: 700;
+/* Whose ride this is, as a route stop. */
+.context {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   margin: 0;
+  font-weight: 700;
+}
+
+.dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: inset 0 0 0 3px var(--primary);
 }
 
 .sos {
@@ -278,9 +291,9 @@ h1 {
   width: 18px;
   height: 18px;
   margin: -9px 0 0 -9px;
-  border: 3px solid #fff;
+  border: 3px solid var(--map-ring);
   border-radius: 50%;
-  box-shadow: 0 1px 4px rgb(0 0 0 / 35%);
+  box-shadow: var(--map-shadow);
 }
 
 .marker.pickup {
@@ -288,7 +301,7 @@ h1 {
 }
 
 .marker.dropoff {
-  background: #14201b;
+  background: var(--map-ink);
 }
 
 .marker.moto {
@@ -310,8 +323,8 @@ h1 {
   right: 6px;
   bottom: 4px;
   font-size: 0.7rem;
-  color: #14201b;
-  background: rgb(255 255 255 / 80%);
+  color: var(--map-ink);
+  background: var(--map-label);
   padding: 0 4px;
   border-radius: 4px;
 }

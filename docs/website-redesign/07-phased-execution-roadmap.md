@@ -171,6 +171,18 @@ Reglas para todos los milestones:
 - **Validación:** V + e2e de cada flujo funcional contra QA o API simulada + axe.
 - **Depende de:** M2.
 - **Riesgos:** regresión en flujos con token → probar con tokens reales de QA.
+- **Hecho (2026-10-17):** `/descargar` en campo verde con la versión publicada en una tarjeta (botón verde: dentro
+  de una tarjeta sobre verde o tinta el botón principal vuelve a verde), un iPhone ve primero su respuesta, el aviso
+  «Descárgala solo desde aquí» como bloque destacado y los cuatro pasos sobre la ruta (`RouteStops`; las capturas
+  A2 del proceso en Android siguen pendientes y se añaden cuando existan). `PageHead` (parada de ruta + titular con
+  punto + entradilla) sustituye los eyebrows en ayuda, contacto, legal e invitación; `LinkList` (filas con línea
+  divisoria) sustituye las tarjetas de artículos y textos legales; `UtilityCard` enmarca verificar correo, nueva
+  contraseña, invitación inexistente y viaje compartido terminado; el error muestra el código como cifra. Contacto
+  en dos columnas en escritorio. Sin botones amarillos sobre fondo claro. `invite.freeMonth` corregido: los días
+  cuentan desde la aprobación (`referrals/services.py`) y el premio es un mes de cuota. Colores sueltos pasados a
+  tokens (`--on-band-soft`, `--on-band-line`, `--map-*`); se eliminan `.eyebrow`, `.grid-2` y `.grid-3`. La lógica
+  de cada página no cambia; `tests/e2e/pages.spec.ts` cubre el envío de contacto, la búsqueda de ayuda, el APK y su
+  huella, el iPhone primero y los estados sin salida. Lighthouse móvil local: rendimiento 92–95, accesibilidad 100.
 
 ## M8 · Producción e integración de assets
 - **Objetivo:** sustituir todo lo provisional por assets finales.

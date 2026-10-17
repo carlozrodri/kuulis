@@ -20,6 +20,8 @@ useSeoMeta({
 })
 
 const copied = ref(false)
+const steps = computed(() => (['download', 'signUp', 'code'] as const).map(key => ({ key, body: t(`invite.steps.${key}`) })))
+
 async function copy() {
   try {
     await navigator.clipboard.writeText(code.value)
@@ -33,34 +35,30 @@ async function copy() {
 </script>
 
 <template>
-  <section class="section">
-    <div class="container narrow">
-      <div
-        v-if="!invite"
-        class="card"
-      >
-        <KuulisWordmark
-          :size="26"
-          class="mark"
-        />
-        <h1>{{ t('invite.invalidTitle') }}</h1>
-        <p class="muted">
-          {{ t('invite.invalidBody') }}
-        </p>
-        <NuxtLinkLocale
-          class="btn btn-primary"
-          to="/motorizados"
-        >
-          {{ t('invite.drivers') }}
-        </NuxtLinkLocale>
-      </div>
+  <UtilityCard v-if="!invite">
+    <h1>{{ t('invite.invalidTitle') }}</h1>
+    <p class="muted">
+      {{ t('invite.invalidBody') }}
+    </p>
+    <NuxtLinkLocale
+      class="btn btn-primary wide"
+      to="/motorizados"
+    >
+      {{ t('invite.drivers') }}
+    </NuxtLinkLocale>
+  </UtilityCard>
 
-      <template v-else>
-        <span class="eyebrow">{{ t('invite.eyebrow') }}</span>
-        <h1>{{ title }}</h1>
-        <p class="lead">
-          {{ t('invite.lead') }}
-        </p>
+  <div
+    v-else
+    class="container-wide invite"
+  >
+    <div class="grid-invite">
+      <div>
+        <PageHead
+          :stop="t('invite.stop')"
+          :title="title"
+          :lead="t('invite.lead')"
+        />
         <p
           v-if="invite.program.active && invite.program.referred_free_month"
           class="notice notice-success"
@@ -69,91 +67,128 @@ async function copy() {
         </p>
         <p
           v-if="!invite.program.active"
-          class="notice"
+          class="notice paused"
         >
           {{ t('invite.paused') }}
         </p>
+      </div>
 
-        <div class="card code-card">
-          <p class="muted small">
-            {{ t('invite.codeLabel') }}
-          </p>
-          <p class="code">
-            {{ formatInviteCode(invite.code) }}
-          </p>
-          <button
-            type="button"
-            class="btn btn-ghost"
-            @click="copy"
-          >
-            {{ copied ? t('invite.copied') : t('invite.copy') }}
-          </button>
-        </div>
-
-        <ol class="steps">
-          <li>{{ t('invite.steps.download') }}</li>
-          <li>{{ t('invite.steps.signUp') }}</li>
-          <li>{{ t('invite.steps.code') }}</li>
-        </ol>
-
-        <div class="actions">
-          <NuxtLinkLocale
-            class="btn btn-accent"
-            to="/descargar"
-          >
-            {{ t('invite.download') }}
-          </NuxtLinkLocale>
-          <a
-            class="btn btn-ghost"
-            :href="appInviteLink(invite.code)"
-          >{{ t('invite.openApp') }}</a>
-        </div>
-        <p class="muted small">
-          {{ t('invite.more') }}
-          <NuxtLinkLocale to="/motorizados">
-            {{ t('invite.drivers') }}
-          </NuxtLinkLocale>
+      <div class="card code-card">
+        <p class="label">
+          {{ t('invite.codeLabel') }}
         </p>
-      </template>
+        <p class="code">
+          {{ formatInviteCode(invite.code) }}
+        </p>
+        <button
+          type="button"
+          class="btn btn-ghost"
+          @click="copy"
+        >
+          {{ copied ? t('invite.copied') : t('invite.copy') }}
+        </button>
+        <span
+          class="sr-only"
+          aria-live="polite"
+        >{{ copied ? t('invite.copied') : '' }}</span>
+      </div>
     </div>
-  </section>
+
+    <RouteStops
+      class="steps"
+      :items="steps"
+    />
+
+    <div class="actions">
+      <NuxtLinkLocale
+        class="btn btn-primary"
+        to="/descargar"
+      >
+        {{ t('invite.download') }}
+      </NuxtLinkLocale>
+      <a
+        class="btn btn-ghost"
+        :href="appInviteLink(invite.code)"
+      >{{ t('invite.openApp') }}</a>
+    </div>
+    <p class="more">
+      {{ t('invite.more') }}
+      <NuxtLinkLocale to="/motorizados">
+        {{ t('invite.drivers') }}
+      </NuxtLinkLocale>
+    </p>
+  </div>
 </template>
 
 <style scoped>
-.mark {
-  color: var(--primary);
-  display: block;
-  margin-bottom: 24px;
+.invite {
+  padding-bottom: var(--section-y);
+}
+
+.grid-invite {
+  display: grid;
+  gap: var(--space-6);
+  align-items: end;
+  margin-bottom: var(--space-8);
+}
+
+.notice {
+  max-width: 40rem;
+  margin: 0;
+}
+
+.paused {
+  background: var(--surface-alt);
 }
 
 .code-card {
-  margin: 24px 0;
   text-align: center;
 }
 
+.label {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-small);
+  font-weight: 600;
+}
+
 .code {
-  font-size: 2.2rem;
+  margin: var(--space-2) 0 var(--space-4);
+  font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
   font-weight: 800;
   letter-spacing: 0.12em;
-  margin: 4px 0 12px;
   font-variant-numeric: tabular-nums;
 }
 
 .steps {
-  display: grid;
-  gap: 8px;
-  margin: 0 0 24px;
-  padding-left: 1.25rem;
+  margin-bottom: var(--space-7);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
-.small {
-  font-size: 0.9rem;
+.more {
+  margin: 0;
+  color: var(--muted);
+}
+
+.more a {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+@media (min-width: 960px) {
+  .grid-invite {
+    grid-template-columns: 7fr 4fr;
+    column-gap: var(--space-9);
+  }
+
+  .code-card {
+    margin-bottom: var(--space-7);
+  }
 }
 </style>

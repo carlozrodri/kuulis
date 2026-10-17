@@ -86,7 +86,7 @@ async function vote(helpful: boolean) {
       <LegalMarkdown :source="article.body_md" />
 
       <div
-        class="card feedback"
+        class="feedback"
         aria-live="polite"
       >
         <template v-if="feedback === 'yes' || feedback === 'no'">
@@ -143,33 +143,47 @@ async function vote(helpful: boolean) {
 </template>
 
 <style scoped>
+.section {
+  padding: clamp(40px, 7vw, 96px) 0 var(--section-y);
+}
+
 .crumbs {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 20px;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  margin-bottom: var(--space-4);
 }
 
 .crumbs a {
+  color: var(--primary);
   font-weight: 700;
   text-decoration: none;
 }
 
 h1 {
-  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-h1);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-heading);
 }
 
 .small {
-  font-size: 0.9rem;
+  margin: 0 0 var(--space-7);
+  font-size: var(--font-small);
 }
 
 .feedback {
-  margin-top: 40px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
 }
 
 .feedback p {
@@ -187,15 +201,27 @@ h1 {
 
 .actions {
   display: flex;
-  gap: 10px;
+  gap: var(--space-2);
 }
 
 .small-btn {
   min-height: 44px;
-  padding: 0 22px;
+  padding: 0 var(--space-5);
 }
 
 .still {
-  margin-top: 40px;
+  margin-top: var(--space-8);
+  padding-top: var(--space-7);
+  border-top: 1px solid var(--border);
+}
+
+.still h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-h2);
+  letter-spacing: var(--tracking-heading);
+}
+
+.still p {
+  margin: 0 0 var(--space-5);
 }
 </style>

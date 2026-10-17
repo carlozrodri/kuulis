@@ -20,7 +20,7 @@ if (error.value && !doc.value) {
 }
 
 useSeoMeta({
-  title: () => doc.value?.title ?? t('legal.title'),
+  title: () => doc.value?.title ?? t('legal.metaTitle'),
   description: () => t('legal.metaDescription'),
 })
 </script>
@@ -35,7 +35,7 @@ useSeoMeta({
         to="/legal"
         class="back"
       >
-        ← {{ t('legal.title') }}
+        ← {{ t('legal.back') }}
       </NuxtLinkLocale>
       <h1>{{ doc.title }}</h1>
       <p class="muted">
@@ -47,14 +47,28 @@ useSeoMeta({
 </template>
 
 <style scoped>
+.section {
+  padding: clamp(40px, 7vw, 96px) 0 var(--section-y);
+}
+
 .back {
-  display: inline-block;
-  margin-bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: var(--space-4);
+  color: var(--primary);
   font-weight: 700;
   text-decoration: none;
 }
 
 h1 {
-  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-h1);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-heading);
+}
+
+.muted {
+  margin: 0 0 var(--space-7);
 }
 </style>

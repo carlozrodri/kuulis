@@ -49,3 +49,5 @@ Carlos respondió «apruebo todo»: vale la opción recomendada de cada pregunta
 | M3 · Inicio: hero y precio claro | Primer paso hecho 2026-10-17; faltan las capturas de la app (ver 07 M3) |
 | M4 · Inicio: resto de secciones | Hecho 2026-10-17 (ver 07 M4) |
 | M6 · Motorizados y Seguridad | Hecho 2026-10-17 (ver 07 M6) |
+| M7 · Descargar y páginas secundarias | Hecho 2026-10-17 (ver 07 M7) |
+| M8 · Producción e integración de assets | Siguiente |

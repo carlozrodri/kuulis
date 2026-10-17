@@ -365,7 +365,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   gap: var(--space-4);
   padding-top: var(--space-6);
-  border-top: 1px solid rgb(255 255 255 / 16%);
+  border-top: 1px solid var(--on-band-line);
 }
 
 .panel-foot a {
