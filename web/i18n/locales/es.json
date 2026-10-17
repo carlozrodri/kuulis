@@ -22,7 +22,11 @@
     "legal": "Legal",
     "helpCenter": "Centro de ayuda",
     "whatsapp": "WhatsApp",
-    "language": "Idioma"
+    "language": "Idioma",
+    "photos": "Fotos",
+    "photoNight": "“Evening in Caracas”, Stig Nygaard",
+    "photoAvila": "“Caracas Altamira”, Cabruta08",
+    "license": "CC BY 2.0"
   },
   "common": {
     "wait": "Un momento…",
@@ -39,9 +43,12 @@
     "metaTitle": "Kuulis · Viajes en moto, sin comisión por viaje",
     "metaDescription": "Pide un motorizado en minutos y paga directo, como acuerden. Los motorizados no pagan comisión por viaje: solo una cuota mensual pequeña los meses que trabajan.",
     "hero": {
-      "title": "En moto por Caracas. Precio claro, y punto.",
+      "title": "En moto por Caracas, y punto.",
       "lead": "Antes de pedir ves cuánto cuesta en dólares y en bolívares, sabes quién te va a buscar y le pagas directo al motorizado, como acuerden.",
-      "note": "Gratis. Por ahora, solo para Android."
+      "note": "Gratis. Por ahora, solo para Android.",
+      "photoAlt": "Una autopista de Caracas de noche, con las luces de los carros.",
+      "chipPrice": "Ejemplo: Mohedano → Sambil",
+      "chipZero": "de comisión por viaje"
     },
     "price": {
       "title": "Sabes el precio antes de subirte.",
@@ -57,7 +64,13 @@
       "haggle": {
         "title": "Sin regateo",
         "body": "El precio lo pone la app, no la discusión."
-      }
+      },
+      "trip": "Viaje",
+      "tripValue": "1,9 km · 5 min",
+      "bcv": "En Bs a tasa BCV",
+      "binance": "En Bs a tasa Binance",
+      "amountLabel": "1 dólar con 80 centavos",
+      "exampleNote": "Ejemplo de la app del 17 de octubre de 2026: de Mohedano al Centro Comercial Sambil. El precio depende de la distancia y el tiempo, y las tasas cambian cada día."
     },
     "download": "Descargar para Android",
     "drive": "Quiero manejar",
@@ -68,7 +81,11 @@
       "cta": "Ver requisitos y cuota",
       "tableTitle": "Cuota mensual",
       "tableNote": "Si no tienes viajes en un mes, no pagas nada. Los primeros {months} meses son gratis.",
-      "zero": "0 %"
+      "zero": "0 %",
+      "photoAlt": "Altamira, en Caracas, con el Ávila al fondo.",
+      "factZero": "de comisión por cada viaje",
+      "factFree": "meses gratis desde tu primer viaje",
+      "factIdle": "en los meses que no trabajas"
     },
     "how": {
       "title": "Tres paradas y llegaste.",
@@ -137,6 +154,37 @@
       "pinLabel": "Ejemplo de PIN de inicio",
       "pinCaption": "Ejemplo: cada viaje tiene su propio PIN.",
       "more": "Cómo te cuidamos en cada viaje"
+    },
+    "eyebrow": {
+      "how": "Cómo funciona",
+      "price": "Precio claro",
+      "drivers": "Para motorizados",
+      "safety": "Seguridad",
+      "download": "Para Android"
+    },
+    "ticker": {
+      "label": "Lo que tienes con Kuulis",
+      "zero": "0 % de comisión por viaje",
+      "prices": "Precio en $ y Bs",
+      "haggle": "Sin regateo",
+      "pause": "Pausar la cinta",
+      "play": "Mover la cinta"
+    },
+    "story": {
+      "step1": {
+        "title": "Dices a dónde vas",
+        "body": "Escribe el destino: una calle, un edificio, un centro comercial. La app ya sabe dónde estás."
+      },
+      "step2": {
+        "title": "Ves el precio antes de pedir",
+        "body": "En dólares, y en bolívares a tasa BCV y Binance. Ese es el precio para ti y para el motorizado."
+      },
+      "step3": {
+        "title": "Le pagas directo",
+        "body": "Efectivo, pago móvil, Zelle o Binance, como acuerden. Kuulis no se queda con nada del viaje."
+      },
+      "chipTitle": "Le pagas al motorizado",
+      "chipBody": "Como acordaron"
     }
   },
   "drivers": {
@@ -512,5 +560,9 @@
       "title": "Viaja con alguien que sabe dónde estás.",
       "body": "Descarga la app, guarda tus contactos de confianza y pide tu primer viaje."
     }
+  },
+  "photos": {
+    "night": "Una autopista de Caracas de noche, con las luces de los carros.",
+    "avila": "Altamira, en Caracas, con el Ávila al fondo."
   }
 }

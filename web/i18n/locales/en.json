@@ -22,7 +22,11 @@
     "legal": "Legal",
     "helpCenter": "Help center",
     "whatsapp": "WhatsApp",
-    "language": "Language"
+    "language": "Language",
+    "photos": "Photos",
+    "photoNight": "“Evening in Caracas”, Stig Nygaard",
+    "photoAvila": "“Caracas Altamira”, Cabruta08",
+    "license": "CC BY 2.0"
   },
   "common": {
     "wait": "One moment…",
@@ -39,9 +43,12 @@
     "metaTitle": "Kuulis · Motorbike rides, no commission per ride",
     "metaDescription": "Get a motorbike ride in minutes and pay the driver directly, however you agree. Drivers pay no commission per ride, just a small monthly fee in the months they work.",
     "hero": {
-      "title": "Across Caracas by motorbike. A clear price, full stop.",
+      "title": "Across Caracas by motorbike. Full stop.",
       "lead": "See the fare in dollars and bolívares before you book, know exactly who's coming to pick you up, and pay your driver directly, however you both prefer.",
-      "note": "Free. Android only, for now."
+      "note": "Free. Android only, for now.",
+      "photoAlt": "A Caracas highway at night, lit by passing cars.",
+      "chipPrice": "Example: Mohedano → Sambil",
+      "chipZero": "commission per ride"
     },
     "price": {
       "title": "You know the price before you get on.",
@@ -57,7 +64,13 @@
       "haggle": {
         "title": "No haggling",
         "body": "The app sets the price, not an argument."
-      }
+      },
+      "trip": "Ride",
+      "tripValue": "1.9 km · 5 min",
+      "bcv": "In Bs at the BCV rate",
+      "binance": "In Bs at the Binance rate",
+      "amountLabel": "1 dollar 80 cents",
+      "exampleNote": "Example from the app on October 17, 2026: from Mohedano to the Sambil mall. The price depends on distance and time, and the rates change every day."
     },
     "download": "Download for Android",
     "drive": "Drive with Kuulis",
@@ -68,7 +81,11 @@
       "cta": "See requirements and fees",
       "tableTitle": "Monthly fee",
       "tableNote": "No rides in a month, nothing to pay. The first {months} months are free.",
-      "zero": "0%"
+      "zero": "0%",
+      "photoAlt": "Altamira, in Caracas, with El Ávila behind it.",
+      "factZero": "commission on every ride",
+      "factFree": "free months from your first ride",
+      "factIdle": "in months you don't work"
     },
     "how": {
       "title": "Three stops and you're there.",
@@ -137,6 +154,37 @@
       "pinLabel": "Example start PIN",
       "pinCaption": "Example: every ride gets its own PIN.",
       "more": "How we look after every ride"
+    },
+    "eyebrow": {
+      "how": "How it works",
+      "price": "Clear price",
+      "drivers": "For drivers",
+      "safety": "Safety",
+      "download": "For Android"
+    },
+    "ticker": {
+      "label": "What you get with Kuulis",
+      "zero": "0 % commission per ride",
+      "prices": "Price in $ and Bs",
+      "haggle": "No haggling",
+      "pause": "Pause the strip",
+      "play": "Play the strip"
+    },
+    "story": {
+      "step1": {
+        "title": "Say where you're going",
+        "body": "Type the destination: a street, a building, a mall. The app already knows where you are."
+      },
+      "step2": {
+        "title": "See the price before you book",
+        "body": "In dollars, and in bolívares at the BCV and Binance rates. That price is the same for you and your driver."
+      },
+      "step3": {
+        "title": "Pay your driver directly",
+        "body": "Cash, pago móvil, Zelle or Binance, however you agree. Kuulis takes nothing from the ride."
+      },
+      "chipTitle": "You pay your driver",
+      "chipBody": "However you agreed"
     }
   },
   "drivers": {
@@ -512,5 +560,9 @@
       "title": "Ride with someone who knows where you are.",
       "body": "Download the app, save your trusted contacts and book your first ride."
     }
+  },
+  "photos": {
+    "night": "A Caracas highway at night, lit by passing cars.",
+    "avila": "Altamira, in Caracas, with El Ávila behind it."
   }
 }

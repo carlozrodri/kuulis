@@ -24,7 +24,8 @@
 
   /* Bands: on green or ink the primary button turns yellow (yellow is never used on light backgrounds). */
   .band-brand,
-  .band-ink {
+  .band-ink,
+  .band-photo {
     color: var(--on-band);
     --focus-outer: var(--on-band);
   }
@@ -35,5 +36,36 @@
 
   .band-ink {
     background: var(--band-ink);
+  }
+
+  /* A photo under a night field: the image fills the band, a dark wash keeps the text readable. */
+  .band-photo {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+  }
+
+  .band-photo > .photo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .band-photo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--photo-wash, linear-gradient(90deg, rgb(7 18 14 / 92%) 0%, rgb(7 18 14 / 72%) 45%, rgb(7 18 14 / 25%) 100%));
+  }
+
+  /* On a phone the text runs the full width, so the wash covers the whole photo. */
+  @media (max-width: 959px) {
+    .band-photo::before {
+      background: var(--photo-wash-narrow, linear-gradient(180deg, rgb(7 18 14 / 78%), rgb(7 18 14 / 90%)));
+    }
   }
 }

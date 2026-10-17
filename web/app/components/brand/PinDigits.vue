@@ -39,8 +39,10 @@ defineProps<{ digits: string, label: string, caption: string }>()
   border-radius: var(--radius-sm);
   background: var(--surface);
   box-shadow: inset 0 0 0 2px var(--border);
-  font-size: clamp(2rem, 1.4rem + 3vw, 3.25rem);
-  font-weight: 800;
+  font-family: var(--font-poster);
+  font-size: clamp(2.4rem, 1.6rem + 3.4vw, 3.8rem);
+  font-weight: 900;
+  font-stretch: 70%;
   font-variant-numeric: tabular-nums;
   color: var(--text);
 }
@@ -49,5 +51,9 @@ figcaption {
   margin-top: var(--space-3);
   color: var(--muted);
   font-size: var(--font-small);
+}
+
+:is(.band-brand, .band-ink, .band-photo) figcaption {
+  color: var(--on-band-soft);
 }
 </style>

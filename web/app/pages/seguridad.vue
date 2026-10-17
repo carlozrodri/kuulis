@@ -7,7 +7,7 @@ import type { IconName } from '~/components/LineIcon.vue'
 
 const { t } = useI18n()
 const { pinAreas, emergency } = await useSafetySettings()
-definePageMeta({ heroHeader: true, endsOnBrand: true })
+definePageMeta({ heroHeader: 'photo', endsOnBrand: true })
 
 useSeoMeta({
   title: () => t('safety.metaTitle'),
@@ -39,30 +39,19 @@ const phases = computed<{ key: string, rows: Row[] }[]>(() => [
 
 <template>
   <div>
-    <section
-      id="hero"
-      class="hero band-brand"
+    <PhotoHero
+      photo="night"
+      :eyebrow="t('home.eyebrow.safety')"
+      :title="t('safety.title')"
+      :lead="t('safety.lead')"
     >
-      <div class="container-wide grid-hero">
-        <div>
-          <BrandHeadline
-            as="h1"
-            class="title"
-            :text="t('safety.title')"
-          />
-          <p class="lead">
-            {{ t('safety.lead') }}
-          </p>
-        </div>
-        <BrandPinDigits
-          v-if="pinAreas.length"
-          class="art"
-          digits="4817"
-          :label="t('safety.pinLabel')"
-          :caption="t('safety.pinCaption')"
-        />
-      </div>
-    </section>
+      <BrandPinDigits
+        v-if="pinAreas.length"
+        digits="4817"
+        :label="t('safety.pinLabel')"
+        :caption="t('safety.pinCaption')"
+      />
+    </PhotoHero>
 
     <div class="container-wide phases">
       <section
@@ -121,38 +110,6 @@ const phases = computed<{ key: string, rows: Row[] }[]>(() => [
 </template>
 
 <style scoped>
-.hero {
-  /* The header (64/72 px) sits on this field. */
-  margin-top: -64px;
-  padding: calc(64px + clamp(40px, 8vw, 112px)) 0 clamp(64px, 8vw, 128px);
-}
-
-.grid-hero {
-  display: grid;
-  gap: var(--space-7);
-  align-items: end;
-}
-
-.title {
-  max-width: 13ch;
-  margin: 0 0 var(--space-5);
-  font-size: var(--font-h1);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-display);
-}
-
-.lead {
-  max-width: 34rem;
-  margin: 0;
-  font-size: var(--font-lead);
-  font-weight: 500;
-  line-height: 1.45;
-}
-
-.art :deep(figcaption) {
-  color: var(--on-band);
-}
-
 .phases {
   padding-block: var(--section-y);
 }
@@ -194,9 +151,12 @@ const phases = computed<{ key: string, rows: Row[] }[]>(() => [
 
 .phase h2 {
   margin: 0 0 var(--space-4);
+  font-family: var(--font-poster);
   font-size: var(--font-h2);
-  line-height: var(--stop);
-  letter-spacing: var(--tracking-heading);
+  font-weight: 900;
+  font-stretch: 66%;
+  line-height: 0.9;
+  text-transform: uppercase;
 }
 
 .rows {
@@ -261,19 +221,6 @@ h3 {
 }
 
 @media (min-width: 960px) {
-  .hero {
-    margin-top: -72px;
-    padding-top: calc(72px + 112px);
-  }
-
-  .grid-hero {
-    grid-template-columns: 7fr 5fr;
-  }
-
-  .art {
-    justify-self: end;
-  }
-
   .phase {
     display: grid;
     grid-template-columns: 4fr 8fr;

@@ -47,10 +47,10 @@ export function useLocaleSeo() {
     ogLocaleAlternate: () => Object.entries(OG_LOCALE).filter(([code]) => code !== locale.value).map(([, value]) => value),
     ogUrl: () => (indexable.value ? absolute(switchLocalePath(locale.value)) : undefined),
     // Link previews (WhatsApp, Telegram) need an absolute image URL.
-    ogImage: () => `${site}/og/${og.value.image}-${locale.value}.png`,
+    ogImage: () => `${site}/og/${og.value.image}-${locale.value}.jpg`,
     ogImageWidth: 1200,
     ogImageHeight: 630,
-    ogImageType: 'image/png',
+    ogImageType: 'image/jpeg',
     ogImageAlt: () => t(og.value.title),
   })
 }

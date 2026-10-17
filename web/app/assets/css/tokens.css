@@ -16,6 +16,9 @@
     --surface: #fff;
     --surface-alt: #eaf5ef;
     --text: #14201b;
+    /* Night: the city after dark, the field of photos and posters (Kuulis de noche, 2026-10-17) */
+    --night: #07120e;
+    --night-2: #0d1d17;
     --muted: #5b6a63;
     --border: #dce6e0;
     --danger: #b42318;
@@ -25,7 +28,7 @@
 
     /* Color fields (full-bleed bands): brand green and ink, with what goes on them */
     --band-brand: var(--primary);
-    --band-ink: #14201b;
+    --band-ink: var(--night);
     --on-band: #fff;
     --on-band-soft: rgb(255 255 255 / 90%);
     --on-band-line: rgb(255 255 255 / 16%);
@@ -40,22 +43,23 @@
     --focus-inner: var(--accent);
     --focus-outer: var(--text);
 
-    /* Type: one family; the fallback face keeps the text from jumping when the web font arrives */
+    /* Type: Plus Jakarta Sans for reading; a condensed, heavy Archivo cut for poster headlines */
+    --font-poster: 'Archivo Poster', 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', sans-serif;
     --font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans Fallback', system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
-    --font-display: clamp(2.75rem, 1.6rem + 5.2vw, 6rem);
-    --font-h1: clamp(2.25rem, 1.5rem + 3.4vw, 4.25rem);
-    --font-h2: clamp(1.75rem, 1.3rem + 2vw, 3rem);
+    --font-display: clamp(3.4rem, 1.2rem + 9.4vw, 9.6rem);
+    --font-h1: clamp(2.8rem, 1.4rem + 6vw, 7rem);
+    --font-h2: clamp(2.3rem, 1.2rem + 4.4vw, 5.2rem);
     --font-h3: 1.25rem;
     --font-lead: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
     --font-body: 1.0625rem;
     --font-small: 0.875rem;
     --font-label: 0.8125rem;
-    --font-number: clamp(5rem, 3rem + 10vw, 11rem);
-    --leading-tight: 1.05;
-    --leading-heading: 1.15;
+    --font-number: clamp(9rem, 3rem + 28vw, 26rem);
+    --leading-tight: 0.88;
+    --leading-heading: 0.92;
     --leading-body: 1.55;
-    --tracking-display: -0.045em;
-    --tracking-heading: -0.03em;
+    --tracking-display: -0.005em;
+    --tracking-heading: 0em;
     --tracking-label: 0.06em;
 
     /* Space: multiples of 4 px */
@@ -110,7 +114,7 @@
       --success: #4ade80;
       --success-soft: #12301f;
       --band-brand: #0c4a37;
-      --band-ink: #0b1310;
+      --band-ink: var(--night);
       --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 35%);
     }
   }

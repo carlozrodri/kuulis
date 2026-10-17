@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// The last stop (docs/website-redesign/03 §5.7): the download, on the green field where the route ends in the dot.
-// Every page that ends with it sets page meta `endsOnBrand`, so the footer's Ávila rises from this field.
+// The last stop (Kuulis de noche): the download as a poster on the night field, where the route draws itself to the
+// dot. Every page that ends with it sets page meta `endsOnBrand`, so the footer's Ávila rises from this field.
 defineProps<{ title: string, body: string }>()
 const { t } = useI18n()
 </script>
@@ -8,7 +8,7 @@ const { t } = useI18n()
 <template>
   <section
     v-reveal
-    class="download band-brand"
+    class="download band-ink"
   >
     <div class="container-wide grid-download">
       <div>
@@ -23,10 +23,21 @@ const { t } = useI18n()
           {{ t('home.download') }}
         </NuxtLinkLocale>
       </div>
-      <BrandRouteLine
-        class="art"
-        :animate="false"
-      />
+      <svg
+        class="art route-draw"
+        viewBox="0 0 300 300"
+        aria-hidden="true"
+      >
+        <path
+          pathLength="1"
+          d="M20 280 C 60 180, 180 240, 190 150 S 250 60, 270 30"
+        />
+        <circle
+          cx="270"
+          cy="30"
+          r="14"
+        />
+      </svg>
     </div>
   </section>
 </template>
@@ -43,23 +54,26 @@ const { t } = useI18n()
 }
 
 .grid-download :deep(h2) {
-  max-width: 14ch;
+  max-width: 13ch;
   margin: 0 0 var(--space-5);
-  font-size: var(--font-h2);
+  font-size: var(--font-h1);
   line-height: var(--leading-heading);
-  letter-spacing: var(--tracking-heading);
 }
 
 .body {
   max-width: 34rem;
   margin: 0 0 var(--space-6);
+  color: var(--on-band-soft);
   font-size: var(--font-lead);
   line-height: 1.5;
 }
 
 .art {
   display: none;
-  color: var(--on-band);
+}
+
+.art circle {
+  fill: var(--accent);
 }
 
 @media (min-width: 960px) {

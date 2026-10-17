@@ -1,15 +1,15 @@
 import { expect, test } from '@playwright/test'
 
-// Drivers and safety pages (docs/website-redesign/07 M6): the fee example agrees with the fee table, the ink hero
+// Drivers and safety pages (docs/website-redesign/07 M6): the fee example agrees with the fee table, the photo hero
 // header, and the safety page's phases, emergency notice and community link. Without the API (a local build) the
 // figures are left out instead of guessed.
 test.use({ locale: 'es-VE' })
 
-test('drivers: the header wears the ink hero, then turns light', async ({ page }) => {
+test('drivers: the header sits on the hero photo, then turns solid', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/motorizados', { waitUntil: 'networkidle' })
   const header = page.locator('header')
-  await expect(header).toHaveClass(/on-ink/)
+  await expect(header).toHaveClass(/on-photo/)
   await page.locator('.faq').scrollIntoViewIfNeeded()
   await expect(header).not.toHaveClass(/on-hero/)
 })

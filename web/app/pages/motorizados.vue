@@ -4,8 +4,8 @@
 // out instead of guessing (04 §8).
 const { t } = useI18n()
 const { data: site } = await useSite()
-// The header wears the hero's ink until the hero scrolls past; the footer's Ávila rises from the green download.
-definePageMeta({ heroHeader: 'ink', endsOnBrand: true })
+// The header sits on the hero photo until it scrolls past; the footer's Ávila rises from the night download.
+definePageMeta({ heroHeader: 'photo', endsOnBrand: true })
 
 useSeoMeta({
   title: () => t('drivers.metaTitle'),
@@ -36,27 +36,19 @@ const faq = computed(() => ['free', 'idle', 'paid', 'fee'].map(key => ({
 
 <template>
   <div>
-    <section
-      id="hero"
-      class="hero band-ink"
+    <PhotoHero
+      photo="avila"
+      :eyebrow="t('home.eyebrow.drivers')"
+      :title="t('drivers.title')"
+      :lead="t('drivers.lead')"
     >
-      <div class="container-wide">
-        <BrandHeadline
-          as="h1"
-          class="title"
-          :text="t('drivers.title')"
-        />
-        <p class="lead">
-          {{ t('drivers.lead') }}
-        </p>
-        <NuxtLinkLocale
-          to="/descargar"
-          class="btn btn-primary"
-        >
-          {{ t('drivers.cta') }}
-        </NuxtLinkLocale>
-      </div>
-    </section>
+      <NuxtLinkLocale
+        to="/descargar"
+        class="btn btn-primary"
+      >
+        {{ t('drivers.cta') }}
+      </NuxtLinkLocale>
+    </PhotoHero>
 
     <section
       v-reveal
@@ -163,35 +155,11 @@ const faq = computed(() => ['free', 'idle', 'paid', 'fee'].map(key => ({
 </template>
 
 <style scoped>
-.hero {
-  /* The header (64/72 px) sits on this field. */
-  margin-top: -64px;
-  padding: calc(64px + clamp(40px, 8vw, 112px)) 0 clamp(64px, 8vw, 128px);
-  /* In dark mode the ink field is the page color; the line keeps the hero's edge. */
-  border-bottom: 1px solid var(--border);
-}
-
-.title {
-  max-width: 11ch;
-  margin: 0 0 var(--space-5);
-  font-size: var(--font-display);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-display);
-}
-
-.lead {
-  max-width: 36rem;
-  margin: 0 0 var(--space-6);
-  font-size: var(--font-lead);
-  font-weight: 500;
-  line-height: 1.45;
-}
-
 .section :deep(h2.headline) {
+  max-width: 14ch;
   margin: 0 0 var(--space-6);
   font-size: var(--font-h2);
   line-height: var(--leading-heading);
-  letter-spacing: var(--tracking-heading);
 }
 
 .grid-needs :deep(h2.headline) {
@@ -229,10 +197,14 @@ const faq = computed(() => ['free', 'idle', 'paid', 'fee'].map(key => ({
 
 .figure {
   color: var(--primary);
+  white-space: nowrap;
+  transform-origin: left bottom;
+  font-family: var(--font-poster);
   font-size: var(--font-number);
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.06em;
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 0.8;
+  letter-spacing: -0.03em;
 }
 
 .label {
@@ -313,11 +285,6 @@ const faq = computed(() => ['free', 'idle', 'paid', 'fee'].map(key => ({
 }
 
 @media (min-width: 960px) {
-  .hero {
-    margin-top: -72px;
-    padding-top: calc(72px + 112px);
-  }
-
   .grid-number {
     grid-template-columns: 5fr 7fr;
     column-gap: var(--space-9);
@@ -333,6 +300,23 @@ const faq = computed(() => ['free', 'idle', 'paid', 'fee'].map(key => ({
   .grid-needs {
     grid-template-columns: 5fr 7fr;
     column-gap: var(--space-9);
+  }
+}
+
+/* The 0 % grows into place as it scrolls up. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .figure {
+      animation: figure-fill linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 45%;
+    }
+  }
+}
+
+@keyframes figure-fill {
+  from {
+    transform: scale(0.8) translateY(10%);
   }
 }
 </style>
