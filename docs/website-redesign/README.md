@@ -1,7 +1,7 @@
 # Rediseño de la web pública
 
-Plan del rediseño completo de la web pública de Kuulis (`web/`). **Estado: plan en revisión, nada implementado.**
-Ninguna línea de código, configuración o asset cambia hasta que Carlos apruebe el plan y pida cada milestone.
+Plan del rediseño completo de la web pública de Kuulis (`web/`). **Estado: plan aprobado (2026-10-17), nada implementado todavía.**
+Carlos aprobó el plan completo el 2026-10-17 («apruebo todo»). Cada milestone se ejecuta solo cuando él lo pide.
 
 | Doc | Qué contiene |
 | --- | --- |
@@ -26,8 +26,8 @@ Ninguna línea de código, configuración o asset cambia hasta que Carlos aprueb
   (propuesta a validar). Las preguntas abiertas están abajo.
 - Los milestones se entregan uno por uno, como PR a `qa`. Nada pasa a `main` sin el OK de Carlos.
 
-## Preguntas para Carlos
-Si respondes «apruebo todo», cuenta la opción recomendada de cada una.
+## Decidido (2026-10-17)
+Carlos respondió «apruebo todo»: cuenta la opción recomendada de cada pregunta.
 1. **URLs en inglés** (`/en`, `/en/drivers`…) para que el inglés se pueda indexar y compartir. Recomendado: sí.
 2. **Fotografía:** (a) lanzar solo con capturas reales y gráficos de marca, y decidir fotos después; (b) sesión
    con fotógrafo en Caracas; (c) imágenes con IA sin personas. Recomendado: (a). No hace falta comprar nada ahora.
@@ -43,4 +43,5 @@ Si respondes «apruebo todo», cuenta la opción recomendada de cada una.
 ## Avance
 | Milestone | Estado |
 | --- | --- |
-| Plan (este directorio) | En revisión |
+| Plan (este directorio) | Aprobado 2026-10-17 |
+| M0 · Línea base | Siguiente |
