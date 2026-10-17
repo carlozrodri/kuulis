@@ -637,6 +637,7 @@ export type WalletEntryKind
     | 'transfer_out'
     | 'subscription_fee'
     | 'adjustment'
+    | 'referral_bonus'
 export const WALLET_ENTRY_KINDS: WalletEntryKind[] = [
   'promo_credit',
   'top_up',
@@ -644,6 +645,7 @@ export const WALLET_ENTRY_KINDS: WalletEntryKind[] = [
   'transfer_out',
   'subscription_fee',
   'adjustment',
+  'referral_bonus',
 ]
 
 /** `details` per kind (all keys optional so an older/newer API never breaks the table). */
@@ -653,7 +655,7 @@ export interface WalletEntryDetails {
   /** top_up */
   method?: string | null
   reference?: string | null
-  /** transfer_in / transfer_out */
+  /** transfer_in / transfer_out / referral_bonus (the invited driver) */
   counterpart_name?: string | null
   note?: string | null
   /** subscription_fee */
@@ -1986,7 +1988,7 @@ export interface QualitySettings {
 
 // ---- Doc 16: anti-fraud ----
 
-export const RISK_KINDS = ['shared_device', 'fake_gps', 'suspicious_ride', 'frequent_pair', 'transfers', 'rating_ring'] as const
+export const RISK_KINDS = ['shared_device', 'fake_gps', 'suspicious_ride', 'frequent_pair', 'transfers', 'rating_ring', 'referral'] as const
 export type RiskKind = typeof RISK_KINDS[number]
 export const SIGNAL_STATUSES = ['open', 'confirmed', 'dismissed'] as const
 export type SignalStatus = typeof SIGNAL_STATUSES[number]
@@ -1998,6 +2000,7 @@ export type HoldStatus = typeof HOLD_STATUSES[number]
 export type RiskReason
   = | 'same_device' | 'little_movement' | 'too_short' | 'same_place' | 'no_track' | 'frequent_pair' | 'shared_device'
     | 'mocked' | 'jumps' | 'chain' | 'fan_in' | 'new_account' | 'recipient_frozen' | 'first_transfer' | 'rating_ring' | 'risk_score'
+    | 'shared_identity'
 export type BlockedKind = 'email' | MarkKind
 
 /** A person in a risk row: links to the driver page when driver_profile_id is set. */
@@ -2444,4 +2447,65 @@ export interface DemandSnapshot {
   window_minutes?: number
   cells: DemandCell[]
   hot?: { name: string, level: DemandLevel, distance_m: number, center: Coord } | null
+}
+
+// ---- Doc 22: referrals (docs/api/referidos.md) ----
+
+/** AppConfig.referral_program; edited from the Referrals page (PUT /admin/referrals/program). */
+export interface ReferralProgram {
+  enabled: boolean
+  reward_usd: Decimal
+  required_trips: number
+  window_days: number
+  referred_free_month: boolean
+  /** Rewards per inviter per month (0 = no limit). */
+  monthly_cap: number
+  budget_usd: Decimal
+  starts_at: string | null
+  ends_at: string | null
+}
+
+export const REFERRAL_STATUSES = ['pending', 'qualified', 'held', 'rewarded', 'rejected'] as const
+export type ReferralStatus = typeof REFERRAL_STATUSES[number]
+/** Why a referral waits or was rejected (a newer API may add more: they render as the code). */
+export type ReferralReason = 'monthly_cap' | 'budget' | 'program_off' | 'risk_score' | 'expired' | 'shared_identity' | 'inviter_inactive' | 'staff'
+export type ReferralRewardKind = 'free_month' | 'wallet_credit'
+
+export interface ReferralAdmin {
+  id: string
+  code: string
+  status: ReferralStatus
+  referrer: UserBrief | null
+  referred: UserBrief | null
+  trips: number
+  required_trips: number
+  deadline_at: string | null
+  qualified_at: string | null
+  rewarded_at: string | null
+  reward_kind: ReferralRewardKind | null
+  reward_amount: Decimal | null
+  reason: ReferralReason | string | null
+  details: { shared?: string[], risk_scores?: Record<string, number>, free_month?: boolean, override?: boolean } & Record<string, unknown>
+  note: string | null
+  reviewed_at: string | null
+  created_at: string
+}
+
+export interface ReferralsOverview {
+  program: ReferralProgram
+  counts: { status: ReferralStatus, count: number }[]
+  paid_usd: Decimal
+  held_usd: Decimal
+  month_paid_usd: Decimal
+  budget_left_usd: Decimal
+  free_months: number
+  alerts: number
+  waiting: Record<string, number>
+}
+
+export interface ReferralRanking {
+  user: UserBrief | null
+  invited: number
+  rewarded: number
+  earned_usd: Decimal
 }

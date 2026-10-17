@@ -34,6 +34,7 @@ class RiskKind(enum.StrEnum):
     FREQUENT_PAIR = "frequent_pair"  # a passenger and a driver always together
     TRANSFERS = "transfers"  # chains, many senders, new accounts receiving balance
     RATING_RING = "rating_ring"  # mutual 5 stars again and again
+    REFERRAL = "referral"  # an invited driver shares a phone, cédula... with the inviter (doc 22)
 
 
 class SignalStatus(enum.StrEnum):

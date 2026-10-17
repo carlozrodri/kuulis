@@ -50,7 +50,7 @@ import { useMode } from '@/providers/ModeProvider';
 import { radius, setThemePreference, space, themePreference, useTheme, type ThemePreference } from '@/theme';
 
 import { Section, Segmented } from './components';
-import { InviteCard, RedeemSection } from './ReferralCard';
+import { InviteCard, InviteesSection, RedeemSection } from './ReferralCard';
 import { rideTo } from './SavedPlaces';
 import { SubScreen } from './SubScreen';
 
@@ -353,6 +353,7 @@ export function InviteScreen() {
   return (
     <SubScreen icon={Gift} tone="accent" title={t('profile.invite.section')}>
       <InviteCard />
+      <InviteesSection />
       <RedeemSection />
     </SubScreen>
   );

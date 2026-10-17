@@ -56,6 +56,7 @@ WEIGHTS: dict[str, int] = {
     "fan_in": 20,
     "new_account": 15,
     "rating_ring": 20,
+    "shared_identity": 30,
 }
 EMAIL = "email"  # blocked identifier kind besides the identity mark kinds
 

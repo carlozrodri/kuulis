@@ -30,7 +30,7 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
 - [ ] Plantillas HTML de email con diseño.
 - [ ] Scheduler de Taskiq desplegado cuando haya tareas periódicas (hoy no hay ninguna).
 - [ ] Limpieza periódica de dispositivos inactivos (las notificaciones de más de 90 días ya se borran, doc 07).
-- [ ] Mostrar en el admin las invitaciones entre motorizados y los meses gratis ganados.
+- [x] Mostrar en el admin las invitaciones entre motorizados y los meses gratis ganados (doc 22: Referidos).
 - [ ] Revisar en el admin las cuentas en proceso de borrado (`deletion_requested_at`); el worker
       borra los datos personales a los 30 días (`ACCOUNT_DELETION_GRACE_DAYS`).
 
@@ -43,5 +43,5 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
 - [x] Tests de componentes (doc 20, React Native Testing Library).
 - [ ] Medir los presupuestos de rendimiento del doc 20 en los teléfonos de la matriz y correr los flujos de
       Maestro (`mobile/README.md` → Calidad).
-- [ ] Enlace de invitación con el código ya puesto cuando la app esté en las tiendas (hoy el mensaje
-      de WhatsApp lleva solo el código).
+- [ ] Código de invitación ya puesto al instalar la app desde cero (necesita las tiendas). Desde el doc 22 el
+      mensaje lleva el enlace `/i/CODIGO`, que abre la app con el código escrito si ya está instalada.

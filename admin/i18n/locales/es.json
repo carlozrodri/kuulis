@@ -37,7 +37,8 @@
     "quality": "Calidad",
     "risk": "Riesgo",
     "closings": "Cierres",
-    "analytics": "Analítica"
+    "analytics": "Analítica",
+    "referrals": "Referidos"
   },
   "navGroups": {
     "operations": "Operación",
@@ -182,7 +183,8 @@
       "safety": "Seguridad",
       "risk": "Riesgo",
       "analytics": "Analítica",
-      "zones": "Zonas"
+      "zones": "Zonas",
+      "referrals": "Referidos"
     },
     "permissions": {
       "users": {
@@ -283,6 +285,10 @@
       "zones": {
         "view": "Ver zonas y ciudades",
         "manage": "Crear y editar zonas y polígonos de ciudades"
+      },
+      "referrals": {
+        "view": "Ver el programa de referidos",
+        "manage": "Configurar el programa y pagar o rechazar premios"
       }
     }
   },
@@ -1269,7 +1275,8 @@
       "transfer_in": "Transferencia recibida",
       "transfer_out": "Transferencia enviada",
       "subscription_fee": "Cuota mensual",
-      "adjustment": "Ajuste"
+      "adjustment": "Ajuste",
+      "referral_bonus": "Premio por invitar"
     },
     "detail": {
       "title": "Detalle",
@@ -1278,7 +1285,8 @@
       "topUpRef": "Binance Pay · orden {reference}",
       "transferIn": "De {name}",
       "transferOut": "Para {name}",
-      "fee": "Cuota de {month}"
+      "fee": "Cuota de {month}",
+      "referral": "Invitó a {name}"
     },
     "adjust": {
       "title": "Ajustar saldo",
@@ -2007,6 +2015,12 @@
         "hold_void": "Anuló un pago retenido",
         "ban": "Vetó una cuenta",
         "unblock": "Quitó un dato vetado"
+      },
+      "referrals": {
+        "program_update": "Cambió el programa de referidos",
+        "release": "Pagó un premio por invitación",
+        "reject": "Rechazó un premio por invitación",
+        "reopen": "Reabrió una invitación rechazada"
       }
     },
     "entities": {
@@ -2037,7 +2051,8 @@
       "quality_pause": "Pausa automática",
       "risk_signal": "Alerta de riesgo",
       "risk_hold": "Pago retenido",
-      "blocked_identifier": "Dato vetado"
+      "blocked_identifier": "Dato vetado",
+      "referral": "Invitación"
     }
   },
   "team": {
@@ -3303,7 +3318,8 @@
       "suspicious_ride": "Viaje sospechoso",
       "frequent_pair": "Pareja frecuente",
       "transfers": "Transferencias",
-      "rating_ring": "Calificaciones cruzadas"
+      "rating_ring": "Calificaciones cruzadas",
+      "referral": "Invitación sospechosa"
     },
     "reasons": {
       "same_device": "Pasajero y motorizado en el mismo teléfono",
@@ -3321,7 +3337,8 @@
       "recipient_frozen": "Destinatario en revisión",
       "first_transfer": "Primera transferencia (espera 24 h)",
       "rating_ring": "5 estrellas mutuas una y otra vez",
-      "risk_score": "Cuenta en revisión"
+      "risk_score": "Cuenta en revisión",
+      "shared_identity": "Comparte datos con quien lo invitó"
     },
     "holdKinds": {
       "promo_credit": "Crédito de promoción",
@@ -3399,7 +3416,8 @@
       "jumps": "{n} saltos a más de 150 km/h en 10 minutos",
       "lastJump": "El último: {distance} en {seconds} s",
       "transfer": "Transferencia de {amount}",
-      "ratingRing": "{n} viajes con 5 estrellas mutuas en {days} días"
+      "ratingRing": "{n} viajes con 5 estrellas mutuas en {days} días",
+      "sharedIdentity": "Comparte con quien lo invitó: {kinds}"
     },
     "review": {
       "dismiss": "Descartar",
@@ -3852,6 +3870,120 @@
       "disabled": "El mapa de demanda está apagado en la configuración.",
       "cell": "{requests} pedidos · {unmatched} sin motorizado",
       "point": "Pico simulado"
+    }
+  },
+  "referrals": {
+    "help": "Motorizados que invitan motorizados. Quien invita gana {reward} en su billetera (no retirable) cuando el invitado hace {trips} viajes en sus primeros {days} días.",
+    "programOff": "Programa apagado",
+    "tabs": {
+      "list": "Invitaciones",
+      "ranking": "Ranking",
+      "program": "Programa"
+    },
+    "allStatuses": "Todas",
+    "alertsFilter": "Alertas",
+    "statuses": {
+      "pending": "En camino",
+      "qualified": "Cumplió, en espera",
+      "held": "Retenida",
+      "rewarded": "Pagada",
+      "rejected": "Rechazada"
+    },
+    "reasons": {
+      "monthly_cap": "Tope del mes de quien invita",
+      "budget": "Sin presupuesto",
+      "program_off": "Programa apagado",
+      "risk_score": "Riesgo alto: espera revisión",
+      "expired": "No llegó a los viajes a tiempo",
+      "shared_identity": "Comparte datos con quien invita",
+      "staff": "Rechazada por el equipo",
+      "other": "Otro motivo",
+      "inviter_inactive": "Quien invita ya no tiene cuenta activa"
+    },
+    "search": "Buscar por nombre, correo o código",
+    "referrer": "Invita",
+    "referred": "Invitado",
+    "status": "Estado",
+    "progress": "Viajes",
+    "reward": "Premio",
+    "joined": "Fecha",
+    "trips": "{n} de {required} viajes",
+    "deadline": "Hasta el {date}",
+    "notApproved": "Aún no aprobado",
+    "legacy": "Primera versión (mes gratis)",
+    "freeMonth": "Mes gratis",
+    "noteShort": "Nota: {note}",
+    "empty": "Sin invitaciones",
+    "total": "Sin invitaciones | 1 invitación | {n} invitaciones",
+    "waiting": "{n} cumplieron y esperan: {reason}",
+    "totals": {
+      "paid": "Premios pagados",
+      "month": "{amount} este mes",
+      "held": "Retenido",
+      "alerts": "Sin alertas | 1 alerta | {n} alertas",
+      "budgetLeft": "Presupuesto disponible",
+      "budget": "de {amount}",
+      "invites": "Invitaciones",
+      "breakdown": "{pending} en camino · {rewarded} pagadas · {months} meses gratis (v1)"
+    },
+    "ranking": {
+      "invited": "Invitados",
+      "rewarded": "Premiados",
+      "earned": "Ganado"
+    },
+    "note": "Nota",
+    "noteHelp": "Opcional. Queda en el historial.",
+    "actions": {
+      "release": {
+        "button": "Pagar",
+        "title": "Pagar el premio",
+        "description": "Se acreditan {amount} a {referrer} por invitar a {referred}.",
+        "done": "Premio pagado"
+      },
+      "reject": {
+        "button": "Rechazar",
+        "reviewed": "Marcar revisada",
+        "title": "Rechazar el premio",
+        "description": "{referrer} no recibe premio por {referred}.",
+        "done": "Invitación revisada"
+      },
+      "reopen": {
+        "button": "Reabrir",
+        "title": "Reabrir la invitación",
+        "description": "Se evalúa de nuevo sin revisar los datos compartidos entre {referrer} y {referred} y, si venció, con una ventana nueva desde hoy.",
+        "done": "Invitación reabierta"
+      }
+    },
+    "program": {
+      "title": "Programa de referidos",
+      "help": "Los cambios aplican a las evaluaciones siguientes; lo ya pagado no cambia.",
+      "enabled": "Activo",
+      "reward": "Premio (USDT)",
+      "rewardHelp": "Crédito en la billetera de quien invita. No suma a la ganancia del mes.",
+      "requiredTrips": "Viajes requeridos",
+      "requiredTripsHelp": "Viajes del invitado que cuentan: no con quien lo invitó ni marcados como sospechosos.",
+      "windowDays": "Días para cumplir",
+      "windowDaysHelp": "Desde que se aprueba al invitado.",
+      "monthlyCap": "Premios por persona al mes",
+      "monthlyCapHelp": "0 = sin tope. Los demás esperan al mes siguiente.",
+      "budget": "Presupuesto total (USDT)",
+      "budgetHelp": "Pagado más retenido nunca lo supera. Disponible: {left}.",
+      "freeMonth": "Mes gratis para el invitado",
+      "freeMonthHelp": "El invitado también gana un mes de suscripción al cumplir.",
+      "startsAt": "Desde",
+      "endsAt": "Hasta",
+      "datesHelp": "Se aceptan códigos nuevos entre estas fechas (vacío = sin límite). Hora de {zone}.",
+      "passengers": "Por ahora solo motorizados invitan motorizados. Los referidos de pasajeros quedan para más adelante.",
+      "save": "Guardar",
+      "saved": "Programa guardado",
+      "errors": {
+        "reward_usd": "El premio debe estar entre 0 y 1000 USDT.",
+        "required_trips": "Los viajes deben estar entre 1 y 500.",
+        "window_days": "Los días deben estar entre 1 y 365.",
+        "monthly_cap": "El tope debe estar entre 0 y 1000.",
+        "budget_usd": "El presupuesto debe estar entre 0 y 1.000.000 USDT.",
+        "dates": "La fecha final debe ser posterior a la inicial."
+      }
     }
   }
 }

@@ -34,6 +34,7 @@ export const walletEntryColor: Record<WalletEntryKind, BadgeColor> = {
   transfer_out: 'info',
   subscription_fee: 'warning',
   adjustment: 'neutral',
+  referral_bonus: 'primary',
 }
 
 const toNumber = (value: string | number | null | undefined): number | null => {

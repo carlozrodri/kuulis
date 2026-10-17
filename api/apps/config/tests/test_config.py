@@ -155,6 +155,17 @@ DEFAULTS = {
         "notify_radius_m": 3000,
         "notify_every_minutes": 30,
     },
+    "referral_program": {
+        "enabled": True,
+        "reward_usd": "5.00",
+        "required_trips": 20,
+        "window_days": 30,
+        "referred_free_month": False,
+        "monthly_cap": 10,
+        "budget_usd": "500.00",
+        "starts_at": None,
+        "ends_at": None,
+    },
 }
 
 

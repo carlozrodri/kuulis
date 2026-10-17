@@ -108,6 +108,10 @@ construir. Las preguntas de cada documento están en su sección final.
 - **21** hecho (2026-10-17): ciudades y zonas como polígonos (sin PostGIS), zonas de recargo, restringidas y de
   puntos de recogida con vigencia, importar/exportar GeoJSON, viajes entre ciudades por par, mapa de demanda H3
   para motorizados con aviso push y capa en Viajes en vivo. Recargo por zona solo manual (decidido).
+- **22** hecho (2026-10-17): premio de 5 USD en la billetera cuando el invitado hace 20 viajes en 30 días, tope por
+  persona al mes, presupuesto, sin premio si comparten datos con quien invita, premio retenido con riesgo alto,
+  página Referidos en el admin, progreso de cada invitado en la app y página web `/i/{código}`. Solo motorizados
+  (decidido).
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay

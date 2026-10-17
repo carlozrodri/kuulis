@@ -28,6 +28,8 @@ class EntryKind(enum.StrEnum):
     TRANSFER_OUT = "transfer_out"
     SUBSCRIPTION_FEE = "subscription_fee"
     ADJUSTMENT = "adjustment"
+    # Doc 22: Kuulis' reward for inviting a driver (not part of the month's earnings).
+    REFERRAL_BONUS = "referral_bonus"
 
 
 class TopUpStatus(enum.StrEnum):

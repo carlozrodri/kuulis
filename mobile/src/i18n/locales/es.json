@@ -381,20 +381,36 @@
     "invite": {
       "section": "Invita y gana",
       "title": "Invita a otro motorizado",
-      "body": "Cuando haga su primer viaje, te regalamos un mes de suscripción.",
+      "body": "Gana {{amount}} USDT en tu billetera cuando tu invitado haga {{trips}} viajes en sus primeros {{days}} días.",
+      "bodyFreeMonth": "Tu invitado también gana un mes de suscripción gratis.",
+      "paused": "El programa de invitaciones está en pausa. Tu código sigue siendo tuyo.",
       "yourCode": "Tu código",
       "copy": "Copiar código",
       "copied": "Código copiado",
       "whatsapp": "Invitar por WhatsApp",
       "message": "¡Gana con tu moto en Kuulis! Sin comisión por viaje. Descarga la app, regístrate como motorizado y usa mi código {{code}}.",
+      "messageLink": "¡Gana con tu moto en Kuulis! Sin comisión por viaje. Regístrate como motorizado con mi código {{code}}: {{link}}",
       "invited_one": "{{count}} invitado",
       "invited_other": "{{count}} invitados",
-      "rewarded_one": "{{count}} ya viajó",
-      "rewarded_other": "{{count}} ya viajaron",
+      "rewarded_one": "{{count}} premiado",
+      "rewarded_other": "{{count}} premiados",
+      "earned": "Ganaste {{amount}} USDT",
       "freeMonths_one": "{{count}} mes gratis",
       "freeMonths_other": "{{count}} meses gratis",
+      "invitees": "Tus invitados",
+      "rules": "Cuentan los viajes completados con pasajeros distintos a ti. El crédito no se retira: sirve para tus cuotas.",
+      "status": {
+        "pending": "{{trips}} de {{required}} viajes",
+        "waitingApproval": "Esperando aprobación",
+        "reviewing": "Premio en revisión",
+        "rewarded": "+{{amount}} USDT",
+        "rewardedMonth": "+1 mes gratis",
+        "expired": "Se venció el plazo",
+        "not_eligible": "No aplica"
+      },
+      "deadline": "Hasta el {{date}}",
       "redeemTitle": "¿Te invitó alguien?",
-      "redeemBody": "Escribe el código de quien te invitó antes de tu primer viaje. Esa persona gana un mes gratis.",
+      "redeemBody": "Escribe el código de quien te invitó antes de tu primer viaje. Esa persona gana un premio cuando completes {{trips}} viajes.",
       "codeLabel": "Código de invitación",
       "redeem": "Usar código",
       "redeemed": "¡Listo! Tu código quedó registrado",
@@ -745,7 +761,8 @@
     "idempotency_key_invalid": "No pudimos enviar esto. Inténtalo de nuevo.",
     "idempotency_key_reused": "No pudimos enviar esto. Inténtalo de nuevo.",
     "pickup_restricted": "No se puede recoger pasajeros en esta zona. Elige otro punto de recogida.",
-    "dropoff_restricted": "No se puede dejar pasajeros en esta zona. Elige otro destino cercano."
+    "dropoff_restricted": "No se puede dejar pasajeros en esta zona. Elige otro destino cercano.",
+    "referral_program_closed": "El programa de invitaciones no está recibiendo códigos ahora."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -1262,6 +1279,11 @@
       },
       "adjustment": {
         "title": "Ajuste de Kuulis"
+      },
+      "referral_bonus": {
+        "title": "Premio por invitar",
+        "titleNamed": "Premio por invitar a {{name}}",
+        "subtitle": "Crédito de Kuulis para tus cuotas"
       }
     },
     "topUpNow": "Recargar ahora",
@@ -1342,7 +1364,8 @@
         "transfers_in": "Transferencias recibidas",
         "transfers_out": "Transferencias enviadas",
         "fees": "Cuotas pagadas",
-        "adjustments": "Ajustes de Kuulis"
+        "adjustments": "Ajustes de Kuulis",
+        "referral_bonuses": "Premios por invitar"
       }
     }
   },
