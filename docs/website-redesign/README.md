@@ -1,6 +1,6 @@
 # Rediseño de la web pública
 
-Plan del rediseño completo de la web pública de Kuulis (`web/`). **Estado: plan aprobado (2026-10-17), nada implementado todavía.**
+Plan del rediseño completo de la web pública de Kuulis (`web/`). **Estado: plan aprobado (2026-10-17), en ejecución por milestones (ver Avance).**
 Carlos aprobó el plan completo el 2026-10-17 («apruebo todo»). Cada milestone se ejecuta solo cuando él lo pide.
 
 | Doc | Qué contiene |
@@ -44,4 +44,5 @@ Carlos respondió «apruebo todo»: vale la opción recomendada de cada pregunta
 | Plan (este directorio) | Aprobado 2026-10-17 |
 | M0 · Línea base | Hecho 2026-10-17 (ver 00 §9) |
 | M1 · Fundamentos | Hecho 2026-10-17 (ver 06 §2) |
-| M2 · Marco | Siguiente |
+| M2 · Marco | Hecho 2026-10-17 (ver 07 M2) |
+| M5 · Idiomas en URL y SEO por idioma | Siguiente |

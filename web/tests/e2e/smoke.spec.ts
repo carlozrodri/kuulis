@@ -12,10 +12,7 @@ const LOCALES = ['es', 'en'] as const
 const IGNORED_CONSOLE = [/cloudflareinsights/]
 
 // Known violations of the current site, each with the milestone that removes it. Delete the entry with the fix.
-const KNOWN_AXE: Record<string, string> = {
-  // The language button shows "EN" but is named "Change language to English" (WCAG 2.5.3).
-  'label-content-name-mismatch': 'M2',
-}
+const KNOWN_AXE: Record<string, string> = {}
 
 for (const locale of LOCALES) {
   for (const width of WIDTHS) {

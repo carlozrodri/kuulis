@@ -48,6 +48,14 @@ Reglas para todos los milestones:
 - **Depende de:** M1.
 - **Riesgos:** la cabecera transparente necesita que cada página tenga un primer bloque conocido → las páginas no
   migradas usan la cabecera sólida por defecto.
+- **Hecho (2026-10-17):** cabecera sólida con dos enlaces (Motorizados, Ayuda), selector de idioma y «Descargar la
+  app»; menú móvil como panel propio dentro de `SiteHeader` (no hizo falta un `MobileMenu` aparte); el selector
+  muestra el nombre del otro idioma («English»/«Español»), lo que quita la excepción de axe
+  `label-content-name-mismatch`; footer con la silueta del Ávila sacada de datos de elevación SRTM (Open-Meteo);
+  favicon e `icon-192.png` con la «k» y el punto amarillo. Pruebas nuevas en `web/tests/e2e/frame.spec.ts`.
+  Queda para después: la cabecera transparente sobre el hero (M3, necesita el hero nuevo) y el enlace «Seguridad»
+  (M6, cuando exista la página). Ojo: los componentes de `components/brand/` se usan con el prefijo `Brand`
+  (`<BrandAvilaRidge>`), por la convención de nombres de Nuxt.
 
 ## M3 · Inicio: hero y precio claro
 - **Objetivo:** la primera impresión.

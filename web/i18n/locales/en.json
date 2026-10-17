@@ -2,18 +2,26 @@
   "nav": {
     "label": "Main",
     "skip": "Skip to content",
+    "home": "Ride",
     "drivers": "Drivers",
     "download": "Download",
-    "legal": "Legal",
-    "language": "Cambiar el idioma a español",
-    "menu": "Menu",
-    "getApp": "Get the app",
     "help": "Help",
-    "contact": "Contact"
+    "contact": "Contact",
+    "legal": "Legal",
+    "getApp": "Get the app",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
+    "otherLanguage": "Español"
   },
   "footer": {
-    "tagline": "Motorbike rides in Venezuela. No commission per ride.",
-    "made": "Made in Venezuela"
+    "tagline": "Motorbike rides across Caracas. No commission per ride.",
+    "made": "Made in Caracas",
+    "kuulis": "Kuulis",
+    "help": "Help",
+    "legal": "Legal",
+    "helpCenter": "Help center",
+    "whatsapp": "WhatsApp",
+    "language": "Language"
   },
   "common": {
     "wait": "One moment…",
