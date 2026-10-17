@@ -129,14 +129,17 @@ function again() {
 </script>
 
 <template>
-  <section class="section">
-    <div class="container narrow">
-      <span class="eyebrow">{{ t('contact.eyebrow') }}</span>
-      <h1>{{ t('contact.title') }}</h1>
+  <section class="contact-page">
+    <div class="container-wide">
+      <PageHead
+        class="head"
+        :stop="t('contact.stop')"
+        :title="t('contact.title')"
+      />
 
       <div
         v-if="state === 'done'"
-        class="card"
+        class="card done"
         role="status"
       >
         <h2 class="done-title">
@@ -169,19 +172,44 @@ function again() {
         </div>
       </div>
 
-      <template v-else>
-        <p class="lead">
-          {{ t('contact.lead') }}
-          <template v-if="promise">
-            {{ promise }}
-          </template>
-        </p>
-        <p class="notice in-app">
-          {{ t('contact.inApp') }}
-        </p>
+      <div
+        v-else
+        class="grid-contact"
+      >
+        <div class="aside">
+          <p class="lead">
+            {{ t('contact.lead') }}
+            <template v-if="promise">
+              {{ promise }}
+            </template>
+          </p>
+          <p class="notice in-app">
+            {{ t('contact.inApp') }}
+          </p>
+          <div
+            v-if="whatsapp || supportEmail"
+            class="other"
+          >
+            <h2>{{ t('contact.other') }}</h2>
+            <div class="actions">
+              <a
+                v-if="whatsapp"
+                :href="whatsapp"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-ghost"
+              >{{ t('help.whatsapp') }}</a>
+              <a
+                v-if="supportEmail"
+                :href="`mailto:${supportEmail}`"
+                class="btn btn-ghost"
+              >{{ supportEmail }}</a>
+            </div>
+          </div>
+        </div>
 
         <form
-          class="card"
+          class="card form"
           novalidate
           @submit.prevent="submit"
           @focusin="warmUp"
@@ -275,41 +303,42 @@ function again() {
             </NuxtLinkLocale>.
           </p>
         </form>
-
-        <div
-          v-if="whatsapp || supportEmail"
-          class="other"
-        >
-          <h2>{{ t('contact.other') }}</h2>
-          <div class="actions">
-            <a
-              v-if="whatsapp"
-              :href="whatsapp"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn btn-ghost"
-            >{{ t('help.whatsapp') }}</a>
-            <a
-              v-if="supportEmail"
-              :href="`mailto:${supportEmail}`"
-              class="btn btn-ghost"
-            >{{ supportEmail }}</a>
-          </div>
-        </div>
-      </template>
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped>
+.contact-page {
+  padding-bottom: var(--section-y);
+}
+
+.head {
+  padding-bottom: var(--space-5);
+}
+
+.grid-contact {
+  display: grid;
+  gap: var(--space-6);
+  align-items: start;
+}
+
 .lead {
-  font-size: 1.15rem;
+  max-width: 34rem;
+  margin: 0 0 var(--space-5);
   color: var(--muted);
+  font-size: var(--font-lead);
+  line-height: 1.5;
 }
 
 .in-app {
+  max-width: 34rem;
+  margin: 0;
   background: var(--surface-alt);
-  margin-bottom: 24px;
+}
+
+.done {
+  max-width: 40rem;
 }
 
 .field .error {
@@ -323,7 +352,7 @@ function again() {
 .verifying {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2);
   background: var(--surface-alt);
 }
 
@@ -342,17 +371,23 @@ function again() {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.4s;
+  }
+}
+
 .wide {
   width: 100%;
-  margin-top: 8px;
+  margin-top: var(--space-2);
 }
 
 .privacy {
-  margin: 14px 0 0;
+  margin: var(--space-4) 0 0;
 }
 
 .small {
-  font-size: 0.9rem;
+  font-size: var(--font-small);
 }
 
 .done-title {
@@ -366,11 +401,23 @@ function again() {
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 8px;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 .other {
-  margin-top: 40px;
+  margin-top: var(--space-7);
+}
+
+.other h2 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-h3);
+}
+
+@media (min-width: 960px) {
+  .grid-contact {
+    grid-template-columns: 5fr 7fr;
+    column-gap: var(--space-9);
+  }
 }
 </style>

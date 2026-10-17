@@ -22,21 +22,6 @@
     padding: var(--space-8) 0;
   }
 
-  .grid {
-    display: grid;
-    gap: var(--space-4);
-  }
-
-  @media (min-width: 720px) {
-    .grid-2 {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .grid-3 {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
   /* Bands: on green or ink the primary button turns yellow (yellow is never used on light backgrounds). */
   .band-brand,
   .band-ink {

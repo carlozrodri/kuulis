@@ -24,68 +24,39 @@ async function confirm() {
 </script>
 
 <template>
-  <section class="section">
-    <div class="container box">
-      <div class="card">
-        <KuulisWordmark
-          :size="26"
-          class="mark"
-        />
-        <template v-if="state === 'done'">
-          <h1>{{ t('verify.doneTitle') }}</h1>
-          <p class="muted">
-            {{ t('verify.doneBody') }}
-          </p>
-        </template>
-        <template v-else-if="state === 'invalid'">
-          <h1>{{ t('verify.invalidTitle') }}</h1>
-          <p class="muted">
-            {{ t('verify.invalidBody') }}
-          </p>
-        </template>
-        <template v-else>
-          <h1>{{ t('verify.title') }}</h1>
-          <p class="muted">
-            {{ t('verify.body') }}
-          </p>
-          <p
-            v-if="state === 'failed'"
-            class="notice notice-danger"
-            role="alert"
-          >
-            {{ t('common.networkError') }}
-          </p>
-          <button
-            type="button"
-            class="btn btn-primary wide"
-            :disabled="state === 'saving'"
-            @click="confirm"
-          >
-            {{ state === 'saving' ? t('common.wait') : t('verify.button') }}
-          </button>
-        </template>
-      </div>
-    </div>
-  </section>
+  <UtilityCard>
+    <template v-if="state === 'done'">
+      <h1>{{ t('verify.doneTitle') }}</h1>
+      <p class="muted">
+        {{ t('verify.doneBody') }}
+      </p>
+    </template>
+    <template v-else-if="state === 'invalid'">
+      <h1>{{ t('verify.invalidTitle') }}</h1>
+      <p class="muted">
+        {{ t('verify.invalidBody') }}
+      </p>
+    </template>
+    <template v-else>
+      <h1>{{ t('verify.title') }}</h1>
+      <p class="muted">
+        {{ t('verify.body') }}
+      </p>
+      <p
+        v-if="state === 'failed'"
+        class="notice notice-danger"
+        role="alert"
+      >
+        {{ t('common.networkError') }}
+      </p>
+      <button
+        type="button"
+        class="btn btn-primary wide"
+        :disabled="state === 'saving'"
+        @click="confirm"
+      >
+        {{ state === 'saving' ? t('common.wait') : t('verify.button') }}
+      </button>
+    </template>
+  </UtilityCard>
 </template>
-
-<style scoped>
-.box {
-  max-width: 460px;
-}
-
-.mark {
-  color: var(--primary);
-  display: block;
-  margin-bottom: 24px;
-}
-
-h1 {
-  font-size: 1.7rem;
-}
-
-.wide {
-  width: 100%;
-  margin-top: 8px;
-}
-</style>

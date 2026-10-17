@@ -219,8 +219,7 @@
   "download": {
     "metaTitle": "Descargar Kuulis para Android",
     "metaDescription": "Instala la app de Kuulis en tu teléfono Android.",
-    "eyebrow": "Descargar",
-    "title": "Kuulis para Android",
+    "title": "Kuulis para Android.",
     "lead": "La app se instala desde esta página, sin pasar por la tienda.",
     "button": "Descargar Kuulis (APK)",
     "meta": "Versión {version} ({build}) · {size} MB · {date}",
@@ -235,18 +234,22 @@
       "body": "La versión para iPhone viene después. Te avisaremos aquí cuando esté disponible."
     },
     "android": {
-      "title": "Cómo instalarla",
+      "title": "Cómo instalarla.",
       "step1": "Toca el botón de descarga y abre el archivo cuando termine.",
       "step2": "Si Android te lo pide, permite instalar apps desde tu navegador.",
       "step3": "Toca Instalar y espera unos segundos.",
       "step4": "Abre Kuulis y crea tu cuenta.",
       "safety": "Descarga Kuulis solo desde esta página. Nunca te pediremos tu contraseña por WhatsApp ni por teléfono."
-    }
+    },
+    "stop": "Descargar",
+    "releaseTitle": "La versión más reciente",
+    "safetyTitle": "Descárgala solo desde aquí",
+    "iphoneFirst": "Estás viendo esta página desde un iPhone."
   },
   "legal": {
     "metaTitle": "Legal · Kuulis",
     "metaDescription": "Términos y condiciones, política de privacidad y normas de la comunidad de Kuulis.",
-    "title": "Legal",
+    "title": "Legal.",
     "lead": "Los textos que aceptas al usar Kuulis. Cuando cambian, te lo avisamos en la app.",
     "version": "Versión {version} · {date}",
     "kinds": {
@@ -255,7 +258,8 @@
       "community": "Normas de la comunidad",
       "driver_terms": "Términos para motorizados",
       "wallet": "Condiciones de la billetera"
-    }
+    },
+    "back": "Todos los textos legales"
   },
   "verify": {
     "title": "Confirma tu correo",
@@ -327,7 +331,6 @@
   "help": {
     "metaTitle": "Centro de ayuda · Kuulis",
     "metaDescription": "Respuestas a las preguntas más comunes sobre tu cuenta, los viajes, los pagos al motorizado, la billetera, la seguridad y los documentos en Kuulis.",
-    "eyebrow": "Ayuda",
     "title": "¿En qué te ayudamos?",
     "lead": "Busca tu pregunta o elige un tema. Si no encuentras la respuesta, escríbenos.",
     "search": "Buscar en la ayuda",
@@ -368,13 +371,13 @@
     "feedbackFailed": "No pudimos guardar tu respuesta. Intenta de nuevo.",
     "stillTitle": "¿Sigues con dudas?",
     "stillBody": "Escríbenos y te ayudamos.",
-    "stillButton": "Escríbenos"
+    "stillButton": "Escríbenos",
+    "stop": "Centro de ayuda"
   },
   "contact": {
     "metaTitle": "Contacto · Kuulis",
     "metaDescription": "Escríbele al equipo de Kuulis, aunque no puedas entrar a tu cuenta. Te respondemos por email.",
-    "eyebrow": "Contacto",
-    "title": "Escríbenos",
+    "title": "Escríbenos.",
     "lead": "¿No puedes entrar a tu cuenta o tienes otra consulta? Cuéntanos y te respondemos por email.",
     "inApp": "Si puedes entrar a la app, escríbenos desde Perfil → Ayuda: así vemos tu cuenta y tus viajes.",
     "name": "Tu nombre",
@@ -405,16 +408,16 @@
     "another": "Enviar otro mensaje",
     "helpLink": "Mientras tanto, mira el centro de ayuda",
     "other": "Otras formas de contactarnos",
-    "privacy": "Usamos estos datos solo para responderte. Lee nuestra"
+    "privacy": "Usamos estos datos solo para responderte. Lee nuestra",
+    "stop": "Contacto"
   },
   "invite": {
     "metaTitle": "Te invitan a Kuulis",
     "metaDescription": "Gana con tu moto en Kuulis: sin comisión por viaje. Regístrate como motorizado con este código.",
-    "eyebrow": "Invitación de motorizado",
     "title": "Te invitan a manejar con Kuulis",
     "titleNamed": "{name} te invita a manejar con Kuulis",
     "lead": "Gana con tu moto sin comisión por viaje: el pasajero te paga directo y solo pagas una cuota mensual los meses que trabajas.",
-    "freeMonth": "Si haces {trips} viajes en tus primeros {days} días, ganas un mes de suscripción gratis.",
+    "freeMonth": "Si haces {trips} viajes en tus primeros {days} días desde que te aprueban, ganas un mes de cuota gratis.",
     "paused": "El programa de invitaciones está en pausa, pero igual puedes registrarte como motorizado.",
     "codeLabel": "Código de invitación",
     "copy": "Copiar código",
@@ -429,7 +432,8 @@
     "more": "¿Quieres saber más?",
     "drivers": "Conoce cómo funciona para motorizados",
     "invalidTitle": "Esta invitación no existe",
-    "invalidBody": "Revisa el enlace o pide el código de nuevo a quien te invitó."
+    "invalidBody": "Revisa el enlace o pide el código de nuevo a quien te invitó.",
+    "stop": "Invitación de motorizado"
   },
   "payments": {
     "cash_usd": "Efectivo $",

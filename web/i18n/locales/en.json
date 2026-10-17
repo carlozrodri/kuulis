@@ -219,8 +219,7 @@
   "download": {
     "metaTitle": "Download Kuulis for Android",
     "metaDescription": "Install the Kuulis app on your Android phone.",
-    "eyebrow": "Download",
-    "title": "Kuulis for Android",
+    "title": "Kuulis for Android.",
     "lead": "The app is installed from this page, without going through the store.",
     "button": "Download Kuulis (APK)",
     "meta": "Version {version} ({build}) · {size} MB · {date}",
@@ -235,18 +234,22 @@
       "body": "The iPhone version comes later. We will announce it here when it is available."
     },
     "android": {
-      "title": "How to install it",
+      "title": "How to install it.",
       "step1": "Tap the download button and open the file when it finishes.",
       "step2": "If Android asks, allow installing apps from your browser.",
       "step3": "Tap Install and wait a few seconds.",
       "step4": "Open Kuulis and create your account.",
       "safety": "Download Kuulis only from this page. We will never ask for your password over WhatsApp or the phone."
-    }
+    },
+    "stop": "Download",
+    "releaseTitle": "The latest version",
+    "safetyTitle": "Only download it from here",
+    "iphoneFirst": "You're viewing this page on an iPhone."
   },
   "legal": {
     "metaTitle": "Legal · Kuulis",
     "metaDescription": "Kuulis terms and conditions, privacy policy and community guidelines.",
-    "title": "Legal",
+    "title": "Legal.",
     "lead": "The texts you accept when you use Kuulis. When they change, we tell you in the app.",
     "version": "Version {version} · {date}",
     "kinds": {
@@ -255,7 +258,8 @@
       "community": "Community guidelines",
       "driver_terms": "Driver terms",
       "wallet": "Wallet conditions"
-    }
+    },
+    "back": "All legal texts"
   },
   "verify": {
     "title": "Confirm your email",
@@ -327,7 +331,6 @@
   "help": {
     "metaTitle": "Help center · Kuulis",
     "metaDescription": "Answers to the most common questions about your account, rides, paying your driver, the wallet, safety and documents on Kuulis.",
-    "eyebrow": "Help",
     "title": "How can we help?",
     "lead": "Search for your question or pick a topic. If you can't find the answer, write to us.",
     "search": "Search the help center",
@@ -368,13 +371,13 @@
     "feedbackFailed": "We could not save your answer. Please try again.",
     "stillTitle": "Still have questions?",
     "stillBody": "Write to us and we'll help.",
-    "stillButton": "Write to us"
+    "stillButton": "Write to us",
+    "stop": "Help center"
   },
   "contact": {
     "metaTitle": "Contact · Kuulis",
     "metaDescription": "Write to the Kuulis team, even if you can't sign in to your account. We answer by email.",
-    "eyebrow": "Contact",
-    "title": "Write to us",
+    "title": "Write to us.",
     "lead": "Can't sign in to your account or have another question? Tell us and we'll answer by email.",
     "inApp": "If you can open the app, write to us from Profile → Help: that way we see your account and rides.",
     "name": "Your name",
@@ -405,16 +408,16 @@
     "another": "Send another message",
     "helpLink": "Meanwhile, browse the help center",
     "other": "Other ways to reach us",
-    "privacy": "We only use this data to answer you. Read our"
+    "privacy": "We only use this data to answer you. Read our",
+    "stop": "Contact"
   },
   "invite": {
     "metaTitle": "You're invited to Kuulis",
     "metaDescription": "Earn with your motorbike on Kuulis: no per-ride commission. Sign up as a driver with this code.",
-    "eyebrow": "Driver invitation",
     "title": "You're invited to drive with Kuulis",
     "titleNamed": "{name} invites you to drive with Kuulis",
     "lead": "Earn with your motorbike with no per-ride commission: riders pay you directly and you only pay a monthly fee in the months you work.",
-    "freeMonth": "Complete {trips} rides in your first {days} days and get a free month of subscription.",
+    "freeMonth": "Complete {trips} rides in your first {days} days after approval and get a month of fees free.",
     "paused": "The invite program is paused, but you can still sign up as a driver.",
     "codeLabel": "Invite code",
     "copy": "Copy code",
@@ -429,7 +432,8 @@
     "more": "Want to know more?",
     "drivers": "See how it works for drivers",
     "invalidTitle": "This invitation doesn't exist",
-    "invalidBody": "Check the link or ask whoever invited you for the code again."
+    "invalidBody": "Check the link or ask whoever invited you for the code again.",
+    "stop": "Driver invitation"
   },
   "payments": {
     "cash_usd": "Cash $",

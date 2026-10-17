@@ -60,13 +60,12 @@ useSeoMeta({
 
 <template>
   <div>
-    <section class="section intro">
-      <div class="container narrow">
-        <span class="eyebrow">{{ t('help.eyebrow') }}</span>
-        <h1>{{ t('help.title') }}</h1>
-        <p class="lead">
-          {{ t('help.lead') }}
-        </p>
+    <div class="container narrow">
+      <PageHead
+        :stop="t('help.stop')"
+        :title="t('help.title')"
+        :lead="t('help.lead')"
+      >
         <form
           role="search"
           class="search"
@@ -108,10 +107,10 @@ useSeoMeta({
             {{ t(`help.audience.${value ?? 'all'}`) }}
           </button>
         </div>
-      </div>
-    </section>
+      </PageHead>
+    </div>
 
-    <section class="container narrow">
+    <section class="container narrow body">
       <p
         v-if="error && !articles"
         class="notice notice-danger"
@@ -160,27 +159,11 @@ useSeoMeta({
           class="topic"
         >
           <h2>{{ t(`help.topics.${group.topic}`) }}</h2>
-          <div class="list">
-            <NuxtLinkLocale
-              v-for="article in group.items"
-              :key="article.id"
-              :to="`/ayuda/${article.slug}`"
-              class="card item"
-            >
-              <span>
-                <strong>{{ article.title }}</strong>
-                <span
-                  v-if="article.excerpt"
-                  class="muted small"
-                >{{ article.excerpt }}</span>
-              </span>
-              <span aria-hidden="true">→</span>
-            </NuxtLinkLocale>
-          </div>
+          <LinkList :items="group.items.map(article => ({ key: article.id, to: `/ayuda/${article.slug}`, title: article.title, meta: article.excerpt || undefined }))" />
         </div>
       </template>
 
-      <div class="card contact">
+      <div class="contact">
         <div>
           <h2>{{ t('help.contactTitle') }}</h2>
           <p class="muted">
@@ -208,41 +191,31 @@ useSeoMeta({
 </template>
 
 <style scoped>
-.intro {
-  padding-bottom: 32px;
-}
-
-.lead {
-  font-size: 1.2rem;
-  color: var(--muted);
-}
-
 .search {
   display: flex;
-  gap: 10px;
-  margin-top: 8px;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
 }
 
 .search input {
   flex: 1;
   min-width: 0;
   min-height: 52px;
-  padding: 0 18px;
+  padding: 0 var(--space-5);
   border: 2px solid var(--border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--surface);
   color: var(--text);
   font: inherit;
 }
 
 .search input:focus {
-  outline: none;
   border-color: var(--primary);
 }
 
 @media (max-width: 480px) {
   .search .btn {
-    padding: 0 18px;
+    padding: 0 var(--space-4);
   }
 }
 
@@ -250,25 +223,28 @@ useSeoMeta({
 .topics {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 16px;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
 }
 
 .topics {
-  margin: 0 0 8px;
+  margin: 0 0 var(--space-2);
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-4);
   border: 0;
+  border-radius: var(--radius-pill);
   background: var(--surface-alt);
   color: var(--text);
   font: inherit;
   font-weight: 700;
-  font-size: 0.9rem;
-  border-radius: 999px;
-  padding: 8px 14px;
-  cursor: pointer;
+  font-size: var(--font-small);
   text-decoration: none;
+  cursor: pointer;
 }
 
 .chip[aria-pressed='true'] {
@@ -276,15 +252,20 @@ useSeoMeta({
   color: var(--on-primary);
 }
 
+.body {
+  padding-bottom: var(--section-y);
+}
+
 .results-head {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .link {
+  min-height: 44px;
   border: 0;
   background: none;
   padding: 0;
@@ -295,48 +276,36 @@ useSeoMeta({
 }
 
 .empty {
-  margin: 24px 0;
+  margin: var(--space-5) 0;
 }
 
 .topic {
-  margin-top: 32px;
-  scroll-margin-top: 84px;
+  margin-top: var(--space-7);
+  scroll-margin-top: 88px;
 }
 
-.list {
-  display: grid;
-  gap: 12px;
+.topic h2,
+.results-head h2 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-h3);
 }
 
-.item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  color: var(--text);
-  text-decoration: none;
-}
-
-.item > span:first-child {
-  display: grid;
-  gap: 4px;
-}
-
-.small {
-  font-size: 0.9rem;
-}
-
+/* Not found: a tinted block, the way out of the help center. */
 .contact {
-  margin-top: 48px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
 }
 
 .contact h2 {
-  margin-top: 0;
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-h3);
 }
 
 .contact p {
@@ -346,6 +315,6 @@ useSeoMeta({
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-2);
 }
 </style>
