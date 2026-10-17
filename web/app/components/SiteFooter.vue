@@ -14,30 +14,50 @@ const legal = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as con
     <div class="band">
       <div class="container-wide grid-footer">
         <div class="brand">
-          <NuxtLink
+          <NuxtLinkLocale
             to="/"
             class="logo"
             aria-label="Kuulis"
           >
             <KuulisWordmark :size="32" />
-          </NuxtLink>
+          </NuxtLinkLocale>
           <p>{{ t('footer.tagline') }}</p>
         </div>
 
         <nav :aria-label="t('footer.kuulis')">
           <h2>{{ t('footer.kuulis') }}</h2>
           <ul>
-            <li><NuxtLink to="/">{{ t('nav.home') }}</NuxtLink></li>
-            <li><NuxtLink to="/motorizados">{{ t('nav.drivers') }}</NuxtLink></li>
-            <li><NuxtLink to="/descargar">{{ t('nav.download') }}</NuxtLink></li>
+            <li>
+              <NuxtLinkLocale to="/">
+                {{ t('nav.home') }}
+              </NuxtLinkLocale>
+            </li>
+            <li>
+              <NuxtLinkLocale to="/motorizados">
+                {{ t('nav.drivers') }}
+              </NuxtLinkLocale>
+            </li>
+            <li>
+              <NuxtLinkLocale to="/descargar">
+                {{ t('nav.download') }}
+              </NuxtLinkLocale>
+            </li>
           </ul>
         </nav>
 
         <nav :aria-label="t('footer.help')">
           <h2>{{ t('footer.help') }}</h2>
           <ul>
-            <li><NuxtLink to="/ayuda">{{ t('footer.helpCenter') }}</NuxtLink></li>
-            <li><NuxtLink to="/contacto">{{ t('nav.contact') }}</NuxtLink></li>
+            <li>
+              <NuxtLinkLocale to="/ayuda">
+                {{ t('footer.helpCenter') }}
+              </NuxtLinkLocale>
+            </li>
+            <li>
+              <NuxtLinkLocale to="/contacto">
+                {{ t('nav.contact') }}
+              </NuxtLinkLocale>
+            </li>
             <li v-if="whatsapp">
               <a
                 :href="whatsapp"
@@ -58,9 +78,9 @@ const legal = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as con
               v-for="kind in legal"
               :key="kind"
             >
-              <NuxtLink :to="`/legal/${kind}`">
+              <NuxtLinkLocale :to="`/legal/${kind}`">
                 {{ t(`legal.kinds.${kind}`) }}
-              </NuxtLink>
+              </NuxtLinkLocale>
             </li>
           </ul>
         </nav>

@@ -161,7 +161,7 @@ useSeoMeta({
         >
           <h2>{{ t(`help.topics.${group.topic}`) }}</h2>
           <div class="list">
-            <NuxtLink
+            <NuxtLinkLocale
               v-for="article in group.items"
               :key="article.id"
               :to="`/ayuda/${article.slug}`"
@@ -175,7 +175,7 @@ useSeoMeta({
                 >{{ article.excerpt }}</span>
               </span>
               <span aria-hidden="true">→</span>
-            </NuxtLink>
+            </NuxtLinkLocale>
           </div>
         </div>
       </template>
@@ -188,12 +188,12 @@ useSeoMeta({
           </p>
         </div>
         <div class="actions">
-          <NuxtLink
+          <NuxtLinkLocale
             to="/contacto"
             class="btn btn-primary"
           >
             {{ t('help.contactButton') }}
-          </NuxtLink>
+          </NuxtLinkLocale>
           <a
             v-if="whatsapp"
             :href="whatsapp"

@@ -25,18 +25,18 @@ const faq = computed(() => (tm('home.faq.items') as { q: unknown, a: unknown }[]
             {{ t('home.lead') }}
           </p>
           <div class="actions">
-            <NuxtLink
+            <NuxtLinkLocale
               to="/descargar"
               class="btn btn-accent"
             >
               {{ t('home.download') }}
-            </NuxtLink>
-            <NuxtLink
+            </NuxtLinkLocale>
+            <NuxtLinkLocale
               to="/motorizados"
               class="btn btn-ghost"
             >
               {{ t('home.drive') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </div>
         </div>
         <div
@@ -136,12 +136,12 @@ const faq = computed(() => (tm('home.faq.items') as { q: unknown, a: unknown }[]
           <p class="lead-muted">
             {{ t('home.drivers.body', { months: freeMonths }) }}
           </p>
-          <NuxtLink
+          <NuxtLinkLocale
             to="/motorizados"
             class="btn btn-primary"
           >
             {{ t('home.drivers.cta') }}
-          </NuxtLink>
+          </NuxtLinkLocale>
         </div>
         <div class="card">
           <h3>{{ t('home.drivers.tableTitle') }}</h3>
@@ -200,12 +200,12 @@ const faq = computed(() => (tm('home.faq.items') as { q: unknown, a: unknown }[]
       <div class="final">
         <h2>{{ t('home.final.title') }}</h2>
         <p>{{ t('home.final.body') }}</p>
-        <NuxtLink
+        <NuxtLinkLocale
           to="/descargar"
           class="btn btn-accent"
         >
           {{ t('home.download') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </section>
   </div>

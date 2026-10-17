@@ -74,9 +74,9 @@ async function vote(helpful: boolean) {
   >
     <article class="container narrow">
       <nav class="crumbs">
-        <NuxtLink to="/ayuda">
+        <NuxtLinkLocale to="/ayuda">
           ← {{ t('help.back') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
         <span class="muted">· {{ t(`help.topics.${article.topic}`) }}</span>
       </nav>
       <h1>{{ article.title }}</h1>
@@ -131,12 +131,12 @@ async function vote(helpful: boolean) {
         <p class="muted">
           {{ t('help.stillBody') }}
         </p>
-        <NuxtLink
+        <NuxtLinkLocale
           to="/contacto"
           class="btn btn-primary"
         >
           {{ t('help.stillButton') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </article>
   </section>

@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import { englishPath } from '../../i18n/pages'
 
 // Smoke test of the public pages (docs/website-redesign/08): each page loads in both languages, has one h1,
 // the right <html lang>, no horizontal scroll on a small phone or a desktop, no console errors and no serious
@@ -7,6 +8,9 @@ import { expect, test } from '@playwright/test'
 const PAGES = ['/', '/motorizados', '/descargar', '/ayuda', '/contacto', '/legal']
 const WIDTHS = [320, 1440]
 const LOCALES = ['es', 'en'] as const
+
+// A Spanish-speaking browser, so / is not redirected to /en.
+test.use({ locale: 'es-VE' })
 
 // Injected by the CDN in front of QA, blocked by our CSP on purpose: not the site's error.
 const IGNORED_CONSOLE = [/cloudflareinsights/]
@@ -17,15 +21,15 @@ const KNOWN_AXE: Record<string, string> = {}
 for (const locale of LOCALES) {
   for (const width of WIDTHS) {
     for (const path of PAGES) {
-      test(`${locale} ${width}px ${path}`, async ({ page, context, baseURL }) => {
-        await context.addCookies([{ name: 'kuulis_locale', value: locale, url: baseURL! }])
+      const url = locale === 'en' ? englishPath(path) : path
+      test(`${locale} ${width}px ${url}`, async ({ page }) => {
         await page.setViewportSize({ width, height: 900 })
         const errors: string[] = []
         page.on('console', (message) => {
           if (message.type() === 'error' && !IGNORED_CONSOLE.some(re => re.test(message.text()))) errors.push(message.text())
         })
 
-        const response = await page.goto(path, { waitUntil: 'networkidle' })
+        const response = await page.goto(url, { waitUntil: 'networkidle' })
         expect(response?.status()).toBe(200)
         await expect(page.locator('html')).toHaveAttribute('lang', locale)
         await expect(page.locator('h1')).toHaveCount(1)
