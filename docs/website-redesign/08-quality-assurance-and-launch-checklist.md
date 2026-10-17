@@ -62,7 +62,7 @@ verificar (p. ej. Safari real o un lector de pantalla), se escribe «no verifica
 ## 7. Rendimiento (Lighthouse CLI, móvil, sobre `pnpm build && pnpm preview` y sobre QA)
 - [x] LCP ≤ 2,5 s, CLS ≤ 0,05, TBT ≤ 150 ms en inicio, motorizados y descargar (QA: 2,1 s, 0, 60–100 ms; ver 00 §9).
 - [x] Peso transferido de la primera visita a inicio ≤ 300 KB (196 KB).
-- [ ] JS comprimido ≤ línea base + 8 KB. **Excepción a aprobar por Carlos:** inicio pasa de 103 a 127 KB
+- [x] JS comprimido ≤ línea base + 8 KB. **Excepción aprobada por Carlos (2026-10-17):** inicio pasa de 103 a 127 KB
       transferidos (+24 KB), por las secciones nuevas en trozos pequeños; el peso total y el rendimiento siguen en
       presupuesto.
 - [x] Puntuaciones: Rendimiento ≥ 90, Accesibilidad ≥ 95, Buenas prácticas ≥ 95, SEO = 100 (producción).
