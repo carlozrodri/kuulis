@@ -23,22 +23,20 @@ Carlos aprobó el plan completo el 2026-10-17 («apruebo todo»). Cada milestone
 
 ## Convenciones
 - Igual que `docs/produccion/`: cada decisión se marca como **Decidido** (lo dijo Carlos) o **Supuesto**
-  (propuesta a validar). Las preguntas abiertas están abajo.
+  (propuesta a validar). Las decisiones de Carlos están abajo.
 - Los milestones se entregan uno por uno, como PR a `qa`. Nada pasa a `main` sin el OK de Carlos.
 
 ## Decidido (2026-10-17)
-Carlos respondió «apruebo todo»: cuenta la opción recomendada de cada pregunta.
-1. **URLs en inglés** (`/en`, `/en/drivers`…) para que el inglés se pueda indexar y compartir. Recomendado: sí.
-2. **Fotografía:** (a) lanzar solo con capturas reales y gráficos de marca, y decidir fotos después; (b) sesión
-   con fotógrafo en Caracas; (c) imágenes con IA sin personas. Recomendado: (a). No hace falta comprar nada ahora.
-3. **Tipografía:** mantener solo Plus Jakarta Sans (la de la app). Recomendado: sí.
-4. **Capturas de la app:** las sacas tú en tu Android con el build de QA y yo preparo los datos y las limpio, o las
-   saco yo del build web. Recomendado: tu Android (es la app real).
-5. **Pruebas automáticas:** añadir `@playwright/test` y `@axe-core/playwright` como dependencias de desarrollo
-   (no pesan en la web). Recomendado: sí.
-6. **Titular del hero:** A «En moto por Caracas. Precio claro, y punto.», B «Pide tu moto. Mira el precio. Y punto.»,
-   C «Tu moto, sin regateo.» Recomendado: A.
-7. **Redes sociales:** ¿Kuulis tiene cuentas? Si no, el footer va sin iconos. Recomendado: sin iconos hasta que existan.
+Carlos respondió «apruebo todo»: vale la opción recomendada de cada pregunta.
+1. **URLs en inglés:** sí (`/en`, `/en/drivers`, `/en/safety`…), para que el inglés se indexe y se comparta.
+2. **Fotografía:** se lanza solo con capturas reales y gráficos de marca; las fotos se deciden después. No se
+   compra ninguna suscripción de IA por ahora.
+3. **Tipografía:** solo Plus Jakarta Sans (la de la app).
+4. **Capturas de la app:** las saca Carlos en su Android con el build de QA; Claude prepara los datos y las limpia.
+5. **Pruebas automáticas:** se añaden `@playwright/test` y `@axe-core/playwright` como dependencias de desarrollo.
+6. **Titular del hero:** «En moto por Caracas. Precio claro, y punto.» / «Across Caracas by motorbike. A clear
+   price, full stop.»
+7. **Redes sociales:** el footer va sin iconos hasta que existan cuentas.
 
 ## Avance
 | Milestone | Estado |
