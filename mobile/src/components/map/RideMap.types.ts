@@ -3,6 +3,9 @@ import type { ReactNode } from 'react';
 import type { Coordinate } from '@/lib/ride';
 import type { DriverLocation, LatLng } from '@/lib/types';
 
+/** A filled polygon under the markers (doc 21: demand cells). */
+export type MapArea = { id: string; coordinates: LatLng[]; fill: string; stroke: string };
+
 export type RideMapProps = {
   pickup?: LatLng | null;
   dropoff?: LatLng | null;
@@ -28,6 +31,10 @@ export type RideMapProps = {
   recenterButton?: boolean;
   /** Distance of the recentre button from the bottom (defaults to just above `insets.bottom`). */
   recenterBottom?: number;
+  /** Polygons drawn under the route and the markers. */
+  areas?: MapArea[];
+  /** Moves the camera there once each time `key` changes (and stops following the user). */
+  focus?: { point: LatLng; key: string | number } | null;
   /** Extra overlays rendered on top of the map (pulsing rings, centre pin). */
   children?: ReactNode;
 };

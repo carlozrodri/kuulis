@@ -53,6 +53,8 @@ from apps.updates.router import router as updates_router
 from apps.users.router import router as users_router
 from apps.wallet.router import admin_router as wallet_admin_router
 from apps.wallet.router import router as wallet_router
+from apps.zones.router import admin_router as zones_admin_router
+from apps.zones.router import router as zones_router
 
 api_v1 = APIRouter()
 # FastAPI tries the routes in this order on every request, so the ones the apps call most go
@@ -70,6 +72,7 @@ api_v1.include_router(drivers_router)
 api_v1.include_router(auth_router)
 api_v1.include_router(realtime_router)
 api_v1.include_router(places_router)
+api_v1.include_router(zones_router)
 api_v1.include_router(safety_router)
 api_v1.include_router(legal_router)
 api_v1.include_router(privacy_router)
@@ -108,6 +111,7 @@ api_v1.include_router(safety_admin_router)
 api_v1.include_router(quality_router)
 api_v1.include_router(quality_admin_router)
 api_v1.include_router(risk_admin_router)
+api_v1.include_router(zones_admin_router)
 
 root = APIRouter()
 root.include_router(health_router)

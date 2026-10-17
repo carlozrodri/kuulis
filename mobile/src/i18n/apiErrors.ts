@@ -67,6 +67,11 @@ export const ADMIN_ONLY_ERROR_CODES = new Set([
   'update_exists',
   'update_not_current',
   'updates_signing_disabled',
+  // Doc 21: the zones editor.
+  'city_not_found',
+  'geojson_invalid',
+  'zone_invalid',
+  'zone_not_found',
   // The public web's contact form (the app sends no captcha).
   'captcha_invalid',
 ]);

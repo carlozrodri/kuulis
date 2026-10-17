@@ -341,6 +341,8 @@ export interface ServiceArea {
   max_lat: number
   min_lng: number
   max_lng: number
+  /** Doc 21: [lat, lng] vertices; when set the box is the rectangle around it. null = the box. */
+  polygon?: [number, number][] | null
 }
 
 export type PaymentMethod = 'cash_usd' | 'pago_movil' | 'binance' | 'zelle' | 'cash_ves'
@@ -2349,4 +2351,97 @@ export interface DriverEconomics {
   ride_hours: number
   utilization: number | null
   utilization_spread: ValueBucket[]
+}
+
+// ---- Doc 21: zones and demand (docs/api/zonas.md) ----
+
+/** [lat, lng], Leaflet's order (the GeoJSON import/export uses [lng, lat]). */
+export type Coord = [number, number]
+
+export type ZoneKind = 'surge' | 'restricted' | 'pickup'
+export const ZONE_KINDS: ZoneKind[] = ['surge', 'restricted', 'pickup']
+
+export interface ZonePoint {
+  name: string
+  lat: number
+  lng: number
+}
+
+export interface SurgeRules {
+  multiplier: Decimal
+  /** 0 = Monday; empty = every day. */
+  days: number[]
+  start: string | null
+  end: string | null
+}
+
+export interface RestrictedRules {
+  pickup: boolean
+  dropoff: boolean
+  message: Localized
+  /** Suggested exits. */
+  points: ZonePoint[]
+}
+
+export interface PickupRules {
+  points: ZonePoint[]
+}
+
+export type ZoneRules = Partial<SurgeRules> & Partial<Omit<RestrictedRules, 'points'>> & { points?: ZonePoint[] }
+
+export interface Zone {
+  id: string
+  kind: ZoneKind
+  name: string
+  city: string
+  polygon: Coord[]
+  active: boolean
+  starts_at: string | null
+  ends_at: string | null
+  rules: ZoneRules
+  created_at: string
+  updated_at: string
+}
+
+export type ZoneWrite = Omit<Zone, 'id' | 'created_at' | 'updated_at'>
+
+/** GET /admin/zones/cities. */
+export interface ZoneCity {
+  name: string
+  polygon: Coord[] | null
+  min_lat: number
+  max_lat: number
+  min_lng: number
+  max_lng: number
+  center: Coord
+}
+
+/** POST /admin/zones/import. */
+export interface ZoneImportResult {
+  cities: number
+  created: number
+  updated: number
+  skipped: { index: number, reason: string }[]
+}
+
+export type DemandLevel = 1 | 2 | 3
+
+export interface DemandCell {
+  cell: string
+  boundary: Coord[]
+  center: Coord
+  level: DemandLevel
+  requests: number
+  unmatched: number
+  /** Only in the admin snapshot. */
+  drivers?: number
+  name?: string | null
+}
+
+export interface DemandSnapshot {
+  enabled: boolean
+  updated_at?: string | null
+  window_minutes?: number
+  cells: DemandCell[]
+  hot?: { name: string, level: DemandLevel, distance_m: number, center: Coord } | null
 }

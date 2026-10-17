@@ -113,6 +113,9 @@
     "check_not_requested": [
       "apps/drivers/verification.py"
     ],
+    "city_not_found": [
+      "apps/zones/services.py"
+    ],
     "client_id_required": [
       "apps/control/router.py"
     ],
@@ -178,6 +181,9 @@
     "driver_requirements_missing": [
       "apps/drivers/services.py"
     ],
+    "dropoff_restricted": [
+      "apps/zones/services.py"
+    ],
     "email_taken": [
       "apps/staff/services.py",
       "apps/users/services.py"
@@ -213,6 +219,9 @@
     ],
     "flag_not_found": [
       "apps/control/services.py"
+    ],
+    "geojson_invalid": [
+      "apps/zones/services.py"
     ],
     "help_article_not_found": [
       "apps/support/services.py"
@@ -352,6 +361,9 @@
     ],
     "permission_denied": [
       "kuulis/core/exceptions.py"
+    ],
+    "pickup_restricted": [
+      "apps/zones/services.py"
     ],
     "pin_attempts_exceeded": [
       "apps/rides/state.py"
@@ -653,6 +665,12 @@
     ],
     "vehicle_year_invalid": [
       "apps/drivers/services.py"
+    ],
+    "zone_invalid": [
+      "apps/zones/services.py"
+    ],
+    "zone_not_found": [
+      "apps/zones/services.py"
     ]
   }
 }

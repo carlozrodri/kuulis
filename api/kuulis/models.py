@@ -51,6 +51,7 @@ from apps.support.models import CannedResponse, HelpArticle, LostItemRequest  # 
 from apps.updates.models import AppUpdate  # noqa: F401
 from apps.users.models import SocialAccount, User  # noqa: F401
 from apps.wallet.models import Receipt, TopUp, Wallet, WalletEntry  # noqa: F401
+from apps.zones.models import Zone  # noqa: F401
 from kuulis.core.models import Base
 
 metadata = Base.metadata

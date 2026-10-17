@@ -8,6 +8,7 @@ import {
   Bike,
   Check,
   Clock,
+  Flame,
   type Icon,
   LifeBuoy,
   Lock,
@@ -33,6 +34,7 @@ import {
   usesDefaultQuiet,
 } from '@/lib/notificationPreferences';
 import type { NotificationPreferencesUpdate } from '@/lib/types';
+import { useMode } from '@/providers/ModeProvider';
 import { radius, space, useTheme } from '@/theme';
 
 /** What always arrives, whatever the user picks (only marketing can be turned off). */
@@ -53,6 +55,8 @@ export function NotificationSettingsScreen() {
   const prefs = useNotificationPreferences();
   const update = useUpdateNotificationPreferences();
   const [picking, setPicking] = useState<'quiet_start' | 'quiet_end' | null>(null);
+  // Doc 21: demand alerts only matter in driver mode (and only servers that know them send the field).
+  const { mode } = useMode();
 
   const save = (change: NotificationPreferencesUpdate) =>
     update.mutate(change, { onError: (e) => showToast(apiErrorMessage(e), 'danger') });
@@ -97,6 +101,20 @@ export function NotificationSettingsScreen() {
               />
             </Card>
           </Section>
+
+          {mode === 'driver' && typeof data.demand_alerts === 'boolean' ? (
+            <Section title={t('notifications.settings.driver')}>
+              <Card style={{ paddingVertical: space.xxs }}>
+                <ToggleRow
+                  icon={Flame}
+                  title={t('notifications.settings.demandAlerts')}
+                  subtitle={t('notifications.settings.demandAlertsHint')}
+                  value={data.demand_alerts}
+                  onChange={(value) => save({ demand_alerts: value })}
+                />
+              </Card>
+            </Section>
+          ) : null}
 
           <Section title={t('notifications.settings.always')}>
             <Card style={{ paddingVertical: space.xxs }}>

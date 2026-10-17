@@ -30,6 +30,17 @@ export interface MapRectangle {
   label?: string
 }
 
+export interface MapPolygon {
+  id: string
+  points: LatLng[]
+  color: string
+  fillOpacity?: number
+  dashed?: boolean
+  weight?: number
+  /** Plain text tooltip, rendered with textContent. */
+  label?: string
+}
+
 /** Caracas centre, used when there is nothing to fit the map to. */
 export const CARACAS_CENTER: LatLng = [10.4806, -66.9036]
 

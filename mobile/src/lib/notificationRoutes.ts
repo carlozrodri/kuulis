@@ -67,6 +67,16 @@ export function campaignNotificationId(payload: unknown): string | null {
   return notificationType(payload) === 'campaign' ? str(fields, 'notification_id') : null;
 }
 
+/** Doc 21: where a demand push points ({type: "demand", name, lat, lng}), or null. */
+export function demandPushPoint(payload: unknown): { lat: number; lng: number } | null {
+  if (notificationType(payload) !== 'demand') return null;
+  const fields = fieldsOf(payload);
+  const lat = Number(fields.lat);
+  const lng = Number(fields.lng);
+  if (fields.lat == null || fields.lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat, lng };
+}
+
 /** Ride completed: the screen depends on whether a rating is pending, so the opener asks first. */
 export const needsPendingRating = (payload: unknown) =>
   notificationType(payload) === 'ride' && notificationEvent(payload) === 'completed';
@@ -147,6 +157,9 @@ export function hrefForNotification(payload: unknown, context: NotificationConte
     case 'risk':
       // Doc 16: a mock location app took the driver offline; home says why and goes online again.
       return { kind: 'route', href: '/', mode: 'driver' };
+    case 'demand':
+      // Doc 21: "Mucha demanda en Chacao" opens the driver home (the drive map), with the demand layer there.
+      return { kind: 'route', href: '/', mode: 'driver' };
     case 'driver_status':
     case 'driver_document':
       // Driver home shows the application or the documents that need something.
@@ -179,7 +192,7 @@ export function notificationKind(payload: unknown, category?: string | null): No
   if (type === 'campaign' || category === 'marketing') return 'campaign';
   if (type === 'safety' || category === 'safety') return 'safety';
   if (type === 'support' || type === 'lost_item' || type?.startsWith('report') || category === 'support') return 'support';
-  if (type === 'ride' || type?.startsWith('ride')) return 'ride';
+  if (type === 'ride' || type?.startsWith('ride') || type === 'demand') return 'ride';
   if (type === 'wallet' || type === 'promo_credit') return 'wallet';
   if (type?.startsWith('subscription')) return 'subscription';
   if (type?.startsWith('driver_')) return 'documents';

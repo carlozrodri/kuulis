@@ -504,6 +504,16 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
                   @click="removeArea(index)"
                 />
               </div>
+              <p
+                v-if="area.polygon?.length"
+                class="text-sm text-(--ui-text-muted)"
+              >
+                {{ t('settings.area.polygon') }}
+                <NuxtLink
+                  to="/zones"
+                  class="text-primary hover:underline"
+                >{{ t('nav.zones') }}</NuxtLink>
+              </p>
               <div class="grid gap-4 sm:grid-cols-2">
                 <UFormField :label="t('settings.area.minLat')">
                   <UInputNumber
@@ -512,7 +522,7 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
                     :max="90"
                     :step="0.01"
                     :format-options="coordFormat"
-                    :disabled="readOnly"
+                    :disabled="readOnly || !!area.polygon?.length"
                   />
                 </UFormField>
                 <UFormField :label="t('settings.area.maxLat')">
@@ -522,7 +532,7 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
                     :max="90"
                     :step="0.01"
                     :format-options="coordFormat"
-                    :disabled="readOnly"
+                    :disabled="readOnly || !!area.polygon?.length"
                   />
                 </UFormField>
                 <UFormField :label="t('settings.area.minLng')">
@@ -532,7 +542,7 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
                     :max="180"
                     :step="0.01"
                     :format-options="coordFormat"
-                    :disabled="readOnly"
+                    :disabled="readOnly || !!area.polygon?.length"
                   />
                 </UFormField>
                 <UFormField :label="t('settings.area.maxLng')">
@@ -542,7 +552,7 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
                     :max="180"
                     :step="0.01"
                     :format-options="coordFormat"
-                    :disabled="readOnly"
+                    :disabled="readOnly || !!area.polygon?.length"
                   />
                 </UFormField>
               </div>

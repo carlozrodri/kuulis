@@ -28,7 +28,14 @@ DEFAULTS = {
     "fare_rounding": "0.10",
     "payment_methods": ["cash_usd", "pago_movil", "binance", "zelle", "cash_ves"],
     "service_areas": [
-        {"name": "Caracas", "min_lat": 10.35, "max_lat": 10.56, "min_lng": -67.1, "max_lng": -66.7}
+        {
+            "name": "Caracas",
+            "min_lat": 10.35,
+            "max_lat": 10.56,
+            "min_lng": -67.1,
+            "max_lng": -66.7,
+            "polygon": None,
+        }
     ],
     "offer_timeout_seconds": 15,
     "search_radius_m": [2000, 4000, 7000],
@@ -139,6 +146,15 @@ DEFAULTS = {
         "new_account_days": 7,
         "rating_ring_rides": 3,
     },
+    "intercity_pairs": [],
+    "demand": {
+        "enabled": True,
+        "window_minutes": 15,
+        "hot_requests": 3,
+        "notify": True,
+        "notify_radius_m": 3000,
+        "notify_every_minutes": 30,
+    },
 }
 
 
@@ -235,6 +251,7 @@ VALENCIA = {
     "max_lat": 39.55,
     "min_lng": -0.45,
     "max_lng": -0.3,
+    "polygon": None,
 }
 
 
@@ -257,7 +274,7 @@ async def test_legacy_single_service_area_is_migrated(client):
         session.add(AppSetting(key="service_area", value=legacy))
         await session.commit()
     body = (await client.get("/api/v1/config/public")).json()
-    assert body["service_areas"] == [{"name": "Caracas", **legacy}]
+    assert body["service_areas"] == [{"name": "Caracas", **legacy, "polygon": None}]
 
 
 async def test_public_site_for_the_website(client):

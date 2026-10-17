@@ -168,7 +168,10 @@
       "useDefault": "Usar el horario recomendado ({{start}} a {{end}})",
       "quietHint": "Entre las {{start}} y las {{end}} (hora de Caracas) no te enviamos promociones. Los avisos de tus viajes, tu cuenta y seguridad llegan siempre.",
       "quietOff": "La hora de inicio y de fin son iguales, así que no tienes horario silencioso.",
-      "caracasTime": "Hora de Caracas"
+      "caracasTime": "Hora de Caracas",
+      "driver": "Como motorizado",
+      "demandAlerts": "Avisos de demanda",
+      "demandAlertsHint": "Te avisamos cuando hay mucha demanda cerca y estás conectado (máximo uno cada 30 minutos)."
     }
   },
   "profile": {
@@ -740,7 +743,9 @@
     "client_id_required": "No pudimos identificar este teléfono. Reinicia la app.",
     "idempotency_in_progress": "Todavía estamos enviando esto. Espera un momento.",
     "idempotency_key_invalid": "No pudimos enviar esto. Inténtalo de nuevo.",
-    "idempotency_key_reused": "No pudimos enviar esto. Inténtalo de nuevo."
+    "idempotency_key_reused": "No pudimos enviar esto. Inténtalo de nuevo.",
+    "pickup_restricted": "No se puede recoger pasajeros en esta zona. Elige otro punto de recogida.",
+    "dropoff_restricted": "No se puede dejar pasajeros en esta zona. Elige otro destino cercano."
   },
   "map": {
     "recenter": "Centrar el mapa"
@@ -826,7 +831,9 @@
         "first_ride_only": "Este código es solo para tu primer viaje.",
         "not_eligible": "Este código no aplica para este viaje (zona, vehículo o monto mínimo)."
       }
-    }
+    },
+    "changePickup": "Cambiar punto de recogida",
+    "zoneSurge": "Alta demanda en esta zona: +{{percent}} %"
   },
   "ride": {
     "pickup": "Recogida",
@@ -2295,5 +2302,29 @@
       "weak": "GPS impreciso",
       "none": "Sin GPS"
     }
+  },
+  "demand": {
+    "layer": "Demanda",
+    "layerHint": "Muestra en el mapa dónde hay más pedidos ahora",
+    "unavailable": "El mapa de demanda no está disponible en este momento",
+    "legendTitle": "Leyenda de demanda",
+    "level": {
+      "1": "Algo de demanda",
+      "2": "Demanda",
+      "3": "Mucha demanda"
+    },
+    "hot": "Mucha demanda en {{name}}",
+    "away": "A {{distance}} de ti",
+    "see": "Ver",
+    "showOnMap": "Centra el mapa en esa zona"
+  },
+  "zones": {
+    "restrictedTitle": "Aquí no podemos recogerte",
+    "dropoffTitle": "Aquí no podemos dejarte",
+    "nearest": "El punto permitido más cercano es {{name}}, a {{distance}}.",
+    "suggested": "Punto de recogida sugerido: {{name}} (a {{distance}})",
+    "use": "Usar {{name}}",
+    "useHint": "Mueve tu punto de recogida ahí, a {{distance}}",
+    "moved": "Te recogeremos en {{name}}"
   }
 }

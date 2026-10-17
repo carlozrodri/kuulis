@@ -19,6 +19,7 @@ import { rememberPauseFromError, useQualityPause } from '@/hooks/useQuality';
 import { useIsOffline } from '@/hooks/useOnline';
 import { fetchQuote, quoteKey, rideKeys, useQuote, useRequestRide } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
+import { useZoneCheck } from '@/hooks/useZones';
 import { apiErrorMessage } from '@/i18n';
 import { ApiError } from '@/lib/api';
 import { confirmHaptic, selectionHaptic } from '@/lib/feedback';
@@ -38,11 +39,13 @@ import {
 } from '@/lib/ride';
 import { useStore } from '@/lib/store';
 import { isAccountSuspended, suspensionFromError } from '@/lib/suspension';
+import { dropoffRestrictionFromError, isZoneSurge, localizedZoneMessage, pickupRestrictionFromError, suggestionPlace, surgePercent, type ZoneSuggestion } from '@/lib/zones';
 import { fonts, radius, space, useTheme } from '@/theme';
 import { track } from '@/lib/analytics';
 
 import { PaymentChips, PlaceRows } from './components';
-import { loadSavedPayment, rideDraft, routedRides, setDraftPayment, setDraftPromoCode } from './store';
+import { PickupZoneNotice } from './PickupZoneNotice';
+import { loadSavedPayment, rideDraft, routedRides, setDraftPayment, setDraftPlace, setDraftPromoCode } from './store';
 
 const isPromoInvalid = (error: unknown) => error instanceof ApiError && error.code === 'promotion_invalid';
 const isFeatureDisabled = (error: unknown) => error instanceof ApiError && error.code === 'feature_disabled';
@@ -65,6 +68,8 @@ export function QuoteScreen() {
   const qualityPause = useQualityPause('passenger');
   const quote = useQuote(draft.pickup, draft.dropoff, 'moto', promoCode, !paused && !qualityPause);
   const request = useRequestRide();
+  // Doc 21: restricted zone or suggested pickup point at the chosen pickup.
+  const zoneCheck = useZoneCheck(draft.pickup, !paused && !qualityPause);
   // Doc 20: rides are never queued offline; the button waits for the network.
   const offline = useIsOffline();
   const [now, setNow] = useState(() => Date.now());
@@ -173,6 +178,11 @@ export function QuoteScreen() {
           showToast(t('quote.promo.unavailable'), 'danger');
           return;
         }
+        if (error.code === 'pickup_restricted' || error.code === 'dropoff_restricted') {
+          // A zone started in between: quote again so the warning (and "Usar …") shows.
+          void quote.refetch();
+          void zoneCheck.refetch();
+        }
         if (error.code === 'rating_required' || error.code === 'ride_already_active') {
           // The ride navigator takes the user to the pending rating / active ride.
           void queryClient.invalidateQueries({ queryKey: rideKeys.pendingRating });
@@ -189,6 +199,15 @@ export function QuoteScreen() {
   const quoteError =
     quote.isError && !(draft.promoCode && (isPromoInvalid(quote.error) || isFeatureDisabled(quote.error))) ? quote.error : null;
   const outside = quoteError instanceof ApiError && quoteError.code === 'outside_service_area';
+  // Doc 21: the pickup is in a restricted zone (the notice below says it and offers the nearest point).
+  const pickupRestriction = pickupRestrictionFromError(quoteError);
+  const dropoffRestriction = dropoffRestrictionFromError(quoteError);
+  const dropoffRestricted = !!dropoffRestriction;
+  const usePickup = (suggestion: ZoneSuggestion) => {
+    selectionHaptic();
+    setDraftPlace('pickup', suggestionPlace(suggestion));
+    showToast(t('zones.moved', { name: suggestion.name }));
+  };
   // Suspended accounts cannot request rides: the suspension replaces the price and the request button.
   const suspendedBy = suspension ?? suspensionFromError(quoteError) ?? suspensionFromError(request.error);
   const pausedBy = qualityPause ?? activePause(pauseFromError(quoteError));
@@ -215,6 +234,12 @@ export function QuoteScreen() {
       footer={
         blocked ? (
           <Button title={t('ride.backHome')} variant="secondary" onPress={() => router.dismissTo('/')} />
+        ) : pickupRestriction ? (
+          <Button
+            title={t('quote.changePickup')}
+            variant="secondary"
+            onPress={() => router.push({ pathname: '/ride/search', params: { field: 'pickup' } })}
+          />
         ) : quoteError ? (
           <Button title={t('quote.changeDestination')} variant="secondary" onPress={() => router.back()} />
         ) : (
@@ -248,12 +273,23 @@ export function QuoteScreen() {
         <PausePanel pause={pausedBy} variant="passenger" />
       ) : paused ? (
         <ServicePausedPanel notice={paused} variant="passenger" />
+      ) : pickupRestriction ? (
+        <PickupZoneNotice
+          check={zoneCheck.data}
+          restricted
+          suggestion={pickupRestriction.suggestion}
+          message={pickupRestriction.message}
+          onUse={usePickup}
+        />
       ) : quoteError ? (
-        <Notice tone={outside ? 'warning' : 'danger'} icon={CircleX} title={outside ? t('quote.outsideTitle') : t('common.error')}>
+        <Notice
+          tone={outside || dropoffRestricted ? 'warning' : 'danger'}
+          icon={CircleX}
+          title={outside ? t('quote.outsideTitle') : dropoffRestricted ? t('zones.dropoffTitle') : t('common.error')}>
           <Txt variant="caption" style={{ fontSize: 14, lineHeight: 20 }}>
-            {apiErrorMessage(quoteError)}
+            {localizedZoneMessage(dropoffRestriction?.message, i18n.language) || apiErrorMessage(quoteError)}
           </Txt>
-          {!outside ? (
+          {!outside && !dropoffRestricted ? (
             <Button title={t('common.retry')} variant="secondary" size="sm" style={{ alignSelf: 'flex-start' }} onPress={() => void quote.refetch()} />
           ) : null}
         </Notice>
@@ -307,7 +343,7 @@ export function QuoteScreen() {
             ) : (
               <Skeleton height={32} width={80} />
             )}
-            {quote.data && hasSurge(quote.data.surge_multiplier) ? (
+            {quote.data && hasSurge(quote.data.surge_multiplier) && !isZoneSurge(quote.data) ? (
               <View style={[styles.surge, { backgroundColor: theme.accent }]} accessibilityLabel={t('quote.surgeA11y', { value: formatSurge(quote.data.surge_multiplier) })}>
                 <Zap size={12} color={theme.onAccent} fill={theme.onAccent} />
                 <Txt variant="micro" style={{ color: theme.onAccent }}>
@@ -325,6 +361,12 @@ export function QuoteScreen() {
           </View>
         </Card>
       )}
+
+      {!quoteError && !blocked ? <PickupZoneNotice check={zoneCheck.data} onUse={usePickup} /> : null}
+
+      {!quoteError && !blocked && quote.data && isZoneSurge(quote.data) ? (
+        <ZoneSurgeNote multiplier={quote.data.surge_multiplier} />
+      ) : null}
 
       {!quoteError && !blocked && quote.data ? (
         <>
@@ -364,6 +406,20 @@ export function QuoteScreen() {
         </View>
       ) : null}
     </MapSheetLayout>
+  );
+}
+
+/** Doc 21: "Alta demanda en esta zona: +20 %" when the surcharge comes from a surge zone at the pickup. */
+export function ZoneSurgeNote({ multiplier }: { multiplier: string }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  return (
+    <View style={[styles.banner, { backgroundColor: theme.accentSoft }]}>
+      <Zap size={20} color={theme.onAccentSoft} fill={theme.onAccentSoft} />
+      <Txt variant="bodyStrong" style={{ color: theme.onAccentSoft, flex: 1 }}>
+        {t('quote.zoneSurge', { percent: surgePercent(multiplier) })}
+      </Txt>
+    </View>
   );
 }
 

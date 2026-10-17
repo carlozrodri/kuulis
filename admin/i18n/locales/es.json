@@ -8,6 +8,7 @@
     "settings": "Configuración",
     "rides": "Viajes",
     "live": "En vivo",
+    "zones": "Zonas",
     "safety": "Seguridad",
     "rates": "Tasas",
     "promotions": "Promociones",
@@ -180,7 +181,8 @@
       "quality": "Calidad",
       "safety": "Seguridad",
       "risk": "Riesgo",
-      "analytics": "Analítica"
+      "analytics": "Analítica",
+      "zones": "Zonas"
     },
     "permissions": {
       "users": {
@@ -277,6 +279,10 @@
       "analytics": {
         "view": "Ver analítica de producto",
         "export": "Exportar CSV de analítica"
+      },
+      "zones": {
+        "view": "Ver zonas y ciudades",
+        "manage": "Crear y editar zonas y polígonos de ciudades"
       }
     }
   },
@@ -442,7 +448,11 @@
     "closing_reconciled": "Ese cierre ya está conciliado.",
     "reconcile_note_required": "Sube primero el estado de cuenta de Binance y, si hay diferencias, explica por qué en la nota.",
     "statement_not_found": "No hay un archivo guardado para ese mes.",
-    "fee_not_lower": "La nueva cuota debe ser menor que la actual ({fee})."
+    "fee_not_lower": "La nueva cuota debe ser menor que la actual ({fee}).",
+    "zone_not_found": "La zona no existe",
+    "city_not_found": "La ciudad no existe",
+    "zone_invalid": "La zona no es válida",
+    "geojson_invalid": "El GeoJSON no es válido"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -634,7 +644,8 @@
       "name": "Ciudad",
       "namePlaceholder": "Ej. Caracas",
       "add": "Agregar ciudad",
-      "remove": "Quitar ciudad"
+      "remove": "Quitar ciudad",
+      "polygon": "Esta ciudad tiene un polígono (se edita en Zonas): la caja se calcula sola."
     },
     "dispatch": {
       "title": "Asignación de viajes",
@@ -1063,7 +1074,15 @@
     "lastSeen": "visto {ago}",
     "secondsAgo": "hace {n} s",
     "minutesAgo": "hace {n} min",
-    "city": "Ciudad"
+    "city": "Ciudad",
+    "demand": "Demanda",
+    "demandCell": "{requests} pedidos · {unmatched} sin motorizado · {drivers} motorizados",
+    "demandDisabled": "El mapa de demanda está apagado en la configuración.",
+    "demandLevels": {
+      "1": "Algo de demanda",
+      "2": "Demanda",
+      "3": "Mucha demanda"
+    }
   },
   "rates": {
     "sources": {
@@ -3690,6 +3709,149 @@
       "tiersHelp": "Con las ganancias de este mes y los tramos de cuota que le aplican.",
       "earnedAbove": "Ganó más de",
       "fee": "Cuota"
+    }
+  },
+  "zones": {
+    "help": "Polígonos de las ciudades y zonas con reglas: recargo, restringida (no se recoge ni se deja) y puntos de recogida sugeridos. Solo cuentan las zonas activas dentro de su vigencia.",
+    "allCities": "Todas las ciudades",
+    "allKinds": "Todos los tipos",
+    "city": "Ciudad",
+    "kind": "Tipo",
+    "kinds": {
+      "surge": "Recargo",
+      "restricted": "Restringida",
+      "pickup": "Punto de recogida"
+    },
+    "kindHelp": {
+      "surge": "Recargo para los viajes con origen dentro de la zona. Se aplica el mayor entre este y el recargo global.",
+      "restricted": "No se recoge o no se deja dentro de la zona. El pasajero ve el mensaje y la salida sugerida más cercana.",
+      "pickup": "Al pedir dentro de la zona, la app sugiere el punto de recogida más cercano."
+    },
+    "statuses": {
+      "inForce": "Vigente",
+      "inactive": "Inactiva",
+      "scheduled": "Programada",
+      "expired": "Vencida"
+    },
+    "allDay": "todo el día",
+    "pointsCount": "sin puntos | 1 punto | {n} puntos",
+    "listTitle": "Zonas ({n})",
+    "empty": "No hay zonas con estos filtros.",
+    "actions": "Acciones",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "new": "Nueva zona",
+    "create": "Crear zona",
+    "editTitle": "Editar zona",
+    "created": "Zona creada",
+    "updated": "Zona guardada",
+    "deleted": "Zona eliminada",
+    "deleteTitle": "Eliminar zona",
+    "deleteBody": "¿Eliminar la zona «{name}»? Sus reglas dejan de aplicarse de inmediato.",
+    "validity": "Vigencia: {from} → {to}",
+    "cityLegend": "Ciudad",
+    "export": "Exportar GeoJSON",
+    "fixErrors": "Revisa la zona",
+    "errors": {
+      "name": "Escribe un nombre.",
+      "city": "Elige la ciudad.",
+      "polygonShort": "Dibuja el polígono en el mapa: al menos 3 vértices.",
+      "polygonLong": "El polígono admite como máximo {max} vértices.",
+      "polygonCrosses": "Los lados del polígono se cruzan: mueve o borra vértices.",
+      "dates": "El fin de la vigencia debe ser posterior al inicio.",
+      "multiplier": "El multiplicador va de 1,00 a 3,00.",
+      "hoursBoth": "Indica inicio y fin, o deja ambos vacíos para todo el día.",
+      "hours": "Las horas deben tener el formato HH:MM.",
+      "hoursSame": "El inicio y el fin no pueden ser iguales.",
+      "restrictNothing": "Marca al menos una restricción: recoger o dejar.",
+      "pointsNone": "Agrega al menos un punto de recogida en el mapa.",
+      "pointsMany": "Como máximo {points} puntos.",
+      "pointName": "Cada punto necesita un nombre."
+    },
+    "form": {
+      "name": "Nombre",
+      "namePlaceholder": "Ej.: Centro Comercial Sambil",
+      "vertices": "Polígono: sin vértices | Polígono: 1 vértice | Polígono: {n} vértices",
+      "active": "Activa",
+      "activeHelp": "Apágala para suspender sus reglas sin borrarla.",
+      "startsAt": "Desde",
+      "endsAt": "Hasta",
+      "validityHelp": "Vacío: sin límite. Hora de tu navegador ({zone}).",
+      "rules": "Reglas",
+      "multiplier": "Multiplicador",
+      "multiplierHelp": "1,20 = +20 % sobre la tarifa. De 1,00 a 3,00.",
+      "days": "Días",
+      "daysHelp": "Sin días marcados: todos los días.",
+      "start": "Inicio",
+      "end": "Fin",
+      "hoursHelp": "Sin horas: todo el día. Horas de Caracas.",
+      "noPickup": "No se recoge",
+      "noDropoff": "No se deja",
+      "message": "Mensaje para el pasajero",
+      "messageHelp": "Se muestra al elegir un origen o destino dentro de la zona.",
+      "points": "Puntos de recogida",
+      "exits": "Salidas sugeridas (opcional)",
+      "noPoints": "Activa «Añadir puntos» y haz clic en el mapa.",
+      "pointName": "Nombre del punto",
+      "pointN": "Punto {n}",
+      "removePoint": "Quitar punto"
+    },
+    "map": {
+      "draw": "Polígono",
+      "addPoints": "Añadir puntos",
+      "undo": "Deshacer",
+      "clear": "Borrar todo",
+      "vertexHint": "Arrastra para mover, haz clic para borrar",
+      "hint": {
+        "vertices": "Clic en el mapa: agrega un vértice. Arrastra un vértice para moverlo; clic sobre él para borrarlo.",
+        "points": "Clic en el mapa: agrega un punto. Arrastra un punto para moverlo.",
+        "pick": "Clic en el mapa: elige dónde simular el pico."
+      }
+    },
+    "cities": {
+      "title": "Ciudades",
+      "box": "Caja",
+      "polygon": "Polígono",
+      "polygonN": "Polígono · {n} vértices",
+      "edit": "Polígono de {city}",
+      "help": "Con polígono, la ciudad solo acepta orígenes dentro de él; la caja se recalcula sola como el rectángulo que lo encierra.",
+      "convert": "Convertir caja en polígono",
+      "save": "Guardar polígono",
+      "toBox": "Volver a la caja",
+      "toBoxConfirm": "¿Quitar el polígono de {city} y volver a usar su caja?",
+      "saved": "Polígono de {city} guardado",
+      "boxRestored": "{city} vuelve a usar su caja"
+    },
+    "import": {
+      "button": "Importar",
+      "title": "Importar GeoJSON",
+      "help": "Un FeatureCollection como el que exporta este panel. Las zonas con id existente se actualizan; las demás se crean.",
+      "choose": "Elegir archivo",
+      "noFile": "Ningún archivo elegido",
+      "replace": "Reemplazar",
+      "replaceHelp": "Borra antes las zonas de las ciudades que vienen en el archivo.",
+      "run": "Importar",
+      "close": "Cerrar",
+      "notJson": "El archivo no es un JSON válido.",
+      "result": "Importado: {cities} ciudades, {created} zonas creadas, {updated} actualizadas.",
+      "skipped": "Se omitieron {n} elementos:",
+      "feature": "Elemento {n}"
+    },
+    "simulate": {
+      "button": "Simular demanda",
+      "title": "Simular pico de demanda",
+      "help": "Solo fuera de producción. Suma pedidos falsos en un punto para probar el mapa de demanda de la app y del panel.",
+      "at": "Punto: {lat}, {lng}",
+      "pickPoint": "Haz clic en el mapa para elegir el punto.",
+      "requests": "Pedidos",
+      "unmatched": "Sin motorizado",
+      "run": "Simular",
+      "done": "Pico simulado",
+      "unavailable": "La simulación no está disponible en este entorno.",
+      "result": "El mapa de demanda tiene {n} celdas.",
+      "disabled": "El mapa de demanda está apagado en la configuración.",
+      "cell": "{requests} pedidos · {unmatched} sin motorizado",
+      "point": "Pico simulado"
     }
   }
 }

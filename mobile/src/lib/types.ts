@@ -76,10 +76,12 @@ export interface NotificationPreferences {
   quiet_end: string;
   default_quiet_start: string;
   default_quiet_end: string;
+  /** Doc 21: "Mucha demanda en …" pushes for drivers (older servers do not send it). */
+  demand_alerts?: boolean;
 }
 
 export type NotificationPreferencesUpdate = Partial<
-  Pick<NotificationPreferences, "marketing_push" | "marketing_email" | "quiet_start" | "quiet_end">
+  Pick<NotificationPreferences, "marketing_push" | "marketing_email" | "quiet_start" | "quiet_end" | "demand_alerts">
 >;
 
 // ── Phase 1A: configuration and drivers (docs/api/phase-1a.md) ──
@@ -344,6 +346,11 @@ export interface Quote {
   total?: string;
   promotion?: RidePromotion | null;
   total_ves?: VesAmount | null;
+  // Doc 21 (optional: older servers do not send them).
+  /** Why there is a surcharge: a surge zone at the pickup, the time of day or a manual one; null without one. */
+  surge_reason?: "zone" | "time" | "manual" | null;
+  /** Name of the surge zone when `surge_reason` is "zone". */
+  surge_zone?: string | null;
 }
 
 export type RideStatus =

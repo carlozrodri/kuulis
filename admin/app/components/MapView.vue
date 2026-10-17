@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import type * as Leaflet from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import type { MapLine, MapMarker, MapRectangle } from '~/utils/geo'
+import type { MapLine, MapMarker, MapPolygon, MapRectangle } from '~/utils/geo'
 
 const props = withDefaults(defineProps<{
   markers?: MapMarker[]
   lines?: MapLine[]
   rectangles?: MapRectangle[]
+  /** Doc 21: city polygons and demand cells. */
+  polygons?: MapPolygon[]
   /** 'always': refit whenever the data changes; 'once': only on the first non-empty data (live views). */
   fit?: 'always' | 'once'
   selected?: string | null
@@ -14,6 +16,7 @@ const props = withDefaults(defineProps<{
   markers: () => [],
   lines: () => [],
   rectangles: () => [],
+  polygons: () => [],
   fit: 'always',
   selected: null,
 })
@@ -50,6 +53,18 @@ function render() {
       interactive: !!rect.label,
     })
     if (rect.label) shape.bindTooltip(tooltipContent(rect.label), { direction: 'top' })
+    shape.addTo(layer)
+  }
+  for (const poly of props.polygons) {
+    if (poly.points.length < 3) continue
+    const shape = L.polygon(poly.points, {
+      color: poly.color,
+      weight: poly.weight ?? 2,
+      fillOpacity: poly.fillOpacity ?? 0.05,
+      dashArray: poly.dashed ? '6 6' : undefined,
+      interactive: !!poly.label,
+    })
+    if (poly.label) shape.bindTooltip(tooltipContent(poly.label), { direction: 'top', sticky: true })
     shape.addTo(layer)
   }
   for (const line of props.lines) {
@@ -117,7 +132,7 @@ onBeforeUnmount(() => {
   layer = null
 })
 
-watch(() => [props.markers, props.lines, props.rectangles], render, { deep: true })
+watch(() => [props.markers, props.lines, props.rectangles, props.polygons], render, { deep: true })
 watch(() => props.selected, focusSelected)
 
 defineExpose({ fitToData })

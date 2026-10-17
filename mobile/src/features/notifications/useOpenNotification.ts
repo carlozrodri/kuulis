@@ -4,11 +4,13 @@ import { useCallback, useEffect, useRef } from 'react';
 import { Linking } from 'react-native';
 
 import { routedRides } from '@/features/ride/store';
+import { demandFocusRequest, setDemandLayer } from '@/hooks/useDemand';
 import { markNotificationRead } from '@/hooks/useNotifications';
 import { rideKeys } from '@/hooks/useRides';
 import { api } from '@/lib/api';
 import {
   campaignNotificationId,
+  demandPushPoint,
   hrefForNotification,
   isInboxTarget,
   needsPendingRating,
@@ -61,6 +63,12 @@ export function useOpenNotification() {
         return;
       }
       if (from === 'inbox' && isInboxTarget(target)) return;
+      // Doc 21: the driver home turns the demand layer on and shows the hot spot.
+      const demandPoint = demandPushPoint(payload);
+      if (demandPoint) {
+        setDemandLayer(true);
+        demandFocusRequest.set({ ...demandPoint, at: Date.now() });
+      }
       if (target.mode && state.current.mode && state.current.mode !== target.mode) await state.current.setMode(target.mode);
       // Already there (e.g. the rating opened by itself): don't stack a second copy.
       const path = pathOf(target.href);

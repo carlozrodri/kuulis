@@ -10,6 +10,7 @@ PERMISSIONS: dict[str, tuple[str, ...]] = {
     "rides": ("rides.view", "rides.cancel", "live.view"),
     "quality": ("quality.view", "quality.manage"),
     "risk": ("risk.view", "risk.manage"),
+    "zones": ("zones.view", "zones.manage"),
     "safety": ("safety.view", "safety.manage"),
     "promotions": ("promotions.view", "promotions.manage"),
     "rates": ("rates.view", "rates.manage"),
@@ -96,6 +97,8 @@ DEFAULT_ROLES: dict[str, tuple[str, tuple[str, ...]]] = {
             "announcements.manage",
             "safety.view",
             "safety.manage",
+            "zones.view",
+            "zones.manage",
         ),
     ),
 }

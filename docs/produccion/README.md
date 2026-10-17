@@ -105,6 +105,9 @@ construir. Las preguntas de cada documento están en su sección final.
   que no se cierra sin señal, cola de acciones del viaje, chat y calificación con reintento, indicadores de
   señal y GPS, contraste AA, test de traducción de todos los códigos de error, tests de pantallas y flujos de
   Maestro. Faltan las mediciones en teléfonos reales y correr Maestro.
+- **21** hecho (2026-10-17): ciudades y zonas como polígonos (sin PostGIS), zonas de recargo, restringidas y de
+  puntos de recogida con vigencia, importar/exportar GeoJSON, viajes entre ciudades por par, mapa de demanda H3
+  para motorizados con aviso push y capa en Viajes en vivo. Recargo por zona solo manual (decidido).
 - Hecho en paralelo por otro hilo (2026-10-11, commit `da5bb1e`): lugares guardados, un contacto de confianza,
   invitaciones entre motorizados (un mes gratis al que invita cuando el invitado completa su primer viaje) y
   eliminación de cuenta con 30 días de gracia y borrado de datos personales. Al implementar 07, 11, 22 y 23 hay
