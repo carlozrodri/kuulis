@@ -249,6 +249,7 @@
   "legal": {
     "metaTitle": "Legal · Kuulis",
     "metaDescription": "Términos y condiciones, política de privacidad y normas de la comunidad de Kuulis.",
+    "kindDescription": "{title}: la versión vigente para quienes usan Kuulis.",
     "title": "Legal.",
     "lead": "Los textos que aceptas al usar Kuulis. Cuando cambian, te lo avisamos en la app.",
     "version": "Versión {version} · {date}",

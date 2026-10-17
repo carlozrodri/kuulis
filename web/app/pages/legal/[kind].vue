@@ -21,7 +21,7 @@ if (error.value && !doc.value) {
 
 useSeoMeta({
   title: () => doc.value?.title ?? t('legal.metaTitle'),
-  description: () => t('legal.metaDescription'),
+  description: () => (doc.value ? t('legal.kindDescription', { title: doc.value.title }) : t('legal.metaDescription')),
 })
 </script>
 

@@ -20,7 +20,11 @@ if (error.value && !article.value) {
   throw createError({ statusCode: notFound ? 404 : 503, statusMessage: notFound ? 'Not found' : 'Unavailable', fatal: true })
 }
 
-const description = computed(() => article.value?.excerpt || t('help.metaDescription'))
+// The excerpt is the article's Markdown flattened by the API: list dashes and the gap a removed link leaves
+// before a full stop read badly in a search result.
+const description = computed(() => (article.value?.excerpt
+  ? article.value.excerpt.replace(/(^|\s)- /g, '$1').replace(/\s+([.,;:])/g, '$1')
+  : t('help.metaDescription')))
 const title = computed(() => (article.value ? `${article.value.title} · ${t('help.back')}` : t('help.metaTitle')))
 useSeoMeta({
   title,

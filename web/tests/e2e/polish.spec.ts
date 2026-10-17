@@ -15,9 +15,11 @@ for (const path of PAGES) {
   for (const locale of ['es', 'en']) {
     const url = locale === 'en' ? englishPath(path) : path
     test(`${url}: no sideways scroll at any width and no skipped heading level`, async ({ page }) => {
+      await page.setViewportSize({ width: WIDTHS[0]!, height: 800 })
+      await page.goto(url, { waitUntil: 'networkidle' })
+      // Resizing reflows the same page: one load per page keeps the test quick against a deployed site.
       for (const width of WIDTHS) {
         await page.setViewportSize({ width, height: 800 })
-        await page.goto(url, { waitUntil: 'networkidle' })
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
         expect(overflow, `${width}px`).toBeLessThanOrEqual(0)
       }
@@ -61,6 +63,32 @@ test('on a phone, every control outside running text is at least 44 px tall', as
       })
       .map(control => `${control.textContent?.trim()} ${Math.round(control.getBoundingClientRect().height)}px`))
     expect(small, path).toEqual([])
+  }
+})
+
+test('with the keyboard alone, every stop shows its focus ring and is on screen', async ({ page }) => {
+  for (const path of ['/', '/motorizados', '/seguridad', '/descargar', '/contacto']) {
+    await page.goto(path, { waitUntil: 'networkidle' })
+    const seen = new Set<string>()
+    for (let i = 0; i < 60; i++) {
+      await page.keyboard.press('Tab')
+      const stop = await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null
+        if (!el || el === document.body) return null
+        const style = getComputedStyle(el)
+        const box = el.getBoundingClientRect()
+        return {
+          id: `${el.tagName} ${el.textContent?.trim().slice(0, 30)} ${Math.round(box.top + scrollY)}`,
+          ring: style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) >= 2,
+          onScreen: box.bottom > 0 && box.top < innerHeight && box.width > 0,
+        }
+      })
+      if (!stop || seen.has(stop.id)) break
+      seen.add(stop.id)
+      expect(stop.ring, `${path}: ${stop.id}`).toBe(true)
+      expect(stop.onScreen, `${path}: ${stop.id}`).toBe(true)
+    }
+    expect(seen.size, path).toBeGreaterThan(5)
   }
 })
 

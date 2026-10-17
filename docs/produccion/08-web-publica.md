@@ -94,3 +94,14 @@ Un sitio público, rápido y bonito, que sea la casa de Kuulis fuera de la app: 
   (emails de verificación y cambio de contraseña).
 - CI: job `web` (lint, tipos, tests y build).
 - Despliegue: app `kuulis-web-<entorno>` en Coolify (ver `docs/deployment.md`).
+
+### Rediseño (2026-10-17, `docs/website-redesign/`)
+- Nueva dirección visual «Y punto.»: campos planos verde y tinta, titulares con el punto amarillo, la ruta y la
+  silueta del Ávila; misma paleta Verde Ávila y Plus Jakarta Sans. Tokens en `web/app/assets/css/tokens.css`.
+- Páginas nuevas o rehechas: inicio por secciones, **Motorizados** con ejemplo de cuota calculado como la API,
+  **Seguridad** (nueva, solo funciones que existen), Descargar, Ayuda, Contacto, Legal y las páginas de un solo
+  paso. Inglés con URL propia (`/en/...`), canonical, `hreflang` y sitemap por idioma; imagen para compartir por
+  página e idioma (`pnpm og`).
+- WCAG 2.2 AA: axe sin errores graves en claro y oscuro, contraste medido desde los tokens, foco de dos tonos,
+  objetivos de 44 px, movimiento reducido respetado. 94 pruebas e2e con Playwright (`pnpm e2e`).
+- Medición final y pendientes de Carlos: `docs/website-redesign/00` §9 y `08`. Producción sigue sin dominio.
