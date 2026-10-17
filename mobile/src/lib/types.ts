@@ -623,6 +623,7 @@ export type WalletEntryKind =
   | "transfer_out"
   | "subscription_fee"
   | "adjustment"
+  | "referral_bonus"
   | (string & {});
 
 /** GET /wallet/me/entries (newest first). */
@@ -781,6 +782,8 @@ export interface StatementMovements {
   transfers_out: string;
   fees: string;
   adjustments: string;
+  /** Doc 22 (missing in statements cached before it). */
+  referral_bonuses?: string;
 }
 
 /** GET /wallet/me/statements?month=YYYY-MM ("Estado de cuenta"). */
@@ -981,17 +984,50 @@ export interface SavedPlace extends Place {
   updated_at: string;
 }
 
+/** What the invite program offers (doc 22). */
+export interface ReferralProgramInfo {
+  /** New codes are accepted. */
+  active: boolean;
+  reward_usd: string;
+  required_trips: number;
+  window_days: number;
+  referred_free_month: boolean;
+  ends_at: string | null;
+}
+
+/** A driver who joined with the code, as the inviter sees them. */
+export interface ReferralInvitee {
+  name: string;
+  joined_at: string;
+  approved: boolean;
+  status: "pending" | "reviewing" | "rewarded" | "expired" | "not_eligible";
+  trips: number;
+  required_trips: number;
+  /** Null until approved. */
+  deadline_at: string | null;
+  reward_usd: string | null;
+  /** free_month: the first version of the program. */
+  reward_kind: "free_month" | "wallet_credit" | null;
+}
+
 /** GET /referrals/me: the driver's invite code and what it has earned. */
 export interface ReferralSummary {
   /** Null until the user is an approved driver. */
   code: string | null;
+  /** The web invite page (https://<site>/i/CODE). */
+  share_url: string | null;
   invited: number;
   rewarded: number;
+  /** Wallet credit earned with invites. */
+  earned_usd: string;
   /** Free months of subscription earned and not used yet. */
   free_months: number;
   referred_by: string | null;
   /** A driver before their first trip can still enter someone's code. */
   can_redeem: boolean;
+  program: ReferralProgramInfo;
+  /** Newest first, at most 50. */
+  invitees: ReferralInvitee[];
 }
 
 /** An APK published for a channel (doc 09). `download_url` is a presigned link valid about an hour. */

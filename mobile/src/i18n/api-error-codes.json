@@ -419,6 +419,9 @@
     "referral_already_used": [
       "apps/referrals/services.py"
     ],
+    "referral_budget_exhausted": [
+      "apps/referrals/services.py"
+    ],
     "referral_closed": [
       "apps/referrals/services.py"
     ],
@@ -428,7 +431,16 @@
     "referral_driver_only": [
       "apps/referrals/services.py"
     ],
+    "referral_invalid_status": [
+      "apps/referrals/services.py"
+    ],
+    "referral_not_found": [
+      "apps/referrals/services.py"
+    ],
     "referral_own_code": [
+      "apps/referrals/services.py"
+    ],
+    "referral_program_closed": [
       "apps/referrals/services.py"
     ],
     "registration_blocked": [

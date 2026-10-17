@@ -83,6 +83,7 @@ async def statement(
             transfers_out=-moved[EntryKind.TRANSFER_OUT],
             fees=-moved[EntryKind.SUBSCRIPTION_FEE],
             adjustments=moved[EntryKind.ADJUSTMENT],
+            referral_bonuses=moved[EntryKind.REFERRAL_BONUS],
         ),
     )
 

@@ -264,6 +264,7 @@ function MovementsCard({ statement }: { statement: Statement }) {
   const rows: { key: string; value: number | string }[] = [
     { key: "top_ups", value: moved.top_ups },
     { key: "promo_credits", value: moved.promo_credits },
+    { key: "referral_bonuses", value: moved.referral_bonuses ?? "0" },
     { key: "transfers_in", value: moved.transfers_in },
     { key: "transfers_out", value: negative(moved.transfers_out) },
     { key: "fees", value: negative(moved.fees) },

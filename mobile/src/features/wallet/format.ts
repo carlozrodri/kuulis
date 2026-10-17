@@ -190,6 +190,15 @@ export function useEntryText() {
           title: t("wallet.kind.adjustment.title"),
           subtitle: text("reason") ?? entry.description ?? null,
         };
+      case "referral_bonus": {
+        const name = text("counterpart_name");
+        return {
+          title: name
+            ? t("wallet.kind.referral_bonus.titleNamed", { name })
+            : t("wallet.kind.referral_bonus.title"),
+          subtitle: t("wallet.kind.referral_bonus.subtitle"),
+        };
+      }
       default:
         return { title: t("wallet.kind.other"), subtitle: null };
     }

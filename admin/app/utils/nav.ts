@@ -49,6 +49,7 @@ export const NAV: NavEntry[] = [
   { key: 'subscriptions', icon: 'i-lucide-calendar-check', to: '/subscriptions', permission: 'subscriptions.view', group: 'money' },
   { key: 'rates', icon: 'i-lucide-banknote', to: '/rates', permission: 'rates.view', group: 'money' },
   { key: 'promotions', icon: 'i-lucide-ticket-percent', to: '/promotions', permission: 'promotions.view', group: 'money' },
+  { key: 'referrals', icon: 'i-lucide-user-plus', to: '/referrals', permission: 'referrals.view', group: 'money' },
   { key: 'campaigns', icon: 'i-lucide-send', to: '/campaigns', permission: 'notifications.send', group: 'messaging' },
   { key: 'notifications', icon: 'i-lucide-bell', to: '/notifications', permission: 'notifications.send', group: 'messaging' },
   { key: 'announcements', icon: 'i-lucide-megaphone', to: '/announcements', permission: 'announcements.view', group: 'messaging' },

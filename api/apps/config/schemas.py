@@ -398,6 +398,50 @@ class RiskSettings(BaseModel):
     rating_ring_rides: int = Field(default=3, ge=2, le=50)
 
 
+Budget = Annotated[
+    Decimal,
+    Field(ge=Decimal("0"), le=Decimal("1000000"), decimal_places=2, allow_inf_nan=False),
+    AfterValidator(_two_places),
+    AsMoneyString,
+]
+
+
+class ReferralProgram(BaseModel):
+    """Drivers inviting drivers (doc 22). The inviter earns ``reward_usd`` of wallet credit (not
+    withdrawable, like promotion credits) once the invited driver completes ``required_trips``
+    within ``window_days`` of being approved. Passenger referrals are not offered yet (Carlos,
+    2026-10-11: drivers only at launch)."""
+
+    enabled: bool = True
+    reward_usd: Money = Decimal("5.00")
+    required_trips: int = Field(default=20, ge=1, le=500)
+    window_days: int = Field(default=30, ge=1, le=365)
+    # The invited driver also gets a free month of subscription when they qualify.
+    referred_free_month: bool = False
+    # Rewards per inviter per month (0: no limit); the rest wait for the next month.
+    monthly_cap: int = Field(default=10, ge=0, le=1000)
+    # Paid plus held rewards never go over this; the rest wait until it is raised.
+    budget_usd: Budget = Decimal("500.00")
+    # New codes are accepted only between these dates (null: no limit). Invites made in time keep
+    # their reward after ``ends_at``.
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def _dates(self) -> Self:
+        if self.starts_at and self.ends_at and self.ends_at <= self.starts_at:
+            raise ValueError("ends_at must be after starts_at")
+        return self
+
+    def accepting(self, now: datetime) -> bool:
+        """New invite codes can be entered."""
+        return (
+            self.enabled
+            and (self.starts_at is None or self.starts_at <= now)
+            and (self.ends_at is None or now < self.ends_at)
+        )
+
+
 class VerificationSettings(BaseModel):
     """Ongoing driver verification (doc 12): expiring documents, the random live selfie,
     re-verification after reports and the optional induction."""
@@ -552,6 +596,9 @@ class AppConfig(BaseModel):
     intercity_pairs: list[CityPair] = Field(default_factory=list, max_length=50)
     demand: DemandSettings = Field(default_factory=DemandSettings)
 
+    # --- Referrals (doc 22) -----------------------------------------------------------------------
+    referral_program: ReferralProgram = Field(default_factory=ReferralProgram)
+
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod
     def check_unique(cls, value: list) -> list:
@@ -641,6 +688,7 @@ class AppConfigUpdate(BaseModel):
     risk: RiskSettings | None = None
     intercity_pairs: list[CityPair] | None = Field(default=None, max_length=50)
     demand: DemandSettings | None = None
+    referral_program: ReferralProgram | None = None
 
     @field_validator("enabled_vehicle_types", "driver_required_documents", "payment_methods")
     @classmethod

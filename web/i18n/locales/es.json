@@ -345,5 +345,29 @@
     "helpLink": "Mientras tanto, mira el centro de ayuda",
     "other": "Otras formas de contactarnos",
     "privacy": "Usamos estos datos solo para responderte. Lee nuestra"
+  },
+  "invite": {
+    "metaTitle": "Te invitan a Kuulis",
+    "metaDescription": "Gana con tu moto en Kuulis: sin comisión por viaje. Regístrate como motorizado con este código.",
+    "eyebrow": "Invitación de motorizado",
+    "title": "Te invitan a manejar con Kuulis",
+    "titleNamed": "{name} te invita a manejar con Kuulis",
+    "lead": "Gana con tu moto sin comisión por viaje: el pasajero te paga directo y solo pagas una cuota mensual los meses que trabajas.",
+    "freeMonth": "Si haces {trips} viajes en tus primeros {days} días, ganas un mes de suscripción gratis.",
+    "paused": "El programa de invitaciones está en pausa, pero igual puedes registrarte como motorizado.",
+    "codeLabel": "Código de invitación",
+    "copy": "Copiar código",
+    "copied": "Copiado",
+    "steps": {
+      "download": "Descarga la app de Kuulis.",
+      "signUp": "Regístrate como motorizado y envía tus documentos.",
+      "code": "Antes de tu primer viaje, escribe este código en Perfil → Invita y gana."
+    },
+    "download": "Descargar la app",
+    "openApp": "Ya tengo la app",
+    "more": "¿Quieres saber más?",
+    "drivers": "Conoce cómo funciona para motorizados",
+    "invalidTitle": "Esta invitación no existe",
+    "invalidBody": "Revisa el enlace o pide el código de nuevo a quien te invitó."
   }
 }

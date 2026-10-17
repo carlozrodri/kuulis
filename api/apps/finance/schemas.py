@@ -33,6 +33,7 @@ class StatementMovements(BaseModel):
     transfers_out: Money  # positive: what left
     fees: Money  # positive: what was paid
     adjustments: Money  # signed
+    referral_bonuses: Money  # doc 22: rewards for inviting drivers
 
 
 class StatementRead(BaseModel):

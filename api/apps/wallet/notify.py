@@ -62,11 +62,11 @@ TEMPLATES: dict[str, dict[str, tuple[str, str]]] = {
     "fee_referral": {
         "es": (
             "Tu cuota de {month} es gratis",
-            "Usaste un mes gratis por invitar a un motorizado. No pagas {fee} USDT.",
+            "Usaste un mes gratis del programa de invitaciones. No pagas {fee} USDT.",
         ),
         "en": (
             "Your {month} fee is free",
-            "You used a free month earned by inviting a driver. You don't pay {fee} USDT.",
+            "You used a free month from the invite program. You don't pay {fee} USDT.",
         ),
     },
     "fee_waived": {

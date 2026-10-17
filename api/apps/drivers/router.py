@@ -27,6 +27,7 @@ from apps.drivers.schemas import (
     VehicleWrite,
 )
 from apps.files.schemas import UploadResponse
+from apps.referrals import tasks as referral_tasks
 from apps.rides import presence
 from apps.users.dependencies import Can, CurrentUser, DBSession
 from kuulis.core.pagination import Page, PageParams, page_params
@@ -271,6 +272,8 @@ async def approve(
     profile = await services.get_or_404(session, driver_id)
     profile = await services.approve(session, profile, admin, config)
     await services.notify(session, profile, "approved")
+    # Doc 22: starts the invite window (and checks the inviter's identity marks).
+    await referral_tasks.evaluate_driver.kiq(str(profile.user_id))
     return await services.admin_read(session, profile, config)
 
 

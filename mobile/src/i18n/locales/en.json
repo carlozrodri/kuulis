@@ -381,20 +381,36 @@
     "invite": {
       "section": "Invite and earn",
       "title": "Invite another driver",
-      "body": "When they finish their first ride, you get a free month of subscription.",
+      "body": "Earn {{amount}} USDT in your wallet when the driver you invite completes {{trips}} rides in their first {{days}} days.",
+      "bodyFreeMonth": "They also get a free month of subscription.",
+      "paused": "The invite program is paused. Your code is still yours.",
       "yourCode": "Your code",
       "copy": "Copy code",
       "copied": "Code copied",
       "whatsapp": "Invite on WhatsApp",
       "message": "Earn with your motorbike on Kuulis! No per-ride commission. Get the app, sign up as a driver and use my code {{code}}.",
+      "messageLink": "Earn with your motorbike on Kuulis! No per-ride commission. Sign up as a driver with my code {{code}}: {{link}}",
       "invited_one": "{{count}} invited",
       "invited_other": "{{count}} invited",
-      "rewarded_one": "{{count}} has ridden",
-      "rewarded_other": "{{count}} have ridden",
+      "rewarded_one": "{{count}} rewarded",
+      "rewarded_other": "{{count}} rewarded",
+      "earned": "You earned {{amount}} USDT",
       "freeMonths_one": "{{count}} free month",
       "freeMonths_other": "{{count}} free months",
+      "invitees": "Your invites",
+      "rules": "Completed rides with passengers other than you count. The credit can't be withdrawn: it pays your fees.",
+      "status": {
+        "pending": "{{trips}} of {{required}} rides",
+        "waitingApproval": "Waiting for approval",
+        "reviewing": "Reward under review",
+        "rewarded": "+{{amount}} USDT",
+        "rewardedMonth": "+1 free month",
+        "expired": "Time ran out",
+        "not_eligible": "Not eligible"
+      },
+      "deadline": "Until {{date}}",
       "redeemTitle": "Did someone invite you?",
-      "redeemBody": "Enter the code of whoever invited you before your first ride. They get a free month.",
+      "redeemBody": "Enter the code of whoever invited you before your first ride. They earn a reward when you complete {{trips}} rides.",
       "codeLabel": "Invite code",
       "redeem": "Use code",
       "redeemed": "Done! Your code is registered",
@@ -745,7 +761,8 @@
     "idempotency_key_invalid": "We couldn't send this. Try again.",
     "idempotency_key_reused": "We couldn't send this. Try again.",
     "pickup_restricted": "Passengers can’t be picked up in this area. Choose another pickup point.",
-    "dropoff_restricted": "Passengers can’t be dropped off in this area. Choose a nearby destination."
+    "dropoff_restricted": "Passengers can’t be dropped off in this area. Choose a nearby destination.",
+    "referral_program_closed": "The invite program is not taking codes right now."
   },
   "map": {
     "recenter": "Recenter map"
@@ -1262,6 +1279,11 @@
       },
       "adjustment": {
         "title": "Kuulis adjustment"
+      },
+      "referral_bonus": {
+        "title": "Invite reward",
+        "titleNamed": "Reward for inviting {{name}}",
+        "subtitle": "Kuulis credit for your fees"
       }
     },
     "topUpNow": "Top up now",
@@ -1342,7 +1364,8 @@
         "transfers_in": "Transfers received",
         "transfers_out": "Transfers sent",
         "fees": "Fees paid",
-        "adjustments": "Kuulis adjustments"
+        "adjustments": "Kuulis adjustments",
+        "referral_bonuses": "Invite rewards"
       }
     }
   },

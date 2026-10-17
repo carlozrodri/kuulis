@@ -56,5 +56,30 @@ pueden abusar.
 16 (señales de fraude), 17 (movimientos de billetera nuevos y cierres).
 
 ## Preguntas para Carlos
-1. ¿Premio por motorizado referido? Recomendado: 5 USD de crédito tras 20 viajes en 30 días.
-2. ¿Programa de pasajeros desde el inicio o solo de motorizados? Recomendado: solo motorizados al lanzar.
+1. ~~¿Premio por motorizado referido?~~ **Decidido** (2026-10-11, Carlos aprobó las recomendaciones): 5 USD de
+   crédito tras 20 viajes en 30 días. Reemplaza el mes gratis por el primer viaje de la primera versión.
+2. ~~¿Programa de pasajeros desde el inicio o solo de motorizados?~~ **Decidido** (2026-10-11): solo motorizados
+   al lanzar. Pasajero invita pasajero queda para cuando haya datos.
+
+## Implementación (2026-10-17)
+Contrato en [`docs/api/referidos.md`](../api/referidos.md).
+- Parte de lo que ya existía (`da5bb1e`): código por motorizado aprobado, `POST /referrals/redeem` antes del
+  primer viaje y la pantalla Invita y gana. El premio cambia a crédito `referral_bonus` en la billetera; los meses
+  gratis ya ganados se siguen usando en la cuota.
+- `AppConfig.referral_program`: premio, viajes, días desde la aprobación, mes gratis opcional para el invitado,
+  tope por persona al mes, presupuesto total y fechas. Se edita en la página Referidos.
+- `referrals` gana estado (`pending`, `qualified`, `held`, `rewarded`, `rejected`), viajes que cuentan, plazo,
+  premio y revisión. Se evalúa tras cada viaje (tarea encolada), al aprobar al invitado y en un barrido cada hora
+  (vence plazos y paga los que esperaban tope o presupuesto).
+- Antifraude: sin premio si comparten teléfono, dispositivo, Binance Pay ID, cédula, RIF o placa (marcas del
+  doc 12), con alerta `referral` en Riesgo; no cuentan los viajes con quien invita de pasajero ni los marcados
+  como sospechosos; riesgo alto retiene el premio hasta revisión. El presupuesto se bloquea al pagar, así que
+  pagado + retenido nunca lo supera.
+- Admin: página Referidos (dinero → Referidos) con invitaciones, alertas, pagar/rechazar/reabrir, ranking y el
+  programa. Permisos `referrals.view` (Operaciones, Finanzas) y `referrals.manage` (Operaciones).
+- App: Invita y gana explica el premio, comparte el enlace `/i/CODIGO` por WhatsApp y muestra cada invitado con
+  su progreso; el movimiento y el estado de cuenta muestran el premio.
+- Web: página `/i/{código}` con vista previa para WhatsApp, el código, cómo usarlo, descargar la app y abrirla con
+  el código ya escrito (`kuulis://profile/invite?code=…`).
+- Fuera por ahora: referidos de pasajeros (decidido) y el código ya puesto al instalar desde cero (necesita las
+  tiendas; ver `docs/pending.md`).

@@ -345,5 +345,29 @@
     "helpLink": "Meanwhile, browse the help center",
     "other": "Other ways to reach us",
     "privacy": "We only use this data to answer you. Read our"
+  },
+  "invite": {
+    "metaTitle": "You're invited to Kuulis",
+    "metaDescription": "Earn with your motorbike on Kuulis: no per-ride commission. Sign up as a driver with this code.",
+    "eyebrow": "Driver invitation",
+    "title": "You're invited to drive with Kuulis",
+    "titleNamed": "{name} invites you to drive with Kuulis",
+    "lead": "Earn with your motorbike with no per-ride commission: riders pay you directly and you only pay a monthly fee in the months you work.",
+    "freeMonth": "Complete {trips} rides in your first {days} days and get a free month of subscription.",
+    "paused": "The invite program is paused, but you can still sign up as a driver.",
+    "codeLabel": "Invite code",
+    "copy": "Copy code",
+    "copied": "Copied",
+    "steps": {
+      "download": "Get the Kuulis app.",
+      "signUp": "Sign up as a driver and send your documents.",
+      "code": "Before your first ride, enter this code in Profile → Invite and earn."
+    },
+    "download": "Get the app",
+    "openApp": "I have the app",
+    "more": "Want to know more?",
+    "drivers": "See how it works for drivers",
+    "invalidTitle": "This invitation doesn't exist",
+    "invalidBody": "Check the link or ask whoever invited you for the code again."
   }
 }

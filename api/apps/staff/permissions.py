@@ -13,6 +13,7 @@ PERMISSIONS: dict[str, tuple[str, ...]] = {
     "zones": ("zones.view", "zones.manage"),
     "safety": ("safety.view", "safety.manage"),
     "promotions": ("promotions.view", "promotions.manage"),
+    "referrals": ("referrals.view", "referrals.manage"),
     "rates": ("rates.view", "rates.manage"),
     "notifications": ("notifications.send",),
     "wallet": ("wallet.view", "top_ups.view", "top_ups.manage", "transfers.view", "wallet.adjust"),
@@ -72,6 +73,7 @@ DEFAULT_ROLES: dict[str, tuple[str, tuple[str, ...]]] = {
             "finance.export",
             "finance.close",
             "rates.view",
+            "referrals.view",
         ),
     ),
     "operaciones": (
@@ -99,6 +101,8 @@ DEFAULT_ROLES: dict[str, tuple[str, tuple[str, ...]]] = {
             "safety.manage",
             "zones.view",
             "zones.manage",
+            "referrals.view",
+            "referrals.manage",
         ),
     ),
 }

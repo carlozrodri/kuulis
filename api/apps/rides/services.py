@@ -28,7 +28,7 @@ from apps.promotions.schemas import PromotionBrief
 from apps.quality import services as quality
 from apps.quality.models import QualityRole
 from apps.rates import services as rates
-from apps.referrals import services as referrals
+from apps.referrals import tasks as referral_tasks
 from apps.rides import dispatch, events, presence, pricing
 from apps.rides.models import (
     ACTIVE_STATUSES,
@@ -540,19 +540,15 @@ async def driver_step(
     now = utcnow()
     setattr(ride, field, now)
     credited = False
-    inviter = None
     if target == RideStatus.COMPLETED:
-        first_trip = await session.scalar(
+        await session.execute(
             update(DriverProfile)
             .where(
                 DriverProfile.user_id == user.id,
                 DriverProfile.first_trip_completed_at.is_(None),
             )
             .values(first_trip_completed_at=now)
-            .returning(DriverProfile.id)
         )
-        if first_trip is not None:
-            inviter = await referrals.reward_first_trip(session, user.id)
         hold = await _check_ride(session, ride)
         credited = await _credit_promotion(session, ride, hold)
     await session.commit()
@@ -563,8 +559,8 @@ async def driver_step(
             await events.notify_promo_credit(session, ride)
         elif hold and ride.discount > 0:
             await _notify_promo_held(session, ride)
-        if inviter is not None:
-            await referrals.notify_rewarded(session, inviter, user)
+        # Doc 22: the invited driver's progress (and the inviter's reward) after each trip.
+        await referral_tasks.evaluate_driver.kiq(str(user.id))
     await events.emit_updated(session, ride)
     if push_event:
         await events.push_to(

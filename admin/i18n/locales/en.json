@@ -37,7 +37,8 @@
     "quality": "Quality",
     "risk": "Risk",
     "closings": "Closings",
-    "analytics": "Analytics"
+    "analytics": "Analytics",
+    "referrals": "Referrals"
   },
   "navGroups": {
     "operations": "Operations",
@@ -182,7 +183,8 @@
       "safety": "Safety",
       "risk": "Risk",
       "analytics": "Analytics",
-      "zones": "Zones"
+      "zones": "Zones",
+      "referrals": "Referrals"
     },
     "permissions": {
       "users": {
@@ -283,6 +285,10 @@
       "zones": {
         "view": "View zones and cities",
         "manage": "Create and edit zones and city polygons"
+      },
+      "referrals": {
+        "view": "See the referral program",
+        "manage": "Set up the program and pay or reject rewards"
       }
     }
   },
@@ -1269,7 +1275,8 @@
       "transfer_in": "Transfer received",
       "transfer_out": "Transfer sent",
       "subscription_fee": "Monthly fee",
-      "adjustment": "Adjustment"
+      "adjustment": "Adjustment",
+      "referral_bonus": "Invite reward"
     },
     "detail": {
       "title": "Detail",
@@ -1278,7 +1285,8 @@
       "topUpRef": "Binance Pay · order {reference}",
       "transferIn": "From {name}",
       "transferOut": "To {name}",
-      "fee": "Fee for {month}"
+      "fee": "Fee for {month}",
+      "referral": "Invited {name}"
     },
     "adjust": {
       "title": "Adjust balance",
@@ -2007,6 +2015,12 @@
         "hold_void": "Voided a held payment",
         "ban": "Banned an account",
         "unblock": "Removed a banned identifier"
+      },
+      "referrals": {
+        "program_update": "Changed the referral program",
+        "release": "Paid an invite reward",
+        "reject": "Rejected an invite reward",
+        "reopen": "Reopened a rejected invite"
       }
     },
     "entities": {
@@ -2037,7 +2051,8 @@
       "quality_pause": "Automatic pause",
       "risk_signal": "Risk alert",
       "risk_hold": "Held payment",
-      "blocked_identifier": "Banned identifier"
+      "blocked_identifier": "Banned identifier",
+      "referral": "Invite"
     }
   },
   "team": {
@@ -3303,7 +3318,8 @@
       "suspicious_ride": "Suspicious ride",
       "frequent_pair": "Frequent pair",
       "transfers": "Transfers",
-      "rating_ring": "Rating ring"
+      "rating_ring": "Rating ring",
+      "referral": "Suspicious invite"
     },
     "reasons": {
       "same_device": "Passenger and driver on the same phone",
@@ -3321,7 +3337,8 @@
       "recipient_frozen": "Recipient under review",
       "first_transfer": "First transfer (waits 24 h)",
       "rating_ring": "Mutual 5 stars again and again",
-      "risk_score": "Account under review"
+      "risk_score": "Account under review",
+      "shared_identity": "Shares data with their inviter"
     },
     "holdKinds": {
       "promo_credit": "Promotion credit",
@@ -3399,7 +3416,8 @@
       "jumps": "{n} jumps faster than 150 km/h within 10 minutes",
       "lastJump": "The last one: {distance} in {seconds} s",
       "transfer": "Transfer of {amount}",
-      "ratingRing": "{n} rides with mutual 5 stars in {days} days"
+      "ratingRing": "{n} rides with mutual 5 stars in {days} days",
+      "sharedIdentity": "Shares with their inviter: {kinds}"
     },
     "review": {
       "dismiss": "Dismiss",
@@ -3852,6 +3870,120 @@
       "disabled": "The demand map is turned off in the settings.",
       "cell": "{requests} requests · {unmatched} without a driver",
       "point": "Simulated peak"
+    }
+  },
+  "referrals": {
+    "help": "Drivers inviting drivers. The inviter earns {reward} in their wallet (not withdrawable) once the invited driver completes {trips} rides in their first {days} days.",
+    "programOff": "Program off",
+    "tabs": {
+      "list": "Invites",
+      "ranking": "Ranking",
+      "program": "Program"
+    },
+    "allStatuses": "All",
+    "alertsFilter": "Alerts",
+    "statuses": {
+      "pending": "On the way",
+      "qualified": "Qualified, waiting",
+      "held": "Held",
+      "rewarded": "Paid",
+      "rejected": "Rejected"
+    },
+    "reasons": {
+      "monthly_cap": "Inviter's monthly cap",
+      "budget": "No budget left",
+      "program_off": "Program off",
+      "risk_score": "High risk: waiting for review",
+      "expired": "Did not reach the rides in time",
+      "shared_identity": "Shares data with the inviter",
+      "staff": "Rejected by the team",
+      "other": "Other reason",
+      "inviter_inactive": "The inviter's account is no longer active"
+    },
+    "search": "Search by name, email or code",
+    "referrer": "Inviter",
+    "referred": "Invited",
+    "status": "Status",
+    "progress": "Rides",
+    "reward": "Reward",
+    "joined": "Date",
+    "trips": "{n} of {required} rides",
+    "deadline": "Until {date}",
+    "notApproved": "Not approved yet",
+    "legacy": "First version (free month)",
+    "freeMonth": "Free month",
+    "noteShort": "Note: {note}",
+    "empty": "No invites",
+    "total": "No invites | 1 invite | {n} invites",
+    "waiting": "{n} qualified and waiting: {reason}",
+    "totals": {
+      "paid": "Rewards paid",
+      "month": "{amount} this month",
+      "held": "Held",
+      "alerts": "No alerts | 1 alert | {n} alerts",
+      "budgetLeft": "Budget left",
+      "budget": "of {amount}",
+      "invites": "Invites",
+      "breakdown": "{pending} on the way · {rewarded} paid · {months} free months (v1)"
+    },
+    "ranking": {
+      "invited": "Invited",
+      "rewarded": "Rewarded",
+      "earned": "Earned"
+    },
+    "note": "Note",
+    "noteHelp": "Optional. Kept in the history.",
+    "actions": {
+      "release": {
+        "button": "Pay",
+        "title": "Pay the reward",
+        "description": "{referrer} gets {amount} for inviting {referred}.",
+        "done": "Reward paid"
+      },
+      "reject": {
+        "button": "Reject",
+        "reviewed": "Mark reviewed",
+        "title": "Reject the reward",
+        "description": "{referrer} gets no reward for {referred}.",
+        "done": "Invite reviewed"
+      },
+      "reopen": {
+        "button": "Reopen",
+        "title": "Reopen the invite",
+        "description": "It is evaluated again without checking the data {referrer} and {referred} share and, if it expired, with a new window from today.",
+        "done": "Invite reopened"
+      }
+    },
+    "program": {
+      "title": "Referral program",
+      "help": "Changes apply to the next evaluations; what was paid does not change.",
+      "enabled": "Active",
+      "reward": "Reward (USDT)",
+      "rewardHelp": "Credit in the inviter's wallet. Not part of the month's earnings.",
+      "requiredTrips": "Required rides",
+      "requiredTripsHelp": "Rides of the invited driver that count: not with their inviter nor flagged as suspicious.",
+      "windowDays": "Days to qualify",
+      "windowDaysHelp": "From the invited driver's approval.",
+      "monthlyCap": "Rewards per person per month",
+      "monthlyCapHelp": "0 = no cap. The rest wait for the next month.",
+      "budget": "Total budget (USDT)",
+      "budgetHelp": "Paid plus held never goes over it. Left: {left}.",
+      "freeMonth": "Free month for the invited driver",
+      "freeMonthHelp": "The invited driver also earns a month of subscription when qualifying.",
+      "startsAt": "From",
+      "endsAt": "Until",
+      "datesHelp": "New codes are accepted between these dates (empty = no limit). {zone} time.",
+      "passengers": "For now only drivers invite drivers. Passenger referrals come later.",
+      "save": "Save",
+      "saved": "Program saved",
+      "errors": {
+        "reward_usd": "The reward must be between 0 and 1000 USDT.",
+        "required_trips": "Rides must be between 1 and 500.",
+        "window_days": "Days must be between 1 and 365.",
+        "monthly_cap": "The cap must be between 0 and 1000.",
+        "budget_usd": "The budget must be between 0 and 1,000,000 USDT.",
+        "dates": "The end date must be after the start date."
+      }
     }
   }
 }

@@ -3,6 +3,8 @@ import { describe, expect, it } from '@jest/globals';
 import {
   firstName,
   formatInviteCode,
+  inviteeProgress,
+  inviteeStatus,
   formatKm,
   initials,
   memberSince,
@@ -63,5 +65,30 @@ describe('sharing and invites', () => {
     expect(normalizeInviteCode(' ab3-k7q ')).toBe('AB3K7Q');
     expect(formatInviteCode('ab3k7q')).toBe('AB3 K7Q');
     expect(formatInviteCode(null)).toBe('');
+  });
+
+  it('describes each invitee', () => {
+    const base = {
+      name: 'Luis G.',
+      joined_at: '2026-10-01T00:00:00Z',
+      approved: true,
+      status: 'pending' as const,
+      trips: 7,
+      required_trips: 20,
+      deadline_at: '2026-10-31T00:00:00Z',
+      reward_usd: null,
+      reward_kind: null,
+    };
+    expect(inviteeStatus(base)).toEqual({ key: 'pending', values: { trips: 7, required: 20 }, tone: 'info' });
+    expect(inviteeStatus({ ...base, approved: false }).key).toBe('waitingApproval');
+    expect(inviteeStatus({ ...base, status: 'rewarded', reward_usd: '5.00', reward_kind: 'wallet_credit' })).toEqual({
+      key: 'rewarded',
+      values: { amount: '5.00' },
+      tone: 'success',
+    });
+    expect(inviteeStatus({ ...base, status: 'rewarded', reward_kind: 'free_month' }).key).toBe('rewardedMonth');
+    expect(inviteeStatus({ ...base, status: 'expired' }).tone).toBe('neutral');
+    expect(inviteeProgress(base)).toBeCloseTo(0.35);
+    expect(inviteeProgress({ trips: 30, required_trips: 20 })).toBe(1);
   });
 });

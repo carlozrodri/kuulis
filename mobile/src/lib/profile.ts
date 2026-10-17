@@ -1,7 +1,7 @@
 /**
  * Pure profile logic (no React, no network) so it can be unit tested.
  */
-import type { User } from './types';
+import type { ReferralInvitee, User } from './types';
 
 /** "Ana María Pérez" -> "AM"; falls back to the email, then "?". */
 export function initials(name: string | null | undefined, email?: string | null): string {
@@ -60,3 +60,27 @@ export function formatInviteCode(code: string | null | undefined): string {
   const clean = normalizeInviteCode(code ?? '');
   return clean.length === 6 ? `${clean.slice(0, 3)} ${clean.slice(3)}` : clean;
 }
+
+export type InviteeTone = 'info' | 'warning' | 'success' | 'neutral';
+
+/** How an invitee shows in "Tus invitados" (doc 22): an i18n key under profile.invite.status, its values and tone. */
+export function inviteeStatus(invitee: ReferralInvitee): { key: string; values: Record<string, string | number>; tone: InviteeTone } {
+  switch (invitee.status) {
+    case 'pending':
+      return invitee.approved
+        ? { key: 'pending', values: { trips: invitee.trips, required: invitee.required_trips }, tone: 'info' }
+        : { key: 'waitingApproval', values: {}, tone: 'neutral' };
+    case 'reviewing':
+      return { key: 'reviewing', values: {}, tone: 'warning' };
+    case 'rewarded':
+      return invitee.reward_kind === 'free_month'
+        ? { key: 'rewardedMonth', values: {}, tone: 'success' }
+        : { key: 'rewarded', values: { amount: invitee.reward_usd ?? '0' }, tone: 'success' };
+    default:
+      return { key: invitee.status, values: {}, tone: 'neutral' };
+  }
+}
+
+/** 0–1 share of the required trips, for the invitee's progress bar. */
+export const inviteeProgress = (invitee: Pick<ReferralInvitee, 'trips' | 'required_trips'>) =>
+  invitee.required_trips > 0 ? Math.min(1, invitee.trips / invitee.required_trips) : 0;

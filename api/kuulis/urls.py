@@ -32,6 +32,7 @@ from apps.quality.router import admin_router as quality_admin_router
 from apps.quality.router import router as quality_router
 from apps.rates.router import router as rates_router
 from apps.realtime.router import router as realtime_router
+from apps.referrals.router import admin_router as referrals_admin_router
 from apps.referrals.router import router as referrals_router
 from apps.releases.router import router as releases_router
 from apps.rides.router import admin_drivers_router as rides_admin_drivers_router
@@ -80,6 +81,7 @@ api_v1.include_router(releases_router)
 api_v1.include_router(updates_router)
 api_v1.include_router(control_router)
 api_v1.include_router(referrals_router)
+api_v1.include_router(referrals_admin_router)
 api_v1.include_router(files_router)
 # Before drivers_admin_router: /admin/drivers/online must win over /admin/drivers/{driver_id}.
 api_v1.include_router(rides_admin_drivers_router)

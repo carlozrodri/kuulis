@@ -30,6 +30,8 @@ function describe(entry: WalletEntry): string {
       return t('wallet.detail.fee', { month: formatMonth(d.month, locale.value) })
     case 'adjustment':
       return d.reason || entry.description || '—'
+    case 'referral_bonus':
+      return t('wallet.detail.referral', { name: d.counterpart_name || '—' })
     default:
       return entry.description || '—'
   }

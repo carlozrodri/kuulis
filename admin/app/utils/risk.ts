@@ -34,6 +34,7 @@ export const RISK_KIND_ICONS: Record<RiskKind, string> = {
   frequent_pair: 'i-lucide-users-round',
   transfers: 'i-lucide-arrow-left-right',
   rating_ring: 'i-lucide-star',
+  referral: 'i-lucide-user-plus',
 }
 
 export const riskKindIcon = (kind: string) => RISK_KIND_ICONS[kind as RiskKind] ?? 'i-lucide-shield-alert'
@@ -135,6 +136,11 @@ export function riskEvidenceLines(signal: Pick<SignalRead, 'kind' | 'reasons' | 
     case 'rating_ring': {
       const rides = num(e.rides)
       if (rides !== null) add('ratingRing', { n: rides, days: num(e.days) ?? 30 })
+      break
+    }
+    case 'referral': {
+      const shared = Array.isArray(e.shared) ? (e.shared as string[]) : []
+      if (shared.length) add('sharedIdentity', { kinds: shared.join(', ') })
       break
     }
   }
