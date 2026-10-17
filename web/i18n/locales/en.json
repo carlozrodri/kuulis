@@ -61,58 +61,80 @@
     "download": "Download for Android",
     "drive": "Drive with Kuulis",
     "drivers": {
-      "eyebrow": "For drivers",
-      "title": "What you earn is yours",
-      "body": "Kuulis takes nothing from your rides. You only pay a small monthly fee based on what you earned, and only in the months you work. The first {months} months are free.",
-      "cta": "See requirements",
+      "title": "Kuulis takes 0% of every ride.",
+      "body": "Every dollar your rider pays is yours. You pay a monthly fee based on what you earned, capped at {max}, and nothing in months you don't drive. Your first {months} months are free.",
+      "bodyNoMax": "Every dollar your rider pays is yours. You pay a small monthly fee based on what you earned, and nothing in months you don't drive. Your first {months} months are free.",
+      "cta": "See requirements and fees",
       "tableTitle": "Monthly fee",
-      "tableNote": "No rides in a month, nothing to pay. The first {months} months are free."
+      "tableNote": "No rides in a month, nothing to pay. The first {months} months are free.",
+      "zero": "0%"
     },
     "how": {
-      "eyebrow": "How it works",
-      "title": "Three steps and you are on your way",
-      "step1": {
-        "title": "Request a ride",
-        "body": "Choose where you are going and see the price."
+      "title": "Three stops and you're there.",
+      "stop1": {
+        "title": "Book",
+        "body": "Tell us where you're going and see the price."
       },
-      "step2": {
-        "title": "A driver accepts",
-        "body": "We show you who they are, their bike and how long until they arrive."
+      "stop2": {
+        "title": "Get picked up",
+        "body": "See the name, photo, bike and plate of the driver on the way."
       },
-      "step3": {
+      "stop3": {
         "title": "Arrive and pay",
-        "body": "Pay the driver directly, with the method you agreed."
+        "body": "Pay your driver directly, then rate the ride."
       }
     },
     "cities": "Available in:",
     "faq": {
       "title": "Frequently asked questions",
-      "items": [
-        {
-          "q": "Does Kuulis take a commission on each ride?",
-          "a": "No. The rider pays the full ride to the driver. The driver pays a monthly fee based on what they earned, and nothing in months they did not work."
-        },
-        {
-          "q": "How do I pay for the ride?",
-          "a": "Directly to the driver: cash, pago móvil, Zelle or Binance, however you agree. The app sets the price and it is the same for both of you."
-        },
-        {
-          "q": "Why is it not on the Play Store?",
-          "a": "For now the app is installed from this website. The Download page explains how to do it safely."
-        },
-        {
-          "q": "I have an iPhone, can I use Kuulis?",
-          "a": "We are working on the iPhone version. Until then, the Android app is the only one available."
-        },
-        {
-          "q": "What do I need to drive?",
-          "a": "Be of age, have your bike with its papers and upload your documents in the app. We review your application and let you know."
-        }
-      ]
+      "commission": {
+        "q": "Does Kuulis take a commission on each ride?",
+        "a": "No. The rider pays the full fare to the driver. Drivers pay a monthly fee based on what they earned, and nothing in months they didn't drive."
+      },
+      "pay": {
+        "q": "How do I pay for the ride?",
+        "a": "Directly to your driver: cash, pago móvil, Zelle or Binance, whatever you agree on. The app sets the price, and it is the same for both of you."
+      },
+      "store": {
+        "q": "Why isn't it on the Play Store?",
+        "a": "For now the app is installed from this site. The Download page shows you how to do it safely."
+      },
+      "iphone": {
+        "q": "I have an iPhone. Can I use Kuulis?",
+        "a": "Not yet. Kuulis is Android-only for now; we'll announce an iPhone version here when it's ready."
+      },
+      "driver": {
+        "q": "What do I need to drive?",
+        "a": "Be at least {age}, have a {year} or newer motorbike with its papers, and upload your documents in the app. We review your application and let you know.",
+        "aNoData": "Have your motorbike with its papers and upload your documents in the app. We review your application and let you know."
+      },
+      "more": "Another question?",
+      "moreLink": "Visit the help center"
     },
     "final": {
-      "title": "Start moving with Kuulis",
-      "body": "Download the app, create your account and request your first ride."
+      "title": "Install it once. Ride whenever you need.",
+      "body": "You download Kuulis from this site, not from the Play Store. We'll walk you through it and show you how to check the file really comes from us."
+    },
+    "safety": {
+      "title": "You know who's driving you. So does someone you trust.",
+      "verified": {
+        "title": "Verified drivers",
+        "body": "We check their ID, license, medical certificate and bike papers before they can go online."
+      },
+      "pin": {
+        "title": "Start PIN",
+        "body": "In {cities}, the ride doesn't start until you give your driver your PIN."
+      },
+      "live": {
+        "title": "Live trip",
+        "body": "Share a link so the people you trust can follow the ride on a map until you arrive."
+      },
+      "sos": {
+        "title": "SOS button",
+        "body": "Press and hold it to call {number}, then send your live location to your trusted contacts."
+      },
+      "pinLabel": "Example start PIN",
+      "pinCaption": "Example: every ride gets its own PIN."
     }
   },
   "drivers": {

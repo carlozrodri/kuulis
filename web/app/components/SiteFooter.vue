@@ -4,12 +4,17 @@
 const { t } = useI18n()
 const { whatsapp, email } = await useSupport()
 const year = new Date().getFullYear()
+// A page that ends on a green field (page meta `endsOnBrand`) has the Ávila rise from that field.
+const route = useRoute()
 
 const legal = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as const
 </script>
 
 <template>
-  <footer class="footer">
+  <footer
+    class="footer"
+    :class="{ 'on-brand': route.meta.endsOnBrand }"
+  >
     <BrandAvilaRidge class="skyline" />
     <div class="band">
       <div class="container-wide grid-footer">
@@ -105,6 +110,14 @@ const legal = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as con
 .skyline {
   color: var(--footer-bg);
   margin-bottom: -1px;
+}
+
+.on-brand {
+  margin-top: 0;
+}
+
+.on-brand .skyline {
+  background: var(--band-brand);
 }
 
 .band {

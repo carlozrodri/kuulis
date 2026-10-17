@@ -61,58 +61,80 @@
     "download": "Descargar para Android",
     "drive": "Quiero manejar",
     "drivers": {
-      "eyebrow": "Para motorizados",
-      "title": "Lo que cobras es tuyo",
-      "body": "Kuulis no se queda con nada de tus viajes. Solo pagas una cuota mensual pequeña, según lo que ganaste, y solo los meses en que trabajas. Los primeros {months} meses son gratis.",
-      "cta": "Ver requisitos",
+      "title": "De cada viaje, Kuulis se queda con 0 %.",
+      "body": "Lo que te paga el pasajero es tuyo completo. Pagas una cuota mensual según lo que ganaste, con tope de {max}, y nada en los meses que no trabajas. Tus primeros {months} meses, nada.",
+      "bodyNoMax": "Lo que te paga el pasajero es tuyo completo. Pagas una cuota mensual pequeña según lo que ganaste, y nada en los meses que no trabajas. Tus primeros {months} meses, nada.",
+      "cta": "Ver requisitos y cuota",
       "tableTitle": "Cuota mensual",
-      "tableNote": "Si no tienes viajes en un mes, no pagas nada. Los primeros {months} meses son gratis."
+      "tableNote": "Si no tienes viajes en un mes, no pagas nada. Los primeros {months} meses son gratis.",
+      "zero": "0 %"
     },
     "how": {
-      "eyebrow": "Cómo funciona",
-      "title": "Tres pasos y vas en camino",
-      "step1": {
-        "title": "Pide tu viaje",
-        "body": "Elige a dónde vas y mira el precio."
+      "title": "Tres paradas y llegaste.",
+      "stop1": {
+        "title": "Pide",
+        "body": "Escribe a dónde vas y mira el precio."
       },
-      "step2": {
-        "title": "Un motorizado acepta",
-        "body": "Te mostramos quién es, su moto y cuánto tarda en llegar."
+      "stop2": {
+        "title": "Te buscan",
+        "body": "Ves el nombre, la foto, la moto y la placa de quien va en camino."
       },
-      "step3": {
+      "stop3": {
         "title": "Llegas y pagas",
-        "body": "Le pagas directo al motorizado, con el método que acordaron."
+        "body": "Le pagas directo al motorizado y califican el viaje."
       }
     },
     "cities": "Disponible en:",
     "faq": {
       "title": "Preguntas frecuentes",
-      "items": [
-        {
-          "q": "¿Kuulis cobra comisión por cada viaje?",
-          "a": "No. El pasajero le paga el viaje completo al motorizado. El motorizado paga una cuota mensual según lo que ganó, y nada los meses en que no trabajó."
-        },
-        {
-          "q": "¿Cómo pago el viaje?",
-          "a": "Directo al motorizado: efectivo, pago móvil, Zelle o Binance, como acuerden. El precio lo calcula la app y es el mismo para los dos."
-        },
-        {
-          "q": "¿Por qué no está en la Play Store?",
-          "a": "Por ahora la app se instala desde esta web. En la página Descargar te explicamos cómo hacerlo de forma segura."
-        },
-        {
-          "q": "¿Tengo iPhone, puedo usar Kuulis?",
-          "a": "Estamos preparando la versión para iPhone. Mientras tanto, la app para Android es la única disponible."
-        },
-        {
-          "q": "¿Qué necesito para ser motorizado?",
-          "a": "Ser mayor de edad, tener tu moto con sus papeles y subir tus documentos desde la app. Revisamos tu solicitud y te avisamos."
-        }
-      ]
+      "commission": {
+        "q": "¿Kuulis cobra comisión por cada viaje?",
+        "a": "No. El pasajero le paga el viaje completo al motorizado. El motorizado paga una cuota mensual según lo que ganó, y nada los meses en que no trabajó."
+      },
+      "pay": {
+        "q": "¿Cómo pago el viaje?",
+        "a": "Directo al motorizado: efectivo, pago móvil, Zelle o Binance, como acuerden. El precio lo calcula la app y es el mismo para los dos."
+      },
+      "store": {
+        "q": "¿Por qué no está en la Play Store?",
+        "a": "Por ahora la app se instala desde esta web. En la página Descargar te explicamos cómo hacerlo de forma segura."
+      },
+      "iphone": {
+        "q": "¿Tengo iPhone, puedo usar Kuulis?",
+        "a": "Todavía no. Por ahora Kuulis es solo para Android; cuando haya versión para iPhone lo anunciaremos aquí."
+      },
+      "driver": {
+        "q": "¿Qué necesito para ser motorizado?",
+        "a": "Tener al menos {age} años, una moto del {year} o más nueva con sus papeles y subir tus documentos desde la app. Revisamos tu solicitud y te avisamos.",
+        "aNoData": "Tener tu moto con sus papeles y subir tus documentos desde la app. Revisamos tu solicitud y te avisamos."
+      },
+      "more": "¿Otra duda?",
+      "moreLink": "Visita el centro de ayuda"
     },
     "final": {
-      "title": "Empieza a moverte con Kuulis",
-      "body": "Descarga la app, crea tu cuenta y pide tu primer viaje."
+      "title": "Instálala una vez. Muévete cuando quieras.",
+      "body": "Kuulis se descarga desde esta web, no desde la Play Store. Te explicamos cómo, paso a paso, y cómo comprobar que el archivo es el nuestro."
+    },
+    "safety": {
+      "title": "Sabes quién te lleva. Y alguien de confianza también.",
+      "verified": {
+        "title": "Motorizados verificados",
+        "body": "Revisamos su cédula, licencia, certificado médico y los papeles de la moto antes de que puedan conectarse."
+      },
+      "pin": {
+        "title": "PIN de inicio",
+        "body": "En {cities}, el viaje no empieza hasta que le dices tu PIN al motorizado."
+      },
+      "live": {
+        "title": "Viaje en vivo",
+        "body": "Comparte un enlace y tu gente ve el viaje en el mapa hasta que llegues."
+      },
+      "sos": {
+        "title": "Botón SOS",
+        "body": "Lo mantienes pulsado y llama al {number}; después envías tu ubicación en vivo a tus contactos de confianza."
+      },
+      "pinLabel": "Ejemplo de PIN de inicio",
+      "pinCaption": "Ejemplo: cada viaje tiene su propio PIN."
     }
   },
   "drivers": {

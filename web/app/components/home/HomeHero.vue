@@ -1,12 +1,15 @@
 <script setup lang="ts">
 // Home hero (docs/website-redesign/03 §5.1): what Kuulis is and the way to download, on a flat green field.
-// The route draws itself to the yellow dot; the Ávila closes the field. The header sits on this field until the
-// sentinel at its end scrolls past (SiteHeader).
+// The route draws itself to the yellow dot; the Ávila closes the field. The header sits on this field until it
+// scrolls out from under it (SiteHeader watches #hero).
 const { t } = useI18n()
 </script>
 
 <template>
-  <section class="hero band-brand">
+  <section
+    id="hero"
+    class="hero band-brand"
+  >
     <div class="container-wide grid-hero">
       <div class="copy">
         <BrandHeadline
@@ -38,10 +41,6 @@ const { t } = useI18n()
       <BrandRouteLine class="art" />
     </div>
     <BrandAvilaRidge class="ridge" />
-    <div
-      id="hero-end"
-      aria-hidden="true"
-    />
   </section>
 </template>
 
@@ -97,13 +96,6 @@ const { t } = useI18n()
   position: relative;
   margin-top: clamp(-40px, -3vw, 0px);
   color: var(--primary-deep);
-}
-
-#hero-end {
-  position: absolute;
-  bottom: 0;
-  height: 1px;
-  width: 1px;
 }
 
 /* Phones: the headline, lead and main button fit in a 360×640 screen; the route is a small accent below. */
