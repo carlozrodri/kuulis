@@ -10,7 +10,8 @@
     "close": "Close",
     "comingSoon": "Coming soon",
     "openSettings": "Open settings",
-    "error": "Something went wrong, please try again"
+    "error": "Something went wrong, please try again",
+    "cancel": "Cancel"
   },
   "a11y": {
     "showPassword": "Show password",
@@ -113,7 +114,10 @@
       "details": "See details in your wallet"
     },
     "pendingFee": "{{amount}} fee pending. Top up by {{date}} to keep getting rides.",
-    "pendingFeeNoDate": "{{amount}} fee pending. Top up to keep getting rides."
+    "pendingFeeNoDate": "{{amount}} fee pending. Top up to keep getting rides.",
+    "shortcuts": "Saved places",
+    "shortcutHint": "See the price to go to {{name}}",
+    "addPlace": "Add place"
   },
   "notifications": {
     "empty": "No notifications",
@@ -320,7 +324,10 @@
         "rejected_one": "{{count}} rejected",
         "rejected_other": "{{count}} rejected",
         "help": "Contact support"
-      }
+      },
+      "compliments": "Compliments",
+      "complimentA11y": "{{name}}: {{count}}",
+      "complimentsHint": "What passengers highlight most when they rate you."
     },
     "saved": {
       "title": "Your places",
@@ -343,7 +350,20 @@
       "savedToast": "{{name}} saved",
       "options": "{{name}} options",
       "change": "Change address",
-      "remove": "Remove place"
+      "remove": "Remove place",
+      "saveHere": "Save here",
+      "pinHint": "Move the map to the exact spot",
+      "icon": "Icon",
+      "icons": {
+        "star": "Star",
+        "heart": "Heart",
+        "dumbbell": "Gym",
+        "school": "School",
+        "store": "Shop",
+        "users": "Family and friends",
+        "utensils": "Restaurant",
+        "hospital": "Health"
+      }
     },
     "contact": {
       "title": "Trusted contacts",
@@ -762,7 +782,9 @@
     "idempotency_key_reused": "We couldn't send this. Try again.",
     "pickup_restricted": "Passengers can’t be picked up in this area. Choose another pickup point.",
     "dropoff_restricted": "Passengers can’t be dropped off in this area. Choose a nearby destination.",
-    "referral_program_closed": "The invite program is not taking codes right now."
+    "referral_program_closed": "The invite program is not taking codes right now.",
+    "receipt_unavailable": "The receipt is available when the ride ends.",
+    "ride_not_for_rider": "This ride was not requested for someone else."
   },
   "map": {
     "recenter": "Recenter map"
@@ -805,7 +827,9 @@
     "dropoffTitle": "Destination",
     "moveMap": "Move the map to place the point",
     "confirmPickup": "Confirm pickup",
-    "confirmDropoff": "Confirm destination"
+    "confirmDropoff": "Confirm destination",
+    "saveTitle": "Place to save",
+    "confirmSave": "Use this spot"
   },
   "quote": {
     "moto": "Moto",
@@ -850,7 +874,29 @@
       }
     },
     "changePickup": "Change pickup point",
-    "zoneSurge": "High demand in this area: +{{percent}}%"
+    "zoneSurge": "High demand in this area: +{{percent}}%",
+    "rider": {
+      "for": "For {{name}}",
+      "me": "For me",
+      "someoneElse": "Tap to request for someone else",
+      "clear": "Request for me",
+      "title": "Who is it for?",
+      "name": "Rider's name",
+      "phone": "Rider's phone",
+      "phoneHint": "You will send them the live ride on WhatsApp.",
+      "save": "Done",
+      "nameRequired": "Type the rider's name.",
+      "phoneInvalid": "Check the phone (e.g. 0414 123 4567)."
+    },
+    "note": {
+      "add": "Note for the driver",
+      "title": "Note for the driver",
+      "hint": "E.g. I'm at the door of the blue building",
+      "clear": "Remove the note",
+      "placeholder": "I'm at the door of the blue building",
+      "count": "{{count}}/{{max}}",
+      "save": "Save note"
+    }
   },
   "ride": {
     "pickup": "Pickup",
@@ -1005,7 +1051,8 @@
     "addContactHint": "To send them your rides with one tap",
     "live": {
       "message": "Follow my Kuulis ride live: {{url}}\nDriver: {{driver}} · Plate {{plate}}\nGoing to: {{dropoff}}",
-      "sosMessage": "🚨 I pressed SOS on Kuulis and may need help. See where I am live: {{url}}\nDriver: {{driver}} · Plate {{plate}}\nGoing to: {{dropoff}}"
+      "sosMessage": "🚨 I pressed SOS on Kuulis and may need help. See where I am live: {{url}}\nDriver: {{driver}} · Plate {{plate}}\nGoing to: {{dropoff}}",
+      "riderMessage": "{{name}}, I booked you a Kuulis moto. Follow it live and see the PIN for the driver: {{url}}\nDriver: {{driver}} · Plate {{plate}}\nDestination: {{dropoff}}"
     },
     "sos": {
       "short": "SOS",
@@ -2349,5 +2396,23 @@
     "use": "Use {{name}}",
     "useHint": "Moves your pickup point there, {{distance}} away",
     "moved": "We’ll pick you up at {{name}}"
+  },
+  "rideActions": {
+    "repeat": "Repeat",
+    "receipt": "Share receipt",
+    "save": "Save place",
+    "saveTitle": "Save the destination as",
+    "receiptTitle": "Kuulis ride receipt No. {{number}}",
+    "receiptTotal": "Total",
+    "receiptNonFiscal": "Paid directly to the driver. Not a tax invoice."
+  },
+  "rideNote": {
+    "rider": "Rider: {{name}}",
+    "noteA11y": "Passenger's note: {{note}}",
+    "forTitle": "This ride is for {{name}}",
+    "sendBody": "Send them the live ride: they will see the driver, the plate and the start PIN.",
+    "sentBody": "You sent the ride to {{name}}. You can send it again if needed.",
+    "sendAgain": "Send again",
+    "send": "Send to {{name}} on WhatsApp"
   }
 }

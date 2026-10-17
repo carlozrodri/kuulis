@@ -22,6 +22,8 @@ import type {
   Quote,
   Ride,
   RideMessage,
+  RideReceipt,
+  RiderInfo,
   VehicleType,
 } from '@/lib/types';
 
@@ -301,11 +303,22 @@ export function useQueuedActions(rideId: string | undefined, kind: OutboxKind): 
   return useMemo(() => items.filter((item) => item.rideId === rideId && item.kind === kind), [items, rideId, kind]);
 }
 
+/** POST /rides body: the note and the person riding (doc 23) only when there are. */
+export function rideRequestBody(input: { quote_id: string; payment_method: PaymentMethod; note?: string | null; rider?: RiderInfo | null }) {
+  const note = input.note?.trim();
+  return {
+    quote_id: input.quote_id,
+    payment_method: input.payment_method,
+    ...(note ? { note } : {}),
+    ...(input.rider ? { rider: input.rider } : {}),
+  };
+}
+
 export function useRequestRide() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: { quote_id: string; payment_method: PaymentMethod }) =>
-      apiOnce<Ride>('/rides', { body: input }),
+    mutationFn: (input: { quote_id: string; payment_method: PaymentMethod; note?: string | null; rider?: RiderInfo | null }) =>
+      apiOnce<Ride>('/rides', { body: rideRequestBody(input) }),
     onSuccess: (ride) => {
       // The requesting screen opens the ride itself.
       routedRides.add(ride.id);
@@ -322,12 +335,22 @@ export async function requestAgain(ride: Ride, attempt = 0): Promise<Ride> {
   const quote = await fetchQuote(ride.pickup, ride.dropoff, ride.vehicle_type);
   try {
     return await apiOnce<Ride>('/rides', {
-      body: { quote_id: quote.quote_id, payment_method: ride.payment_method },
+      body: rideRequestBody({
+        quote_id: quote.quote_id,
+        payment_method: ride.payment_method,
+        note: ride.note,
+        rider: ride.rider_name && ride.rider_phone ? { name: ride.rider_name, phone: ride.rider_phone } : null,
+      }),
     });
   } catch (error) {
     if (attempt === 0 && error instanceof ApiError && error.code === 'promotion_unavailable') return requestAgain(ride, 1);
     throw error;
   }
+}
+
+/** GET /rides/{id}/receipt (doc 23): only completed rides (409 receipt_unavailable before). */
+export function fetchRideReceipt(id: string) {
+  return api<RideReceipt>(`/rides/${id}/receipt`);
 }
 
 export function useCancelRide() {

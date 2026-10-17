@@ -1056,7 +1056,10 @@
       "yes": "Yes",
       "no": "No",
       "at": "Time"
-    }
+    },
+    "rider": "Rider",
+    "riderHelp": "Requested for someone else",
+    "note": "Note for the driver"
   },
   "live": {
     "activeRides": "Rides ({n})",

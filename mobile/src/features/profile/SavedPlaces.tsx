@@ -13,7 +13,7 @@ import { shortAddress } from '@/lib/ride';
 import type { Place, PlaceKind, SavedPlace } from '@/lib/types';
 import { radius, space } from '@/theme';
 
-import { PLACE_ICONS } from './PlacePickerScreen';
+import { PLACE_ICONS, placeIcon } from './PlacePickerScreen';
 
 /** A saved or frequent place: straight to the price (pickup = where the passenger is), or search. */
 export function rideTo(place: Place) {
@@ -55,7 +55,7 @@ export function SavedPlacesCard() {
     place ? (
       <ListRow
         key={place.id}
-        icon={PLACE_ICONS[kind]}
+        icon={placeIcon(place)}
         iconTone={kind === 'other' ? 'primary' : 'accent'}
         title={name(place)}
         subtitle={shortAddress(place.address)}

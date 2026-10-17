@@ -38,6 +38,8 @@ async def save(session: AsyncSession, user_id: uuid.UUID, data: PlaceWrite) -> S
     values = data.model_dump()
     values["label"] = values["label"].strip()
     if data.kind != PlaceKind.OTHER:
+        values["icon"] = None
+    if data.kind != PlaceKind.OTHER:
         existing = await session.scalar(
             select(SavedPlace)
             .where(SavedPlace.user_id == user_id, SavedPlace.kind == data.kind)
@@ -76,6 +78,8 @@ async def update(
 ) -> SavedPlace:
     place = await _own(session, user_id, place_id)
     for field, value in data.model_dump(exclude_unset=True, exclude_none=True).items():
+        if field == "icon" and place.kind != PlaceKind.OTHER:
+            continue
         setattr(place, field, value.strip() if field == "label" else value)
     await session.flush()
     await session.refresh(place)

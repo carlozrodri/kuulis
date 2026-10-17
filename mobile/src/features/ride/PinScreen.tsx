@@ -14,7 +14,7 @@ import { inServiceArea, placeFromGeo, shortAddress } from '@/lib/ride';
 import type { LatLng, Place } from '@/lib/types';
 import { radius, space, useTheme } from '@/theme';
 
-import { type DraftField, rideDraft, setDraftPlace } from './store';
+import { type DraftField, pinnedPlace, rideDraft, setDraftPlace } from './store';
 
 /** Move the map under a fixed centre pin to choose the pickup or destination precisely. */
 export function PinScreen() {
@@ -22,7 +22,9 @@ export function PinScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { config } = useAppConfig();
-  const params = useLocalSearchParams<{ field?: DraftField }>();
+  // `save` (doc 23): choosing a place to save (Casa, Trabajo…), not a point of the ride.
+  const params = useLocalSearchParams<{ field?: DraftField; save?: string }>();
+  const saving = params.save === '1';
   const field: DraftField = params.field === 'pickup' ? 'pickup' : 'dropoff';
   const [initial] = useState<LatLng | null>(() => rideDraft.get()[field] ?? getLastPosition() ?? rideDraft.get().pickup);
   const [center, setCenter] = useState<LatLng | null>(initial);
@@ -50,10 +52,15 @@ export function PinScreen() {
   }, [center]);
 
   const loading = !!center && resolved !== center;
-  const inside = center ? inServiceArea(center, config.service_areas) : true;
+  const inside = saving || (center ? inServiceArea(center, config.service_areas) : true);
 
   const confirm = () => {
     if (!place) return;
+    if (saving) {
+      pinnedPlace.set(place);
+      router.back();
+      return;
+    }
     setDraftPlace(field, place);
     const draft = rideDraft.get();
     if (draft.pickup && draft.dropoff) router.replace('/ride/quote');
@@ -92,7 +99,7 @@ export function PinScreen() {
 
       <View style={[styles.panel, { backgroundColor: theme.surface, paddingBottom: Math.max(insets.bottom, space.md) + space.xs }]}>
         <Txt variant="overline" color="muted">
-          {field === 'pickup' ? t('pin.pickupTitle') : t('pin.dropoffTitle')}
+          {saving ? t('pin.saveTitle') : field === 'pickup' ? t('pin.pickupTitle') : t('pin.dropoffTitle')}
         </Txt>
         <View style={styles.addressRow}>
           <Txt variant="subtitle" numberOfLines={2} style={{ flex: 1 }}>
@@ -107,7 +114,7 @@ export function PinScreen() {
         ) : null}
         {!inside ? <Notice tone="warning">{t('errors.outside_service_area')}</Notice> : null}
         <Button
-          title={field === 'pickup' ? t('pin.confirmPickup') : t('pin.confirmDropoff')}
+          title={saving ? t('pin.confirmSave') : field === 'pickup' ? t('pin.confirmPickup') : t('pin.confirmDropoff')}
           disabled={!place || loading || !inside}
           onPress={confirm}
         />

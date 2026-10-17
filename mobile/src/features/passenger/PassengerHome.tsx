@@ -27,6 +27,8 @@ import type { Place } from '@/lib/types';
 import { useAuth } from '@/providers/AuthProvider';
 import { elevation, radius, space, useTheme } from '@/theme';
 
+import { SavedShortcuts } from './SavedShortcuts';
+
 export function greetingKey(date = new Date()) {
   const hour = date.getHours();
   if (hour < 12) return 'home.goodMorning';
@@ -138,6 +140,8 @@ export function PassengerHome() {
           </View>
         </Pressable>
       )}
+
+      {!activeRide && !suspension && !qualityPause && !paused ? <SavedShortcuts /> : null}
 
       <UpdateBanner />
 

@@ -1,6 +1,6 @@
 import { secureStorage } from '@/lib/storage';
 import { createStore } from '@/lib/store';
-import type { PaymentMethod, Place } from '@/lib/types';
+import type { PaymentMethod, Place, RiderInfo } from '@/lib/types';
 
 export type DraftField = 'pickup' | 'dropoff';
 
@@ -12,6 +12,9 @@ export type RideDraft = {
   paymentMethod: PaymentMethod | null;
   /** Promo code the passenger applied on the quote screen (normalized), until the ride is requested. */
   promoCode: string | null;
+  /** Doc 23: note for the driver and the person riding (null: the passenger), until the ride is requested. */
+  note: string;
+  rider: RiderInfo | null;
 };
 
 /** The ride being put together across search → pin → quote. */
@@ -21,6 +24,8 @@ export const rideDraft = createStore<RideDraft>({
   dropoff: null,
   paymentMethod: null,
   promoCode: null,
+  note: '',
+  rider: null,
 });
 
 export function setDraftPlace(field: DraftField, place: Place, fromCurrentLocation = false) {
@@ -33,6 +38,27 @@ export function setDraftPlace(field: DraftField, place: Place, fromCurrentLocati
 
 export function resetDraftDestination() {
   rideDraft.set((draft) => ({ ...draft, dropoff: null }));
+}
+
+export function setDraftNote(note: string) {
+  rideDraft.set((draft) => ({ ...draft, note }));
+}
+
+export function setDraftRider(rider: RiderInfo | null) {
+  rideDraft.set((draft) => ({ ...draft, rider }));
+}
+
+/** "Repetir viaje" (doc 23): same route, a fresh price on the quote screen. */
+export function repeatRide(ride: { pickup: Place; dropoff: Place }) {
+  rideDraft.set((draft) => ({
+    ...draft,
+    pickup: ride.pickup,
+    pickupIsCurrent: false,
+    dropoff: ride.dropoff,
+    promoCode: null,
+    note: '',
+    rider: null,
+  }));
 }
 
 export function setDraftPromoCode(code: string | null) {
@@ -54,6 +80,9 @@ export async function loadSavedPayment() {
     rideDraft.set((draft) => ({ ...draft, paymentMethod: saved as PaymentMethod }));
   }
 }
+
+/** Doc 23: a point chosen on the map (PinScreen in "save" mode) for the place being saved. */
+export const pinnedPlace = createStore<Place | null>(null);
 
 /** Unread chat messages per ride (reset when the chat screen is open). */
 export const chatUnread = createStore<Record<string, number>>({});

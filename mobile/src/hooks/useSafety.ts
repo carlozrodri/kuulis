@@ -45,7 +45,9 @@ export function useDeleteContact() {
 }
 
 /** A fresh live link for the ride (`/v/{token}` on the website); it stops working when the ride ends. */
-export const createShareLink = (rideId: string) => api<ShareLink>(`/rides/${rideId}/share`, { method: 'POST' });
+/** `forRider` (doc 23): the link for the person riding a ride requested for them; it also shows the PIN. */
+export const createShareLink = (rideId: string, forRider = false) =>
+  api<ShareLink>(`/rides/${rideId}/share`, { method: 'POST', ...(forRider ? { body: { for_rider: true } } : {}) });
 
 /** My open SOS and the check-ins waiting for my answer. Polls while one is open, and while `watch`. */
 export function useActiveAlerts(enabled: boolean, watch: boolean) {

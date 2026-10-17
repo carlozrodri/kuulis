@@ -655,6 +655,33 @@ async function confirmCancel() {
                 </dt>
                 <dd>{{ label(`paymentMethods.${ride.payment_method}`, ride.payment_method) }}</dd>
               </div>
+              <div
+                v-if="ride.rider_name"
+                class="flex justify-between gap-4"
+              >
+                <dt class="text-(--ui-text-muted)">
+                  {{ t('rides.rider') }}
+                  <span class="block text-xs">{{ t('rides.riderHelp') }}</span>
+                </dt>
+                <dd class="text-right">
+                  {{ ride.rider_name }}
+                  <span
+                    v-if="ride.rider_phone"
+                    class="block font-mono text-xs text-(--ui-text-muted)"
+                  >{{ ride.rider_phone }}</span>
+                </dd>
+              </div>
+              <div
+                v-if="ride.note"
+                class="flex justify-between gap-4"
+              >
+                <dt class="text-(--ui-text-muted)">
+                  {{ t('rides.note') }}
+                </dt>
+                <dd class="text-right italic">
+                  “{{ ride.note }}”
+                </dd>
+              </div>
               <div class="flex justify-between gap-4">
                 <dt class="text-(--ui-text-muted)">
                   {{ t('rides.vehicleType') }}

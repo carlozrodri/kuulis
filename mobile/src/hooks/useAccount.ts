@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { ApiError, api } from '@/lib/api';
-import type { PlaceKind, ReferralSummary, SavedPlace } from '@/lib/types';
+import type { PlaceIcon, PlaceKind, ReferralSummary, SavedPlace } from '@/lib/types';
 
 export const accountKeys = {
   places: ['users', 'me', 'places'] as const,
@@ -27,7 +27,7 @@ export function useSavedPlaces(enabled = true) {
   });
 }
 
-export type PlaceInput = { kind: PlaceKind; label?: string; address: string; lat: number; lng: number };
+export type PlaceInput = { kind: PlaceKind; label?: string; address: string; lat: number; lng: number; icon?: PlaceIcon | null };
 
 /** Saves a new place, or updates one when `id` is given. Home and work replace the previous one. */
 export function useSavePlace() {
@@ -37,7 +37,7 @@ export function useSavePlace() {
       id
         ? api<SavedPlace>(`/users/me/places/${id}`, {
             method: 'PATCH',
-            body: { label: input.label, address: input.address, lat: input.lat, lng: input.lng },
+            body: { label: input.label, address: input.address, lat: input.lat, lng: input.lng, ...(input.icon ? { icon: input.icon } : {}) },
           })
         : api<SavedPlace>('/users/me/places', { method: 'POST', body: input }),
     onSettled: () => void queryClient.invalidateQueries({ queryKey: accountKeys.places }),

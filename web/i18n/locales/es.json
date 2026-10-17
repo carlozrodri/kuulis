@@ -261,7 +261,10 @@
     "invalidTitle": "Enlace no válido",
     "invalidBody": "Revisa que el enlace esté completo o pide uno nuevo.",
     "failedTitle": "No pudimos cargar el viaje",
-    "failedBody": "Revisa tu conexión; seguiremos intentando."
+    "failedBody": "Revisa tu conexión; seguiremos intentando.",
+    "forRider": "{name}, este es tu viaje",
+    "pinLabel": "PIN de inicio",
+    "pinHelp": "Díselo al motorizado al subirte: sin el PIN no puede iniciar el viaje."
   },
   "help": {
     "metaTitle": "Centro de ayuda · Kuulis",

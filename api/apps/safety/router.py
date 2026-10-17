@@ -17,6 +17,7 @@ from apps.safety.schemas import (
     Position,
     SharedRide,
     ShareLink,
+    ShareRequest,
     SosRead,
     SosRequest,
 )
@@ -64,10 +65,18 @@ async def delete_contact(contact_id: uuid.UUID, user: CurrentUser, session: DBSe
 @router.post("/rides/{ride_id}/share", response_model=ShareLink)
 @limiter.limit("20/minute")
 async def share(
-    request: Request, ride_id: uuid.UUID, user: CurrentUser, session: DBSession
+    request: Request,
+    ride_id: uuid.UUID,
+    user: CurrentUser,
+    session: DBSession,
+    data: ShareRequest | None = None,
 ) -> ShareLink:
-    """A new link to follow the ride live; it stops working when the ride ends (410)."""
-    return await services.share(session, user, ride_id)
+    """A new link to follow the ride live; it stops working when the ride ends (410).
+
+    ``for_rider`` (doc 23, passenger of a ride requested for someone else): the link for the
+    person riding, which also shows the start PIN.
+    """
+    return await services.share(session, user, ride_id, for_rider=data.for_rider if data else False)
 
 
 @router.get("/public/rides/shared/{token}", response_model=SharedRide)

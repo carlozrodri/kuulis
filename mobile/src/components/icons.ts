@@ -132,3 +132,15 @@ export { default as Timer } from 'lucide-react-native/icons/timer';
 export { default as Percent } from 'lucide-react-native/icons/percent';
 export { default as ChartNoAxesColumn } from 'lucide-react-native/icons/chart-no-axes-column';
 export { default as Flame } from 'lucide-react-native/icons/flame';
+// Doc 23: saved place icons, note for the driver, ride for someone else, compliments.
+export { default as Heart } from 'lucide-react-native/icons/heart';
+export { default as Dumbbell } from 'lucide-react-native/icons/dumbbell';
+export { default as School } from 'lucide-react-native/icons/school';
+export { default as Store } from 'lucide-react-native/icons/store';
+export { default as Users } from 'lucide-react-native/icons/users';
+export { default as Utensils } from 'lucide-react-native/icons/utensils';
+export { default as Hospital } from 'lucide-react-native/icons/hospital';
+export { default as StickyNote } from 'lucide-react-native/icons/sticky-note';
+export { default as UserRound } from 'lucide-react-native/icons/user-round';
+export { default as BookmarkPlus } from 'lucide-react-native/icons/bookmark-plus';
+export { default as Award } from 'lucide-react-native/icons/award';

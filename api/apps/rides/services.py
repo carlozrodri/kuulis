@@ -302,6 +302,9 @@ async def create_ride(session: AsyncSession, user: User, data: RideCreate) -> Ri
         rate_binance=frozen.binance,
         payment_method=PaymentMethod(data.payment_method),
         polyline=quote.polyline,
+        note=data.note,
+        rider_name=data.rider.name if data.rider else None,
+        rider_phone=data.rider.phone if data.rider else None,
         requested_at=now,
         search_expires_at=now + timedelta(seconds=config.search_timeout_seconds),
     )

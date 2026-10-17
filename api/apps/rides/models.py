@@ -216,6 +216,11 @@ class Ride(BaseModel):
     polyline: Mapped[str | None] = mapped_column(Text)
     # Snapshot of the vehicle when the driver accepted (brand, model, color, plate, type).
     vehicle: Mapped[dict | None] = mapped_column(JSONB)
+    # Doc 23: the ride is for someone else (the driver sees that name; the requester sends them
+    # the live link by WhatsApp) and a short note for the driver ("portón azul").
+    rider_name: Mapped[str | None] = mapped_column(String(60))
+    rider_phone: Mapped[str | None] = mapped_column(String(16))
+    note: Mapped[str | None] = mapped_column(String(140))
 
     requested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     search_expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

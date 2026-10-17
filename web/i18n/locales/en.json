@@ -261,7 +261,10 @@
     "invalidTitle": "Invalid link",
     "invalidBody": "Check the link is complete or ask for a new one.",
     "failedTitle": "We couldn't load the ride",
-    "failedBody": "Check your connection; we'll keep trying."
+    "failedBody": "Check your connection; we'll keep trying.",
+    "forRider": "{name}, this is your ride",
+    "pinLabel": "Start PIN",
+    "pinHelp": "Tell it to the driver when you get on: without the PIN the ride cannot start."
   },
   "help": {
     "metaTitle": "Help center · Kuulis",

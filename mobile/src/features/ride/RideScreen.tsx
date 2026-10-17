@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { ChevronDown, CircleX, Clock, MessageCircle, RefreshCw, SearchX, Share2, ShieldCheck, Timer, UserX } from '@/components/icons';
+import { ChevronDown, CircleX, Clock, MessageCircle, RefreshCw, SearchX, Share2, ShieldCheck, Timer, UserRound, UserX } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { type MapInsets, MapSheetLayout } from '@/components/MapSheetLayout';
 import { DiscountNote, VesLine } from '@/components/Money';
@@ -34,6 +34,7 @@ import type { Ride } from '@/lib/types';
 import { AutoShareSheet } from '@/features/safety/AutoShareSheet';
 import { PinCard } from '@/features/safety/PinCard';
 import { SafetySheet, useRideShare } from '@/features/safety/SafetySheet';
+import { shareWithRider } from '@/features/safety/share';
 import { useFirstRideTips } from '@/features/safety/SafetyTips';
 import { SosButton } from '@/features/safety/SosButton';
 import { radius, space, useTheme } from '@/theme';
@@ -251,6 +252,7 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
       <ProgressSteps total={4} current={ride.status === 'driver_assigned' ? 2 : ride.status === 'driver_arrived' ? 3 : 4} />
       {ride.status === 'driver_arrived' ? <WaitingCounter ride={ride} /> : null}
       {ride.start_pin && ride.status !== 'in_progress' ? <PinCard pin={ride.start_pin} /> : null}
+      {ride.rider_name && ride.rider_phone ? <RiderShareCard ride={ride} /> : null}
 
       <View style={[styles.driverCard, { backgroundColor: theme.background }]}>
         <Avatar name={driver?.first_name} photoUrl={driver?.photo_url} size={60} />
@@ -292,6 +294,51 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
       <SafetySheet visible={safety} ride={ride} role="passenger" onClose={() => setSafety(false)} />
       <AutoShareSheet ride={ride} />
     </>
+  );
+}
+
+/**
+ * Doc 23: the ride is for someone else. One tap sends them the live link by WhatsApp (driver, plate and the
+ * PIN on the page) so they can meet the driver.
+ */
+function RiderShareCard({ ride }: { ride: Ride }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const name = ride.rider_name?.trim().split(/\s+/)[0] ?? '';
+  const send = async () => {
+    setSending(true);
+    try {
+      await shareWithRider(ride, t);
+      setSent(true);
+    } catch (error) {
+      showToast(apiErrorMessage(error), 'danger');
+    } finally {
+      setSending(false);
+    }
+  };
+  return (
+    <View style={[styles.riderCard, { backgroundColor: theme.accentSoft }]}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.xs }}>
+        <UserRound size={18} color={theme.onAccentSoft} strokeWidth={2.4} />
+        <Txt variant="bodyStrong" style={{ color: theme.onAccentSoft, flex: 1 }}>
+          {t('rideNote.forTitle', { name })}
+        </Txt>
+      </View>
+      <Txt variant="caption" style={{ color: theme.text }}>
+        {sent ? t('rideNote.sentBody', { name }) : t('rideNote.sendBody', { name })}
+      </Txt>
+      <Button
+        title={sent ? t('rideNote.sendAgain') : t('rideNote.send', { name })}
+        variant={sent ? 'secondary' : 'accent'}
+        size="sm"
+        icon={Share2}
+        loading={sending}
+        style={{ alignSelf: 'flex-start' }}
+        onPress={() => void send()}
+      />
+    </View>
   );
 }
 
@@ -397,6 +444,7 @@ function WaitingCounter({ ride }: { ride: Ride }) {
 }
 
 const styles = StyleSheet.create({
+  riderCard: { gap: space.xs, borderRadius: radius.tile, padding: space.md },
   waiting: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderRadius: radius.tile, paddingHorizontal: space.md, paddingVertical: space.sm },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.lg, gap: space.md },

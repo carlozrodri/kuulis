@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Animated, Easing, Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
-import { Banknote, Bike, Bitcoin, Coins, type Icon, Landmark, Smartphone, Star } from '@/components/icons';
+import { Banknote, Bike, Bitcoin, Coins, type Icon, Landmark, Smartphone, Star, StickyNote, UserRound } from '@/components/icons';
 import { Chip, Txt } from '@/components/ui';
 import { formatPlate, formatRating, shortAddress } from '@/lib/ride';
 import type { PaymentMethod, Place } from '@/lib/types';
@@ -357,4 +357,37 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   stars: { flexDirection: 'row', justifyContent: 'center', gap: space.xs },
+});
+
+/**
+ * Doc 23: who rides when the ride was requested for someone else, and the passenger's note for the driver.
+ * Shown on the driver's offer and ride, and on the ride detail.
+ */
+export function RideNote({ ride }: { ride: { note?: string | null; rider_name?: string | null } }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  if (!ride.note && !ride.rider_name) return null;
+  return (
+    <View style={[noteStyles.box, { backgroundColor: theme.accentSoft }]}>
+      {ride.rider_name ? (
+        <View style={noteStyles.line}>
+          <UserRound size={18} color={theme.onAccentSoft} strokeWidth={2.4} />
+          <Txt variant="bodyStrong" style={{ color: theme.onAccentSoft, flex: 1 }}>
+            {t('rideNote.rider', { name: ride.rider_name })}
+          </Txt>
+        </View>
+      ) : null}
+      {ride.note ? (
+        <View style={noteStyles.line} accessibilityLabel={t('rideNote.noteA11y', { note: ride.note })}>
+          <StickyNote size={18} color={theme.onAccentSoft} strokeWidth={2.4} />
+          <Txt style={{ color: theme.text, flex: 1 }}>“{ride.note}”</Txt>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+const noteStyles = StyleSheet.create({
+  box: { gap: 6, borderRadius: radius.tile, paddingHorizontal: 14, paddingVertical: space.sm },
+  line: { flexDirection: 'row', alignItems: 'flex-start', gap: space.xs },
 });

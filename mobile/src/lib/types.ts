@@ -437,6 +437,42 @@ export interface Ride {
   no_show_at?: string | null;
   /** While a driver is assigned: the passenger can cancel without it counting until then. */
   cancel_free_until?: string | null;
+  // Doc 23 (optional: older servers do not send them).
+  /** Note for the driver ("portón azul"), up to 140 characters. */
+  note?: string | null;
+  /** The ride was requested for this person; the driver sees the name. */
+  rider_name?: string | null;
+  /** Only for the passenger who requested (to send the live link to the person riding). */
+  rider_phone?: string | null;
+}
+
+/** Doc 23: who actually rides when the passenger requests for someone else. */
+export interface RiderInfo {
+  name: string;
+  /** E.164 ("+584141112233"). */
+  phone: string;
+}
+
+/** GET /rides/{id}/receipt (doc 23): the receipt of a completed ride and its shareable image. */
+export interface RideReceipt {
+  ride_id: string;
+  number: string;
+  completed_at: string;
+  pickup_address: string;
+  dropoff_address: string;
+  distance_m: number;
+  duration_s: number;
+  fare: string;
+  discount: string;
+  total: string;
+  rates: { bcv: string | null; binance: string | null };
+  total_ves: VesAmount;
+  payment_method: PaymentMethod;
+  passenger_name: string;
+  driver_name: string;
+  plate: string | null;
+  /** Signed PNG anyone with the link can open. */
+  image_url: string;
 }
 
 // ── Doc 15: cancellations and quality ──
@@ -543,6 +579,9 @@ export interface Offer {
   discount?: string;
   total?: string;
   total_ves?: VesAmount | null;
+  // Doc 23 (optional): the passenger's note and who rides when it is someone else.
+  note?: string | null;
+  rider_name?: string | null;
 }
 
 export interface DriverState {
@@ -957,6 +996,8 @@ export interface DriverStats {
   by_day: (PeriodStats & { date: string })[];
   total_rides: number;
   rating: number | null;
+  /** Doc 23: compliments passengers gave (rating tags), most given first. */
+  compliments?: { tag: string; count: number }[];
 }
 
 /** GET /rides/me/stats: the passenger's completed rides. */
@@ -981,8 +1022,12 @@ export interface SavedPlace extends Place {
   kind: PlaceKind;
   /** Custom name for "other" places ("Gym"); empty for home and work. */
   label: string;
+  /** Doc 23: icon of an "other" place (null: the star). */
+  icon?: PlaceIcon | null;
   updated_at: string;
 }
+
+export type PlaceIcon = "star" | "heart" | "dumbbell" | "school" | "store" | "users" | "utensils" | "hospital";
 
 /** What the invite program offers (doc 22). */
 export interface ReferralProgramInfo {

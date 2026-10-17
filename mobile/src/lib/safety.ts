@@ -91,6 +91,18 @@ export function liveShareMessage(ride: Pick<Ride, 'driver' | 'dropoff'>, url: st
   });
 }
 
+/** Doc 23: to the person riding a ride requested for them; the page behind the link shows the PIN. */
+export function riderShareMessage(ride: Pick<Ride, 'driver' | 'dropoff' | 'rider_name'>, url: string, t: Translate) {
+  const vehicle = ride.driver?.vehicle;
+  return t('safety.live.riderMessage', {
+    name: ride.rider_name?.trim().split(/\s+/)[0] ?? '',
+    driver: ride.driver?.first_name ?? '',
+    plate: formatPlate(vehicle?.plate),
+    dropoff: shortAddress(ride.dropoff.address),
+    url,
+  });
+}
+
 // ── Notifications ──
 
 export const SAFETY_CATEGORY = 'safety_check';

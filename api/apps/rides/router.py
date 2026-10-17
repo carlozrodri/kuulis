@@ -2,12 +2,12 @@ import uuid
 from datetime import date
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Header, Query, Request, status
+from fastapi import APIRouter, Depends, Header, Path, Query, Request, Response, status
 
 from apps.audit.services import audit
 from apps.legal.dependencies import LegalAccepted
 from apps.releases.dependencies import AppUpToDate
-from apps.rides import events, presence, services, stats
+from apps.rides import events, presence, receipt, services, stats
 from apps.rides.models import Ride, RideStatus
 from apps.rides.schemas import (
     AdminCancelRequest,
@@ -30,6 +30,7 @@ from apps.rides.schemas import (
     RideAdminRead,
     RideCreate,
     RideRead,
+    RideReceipt,
     RideSafetyAlert,
     StartRequest,
 )
@@ -44,6 +45,7 @@ router = APIRouter(prefix="/rides", tags=["rides"])
 driver_router = APIRouter(prefix="/drivers/me", tags=["rides"])
 admin_router = APIRouter(prefix="/admin/rides", tags=["rides"])
 admin_drivers_router = APIRouter(prefix="/admin/drivers", tags=["rides"])
+public_router = APIRouter(prefix="/public/rides", tags=["rides"])
 
 
 async def _read(session: DBSession, ride, user: User) -> RideRead:
@@ -115,6 +117,36 @@ async def get_ride(ride_id: uuid.UUID, user: CurrentUser, session: DBSession) ->
         return await events.left_read(session, ride)
     ride = await services.get_for_participant(session, user, ride_id)
     return await _read(session, ride, user)
+
+
+@router.get("/{ride_id}/receipt", response_model=RideReceipt)
+async def ride_receipt(ride_id: uuid.UUID, user: CurrentUser, session: DBSession) -> RideReceipt:
+    """Doc 23: receipt of a completed ride (409 receipt_unavailable before), with a signed image
+    link in the user's language to share."""
+    ride = await services.get_for_participant(session, user, ride_id)
+    return await receipt.build(session, ride, user.locale)
+
+
+@public_router.get(
+    "/receipts/{token}.png",
+    response_class=Response,
+    responses={200: {"content": {"image/png": {}}}},
+)
+@limiter.limit("60/minute")
+async def receipt_image(
+    request: Request, token: Annotated[str, Path(max_length=80)], session: DBSession
+) -> Response:
+    """No login: the receipt image behind the signed link (404 when forged or not completed)."""
+    ride_id, lang = receipt.parse_token(token)
+    ride = await session.get(Ride, ride_id)
+    if ride is None or ride.status != RideStatus.COMPLETED:
+        raise receipt.ReceiptNotFoundError()
+    data = await receipt.build(session, ride, lang)
+    return Response(
+        receipt.render(data, lang),
+        media_type="image/png",
+        headers={"Cache-Control": "private, max-age=3600"},
+    )
 
 
 def _left(ride: Ride, user: User) -> bool:

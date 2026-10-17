@@ -18,7 +18,8 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
 import { space, useTheme } from '@/theme';
 
-import { Avatar, PAYMENT_ICONS, PlaceRows, RatingBadge } from './components';
+import { Avatar, PAYMENT_ICONS, PlaceRows, RatingBadge, RideNote } from './components';
+import { RideActions } from './RideActions';
 import { STATUS_TONE } from './HistoryScreen';
 
 /**
@@ -126,6 +127,10 @@ export function RideDetailScreen() {
           </View>
         </View>
       ) : null}
+
+      {ride.rider_name || ride.note ? <RideNote ride={ride} /> : null}
+
+      {!isActiveStatus(ride.status) ? <RideActions ride={ride} role={role} /> : null}
 
       {isActiveStatus(ride.status) ? (
         <Button

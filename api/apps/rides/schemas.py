@@ -65,10 +65,30 @@ class Quote(BaseModel):
     expires_at: datetime
 
 
+class RiderInfo(BaseModel):
+    """Doc 23: who actually rides when the passenger requests for someone else."""
+
+    name: str = Field(min_length=1, max_length=60)
+    phone: str = Field(pattern=r"^\+\d{10,15}$")  # E.164 ("+584121234567")
+
+    @field_validator("name")
+    @classmethod
+    def _strip(cls, value: str) -> str:
+        return _strip_required(value)
+
+
 class RideCreate(BaseModel):
     quote_id: str = Field(min_length=1, max_length=64)
     # Plain string: unknown or disabled methods answer 400 payment_method_invalid (contract).
     payment_method: str = Field(max_length=32)
+    # Doc 23: a note the driver sees before accepting, and the person riding (None: the passenger).
+    note: str | None = Field(default=None, max_length=140)
+    rider: RiderInfo | None = None
+
+    @field_validator("note")
+    @classmethod
+    def _note(cls, value: str | None) -> str | None:
+        return " ".join((value or "").split()) or None
 
 
 class CancelRequest(BaseModel):
@@ -169,6 +189,11 @@ class RideRead(BaseModel):
     no_show_at: datetime | None = None
     # Until then the passenger may cancel without it counting.
     cancel_free_until: datetime | None = None
+    # Doc 23: note for the driver and the person riding when it is not the passenger. The phone
+    # only reaches the passenger who requested (to send the live link) and the team.
+    note: str | None = None
+    rider_name: str | None = None
+    rider_phone: str | None = None
 
 
 class OfferPassenger(BaseModel):
@@ -192,6 +217,8 @@ class Offer(BaseModel):
     payment_method: PaymentMethod
     passenger: OfferPassenger
     expires_at: datetime
+    note: str | None = None
+    rider_name: str | None = None  # doc 23: the ride is for this person, not the passenger
 
 
 class DriverState(BaseModel):
@@ -363,6 +390,11 @@ class StatsDay(PeriodStats):
     date: date
 
 
+class Compliment(BaseModel):
+    tag: str  # one of PASSENGER_TAGS
+    count: int
+
+
 class DriverStats(BaseModel):
     """GET /drivers/me/stats: completed rides and earnings (fare - promo discount), Caracas time."""
 
@@ -374,6 +406,8 @@ class DriverStats(BaseModel):
     by_day: list[StatsDay]  # last 7 days, oldest first
     total_rides: int
     rating: float | None
+    # Doc 23: compliments (rating tags) passengers gave, most given first; ignored ratings out.
+    compliments: list[Compliment] = Field(default_factory=list)
 
 
 class FrequentPlace(BaseModel):
@@ -381,6 +415,29 @@ class FrequentPlace(BaseModel):
     lat: float
     lng: float
     rides: int
+
+
+class RideReceipt(BaseModel):
+    """GET /rides/{id}/receipt (doc 23): what the shareable receipt image shows, and its link."""
+
+    ride_id: uuid.UUID
+    number: str  # short code for support, the start of the ride id
+    completed_at: datetime
+    pickup_address: str
+    dropoff_address: str
+    distance_m: int
+    duration_s: int
+    fare: MoneyStr
+    discount: MoneyStr
+    total: MoneyStr
+    rates: FrozenRates
+    total_ves: VesAmount
+    payment_method: PaymentMethod
+    passenger_name: str  # the person who rode (doc 23: may not be the account holder)
+    driver_name: str
+    plate: str | None
+    # Signed PNG anyone with the link can open (sent by WhatsApp to whoever reimburses).
+    image_url: str
 
 
 class PassengerStats(BaseModel):

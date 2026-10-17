@@ -64,6 +64,11 @@ class ContactRead(BaseModel):
 # --- Sharing a ride ----------------------------------------------------------------------------
 
 
+class ShareRequest(BaseModel):
+    # Doc 23: the link goes to the person riding a ride requested for them; it shows the PIN.
+    for_rider: bool = False
+
+
 class ShareLink(BaseModel):
     url: str
     token: str
@@ -93,6 +98,10 @@ class SharedRide(BaseModel):
     sos: bool
     sos_location: DriverLocation | None
     updated_at: datetime
+    # Doc 23: a link sent to the person riding (ride requested for them) shows the start PIN
+    # until the ride starts, so they can give it to the driver.
+    for_rider: bool = False
+    start_pin: str | None = None
 
 
 # --- SOS and check-ins -------------------------------------------------------------------------
