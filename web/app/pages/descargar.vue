@@ -104,7 +104,10 @@ definePageMeta({ heroHeader: true })
       </div>
     </section>
 
-    <section class="container-wide safety">
+    <section
+      v-reveal
+      class="container-wide safety"
+    >
       <div class="safety-block">
         <LineIcon
           name="shield-check"
@@ -117,7 +120,10 @@ definePageMeta({ heroHeader: true })
       </div>
     </section>
 
-    <section class="steps">
+    <section
+      v-reveal
+      class="steps"
+    >
       <div class="container-wide">
         <BrandHeadline :text="t('download.android.title')" />
         <RouteStops :items="steps" />

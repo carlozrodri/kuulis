@@ -58,7 +58,10 @@ const faq = computed(() => ['free', 'idle', 'paid', 'fee'].map(key => ({
       </div>
     </section>
 
-    <section class="section number">
+    <section
+      v-reveal
+      class="section number"
+    >
       <div class="container-wide grid-number">
         <h2 class="zero">
           <span class="figure">{{ t('drivers.zero') }}</span>
@@ -76,7 +79,10 @@ const faq = computed(() => ['free', 'idle', 'paid', 'fee'].map(key => ({
       </div>
     </section>
 
-    <section class="section fees">
+    <section
+      v-reveal
+      class="section fees"
+    >
       <div class="container-wide grid-fees">
         <div>
           <BrandHeadline :text="t('drivers.fees.title')" />
@@ -100,7 +106,10 @@ const faq = computed(() => ['free', 'idle', 'paid', 'fee'].map(key => ({
       </div>
     </section>
 
-    <section class="section needs">
+    <section
+      v-reveal
+      class="section needs"
+    >
       <div class="container-wide grid-needs">
         <BrandHeadline :text="t('drivers.requirements.title')" />
         <div>
@@ -126,14 +135,20 @@ const faq = computed(() => ['free', 'idle', 'paid', 'fee'].map(key => ({
       </div>
     </section>
 
-    <section class="section steps">
+    <section
+      v-reveal
+      class="section steps"
+    >
       <div class="container-wide">
         <BrandHeadline :text="t('drivers.steps.title')" />
         <RouteStops :items="steps" />
       </div>
     </section>
 
-    <section class="section faq">
+    <section
+      v-reveal
+      class="section faq"
+    >
       <div class="container narrow">
         <BrandHeadline :text="t('drivers.faq.title')" />
         <FaqList :items="faq" />

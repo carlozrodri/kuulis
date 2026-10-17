@@ -211,6 +211,16 @@ Reglas para todos los milestones:
 - **Aceptación:** checklist de 08 §2–§4 completa.
 - **Validación:** V + e2e completo + axe + Lighthouse.
 - **Depende de:** M8.
+- **Hecho 2026-10-17:** las secciones bajo el pliegue aparecen una vez al llegar a ellas (`v-reveal`,
+  `plugins/reveal.ts`: 16 px y opacidad, 320 ms; nada se oculta en el servidor, sin JavaScript, con movimiento
+  reducido ni si ya está en pantalla) y las respuestas de las preguntas se abren con un fundido de 160 ms.
+  Objetivos táctiles de 44 px en móvil (logotipos, pie, menú, enlaces sueltos). Titulares sin palabra sola al final
+  (las dos últimas palabras van juntas en `BrandHeadline`, `text-wrap: pretty` en h1–h3). Dos contrastes que no
+  llegaban a 4,5:1 corregidos (`--on-band-soft`, `--success`) y una prueba que los mide desde `tokens.css`.
+  `tests/e2e/polish.spec.ts`: 7 anchos sin scroll lateral, jerarquía de títulos, axe en oscuro, ningún texto en
+  español en inglés, controles de 44 px, aparición al hacer scroll, sin JavaScript y con movimiento reducido. 08
+  §2–§4 marcado; quedan los recortes de las capturas (M8) y TalkBack (no verificado). Lighthouse móvil local:
+  rendimiento 92–96, accesibilidad y buenas prácticas 100, CLS 0.
 
 ## M10 · Verificación final y salida
 - **Objetivo:** listo para producción.

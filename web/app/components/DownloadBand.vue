@@ -6,7 +6,10 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <section class="download band-brand">
+  <section
+    v-reveal
+    class="download band-brand"
+  >
     <div class="container-wide grid-download">
       <div>
         <BrandHeadline :text="title" />

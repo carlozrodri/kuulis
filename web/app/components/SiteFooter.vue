@@ -142,6 +142,9 @@ const legal = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as con
 }
 
 .logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--on-band);
   text-decoration: none;
 }
@@ -176,6 +179,20 @@ a {
   font-weight: 600;
   text-decoration: none;
   overflow-wrap: anywhere;
+}
+
+/* 44 px touch targets on phones and tablets. */
+@media (max-width: 959px) {
+  ul {
+    gap: 0;
+  }
+
+  ul a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0;
+  }
 }
 
 @media (hover: hover) {

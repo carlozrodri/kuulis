@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import { englishPath } from '../../i18n/pages'
+import { revealAll } from './helpers'
 
 // Smoke test of the public pages (docs/website-redesign/08): each page loads in both languages, has one h1,
 // the right <html lang>, no horizontal scroll on a small phone or a desktop, no console errors and no serious
@@ -36,6 +37,7 @@ for (const locale of LOCALES) {
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
         expect(overflow).toBeLessThanOrEqual(0)
 
+        await revealAll(page)
         const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze()
         const serious = axe.violations.filter(v => (v.impact === 'serious' || v.impact === 'critical') && !KNOWN_AXE[v.id])
         expect(serious.map(v => `${v.id}: ${v.nodes.map(n => n.target.join(' ')).join(', ')}`)).toEqual([])

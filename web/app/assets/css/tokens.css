@@ -20,14 +20,14 @@
     --border: #dce6e0;
     --danger: #b42318;
     --danger-soft: #fdecec;
-    --success: #15803d;
+    --success: #137a3a;
     --success-soft: #dcf3e4;
 
     /* Color fields (full-bleed bands): brand green and ink, with what goes on them */
     --band-brand: var(--primary);
     --band-ink: #14201b;
     --on-band: #fff;
-    --on-band-soft: rgb(255 255 255 / 78%);
+    --on-band-soft: rgb(255 255 255 / 90%);
     --on-band-line: rgb(255 255 255 / 16%);
 
     /* The shared-ride map: its tiles are light in both themes, so its markers and labels keep these colors */
