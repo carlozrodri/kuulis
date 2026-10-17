@@ -191,6 +191,24 @@ Lectura:
 - El LCP móvil de 1,9 s es casi todo latencia del servidor (documento en ~640 ms) y la CSS bloqueante; la página
   ya es ligera (~150 KB). El rediseño tiene que mantenerse en ese orden de magnitud (objetivo de 06 §7: ≤ 300 KB).
 
+### Medición final (M10, 2026-10-17, QA con el rediseño M0–M9)
+Mismo método que la línea base (Lighthouse 12 contra `https://kuulis.top8.uk`, móvil por defecto y escritorio).
+
+| Página | Perf. / A11y / Buenas prácticas / SEO (móvil) | LCP | CLS | TBT | Peso transferido | Escritorio (Perf. / A11y) |
+| --- | --- | --- | --- | --- | --- | --- |
+| `/` | 96 / 100 / 93 / 66 | 2,1 s | 0 | 90 ms | 196 KB | 100 / 100 |
+| `/motorizados` | 97 / 100 / 93 / 66 | 2,1 s | 0 | 100 ms | 194 KB | 100 / 100 |
+| `/seguridad` | 97 / 100 / 93 / 66 | 2,1 s | 0 | 60 ms | 194 KB | 100 / 100 |
+| `/descargar` | 97 / 100 / 93 / 66 | 2,1 s | 0 | 100 ms | 193 KB | 100 / 100 |
+| `/ayuda` | 96–97 / 100 / 93 / 66 | 2,1 s | 0 | 110–120 ms | 199 KB | 100 / 100 (CLS 0) |
+| `/contacto` | 97 / 100 / 93 / 66 | 2,1 s | 0,021 | 110 ms | 192 KB | 100 / 100 |
+
+Frente a la línea base: rendimiento igual o mejor, accesibilidad 100 en todas, el CLS de `/ayuda` en escritorio
+pasó de 0,178 a 0, y el peso subió de ~155 a ~195 KB (presupuesto 300 KB). El JavaScript transferido de inicio pasó
+de 103 a 127 KB, por encima del margen de +8 KB de 06 §7 (ver 08 §7). Buenas prácticas sigue en 93 por el
+*beacon* de Cloudflare y SEO en 66 por el `robots.txt` de QA; en configuración de producción (local) dan 100 y 100.
+Capturas de página completa a 360 y 1440 px, claro y oscuro: `kuulis/web-m10/` en la carpeta del proyecto.
+
 ### Capturas y enlaces de referencia (M0)
 - Capturas de página completa en español e inglés: todas las páginas a 360 y 1440 px, y la de inicio a 320,
   360, 414, 768, 1024, 1440 y 1920 px, más los JSON de Lighthouse, en la carpeta compartida del proyecto

@@ -229,6 +229,12 @@ Reglas para todos los milestones:
 - **Aceptación:** todos los puntos de 08 en verde o con excepción aprobada por Carlos.
 - **Validación:** todo lo anterior sobre QA.
 - **Depende de:** M9.
+- **Hecho 2026-10-17 (lo que se puede verificar desde aquí):** checklist 08 recorrido: 46 puntos en verde y 14
+  pendientes, todos de Carlos (capturas de la app, enlace real en WhatsApp, revisión en su teléfono, TalkBack,
+  revisión del español, contacto, emails, viaje e invitación reales y la salida a `main`) más una excepción de
+  presupuesto de JavaScript que él aprueba o no. Medición final en 00 §9. Arreglos: cada texto legal tiene su
+  descripción y las de los artículos de ayuda salen sin guiones de lista. Pruebas nuevas: `site.spec.ts` (títulos y
+  descripciones únicos, rastreo de enlaces de todo el sitemap) y recorrido con teclado; 92 de 94 pasan (2 se saltan por ser variantes sin API), local y en QA.
 - **Riesgos:** la producción de la web aún no tiene dominio → la salida a `main` queda sujeta a esa decisión de
   Carlos, fuera de este proyecto.
 
