@@ -194,6 +194,14 @@ Reglas para todos los milestones:
 - **Validación:** V + Lighthouse + revisión visual de capturas.
 - **Depende de:** M3, M4, M6, M7.
 - **Riesgos:** retrasos en la producción de capturas → M3/M4 pueden ir con capturas reales provisionales de QA.
+- **Hecho en parte 2026-10-17 (A8):** una imagen para compartir por página principal e idioma (inicio,
+  motorizados, seguridad, descargar; `web/public/og/{home,drivers,safety,download}-{es,en}.png`, 1200×630, 26–50
+  KB). Campo verde, titular de la página en blanco con su punto amarillo, logotipo, ruta y el Ávila. Las genera
+  `pnpm og` (`web/scripts/og-images.mjs`, Chromium de Playwright) a partir del título de cada página en
+  `i18n/locales`, así que un cambio de texto solo pide volver a ejecutarlo. `useLocaleSeo` elige la imagen por
+  página e idioma y añade tamaño, tipo y `og:image:alt`; las demás páginas usan la del inicio. `og.png` (275 KB)
+  pasa a ser una copia ligera de la del inicio para enlaces viejos. Pendiente: capturas A1/A2 cuando Carlos las
+  envíe.
 
 ## M9 · Movimiento, responsive fino y accesibilidad
 - **Objetivo:** pulido.
