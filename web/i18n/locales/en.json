@@ -37,32 +37,29 @@
   "home": {
     "metaTitle": "Kuulis · Motorbike rides, no commission per ride",
     "metaDescription": "Get a motorbike ride in minutes and pay the driver directly, however you agree. Drivers pay no commission per ride, just a small monthly fee in the months they work.",
-    "pill": "Drivers: {months} months free to start",
-    "title": "Your ride in minutes. No commission per ride.",
-    "lead": "Request a motorbike near you, see the price before you go and pay the driver directly, however you agree.",
-    "download": "Download for Android",
-    "drive": "I want to drive",
-    "card": {
-      "driver": "Luis is on the way",
-      "bike": "Yamaha YBR · Black",
-      "fare": "Ride price"
+    "hero": {
+      "title": "Across Caracas by motorbike. A clear price, full stop.",
+      "lead": "See the fare in dollars and bolívares before you book, know exactly who's coming to pick you up, and pay your driver directly, however you both prefer.",
+      "note": "Free. Android only, for now."
     },
-    "riders": {
-      "eyebrow": "For riders",
-      "title": "Fast, clear and no surprises",
-      "price": {
-        "title": "Price before you go",
-        "body": "The app prices the ride by distance and time. You see it before you request and it does not change on the way."
+    "price": {
+      "title": "You know the price before you get on.",
+      "body": "The app works out the fare from distance and time and shows it in dollars, alongside the bolívar amount at both the BCV and Binance rates. That's the price, for you and for your driver.",
+      "rates": {
+        "title": "Dollars and bolívares",
+        "body": "Both rates on screen, so nobody has to do the maths on the street."
       },
       "pay": {
-        "title": "Pay your way",
-        "body": "Cash in dollars or bolívares, pago móvil, Zelle or Binance: agree with the driver and pay them directly."
+        "title": "Pay however you agree",
+        "body": "You pay your driver directly, with the method you agree on:"
       },
-      "safe": {
-        "title": "Never alone",
-        "body": "You see the driver's name, photo, bike and plate, and you can share your ride with someone you trust."
+      "haggle": {
+        "title": "No haggling",
+        "body": "The app sets the price, not an argument."
       }
     },
+    "download": "Download for Android",
+    "drive": "Drive with Kuulis",
     "drivers": {
       "eyebrow": "For drivers",
       "title": "What you earn is yours",
@@ -380,5 +377,12 @@
     "drivers": "See how it works for drivers",
     "invalidTitle": "This invitation doesn't exist",
     "invalidBody": "Check the link or ask whoever invited you for the code again."
+  },
+  "payments": {
+    "cash_usd": "Cash $",
+    "pago_movil": "Pago móvil",
+    "binance": "Binance",
+    "zelle": "Zelle",
+    "cash_ves": "Cash Bs"
   }
 }

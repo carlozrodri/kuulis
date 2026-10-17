@@ -70,6 +70,16 @@ Reglas para todos los milestones:
 - **Validación:** V + Lighthouse + e2e responsive + axe.
 - **Depende de:** M2.
 - **Riesgos:** peso de la captura del hero → presupuesto de 45 KB.
+- **Hecho, primer paso (2026-10-17):** como no hay capturas A1 todavía y el plan prohíbe fusionar provisionales,
+  el M3 va en dos pasos. Ahora: `HomeHero` en campo verde plano con el titular aprobado (`BrandHeadline`: el punto
+  final es amarillo sobre verde o tinta y verde sobre claro), lead, botones, nota «Gratis. Por ahora, solo para
+  Android.», `BrandRouteLine` que se dibuja hasta el punto amarillo (CSS, sin JS, quieta con movimiento reducido) y
+  el Ávila; `HomePrice` en filas con `PaymentChips` de `/public/site`. Se quitó la tarjeta inventada del hero
+  («Luis está en camino», $2.40) y la sección de tres tarjetas de pasajeros (el punto de seguridad vuelve en M4).
+  La cabecera lleva el verde del hero (sólido, no transparente, para que sin JS se lea en todo el sitio) y pasa
+  a clara cuando `#hero-end` queda debajo. Lighthouse móvil local: rendimiento 92–96, accesibilidad 100, LCP
+  2,2–2,4 s, CLS 0, 222 KB. Segundo paso: la captura de cotización en `PhoneFrame` en el hero y en precio claro,
+  cuando Carlos pase las capturas (05 A1).
 
 ## M4 · Inicio: resto de secciones
 - **Objetivo:** completar la narrativa de la página de inicio.

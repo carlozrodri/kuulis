@@ -37,32 +37,29 @@
   "home": {
     "metaTitle": "Kuulis · Viajes en moto, sin comisión por viaje",
     "metaDescription": "Pide un motorizado en minutos y paga directo, como acuerden. Los motorizados no pagan comisión por viaje: solo una cuota mensual pequeña los meses que trabajan.",
-    "pill": "Motorizados: {months} meses gratis al empezar",
-    "title": "Tu moto en minutos. Sin comisión por viaje.",
-    "lead": "Pide un motorizado cerca de ti, ve el precio antes de salir y págale directo, como acuerden.",
-    "download": "Descargar para Android",
-    "drive": "Quiero manejar",
-    "card": {
-      "driver": "Luis está en camino",
-      "bike": "Yamaha YBR · Negra",
-      "fare": "Precio del viaje"
+    "hero": {
+      "title": "En moto por Caracas. Precio claro, y punto.",
+      "lead": "Antes de pedir ves cuánto cuesta en dólares y en bolívares, sabes quién te va a buscar y le pagas directo al motorizado, como acuerden.",
+      "note": "Gratis. Por ahora, solo para Android."
     },
-    "riders": {
-      "eyebrow": "Para pasajeros",
-      "title": "Rápido, claro y sin sorpresas",
-      "price": {
-        "title": "Precio antes de salir",
-        "body": "La app calcula el precio por distancia y tiempo. Lo ves antes de pedir y no cambia en el camino."
+    "price": {
+      "title": "Sabes el precio antes de subirte.",
+      "body": "La app calcula el viaje por distancia y tiempo y te lo muestra en dólares, con su equivalente en bolívares a tasa BCV y Binance. Ese es el precio, para ti y para el motorizado.",
+      "rates": {
+        "title": "Dólares y bolívares",
+        "body": "Las dos tasas a la vista, para que nadie saque cuentas en la calle."
       },
       "pay": {
-        "title": "Pagas como quieras",
-        "body": "Efectivo en dólares o bolívares, pago móvil, Zelle o Binance: lo acuerdas con el motorizado y le pagas directo."
+        "title": "Pagas como acuerden",
+        "body": "Le pagas directo al motorizado con el método que acuerden:"
       },
-      "safe": {
-        "title": "Viajas acompañado",
-        "body": "Ves el nombre, la foto, la moto y la placa del motorizado, y puedes compartir tu viaje con alguien de confianza."
+      "haggle": {
+        "title": "Sin regateo",
+        "body": "El precio lo pone la app, no la discusión."
       }
     },
+    "download": "Descargar para Android",
+    "drive": "Quiero manejar",
     "drivers": {
       "eyebrow": "Para motorizados",
       "title": "Lo que cobras es tuyo",
@@ -380,5 +377,12 @@
     "drivers": "Conoce cómo funciona para motorizados",
     "invalidTitle": "Esta invitación no existe",
     "invalidBody": "Revisa el enlace o pide el código de nuevo a quien te invitó."
+  },
+  "payments": {
+    "cash_usd": "Efectivo $",
+    "pago_movil": "Pago móvil",
+    "binance": "Binance",
+    "zelle": "Zelle",
+    "cash_ves": "Efectivo Bs"
   }
 }

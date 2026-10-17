@@ -1,6 +1,9 @@
 <script setup lang="ts">
 // Site header (docs/website-redesign/04 §2–§3): logo, main links and the download button; below 960 px the
 // links move to a full-screen menu that keeps focus inside, closes with Escape and returns focus to its button.
+// On a page that starts with a green hero (page meta `heroHeader`), the header wears the hero's green until the
+// hero's end (#hero-end) scrolls under it, then turns solid light: an IntersectionObserver, no scroll listener.
+// Its green is solid, not transparent, so without JavaScript it is still readable over every section.
 const open = defineModel<boolean>('open', { default: false })
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -16,6 +19,21 @@ const menuLinks = computed(() => [
   { to: '/ayuda', label: t('nav.help') },
   { to: '/contacto', label: t('nav.contact') },
 ])
+
+const heroPassed = ref(false)
+const onHero = computed(() => Boolean(route.meta.heroHeader) && !heroPassed.value && !open.value)
+let observer: IntersectionObserver | undefined
+
+function watchHero() {
+  observer?.disconnect()
+  heroPassed.value = false
+  const end = document.getElementById('hero-end')
+  if (!route.meta.heroHeader || !end) return
+  observer = new IntersectionObserver(([entry]) => {
+    heroPassed.value = !!entry && !entry.isIntersecting && entry.boundingClientRect.top < 80
+  }, { rootMargin: '-72px 0px 0px 0px' })
+  observer.observe(end)
+}
 
 const toggle = ref<HTMLButtonElement>()
 const panel = ref<HTMLElement>()
@@ -59,15 +77,24 @@ watch(open, async (isOpen, wasOpen) => {
   }
 })
 
-onMounted(() => document.addEventListener('keydown', onKeydown))
+onMounted(() => {
+  document.addEventListener('keydown', onKeydown)
+  watchHero()
+})
+// After a navigation the new page is rendered on the next tick.
+watch(() => route.path, () => nextTick(watchHero))
 onBeforeUnmount(() => {
+  observer?.disconnect()
   document.removeEventListener('keydown', onKeydown)
   document.documentElement.classList.remove('menu-open')
 })
 </script>
 
 <template>
-  <header class="header">
+  <header
+    class="header"
+    :class="{ 'on-hero': onHero }"
+  >
     <div class="container-wide bar">
       <NuxtLinkLocale
         to="/"
@@ -150,6 +177,33 @@ onBeforeUnmount(() => {
   z-index: 20;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
+  transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+
+/* Over the green hero: the hero's own green, white text, the yellow button and dot. */
+.header.on-hero {
+  background: var(--band-brand);
+  border-bottom-color: var(--band-brand);
+  color: var(--on-band);
+  --focus-outer: var(--on-band);
+}
+
+.on-hero .brand,
+.on-hero .nav-link {
+  color: var(--on-band);
+}
+
+.on-hero .nav-link.router-link-active::after {
+  background: var(--accent);
+}
+
+.on-hero .cta {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.on-hero .menu-button span {
+  background: var(--on-band);
 }
 
 .bar {
@@ -194,6 +248,12 @@ onBeforeUnmount(() => {
 @media (hover: hover) {
   .nav-link:hover {
     color: var(--primary);
+  }
+
+  .on-hero .nav-link:hover {
+    color: var(--on-band);
+    text-decoration: underline;
+    text-underline-offset: 6px;
   }
 }
 
