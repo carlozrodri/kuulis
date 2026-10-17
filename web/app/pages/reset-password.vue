@@ -33,96 +33,69 @@ async function save() {
 </script>
 
 <template>
-  <section class="section">
-    <div class="container box">
-      <div class="card">
-        <KuulisWordmark
-          :size="26"
-          class="mark"
-        />
-        <template v-if="state === 'done'">
-          <h1>{{ t('reset.doneTitle') }}</h1>
-          <p class="muted">
-            {{ t('reset.doneBody') }}
-          </p>
-        </template>
-        <template v-else-if="state === 'invalid'">
-          <h1>{{ t('reset.invalidTitle') }}</h1>
-          <p class="muted">
-            {{ t('reset.invalidBody') }}
-          </p>
-        </template>
-        <form
-          v-else
-          novalidate
-          @submit.prevent="save"
+  <UtilityCard>
+    <template v-if="state === 'done'">
+      <h1>{{ t('reset.doneTitle') }}</h1>
+      <p class="muted">
+        {{ t('reset.doneBody') }}
+      </p>
+    </template>
+    <template v-else-if="state === 'invalid'">
+      <h1>{{ t('reset.invalidTitle') }}</h1>
+      <p class="muted">
+        {{ t('reset.invalidBody') }}
+      </p>
+    </template>
+    <form
+      v-else
+      novalidate
+      @submit.prevent="save"
+    >
+      <h1>{{ t('reset.title') }}</h1>
+      <p class="muted">
+        {{ t('reset.body') }}
+      </p>
+      <label class="field">
+        {{ t('reset.password') }}
+        <input
+          v-model="password"
+          type="password"
+          autocomplete="new-password"
+          maxlength="128"
+          required
         >
-          <h1>{{ t('reset.title') }}</h1>
-          <p class="muted">
-            {{ t('reset.body') }}
-          </p>
-          <label class="field">
-            {{ t('reset.password') }}
-            <input
-              v-model="password"
-              type="password"
-              autocomplete="new-password"
-              maxlength="128"
-              required
-            >
-            <small>{{ touched && tooShort ? t('reset.tooShort') : t('reset.hint') }}</small>
-          </label>
-          <label class="field">
-            {{ t('reset.repeat') }}
-            <input
-              v-model="repeat"
-              type="password"
-              autocomplete="new-password"
-              maxlength="128"
-              required
-            >
-            <small v-if="touched && mismatch">{{ t('reset.mismatch') }}</small>
-          </label>
-          <p
-            v-if="state === 'failed'"
-            class="notice notice-danger"
-            role="alert"
-          >
-            {{ t('common.networkError') }}
-          </p>
-          <button
-            type="submit"
-            class="btn btn-primary wide"
-            :disabled="state === 'saving'"
-          >
-            {{ state === 'saving' ? t('common.wait') : t('reset.button') }}
-          </button>
-        </form>
-      </div>
-    </div>
-  </section>
+        <small>{{ touched && tooShort ? t('reset.tooShort') : t('reset.hint') }}</small>
+      </label>
+      <label class="field">
+        {{ t('reset.repeat') }}
+        <input
+          v-model="repeat"
+          type="password"
+          autocomplete="new-password"
+          maxlength="128"
+          required
+        >
+        <small v-if="touched && mismatch">{{ t('reset.mismatch') }}</small>
+      </label>
+      <p
+        v-if="state === 'failed'"
+        class="notice notice-danger"
+        role="alert"
+      >
+        {{ t('common.networkError') }}
+      </p>
+      <button
+        type="submit"
+        class="btn btn-primary wide"
+        :disabled="state === 'saving'"
+      >
+        {{ state === 'saving' ? t('common.wait') : t('reset.button') }}
+      </button>
+    </form>
+  </UtilityCard>
 </template>
 
 <style scoped>
-.box {
-  max-width: 460px;
-}
-
-.mark {
-  color: var(--primary);
-  display: block;
-  margin-bottom: 24px;
-}
-
-h1 {
-  font-size: 1.7rem;
-}
-
-.wide {
-  width: 100%;
-  margin-top: 8px;
-}
-
 .field small {
   color: var(--muted);
 }

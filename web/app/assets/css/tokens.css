@@ -27,6 +27,14 @@
     --band-brand: var(--primary);
     --band-ink: #14201b;
     --on-band: #fff;
+    --on-band-soft: rgb(255 255 255 / 78%);
+    --on-band-line: rgb(255 255 255 / 16%);
+
+    /* The shared-ride map: its tiles are light in both themes, so its markers and labels keep these colors */
+    --map-ring: #fff;
+    --map-ink: #14201b;
+    --map-label: rgb(255 255 255 / 80%);
+    --map-shadow: 0 1px 4px rgb(0 0 0 / 35%);
 
     /* Focus ring: an ink outline around a yellow inner ring, visible on light, green and ink backgrounds */
     --focus-inner: var(--accent);

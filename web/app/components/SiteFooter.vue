@@ -149,7 +149,7 @@ const legal = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as con
 .brand p {
   margin: var(--space-3) 0 0;
   max-width: 30ch;
-  color: rgb(255 255 255 / 78%);
+  color: var(--on-band-soft);
 }
 
 h2 {
@@ -158,7 +158,7 @@ h2 {
   font-weight: 700;
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  color: rgb(255 255 255 / 70%);
+  color: var(--on-band-soft);
 }
 
 ul {
@@ -192,9 +192,9 @@ a {
   gap: var(--space-3);
   margin-top: var(--space-7);
   padding-top: var(--space-4);
-  border-top: 1px solid rgb(255 255 255 / 16%);
+  border-top: 1px solid var(--on-band-line);
   font-size: var(--font-small);
-  color: rgb(255 255 255 / 78%);
+  color: var(--on-band-soft);
 }
 
 .bottom p {
