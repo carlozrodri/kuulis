@@ -2,18 +2,26 @@
   "nav": {
     "label": "Principal",
     "skip": "Saltar al contenido",
+    "home": "Viajar",
     "drivers": "Motorizados",
     "download": "Descargar",
-    "legal": "Legal",
-    "language": "Change language to English",
-    "menu": "Menú",
-    "getApp": "Descargar la app",
     "help": "Ayuda",
-    "contact": "Contacto"
+    "contact": "Contacto",
+    "legal": "Legal",
+    "getApp": "Descargar la app",
+    "menuOpen": "Abrir menú",
+    "menuClose": "Cerrar menú",
+    "otherLanguage": "English"
   },
   "footer": {
-    "tagline": "Viajes en moto en Venezuela. Sin comisión por viaje.",
-    "made": "Hecho en Venezuela"
+    "tagline": "Viajes en moto por Caracas. Sin comisión por viaje.",
+    "made": "Hecho en Caracas",
+    "kuulis": "Kuulis",
+    "help": "Ayuda",
+    "legal": "Legal",
+    "helpCenter": "Centro de ayuda",
+    "whatsapp": "WhatsApp",
+    "language": "Idioma"
   },
   "common": {
     "wait": "Un momento…",
