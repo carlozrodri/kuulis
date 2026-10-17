@@ -43,4 +43,5 @@ Carlos respondió «apruebo todo»: vale la opción recomendada de cada pregunta
 | --- | --- |
 | Plan (este directorio) | Aprobado 2026-10-17 |
 | M0 · Línea base | Hecho 2026-10-17 (ver 00 §9) |
-| M1 · Fundamentos | Siguiente |
+| M1 · Fundamentos | Hecho 2026-10-17 (ver 06 §2) |
+| M2 · Marco | Siguiente |

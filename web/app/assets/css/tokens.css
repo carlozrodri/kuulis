@@ -1,0 +1,115 @@
+/*
+ * Design tokens (docs/website-redesign/02 and 06 §2). The "Verde Ávila" palette is the brand's source of truth
+ * (docs/product/mobile-design.md): colors here only get new semantic names, never new values.
+ */
+@layer tokens {
+  :root {
+    /* Brand palette, light */
+    --primary: #0e7c5a;
+    --primary-pressed: #0b6a4c;
+    --primary-deep: #0a5c43;
+    --on-primary: #fff;
+    --accent: #ffc83d;
+    --accent-pressed: #f0b520;
+    --on-accent: #3a2a00;
+    --bg: #f3f7f4;
+    --surface: #fff;
+    --surface-alt: #eaf5ef;
+    --text: #14201b;
+    --muted: #5b6a63;
+    --border: #dce6e0;
+    --danger: #b42318;
+    --danger-soft: #fdecec;
+    --success: #15803d;
+    --success-soft: #dcf3e4;
+
+    /* Color fields (full-bleed bands): brand green and ink, with what goes on them */
+    --band-brand: var(--primary);
+    --band-ink: #14201b;
+    --on-band: #fff;
+
+    /* Legacy hero gradient, removed when the home page is redesigned (M3) */
+    --hero: var(--primary);
+    --hero-shade: var(--primary-deep);
+
+    /* Focus ring: an ink outline around a yellow inner ring, visible on light, green and ink backgrounds */
+    --focus-inner: var(--accent);
+    --focus-outer: var(--text);
+
+    /* Type: one family; the fallback face keeps the text from jumping when the web font arrives */
+    --font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans Fallback', system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+    --font-display: clamp(2.75rem, 1.6rem + 5.2vw, 6rem);
+    --font-h1: clamp(2.25rem, 1.5rem + 3.4vw, 4.25rem);
+    --font-h2: clamp(1.75rem, 1.3rem + 2vw, 3rem);
+    --font-h3: 1.25rem;
+    --font-lead: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+    --font-body: 1.0625rem;
+    --font-small: 0.875rem;
+    --font-label: 0.8125rem;
+    --font-number: clamp(5rem, 3rem + 10vw, 11rem);
+    --leading-tight: 1.05;
+    --leading-heading: 1.15;
+    --leading-body: 1.55;
+    --tracking-display: -0.045em;
+    --tracking-heading: -0.03em;
+    --tracking-label: 0.06em;
+
+    /* Space: multiples of 4 px */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+    --space-9: 96px;
+    --space-10: 160px;
+    --gutter: clamp(16px, 4vw, 32px);
+    --section-y: clamp(64px, 8vw, 128px);
+    --container: 1080px;
+    --container-wide: 1200px;
+
+    /* Shape */
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --radius-pill: 999px;
+    --radius: var(--radius-md);
+    --shadow: 0 1px 2px rgb(20 32 27 / 6%), 0 8px 24px rgb(20 32 27 / 8%);
+
+    /* Motion */
+    --dur-fast: 120ms;
+    --dur-base: 200ms;
+    --dur-slow: 320ms;
+    --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+    color-scheme: light dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --primary: #34c08c;
+      --primary-pressed: #2aa77a;
+      --primary-deep: #072e22;
+      --on-primary: #06231a;
+      --accent: #ffd25e;
+      --accent-pressed: #ffc83d;
+      --bg: #0b1310;
+      --surface: #131d19;
+      --surface-alt: #18261f;
+      --text: #e8f0ec;
+      --muted: #9aada4;
+      --border: #24332c;
+      --danger: #f97066;
+      --danger-soft: #3a1513;
+      --success: #4ade80;
+      --success-soft: #12301f;
+      --band-brand: #0c4a37;
+      --band-ink: #0b1310;
+      --hero: #0c4a37;
+      --hero-shade: #072e22;
+      --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 35%);
+    }
+  }
+}
