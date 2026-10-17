@@ -51,6 +51,23 @@ test.describe('Spanish browser', () => {
     expect(sitemap).toContain('hreflang="x-default"')
   })
 
+  test('each main page shares its own image, in the page language', async ({ page, request }) => {
+    const pages = [
+      ['/', 'home-es'], ['/en', 'home-en'], ['/motorizados', 'drivers-es'], ['/en/drivers', 'drivers-en'],
+      ['/seguridad', 'safety-es'], ['/en/safety', 'safety-en'], ['/descargar', 'download-es'], ['/en/download', 'download-en'],
+      ['/ayuda', 'home-es'],
+    ]
+    for (const [path, image] of pages) {
+      await page.goto(path)
+      const url = new URL((await page.locator('meta[property="og:image"]').getAttribute('content'))!)
+      expect(url.pathname, path).toBe(`/og/${image}.png`)
+      expect(await page.locator('meta[property="og:image:alt"]').getAttribute('content'), path).toBeTruthy()
+      const file = await request.get(url.pathname)
+      expect(file.status(), path).toBe(200)
+      expect(file.headers()['content-type']).toBe('image/png')
+    }
+  })
+
   test('every internal link on an English page stays in English', async ({ page }) => {
     await page.goto('/en/drivers', { waitUntil: 'networkidle' })
     const hrefs = await page.locator('a[href^="/"]:not([hreflang])').evaluateAll(links => links.map(a => a.getAttribute('href')!))
