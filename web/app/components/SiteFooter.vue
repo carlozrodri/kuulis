@@ -43,6 +43,11 @@ const legal = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as con
               </NuxtLinkLocale>
             </li>
             <li>
+              <NuxtLinkLocale to="/seguridad">
+                {{ t('nav.safety') }}
+              </NuxtLinkLocale>
+            </li>
+            <li>
               <NuxtLinkLocale to="/descargar">
                 {{ t('nav.download') }}
               </NuxtLinkLocale>

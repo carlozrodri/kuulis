@@ -145,6 +145,19 @@ Reglas para todos los milestones:
 - **Depende de:** M4 (y M5 si ya está, para las URLs `/en/drivers` y `/en/safety`).
 - **Riesgos:** funciones de seguridad que cambian de config (p. ej. `sos_team_alert`) → el texto no promete un
   equipo de respuesta.
+- **Hecho (2026-10-17):** `/motorizados` (EN `/drivers`) con hero en campo tinta (la cabecera lo acompaña con
+  `heroHeader: 'ink'`), el «0 %» y tres filas, «Tu cuota, con números» con `FeeTable` y `FeeExample` (ganas $250 →
+  la cuota se calcula con `feeFor`, igual que `fee_for` de la API: el tramo más alto cuyo `above` se supera), lo que
+  necesitas desde `/public/site`, el registro sobre la ruta (`RouteStops`, compartido con el inicio), cuatro
+  preguntas de motorizados (`FaqList`, compartido) y la descarga (`DownloadBand`, antes `HomeDownload`). Sin API se
+  omiten la tabla, el ejemplo, la edad y el año. `/seguridad` (EN `/safety`) nueva: antes, durante, si algo pasa y
+  después como paradas de una ruta, verificadas en el código de la app y la API: aprobación del motorizado; nombre,
+  foto, calificación, moto y placa; PIN (`safety.pin_areas`, fila y gráfico omitidos sin ciudades); enlace en vivo y
+  contactos de confianza; chat; pedir para otra persona con su propio enlace; el «¿Todo bien?» ante paradas o
+  desvíos; SOS que llama al número de `app_links` y luego deja enviar la ubicación a los contactos (no se promete
+  equipo: `sos_team_alert` está apagado por defecto); reportes y objetos perdidos; calificación de los dos lados;
+  normas de la comunidad. Enlazada desde cabecera, menú, footer y el bloque de seguridad del inicio; en el sitemap.
+  Lighthouse móvil local: rendimiento 96, accesibilidad 100, LCP 2,2 s, CLS 0, 240 KB en las dos páginas.
 
 ## M7 · Descargar y páginas secundarias
 - **Objetivo:** coherencia en todo el sitio.

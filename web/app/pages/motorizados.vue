@@ -1,6 +1,11 @@
 <script setup lang="ts">
+// Drivers (docs/website-redesign/03 §6): the number, the fee with a worked example, what you need, how to sign up
+// and the drivers' own questions. Every figure comes from GET /public/site; without it the page leaves the figure
+// out instead of guessing (04 §8).
 const { t } = useI18n()
 const { data: site } = await useSite()
+// The header wears the hero's ink until the hero scrolls past; the footer's Ávila rises from the green download.
+definePageMeta({ heroHeader: 'ink', endsOnBrand: true })
 
 useSeoMeta({
   title: () => t('drivers.metaTitle'),
@@ -10,20 +15,39 @@ useSeoMeta({
 })
 
 const freeMonths = computed(() => site.value?.free_months ?? 3)
-const minAge = computed(() => site.value?.driver.min_age ?? 21)
+const tiers = computed(() => site.value?.fee_tiers ?? [])
+const minAge = computed(() => site.value?.driver.min_age ?? null)
 const minYear = computed(() => site.value?.driver.vehicle_min_year.moto ?? null)
 const documents = computed(() => site.value?.driver.documents ?? [])
 const photos = computed(() => site.value?.driver.vehicle_photo_min_count ?? 0)
+
+const why = computed(() => ['commission', 'free', 'direct'].map(key => ({
+  key,
+  title: t(`drivers.why.${key}.title`, { months: freeMonths.value }),
+  body: t(`drivers.why.${key}.body`),
+})))
+const steps = computed(() => [1, 2, 3, 4].map(n => ({ key: `step${n}`, body: t(`drivers.steps.step${n}`) })))
+const faq = computed(() => ['free', 'idle', 'paid', 'fee'].map(key => ({
+  key,
+  q: t(`drivers.faq.${key}.q`),
+  a: t(`drivers.faq.${key}.a`, { months: freeMonths.value }),
+})))
 </script>
 
 <template>
   <div>
-    <section class="section">
-      <div class="container narrow">
-        <span class="eyebrow">{{ t('drivers.eyebrow') }}</span>
-        <h1>{{ t('drivers.title') }}</h1>
+    <section
+      id="hero"
+      class="hero band-ink"
+    >
+      <div class="container-wide">
+        <BrandHeadline
+          as="h1"
+          class="title"
+          :text="t('drivers.title')"
+        />
         <p class="lead">
-          {{ t('drivers.lead', { months: freeMonths }) }}
+          {{ t('drivers.lead') }}
         </p>
         <NuxtLinkLocale
           to="/descargar"
@@ -34,27 +58,56 @@ const photos = computed(() => site.value?.driver.vehicle_photo_min_count ?? 0)
       </div>
     </section>
 
-    <section class="container">
-      <div class="grid grid-3">
+    <section class="section number">
+      <div class="container-wide grid-number">
+        <h2 class="zero">
+          <span class="figure">{{ t('drivers.zero') }}</span>
+          <span class="label">{{ t('drivers.zeroLabel') }}</span>
+        </h2>
+        <ul class="rows">
+          <li
+            v-for="row in why"
+            :key="row.key"
+          >
+            <h3>{{ row.title }}</h3>
+            <p>{{ row.body }}</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section fees">
+      <div class="container-wide grid-fees">
+        <div>
+          <BrandHeadline :text="t('drivers.fees.title')" />
+          <p class="body">
+            {{ tiers.length ? t('drivers.fees.body') : t('drivers.fees.bodyNoData') }}
+          </p>
+          <FeeExample
+            v-if="tiers.length"
+            :tiers="tiers"
+          />
+          <p class="note">
+            {{ t('drivers.fees.note', { months: freeMonths }) }}
+          </p>
+        </div>
         <div
-          v-for="key in ['commission', 'free', 'direct']"
-          :key="key"
+          v-if="tiers.length"
           class="card"
         >
-          <h3>{{ t(`drivers.why.${key}.title`, { months: freeMonths }) }}</h3>
-          <p class="muted">
-            {{ t(`drivers.why.${key}.body`, { months: freeMonths }) }}
-          </p>
+          <FeeTable :tiers="tiers" />
         </div>
       </div>
     </section>
 
-    <section class="section">
-      <div class="container grid grid-2 two">
-        <div class="card">
-          <h2>{{ t('drivers.requirements.title') }}</h2>
+    <section class="section needs">
+      <div class="container-wide grid-needs">
+        <BrandHeadline :text="t('drivers.requirements.title')" />
+        <div>
           <ul class="checks">
-            <li>{{ t('drivers.requirements.age', { age: minAge }) }}</li>
+            <li v-if="minAge">
+              {{ t('drivers.requirements.age', { age: minAge }) }}
+            </li>
             <li v-if="minYear">
               {{ t('drivers.requirements.year', { year: minYear }) }}
             </li>
@@ -66,61 +119,177 @@ const photos = computed(() => site.value?.driver.vehicle_photo_min_count ?? 0)
             </li>
             <li>{{ t('drivers.requirements.phone') }}</li>
           </ul>
-        </div>
-        <div class="card">
-          <h2>{{ t('drivers.fees.title') }}</h2>
-          <p class="muted">
-            {{ t('drivers.fees.body', { months: freeMonths }) }}
+          <p class="note">
+            {{ t('drivers.requirements.review') }}
           </p>
-          <FeeTable
-            v-if="site?.fee_tiers?.length"
-            :tiers="site.fee_tiers"
-          />
         </div>
       </div>
     </section>
 
-    <section class="container narrow">
-      <h2>{{ t('drivers.steps.title') }}</h2>
-      <ol class="steps">
-        <li
-          v-for="n in 4"
-          :key="n"
-        >
-          {{ t(`drivers.steps.step${n}`) }}
-        </li>
-      </ol>
+    <section class="section steps">
+      <div class="container-wide">
+        <BrandHeadline :text="t('drivers.steps.title')" />
+        <RouteStops :items="steps" />
+      </div>
     </section>
+
+    <section class="section faq">
+      <div class="container narrow">
+        <BrandHeadline :text="t('drivers.faq.title')" />
+        <FaqList :items="faq" />
+      </div>
+    </section>
+
+    <DownloadBand
+      :title="t('drivers.final.title')"
+      :body="t('drivers.final.body')"
+    />
   </div>
 </template>
 
 <style scoped>
+.hero {
+  /* The header (64/72 px) sits on this field. */
+  margin-top: -64px;
+  padding: calc(64px + clamp(40px, 8vw, 112px)) 0 clamp(64px, 8vw, 128px);
+  /* In dark mode the ink field is the page color; the line keeps the hero's edge. */
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  max-width: 11ch;
+  margin: 0 0 var(--space-5);
+  font-size: var(--font-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+}
+
 .lead {
-  font-size: 1.2rem;
+  max-width: 36rem;
+  margin: 0 0 var(--space-6);
+  font-size: var(--font-lead);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.section :deep(h2.headline) {
+  margin: 0 0 var(--space-6);
+  font-size: var(--font-h2);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+.grid-needs :deep(h2.headline) {
+  margin: 0;
+}
+
+.number,
+.fees,
+.needs,
+.steps,
+.faq {
+  padding: var(--section-y) 0 0;
+}
+
+.faq {
+  padding-bottom: var(--section-y);
+}
+
+.grid-number,
+.grid-fees,
+.grid-needs {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.grid-needs {
+  gap: var(--space-6);
+}
+
+.zero {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.figure {
+  color: var(--primary);
+  font-size: var(--font-number);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+}
+
+.label {
+  margin-top: var(--space-3);
+  font-size: var(--font-h3);
+  font-weight: 700;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows li {
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--border);
+}
+
+.rows li:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.rows h3 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-h3);
+  letter-spacing: -0.01em;
+}
+
+.rows p,
+.body,
+.note {
+  margin: 0;
   color: var(--muted);
 }
 
-.two {
-  align-items: start;
+.body {
+  max-width: 34rem;
+  margin-bottom: var(--space-5);
+  font-size: var(--font-lead);
+  line-height: 1.5;
+}
+
+.note {
+  max-width: 34rem;
+  margin-top: var(--space-4);
+  font-size: var(--font-small);
 }
 
 .checks {
-  list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .checks li {
   position: relative;
-  padding: 10px 0 10px 32px;
+  padding: var(--space-3) 0 var(--space-3) var(--space-7);
   border-top: 1px solid var(--border);
+  font-weight: 600;
 }
 
+.checks li:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+/* A check in the brand green. */
 .checks li::before {
   content: '';
   position: absolute;
   left: 4px;
-  top: 16px;
+  top: calc(var(--space-3) + 6px);
   width: 14px;
   height: 8px;
   border-left: 3px solid var(--primary);
@@ -128,11 +297,27 @@ const photos = computed(() => site.value?.driver.vehicle_photo_min_count ?? 0)
   transform: rotate(-45deg);
 }
 
-.steps {
-  padding-left: 1.3em;
-}
+@media (min-width: 960px) {
+  .hero {
+    margin-top: -72px;
+    padding-top: calc(72px + 112px);
+  }
 
-.steps li {
-  margin-bottom: 10px;
+  .grid-number {
+    grid-template-columns: 5fr 7fr;
+    column-gap: var(--space-9);
+    align-items: center;
+  }
+
+  .grid-fees {
+    grid-template-columns: 6fr 5fr;
+    column-gap: var(--space-9);
+    align-items: start;
+  }
+
+  .grid-needs {
+    grid-template-columns: 5fr 7fr;
+    column-gap: var(--space-9);
+  }
 }
 </style>

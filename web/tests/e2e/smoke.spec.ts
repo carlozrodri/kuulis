@@ -5,7 +5,7 @@ import { englishPath } from '../../i18n/pages'
 // Smoke test of the public pages (docs/website-redesign/08): each page loads in both languages, has one h1,
 // the right <html lang>, no horizontal scroll on a small phone or a desktop, no console errors and no serious
 // accessibility violations.
-const PAGES = ['/', '/motorizados', '/descargar', '/ayuda', '/contacto', '/legal']
+const PAGES = ['/', '/motorizados', '/seguridad', '/descargar', '/ayuda', '/contacto', '/legal']
 const WIDTHS = [320, 1440]
 const LOCALES = ['es', 'en'] as const
 

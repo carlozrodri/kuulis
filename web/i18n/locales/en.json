@@ -11,7 +11,8 @@
     "getApp": "Get the app",
     "menuOpen": "Open menu",
     "menuClose": "Close menu",
-    "otherLanguage": "Español"
+    "otherLanguage": "Español",
+    "safety": "Safety"
   },
   "footer": {
     "tagline": "Motorbike rides across Caracas. No commission per ride.",
@@ -134,15 +135,15 @@
         "body": "Press and hold it to call {number}, then send your live location to your trusted contacts."
       },
       "pinLabel": "Example start PIN",
-      "pinCaption": "Example: every ride gets its own PIN."
+      "pinCaption": "Example: every ride gets its own PIN.",
+      "more": "How we look after every ride"
     }
   },
   "drivers": {
     "metaTitle": "Drive with Kuulis · No commission per ride",
-    "metaDescription": "Earn with your motorbike without giving a commission on each ride. Requirements, monthly fee and how to sign up.",
-    "eyebrow": "Drivers",
-    "title": "Earn with your bike, no commission per ride",
-    "lead": "You bring the time and the bike; Kuulis brings the rides. What riders pay you is yours. The first {months} months are free.",
+    "metaDescription": "What you earn is yours: Kuulis charges no commission per ride. Requirements, the monthly fee with an example, and how to sign up.",
+    "title": "What you earn is yours.",
+    "lead": "Kuulis charges no commission per ride. You bring the bike and the hours; we bring you the rides.",
     "cta": "Download the app",
     "why": {
       "commission": {
@@ -150,19 +151,20 @@
         "body": "We take nothing from your rides. The rider pays you directly, however you agree."
       },
       "free": {
-        "title": "{months} months free",
+        "title": "{months} months free from your first ride",
         "body": "Start without paying anything. Then a small fee only in the months you work."
       },
       "direct": {
-        "title": "You decide when",
+        "title": "You decide when you go online",
         "body": "Go online whenever you want and get rides near you."
       }
     },
     "requirements": {
-      "title": "Requirements",
+      "title": "What you need.",
       "age": "Be {age} or older",
       "year": "A {year} or newer motorbike",
-      "phone": "An Android phone with data and GPS"
+      "phone": "An Android phone with data and GPS",
+      "review": "We review your documents before you can go online."
     },
     "documents": {
       "id_card": "National ID card",
@@ -174,15 +176,44 @@
       "vehicle_photo": "{n} photos of your bike"
     },
     "fees": {
-      "title": "Monthly fee",
-      "body": "Based on what you earned in the month and paid from your Kuulis wallet. The first {months} months are free."
+      "title": "Your fee, in numbers.",
+      "body": "The fee is based on what you earned in the month.",
+      "bodyNoData": "The fee is small and based on what you earned in the month. See the current table in the app.",
+      "example": "Example: earn {earned} in a month and you pay {fee}. You keep {rest}.",
+      "exampleFree": "Example: earn {earned} in a month and you pay nothing.",
+      "note": "Paid from your Kuulis wallet. No rides in a month, nothing to pay. The first {months} months are free."
     },
     "steps": {
-      "title": "How to sign up",
+      "title": "How to sign up.",
       "step1": "Download the app and create your account.",
       "step2": "In Profile, switch to driver mode and fill in your application.",
       "step3": "Upload your documents and the photos of your bike.",
       "step4": "We review your application and let you know when you can go online."
+    },
+    "zero": "0%",
+    "zeroLabel": "commission per ride",
+    "faq": {
+      "title": "Questions from drivers.",
+      "free": {
+        "q": "When do the free months start?",
+        "a": "From your first completed ride, not from when you sign up. You get {months} months."
+      },
+      "idle": {
+        "q": "What if I don't work for a month?",
+        "a": "You pay nothing. The fee is only charged in months when you have rides."
+      },
+      "paid": {
+        "q": "How do I get paid for rides?",
+        "a": "The rider pays you directly, with whatever method you agree on. Kuulis keeps none of it."
+      },
+      "fee": {
+        "q": "How do I pay the fee?",
+        "a": "From your Kuulis wallet. If your balance falls short, the fee stays pending and is charged when you top up."
+      }
+    },
+    "final": {
+      "title": "Your bike, your hours, your money.",
+      "body": "Download the app, switch to driver mode in your profile and send your application. We'll let you know when it's approved."
     }
   },
   "download": {
@@ -406,5 +437,75 @@
     "binance": "Binance",
     "zelle": "Zelle",
     "cash_ves": "Cash Bs"
+  },
+  "safety": {
+    "metaTitle": "Safety at Kuulis · Before, during and after the ride",
+    "metaDescription": "Verified drivers, a start PIN, live trip sharing, an SOS button and ratings. What the Kuulis app does so you can ride with peace of mind.",
+    "title": "Feeling safe is part of the ride.",
+    "lead": "This is what the app does before, during and after every ride. We only list what already works.",
+    "before": {
+      "title": "Before",
+      "verified": {
+        "title": "Verified drivers",
+        "body": "We review their documents and their bike before they can go online. No approval, no rides."
+      },
+      "identity": {
+        "title": "You know who's coming",
+        "body": "You see their name, photo, rating and bike: make, model, color and plate."
+      }
+    },
+    "during": {
+      "title": "During",
+      "pin": {
+        "title": "Start PIN",
+        "body": "In {cities}, the ride doesn't start until you give the driver your PIN."
+      },
+      "live": {
+        "title": "Live trip",
+        "body": "Share a link and your people follow the ride on the map until you arrive. If you save trusted contacts, the app offers to tell them as soon as a driver is assigned."
+      },
+      "chat": {
+        "title": "In-app chat",
+        "body": "You talk to the driver through the ride's chat."
+      },
+      "other": {
+        "title": "Ride for someone else",
+        "body": "If the ride is for someone else, you send them their own link, with the ride's PIN when it applies."
+      },
+      "checkin": {
+        "title": "All good?",
+        "body": "If the ride stops for a long time or leaves the route, the app asks both of you whether everything is fine."
+      }
+    },
+    "trouble": {
+      "title": "If something happens",
+      "sos": {
+        "title": "SOS button",
+        "body": "Hold it down and the app calls {number}. Then you send your live location to your trusted contacts, one tap each."
+      },
+      "report": {
+        "title": "Report a problem",
+        "body": "From your ride history you report a problem or a lost item, and we ask the driver."
+      }
+    },
+    "after": {
+      "title": "After",
+      "rating": {
+        "title": "Ratings both ways",
+        "body": "When the ride ends, you rate the driver and the driver rates you."
+      },
+      "community": {
+        "title": "Community guidelines",
+        "body": "The same rules for riders and drivers.",
+        "link": "Read the guidelines"
+      }
+    },
+    "pinLabel": "Example start PIN",
+    "pinCaption": "Example: every ride gets its own PIN.",
+    "notice": "Kuulis doesn't replace emergency services. If you're in danger, call {number}.",
+    "final": {
+      "title": "Ride with someone who knows where you are.",
+      "body": "Download the app, save your trusted contacts and book your first ride."
+    }
   }
 }
