@@ -42,4 +42,5 @@ Carlos respondió «apruebo todo»: vale la opción recomendada de cada pregunta
 | Milestone | Estado |
 | --- | --- |
 | Plan (este directorio) | Aprobado 2026-10-17 |
-| M0 · Línea base | Siguiente |
+| M0 · Línea base | Hecho 2026-10-17 (ver 00 §9) |
+| M1 · Fundamentos | Siguiente |

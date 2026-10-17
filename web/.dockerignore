@@ -3,3 +3,5 @@ node_modules
 .output
 .env
 .env.*
+test-results
+playwright-report

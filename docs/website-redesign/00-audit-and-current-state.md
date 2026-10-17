@@ -162,8 +162,43 @@ tramos de la cuota, requisitos, métodos de pago y la existencia del APK.
 | `/ayuda` | 368 KB | 314 KB | No |
 | `/contacto` | 353 KB | 310 KB | No |
 
-El doc 08 registró ~85 KB de JS **comprimido**. Las medidas son con Playwright, sin limitación de red; **Lighthouse
-no se ha ejecutado** (no está instalado en el repo). Se medirá en el milestone 0 antes de tocar nada.
+El doc 08 registró ~85 KB de JS **comprimido**. Las medidas de arriba son con Playwright, sin limitación de red.
+
+### Línea base con Lighthouse (M0, 2026-10-17)
+Lighthouse 12 (`npx`, Chromium sin interfaz) contra QA, `https://kuulis.top8.uk`. Móvil = perfil por defecto
+(Moto G, 4G lenta simulada); escritorio = `--preset=desktop`. Las ejecuciones de escritorio salieron **en inglés**
+(Lighthouse manda `Accept-Language: en-US` y la web detecta el idioma); las de móvil, en español.
+
+| Página | Perf. / A11y / Buenas prácticas / SEO (móvil) | LCP | CLS | TBT | Peso transferido | Escritorio (Perf. / A11y) |
+| --- | --- | --- | --- | --- | --- | --- |
+| `/` | 93 / 100 / 93 / 63 | 1,9 s | 0,031 | 260 ms | 159 KB | 100 / 100 |
+| `/motorizados` | 98 / 98 / 93 / 63 | 1,9 s | 0 | 100 ms | 150 KB | 100 / 98 |
+| `/descargar` | 98 / 100 / 93 / 63 | 1,9 s | 0,012 | 80 ms | 148 KB | 100 / 100 |
+| `/ayuda` | 98 / 100 / 93 / 63 | 1,9 s | 0 | 80 ms | 159 KB | 92 / 100 (**CLS 0,178**) |
+| `/contacto` | 98 / 100 / 93 / 63 | 1,9 s | 0 | 80 ms | 153 KB | 100 / 100 |
+
+Lectura:
+- **SEO 63 es esperado en QA**: `robots.txt` bloquea todo fuera de producción. Se medirá en configuración de
+  producción (`pnpm build` + `NUXT_PUBLIC_APP_ENV=production`) en los milestones de SEO.
+- **Buenas prácticas 93** por errores de consola ajenos a la web: (1) Cloudflare inyecta su *beacon* de Web
+  Analytics (`static.cloudflareinsights.com`) y la CSP lo bloquea; (2) una petición a
+  `/_nuxt/builds/meta/<build>.json` devolvió 502 una vez (al repetirla dio 200: intermitente del proxy).
+- **CLS 0,178 en `/ayuda` (escritorio, inglés)**: la sección `container narrow` se desplaza al cargar. Se
+  corrige en M7.
+- **`heading-order` en `/motorizados`**: tarjetas con `h3` justo después del `h1`. Se corrige en M6.
+- **`label-content-name-mismatch`** en el botón de idioma: se ve «EN» pero se llama «Change language to
+  English» (WCAG 2.5.3). Se corrige en M2.
+- El LCP móvil de 1,9 s es casi todo latencia del servidor (documento en ~640 ms) y la CSS bloqueante; la página
+  ya es ligera (~150 KB). El rediseño tiene que mantenerse en ese orden de magnitud (objetivo de 06 §7: ≤ 300 KB).
+
+### Capturas y enlaces de referencia (M0)
+- Capturas de página completa en español e inglés: todas las páginas a 360 y 1440 px, y la de inicio a 320,
+  360, 414, 768, 1024, 1440 y 1920 px, más los JSON de Lighthouse, en la carpeta compartida del proyecto
+  `kuulis/web-linea-base-2026-10-17/` (fuera del repo por tamaño, 18 MB).
+- Sin desbordamiento horizontal en ninguna página a ningún ancho, `<html lang>` correcto y un solo `h1` por página.
+- Todos los enlaces internos responden 200 (inicio, motorizados, descargar, ayuda y sus 9 artículos, contacto,
+  legal y sus 5 textos); `/api/v1/app/download` responde 302 al APK. En QA no hay email ni WhatsApp de soporte
+  configurados, así que esos enlaces no aparecen.
 
 ## 10. Accesibilidad e infraestructura de pruebas
 - Bien: enlace «Saltar al contenido», `aria-label` en nav y menú, `aria-expanded`, `:focus-visible` amarillo de
@@ -171,9 +206,9 @@ no se ha ejecutado** (no está instalado en el repo). Se medirá en el milestone
 - Mal o a revisar: el contraste del degradado del hero; `.sr-only` sin `margin:-1px`/`padding:0`; el menú móvil no
   atrapa foco ni se cierra con Escape; el foco amarillo es casi invisible sobre fondos claros (1,43:1) — no cumple
   WCAG 2.2 «Focus Appearance»; el botón de idioma muestra «EN» sin indicar que es un cambio de idioma visible.
-- Tests: 4 archivos de Vitest con funciones puras (`invite`, `markdown`, `pow`, `sharedRide`). **No hay tests de
-  componentes, ni e2e, ni de accesibilidad, ni de regresión visual.** Playwright está disponible en el entorno de
-  Claude, no como dependencia del repo.
+- Tests: 4 archivos de Vitest con funciones puras (`invite`, `markdown`, `pow`, `sharedRide`). Desde M0 hay
+  además un test e2e de humo con Playwright y axe (`web/tests/e2e/smoke.spec.ts`, `pnpm e2e`): 6 páginas × 2
+  idiomas × 2 anchos (320 y 1440 px). No hay tests de componentes ni de regresión visual.
 
 ## 11. Restricciones
 - El público son teléfonos Android de gama baja con datos móviles caros y lentos (README de `web/`).
