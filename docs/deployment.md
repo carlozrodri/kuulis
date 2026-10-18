@@ -262,7 +262,8 @@ Todo se cifra con `openssl enc -aes-256-cbc -pbkdf2` y `BACKUP_PASSPHRASE`, bajo
 | Prueba de restauración (base temporal, cuenta filas, la borra) | domingos 04:00 Caracas | — |
 
 El estado se ve en el admin (Sistema → Backups) y hay alerta si no hay dump en 35 min, si falla un trabajo o
-si falla la prueba de restauración. La app **nunca borra dumps ni el libro contable**; solo borra en `files/`
+si falla la prueba de restauración. Un trabajo diario o semanal que falla se reintenta a los 15 min (no al día
+siguiente), así la alerta se cierra sola si fue un corte pasajero de R2. La app **nunca borra dumps ni el libro contable**; solo borra en `files/`
 la copia de un archivo borrado en la app (borrado de cuentas).
 
 ### Configurar (una vez por entorno)

@@ -4,6 +4,9 @@ due; a Redis lock makes one worker process do each job:
 - database dump every BACKUP_EVERY_MINUTES;
 - after 03:00 Caracas, once a day: ledger CSV and file mirror;
 - on Sundays after 04:00 Caracas: restore check.
+
+A daily or weekly job that fails is tried again RETRY_MINUTES later, not on its next day: its error
+keeps an alert open (repeated every 30 min) until it succeeds.
 """
 
 import asyncio
@@ -30,12 +33,17 @@ DONE_KEY = f"{settings.APP_ENV}:backups:done:"  # + job + date
 LOCK_SECONDS = 30 * 60  # longest a job may hold the turn (a large restore check)
 DAILY_HOUR = 3
 RESTORE_WEEKDAY, RESTORE_HOUR = 6, 4  # Sunday 04:00
+RETRY_MINUTES = 15
 
 _task: asyncio.Task | None = None
 
 
 async def _due_once(job: str, day: str) -> bool:
     return bool(await redis_client.set(f"{DONE_KEY}{job}:{day}", "1", nx=True, ex=8 * 86400))
+
+
+async def _retry_later(job: str, day: str) -> None:
+    await redis_client.expire(f"{DONE_KEY}{job}:{day}", RETRY_MINUTES * 60)
 
 
 async def run_due() -> list[str]:
@@ -54,11 +62,16 @@ async def run_due() -> list[str]:
 
         now = local_now()
         today = now.date().isoformat()
-        if now.hour >= DAILY_HOUR and await _due_once("daily", today):
-            await _job("ledger", services.export_ledger(store))
-            if settings.BACKUP_MIRROR_FILES and settings.storage_enabled:
-                await _job("files", services.mirror_files(store, AppFiles(get_s3_client())))
-            ran.append("daily")
+        if now.hour >= DAILY_HOUR:
+            if await _due_once("ledger", today):
+                if not await _job("ledger", services.export_ledger(store)):
+                    await _retry_later("ledger", today)
+                ran.append("ledger")
+            mirror = settings.BACKUP_MIRROR_FILES and settings.storage_enabled
+            if mirror and await _due_once("files", today):
+                if not await _job("files", services.mirror_files(store, AppFiles(get_s3_client()))):
+                    await _retry_later("files", today)
+                ran.append("files")
         if (
             now.weekday() == RESTORE_WEEKDAY
             and now.hour >= RESTORE_HOUR
@@ -73,20 +86,23 @@ async def run_due() -> list[str]:
                     last_restore_ok=False,
                     last_restore={"error": str(error)[:500]},
                 )
+                await _retry_later("restore", today)
             ran.append("restore")
     finally:
         await redis_client.delete(LOCK_KEY)
     return ran
 
 
-async def _job(name: str, work) -> None:
+async def _job(name: str, work) -> bool:
     """One failing job does not stop the others; the error is kept for the status page."""
     try:
         await work
         await services.record(**{f"last_{name}_error": None})
+        return True
     except Exception as error:
         logger.exception("Backup job %s failed", name)
         await services.record(**{f"last_{name}_error": str(error)[:500]})
+        return False
 
 
 async def loop() -> None:
