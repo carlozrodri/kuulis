@@ -1,42 +1,44 @@
-// Renders the link-preview images (og:image) for the main pages, one per language: 1200×630 PNG in public/og/
-// (docs/website-redesign/05 A8). The headline comes from the page's own title in i18n/locales, so a copy change
-// only needs `pnpm og` again. Uses the Playwright Chromium the e2e tests already need.
+// Renders the link-preview images (og:image) for the main pages, one per language: 1200×630 JPEG in public/og/
+// (Kuulis de noche: the night photo, the poster headline, the yellow route). The headline comes from the page's own
+// title in i18n/locales, so a copy change only needs `pnpm og` again. Uses the Playwright Chromium the e2e tests
+// already need.
 import { readFileSync, statSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from '@playwright/test'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-// Inlined: a page set with setContent may not load file:// fonts.
-const font = `data:font/woff2;base64,${readFileSync(resolve(root, 'node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2')).toString('base64')}`
-const ridge = readFileSync(resolve(root, 'app/components/brand/AvilaRidge.vue'), 'utf8').match(/<path d="([^"]+)"/)[1]
+// Inlined: a page set with setContent may not load file:// fonts or images.
+const inline = (path, type) => `data:${type};base64,${readFileSync(resolve(root, path)).toString('base64')}`
+const jakarta = inline('node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2', 'font/woff2')
+const poster = inline('public/fonts/archivo-poster.woff2', 'font/woff2')
+const photo = inline('public/img/fotos/caracas-noche-1280.webp', 'image/webp')
 
 /** Page key (the file name) → where its headline lives in the locale file. Keep in sync with OG_PAGES in useLocaleSeo. */
 const PAGES = { home: 'home.hero.title', drivers: 'drivers.title', safety: 'safety.title', download: 'download.title' }
-const MAX_BYTES = 120 * 1024
+const MAX_BYTES = 160 * 1024
 
 const escape = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;')
-/** The final period in yellow, like the headlines on the site. */
-const headline = title => escape(title).replace(/\.$/, '<span class="dot">.</span>')
+/** The final full stop as the yellow dot, like the headlines on the site. */
+const headline = title => escape(title).replace(/\.$/, '<span class="dot"></span>')
 
 const html = title => `<!doctype html><html><head><style>
-@font-face { font-family: Jakarta; src: url(${font}) format('woff2'); font-weight: 200 800; }
+@font-face { font-family: Jakarta; src: url(${jakarta}) format('woff2'); font-weight: 200 800; }
+@font-face { font-family: Poster; src: url(${poster}) format('woff2'); font-weight: 800 900; font-stretch: 62% 75%; }
 * { margin: 0; box-sizing: border-box; }
-body { width: 1200px; height: 630px; background: #0e7c5a; color: #fff; font-family: Jakarta; position: relative; overflow: hidden; }
+body { width: 1200px; height: 630px; background: #07120e url(${photo}) 60% 40% / cover; color: #fff; font-family: Jakarta; position: relative; overflow: hidden; }
+body::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(7 18 14 / 94%) 0%, rgb(7 18 14 / 75%) 55%, rgb(7 18 14 / 35%) 100%); }
 .wordmark { position: absolute; left: 80px; top: 64px; font-size: 44px; font-weight: 800; letter-spacing: -0.03em; }
-.dot { color: #ffc83d; }
-h1 { position: absolute; left: 80px; bottom: 170px; width: 720px; font-size: 76px; line-height: 1.04; font-weight: 800; letter-spacing: -0.035em; text-wrap: balance; }
-.route { position: absolute; right: 70px; top: 70px; width: 300px; height: 350px; }
-.ridge { position: absolute; left: 0; bottom: 0; width: 1200px; height: 110px; fill: #0a5c43; }
+.wordmark span { color: #ffc83d; }
+h1 { position: absolute; left: 80px; bottom: 110px; width: 820px; font-family: Poster; font-size: 104px; font-weight: 900; font-stretch: 66%; line-height: 0.9; text-transform: uppercase; text-wrap: balance; }
+.dot { display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.05em; border-radius: 50%; background: #ffc83d; }
+.route { position: absolute; left: 0; bottom: 0; width: 1200px; height: 90px; }
 </style></head><body>
-<div class="wordmark">kuulis<span class="dot">.</span></div>
+<div class="wordmark">kuulis<span>.</span></div>
 <h1>${headline(title)}</h1>
-<svg class="route" viewBox="40 20 400 520" fill="none">
-  <path d="M84 500C84 420 150 392 228 380S392 344 392 262 300 170 300 112 344 60 396 60" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 18" />
-  <circle cx="84" cy="500" r="18" fill="#0e7c5a" stroke="#fff" stroke-width="8" />
-  <circle cx="396" cy="60" r="22" fill="#ffc83d" />
+<svg class="route" viewBox="0 0 1200 90" preserveAspectRatio="none" fill="none">
+  <path d="M-20 70 C 220 76, 330 26, 560 40 S 900 80, 1220 18" stroke="#ffc83d" stroke-width="5" stroke-linecap="round" />
 </svg>
-<svg class="ridge" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="${ridge}" /></svg>
 </body></html>`
 
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {})
@@ -49,13 +51,14 @@ for (const locale of ['es', 'en']) {
     await page.setContent(html(title))
     await page.evaluate(async () => {
       await document.fonts.ready
-      if (!document.fonts.check('800 76px Jakarta')) throw new Error('Plus Jakarta Sans did not load')
+      if (!document.fonts.check('800 44px Jakarta')) throw new Error('Plus Jakarta Sans did not load')
+      if (!document.fonts.check('900 104px Poster')) throw new Error('The poster face did not load')
     })
-    const file = resolve(root, `public/og/${key}-${locale}.png`)
-    await page.screenshot({ path: file, type: 'png' })
+    const file = resolve(root, `public/og/${key}-${locale}.jpg`)
+    await page.screenshot({ path: file, type: 'jpeg', quality: 82 })
     const bytes = statSync(file).size
     failed ||= bytes > MAX_BYTES
-    console.log(`${bytes > MAX_BYTES ? '✗' : '✓'} public/og/${key}-${locale}.png ${(bytes / 1024).toFixed(0)} KB`)
+    console.log(`${bytes > MAX_BYTES ? '✗' : '✓'} public/og/${key}-${locale}.jpg ${(bytes / 1024).toFixed(0)} KB`)
   }
 }
 await browser.close()

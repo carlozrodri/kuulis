@@ -238,6 +238,25 @@ Reglas para todos los milestones:
 - **Riesgos:** la producción de la web aún no tiene dominio → la salida a `main` queda sujeta a esa decisión de
   Carlos, fuera de este proyecto.
 
+## M11 · Kuulis de noche (después de M10)
+- **Por qué:** el 2026-10-17 Carlos vio el resultado de M0–M10 y dijo que se veía simple, sin animaciones
+  llamativas, sin identidad y "generado por IA", y pidió fotos. Le gustó la propuesta "Kuulis de noche"
+  (https://claude.ai/artifact/5Z97hnhYmzLVB2Fuxsmt6f) y pidió pasarla a toda la web.
+- **Qué cambia:** titulares de cartel en Archivo condensado y en mayúsculas (`public/fonts/archivo-poster.woff2`,
+  31 KB, SIL OFL); fotos de Caracas a pantalla completa (`public/img/fotos`, CC BY 2.0, créditos en el pie);
+  cabecera de noche en todo el sitio; portada nueva (`HomeHero`, `HomeTicker`, `HomeStory` con el teléfono que
+  cambia de pantalla, `HomePrice` con un precio real de la app como cartel, `HomeDrivers` sobre el Ávila,
+  `HomeSafety` de noche); `PhotoHero` para motorizados y seguridad; descargar con foto; la banda final es de noche;
+  imágenes de vista previa nuevas en JPEG. Las capturas de la app son las del 2026-10-17 (A1 resuelto).
+- **Movimiento:** palabras del titular que suben, punto amarillo que cae, ruta que se dibuja, cinta de métodos de
+  pago con botón de pausa, teléfono que cambia de pantalla con el scroll, el 0 % que se rellena y la foto con
+  paralaje (`animation-timeline: view()` donde el navegador lo soporta). Todo lo decorativo se detiene en menos
+  de cinco segundos (WCAG 2.2.2) y nada se mueve con movimiento reducido.
+- **Validación:** lint, tipos, 69 pruebas unitarias y 92 e2e (axe incluido) en verde contra el build local con la
+  API de QA. Lighthouse móvil local de la portada: rendimiento 89 (LCP 3,2 s por la foto, con el servidor local
+  llamando a la API remota), accesibilidad y buenas prácticas 100, CLS 0.
+- **Pendiente de Carlos:** fotos propias de motorizados y pasajeros para cambiar las de licencia libre.
+
 ## Orden recomendado
 M0 → M1 → M2 → M5 → M3 → M4 → M6 → M7 → M8 → M9 → M10.
 M5 va pronto porque cambia cómo se escriben todos los enlaces: hacerlo antes de reescribir las páginas evita

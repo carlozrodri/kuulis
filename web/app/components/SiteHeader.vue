@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Site header (docs/website-redesign/04 §2–§3): logo, main links and the download button; below 960 px the
 // links move to a full-screen menu that keeps focus inside, closes with Escape and returns focus to its button.
-// On a page that starts with a green hero (page meta `heroHeader`, or `heroHeader: 'ink'` for an ink one), the
+// On a page that starts with a hero (page meta `heroHeader`: true for green, 'ink' for night, 'photo' for a photo), the
 // header wears the hero's color until the hero (#hero) has scrolled out from under it, then turns solid light: an
 // IntersectionObserver, no scroll listener. Its color is solid, not transparent, so without JavaScript it is still
 // readable over every section.
@@ -98,7 +98,7 @@ onBeforeUnmount(() => {
 <template>
   <header
     class="header"
-    :class="{ 'on-hero': onHero, 'on-ink': onHero && route.meta.heroHeader === 'ink' }"
+    :class="{ 'on-hero': onHero, 'on-ink': onHero && route.meta.heroHeader === 'ink', 'on-photo': onHero && route.meta.heroHeader === 'photo' }"
   >
     <div class="container-wide bar">
       <NuxtLinkLocale
@@ -180,8 +180,10 @@ onBeforeUnmount(() => {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  background: var(--band-ink);
+  border-bottom: 1px solid var(--on-band-line);
+  color: var(--on-band);
+  --focus-outer: var(--on-band);
   transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
 }
 
@@ -198,21 +200,29 @@ onBeforeUnmount(() => {
   border-bottom-color: var(--band-ink);
 }
 
-.on-hero .brand,
-.on-hero .nav-link {
+/* Over a photo hero: the night field, a little see-through so the city shows behind it. Still dark enough to read
+   over any section without JavaScript. */
+.header.on-photo {
+  background: rgb(7 18 14 / 82%);
+  border-bottom-color: transparent;
+  backdrop-filter: blur(12px);
+}
+
+.brand,
+.nav-link {
   color: var(--on-band);
 }
 
-.on-hero .nav-link.router-link-active::after {
+.nav-link.router-link-active::after {
   background: var(--accent);
 }
 
-.on-hero .cta {
+.header .cta {
   background: var(--accent);
   color: var(--on-accent);
 }
 
-.on-hero .menu-button span {
+.menu-button span {
   background: var(--on-band);
 }
 
@@ -227,7 +237,7 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  color: var(--primary);
+  color: var(--on-band);
   text-decoration: none;
   margin-right: auto;
 }
@@ -239,13 +249,13 @@ onBeforeUnmount(() => {
 
 .nav-link {
   position: relative;
-  color: var(--text);
+  color: var(--on-band);
   font-weight: 600;
   text-decoration: none;
   padding: var(--space-2) 0;
 }
 
-/* The brand dot under the current page (green: yellow does not show on light backgrounds). */
+/* The brand dot under the current page, yellow on the night header. */
 .nav-link.router-link-active::after {
   content: '';
   position: absolute;
@@ -255,15 +265,11 @@ onBeforeUnmount(() => {
   height: 6px;
   margin-left: -3px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--accent);
 }
 
 @media (hover: hover) {
   .nav-link:hover {
-    color: var(--primary);
-  }
-
-  .on-hero .nav-link:hover {
     color: var(--on-band);
     text-decoration: underline;
     text-underline-offset: 6px;

@@ -8,6 +8,11 @@ const year = new Date().getFullYear()
 const route = useRoute()
 
 const legal = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as const
+// The photographs on the site are used under CC BY 2.0, which asks for the author and a link to the original.
+const photos = [
+  { key: 'photoNight', href: 'https://www.flickr.com/photos/10259776@N00/41787795821' },
+  { key: 'photoAvila', href: 'https://www.flickr.com/photos/47556918@N04/5385421318' },
+] as const
 </script>
 
 <template>
@@ -96,6 +101,25 @@ const legal = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as con
         </nav>
       </div>
 
+      <p class="container-wide credits">
+        {{ t('footer.photos') }}:
+        <template
+          v-for="(photo, i) in photos"
+          :key="photo.key"
+        >
+          <a
+            :href="photo.href"
+            rel="noopener"
+            target="_blank"
+          >{{ t(`footer.${photo.key}`) }}</a>{{ i < photos.length - 1 ? ' · ' : '' }}
+        </template>
+        (<a
+          href="https://creativecommons.org/licenses/by/2.0/"
+          rel="noopener license"
+          target="_blank"
+        >{{ t('footer.license') }}</a>)
+      </p>
+
       <div class="container-wide bottom">
         <p>© {{ year }} Kuulis · {{ t('footer.made') }}</p>
         <LanguageSwitch />
@@ -122,13 +146,23 @@ const legal = ['terms', 'privacy', 'community', 'driver_terms', 'wallet'] as con
 }
 
 .on-brand .skyline {
-  background: var(--band-brand);
+  background: var(--band-ink);
 }
 
 .band {
   background: var(--footer-bg);
   padding: var(--space-6) 0 var(--space-5);
   --focus-outer: var(--on-band);
+}
+
+.credits {
+  margin: var(--space-6) auto 0;
+  color: var(--on-band-soft);
+  font-size: var(--font-label);
+}
+
+.credits a {
+  color: inherit;
 }
 
 .grid-footer {

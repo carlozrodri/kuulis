@@ -60,11 +60,11 @@ test.describe('Spanish browser', () => {
     for (const [path, image] of pages) {
       await page.goto(path)
       const url = new URL((await page.locator('meta[property="og:image"]').getAttribute('content'))!)
-      expect(url.pathname, path).toBe(`/og/${image}.png`)
+      expect(url.pathname, path).toBe(`/og/${image}.jpg`)
       expect(await page.locator('meta[property="og:image:alt"]').getAttribute('content'), path).toBeTruthy()
       const file = await request.get(url.pathname)
       expect(file.status(), path).toBe(200)
-      expect(file.headers()['content-type']).toBe('image/png')
+      expect(file.headers()['content-type']).toBe('image/jpeg')
     }
   })
 

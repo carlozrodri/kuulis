@@ -26,16 +26,26 @@ const headers = useRequestHeaders(['user-agent'])
 const agent = import.meta.server ? headers['user-agent'] ?? '' : navigator.userAgent
 const isIphone = /iPhone|iPad|iPod/i.test(agent)
 const steps = computed(() => [1, 2, 3, 4].map(n => ({ key: `step${n}`, body: t(`download.android.step${n}`) })))
-// The header wears the hero's green until the hero scrolls past.
-definePageMeta({ heroHeader: true })
+// The header sits on the hero photo until it scrolls past.
+definePageMeta({ heroHeader: 'photo' })
 </script>
 
 <template>
   <div>
     <section
       id="hero"
-      class="hero band-brand"
+      class="hero band-photo"
     >
+      <img
+        class="photo"
+        src="/img/fotos/caracas-avila-1280.webp"
+        srcset="/img/fotos/caracas-avila-768.webp 768w, /img/fotos/caracas-avila-1280.webp 1280w, /img/fotos/caracas-avila-1920.webp 1920w"
+        sizes="100vw"
+        width="1920"
+        height="1440"
+        :alt="t('photos.avila')"
+        fetchpriority="high"
+      >
       <div class="container-wide grid-hero">
         <div>
           <BrandHeadline
@@ -134,9 +144,16 @@ definePageMeta({ heroHeader: true })
 
 <style scoped>
 .hero {
+  --photo-wash: linear-gradient(90deg, rgb(7 18 14 / 92%) 0%, rgb(7 18 14 / 78%) 50%, rgb(7 18 14 / 45%) 100%);
+
   /* The header (64/72 px) sits on this field. */
   margin-top: -64px;
   padding: calc(64px + clamp(40px, 7vw, 96px)) 0 clamp(56px, 7vw, 112px);
+  background: var(--night);
+}
+
+.photo {
+  object-position: center 30%;
 }
 
 .grid-hero {

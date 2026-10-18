@@ -53,3 +53,4 @@ Carlos respondió «apruebo todo»: vale la opción recomendada de cada pregunta
 | M8 · Producción e integración de assets | En parte 2026-10-17: imágenes para compartir; faltan capturas de la app (ver 07 M8) |
 | M9 · Movimiento, responsive fino y accesibilidad | Hecho 2026-10-17; TalkBack no verificado (ver 07 M9) |
 | M10 · Verificación final y salida | Verificado 2026-10-17; faltan las pruebas de Carlos y su OK para `main` (ver 08) |
+| M11 · Kuulis de noche | En revisión 2026-10-17: fotos, titulares de cartel y movimiento en toda la web (ver 07) |
