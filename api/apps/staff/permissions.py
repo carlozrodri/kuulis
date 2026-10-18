@@ -16,6 +16,7 @@ PERMISSIONS: dict[str, tuple[str, ...]] = {
     "referrals": ("referrals.view", "referrals.manage"),
     "rates": ("rates.view", "rates.manage"),
     "notifications": ("notifications.send",),
+    "marketing": ("marketing.view", "marketing.manage", "marketing.approve", "marketing.publish"),
     "wallet": ("wallet.view", "top_ups.view", "top_ups.manage", "transfers.view", "wallet.adjust"),
     "subscriptions": ("subscriptions.view", "subscriptions.manage"),
     "finance": ("finance.view", "finance.export", "finance.close"),
@@ -105,4 +106,11 @@ DEFAULT_ROLES: dict[str, tuple[str, tuple[str, ...]]] = {
             "referrals.manage",
         ),
     ),
+    # Social media (docs/marketing): the team that prepares content; Carlos (admin) approves it.
+    "marketing": (
+        "Marketing",
+        ("marketing.view", "marketing.manage", "marketing.publish"),
+    ),
+    # The person in Caracas who posts from a phone: only the day's posting cards.
+    "publicador": ("Publicador", ("marketing.publish",)),
 }

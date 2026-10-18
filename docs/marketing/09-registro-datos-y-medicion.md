@@ -29,7 +29,14 @@ herramientas y para no pagar dos veces por lo mismo).
 - **Acceso:** la persona que publica descarga con enlaces temporales firmados; nada es público.
 - **Tamaño estimado:** ~2 piezas al día × 3 redes × ~20 MB + originales ≈ 5–8 GB al mes. Se revisa al mes 1.
 
-## 2. Modelo de datos (propuesta)
+## 2. Modelo de datos (implementado en MK5)
+Implementado el 2026-10-18 en `api/apps/marketing`; el contrato está en [`docs/api/marketing.md`](../api/marketing.md).
+Diferencias con la propuesta de abajo: la versión por red apunta a sus archivos por id (`asset_id`,
+`cover_asset_id`) en vez de guardar la clave de S3; la hora de publicación va en cada versión (`scheduled_at`) y
+la pieza guarda solo el día (`scheduled_for`); el enlace con UTM se calcula al leer (no se guarda); el alcance de
+un aprendizaje son tres columnas (`platform`, `pillar`, `format`); y `marketing_experiment` queda para MK9, cuando
+haya datos que comparar.
+
 Sigue las convenciones de la API: una app por dominio, migraciones con Alembic, lógica en `services.py`,
 tareas lentas en `tasks.py`.
 

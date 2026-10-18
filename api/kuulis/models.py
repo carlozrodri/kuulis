@@ -17,6 +17,16 @@ from apps.control.models import Announcement, FeatureFlag  # noqa: F401
 from apps.drivers.models import DriverDocument, DriverProfile, Vehicle  # noqa: F401
 from apps.finance.models import MonthlyClosing  # noqa: F401
 from apps.legal.models import LegalAcceptance, LegalDocument  # noqa: F401
+from apps.marketing.models import (  # noqa: F401
+    MarketingAccount,
+    MarketingAsset,
+    MarketingContent,
+    MarketingLearning,
+    MarketingMetricSnapshot,
+    MarketingPublication,
+    MarketingSpend,
+    MarketingVariant,
+)
 from apps.moderation.models import Report, ReportMessage, ReportNote, Suspension  # noqa: F401
 from apps.notifications.models import Device, Notification  # noqa: F401
 from apps.places.models import SavedPlace  # noqa: F401

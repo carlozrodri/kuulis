@@ -38,7 +38,14 @@
     "risk": "Riesgo",
     "closings": "Cierres",
     "analytics": "Analítica",
-    "referrals": "Referidos"
+    "referrals": "Referidos",
+    "marketingCalendar": "Calendario",
+    "marketingApprove": "Aprobar contenido",
+    "marketingPublish": "Publicar",
+    "marketingPerformance": "Rendimiento",
+    "marketingLearnings": "Aprendizajes",
+    "marketingSpend": "Gasto",
+    "marketingAccounts": "Cuentas"
   },
   "navGroups": {
     "operations": "Operación",
@@ -47,7 +54,8 @@
     "money": "Finanzas",
     "messaging": "Comunicación",
     "platform": "App y sistema",
-    "administration": "Administración"
+    "administration": "Administración",
+    "marketing": "Redes sociales"
   },
   "navShort": {
     "reports": "Conversaciones",
@@ -184,7 +192,8 @@
       "risk": "Riesgo",
       "analytics": "Analítica",
       "zones": "Zonas",
-      "referrals": "Referidos"
+      "referrals": "Referidos",
+      "marketing": "Redes sociales"
     },
     "permissions": {
       "users": {
@@ -289,6 +298,12 @@
       "referrals": {
         "view": "Ver el programa de referidos",
         "manage": "Configurar el programa y pagar o rechazar premios"
+      },
+      "marketing": {
+        "view": "Ver el contenido, el rendimiento y el gasto",
+        "manage": "Crear y editar piezas, archivos, métricas y gasto",
+        "approve": "Aprobar el contenido o pedir cambios",
+        "publish": "Ver las publicaciones del día y marcarlas publicadas"
       }
     }
   },
@@ -458,7 +473,19 @@
     "zone_not_found": "La zona no existe",
     "city_not_found": "La ciudad no existe",
     "zone_invalid": "La zona no es válida",
-    "geojson_invalid": "El GeoJSON no es válido"
+    "geojson_invalid": "El GeoJSON no es válido",
+    "marketing_content_locked": "Esta pieza ya se publicó o se descartó: no se puede editar",
+    "marketing_invalid_transition": "La pieza no puede pasar a ese estado",
+    "marketing_not_ready": "Cada red necesita su archivo final y su hora antes de aprobar",
+    "marketing_asset_not_uploaded": "El archivo aún no está en el almacenamiento",
+    "marketing_invalid_asset": "Ese archivo no se puede usar aquí",
+    "marketing_already_published": "Esta publicación ya está marcada como publicada",
+    "marketing_not_approved": "Solo se pueden publicar piezas aprobadas",
+    "marketing_variant_exists": "La pieza ya tiene una versión para esa red",
+    "marketing_account_exists": "Esa cuenta ya está registrada",
+    "marketing_storage_disabled": "El almacenamiento de marketing no está configurado todavía",
+    "marketing_not_found": "No se encontró",
+    "month_invalid": "El mes no es válido"
   },
   "vehicleTypes": {
     "moto": "Moto",
@@ -3987,6 +4014,257 @@
         "budget_usd": "El presupuesto debe estar entre 0 y 1.000.000 USDT.",
         "dates": "La fecha final debe ser posterior a la inicial."
       }
+    }
+  },
+  "marketing": {
+    "statuses": {
+      "idea": "Idea",
+      "guion": "Guion",
+      "revisado": "Revisado",
+      "producido": "Producido",
+      "aprobado": "Aprobado",
+      "publicado": "Publicado",
+      "archivado": "Archivado",
+      "descartado": "Descartado"
+    },
+    "moveTo": {
+      "idea": "Volver a idea",
+      "guion": "Pasar a guion",
+      "revisado": "Marcar revisado",
+      "producido": "Marcar producido",
+      "aprobado": "Aprobar",
+      "publicado": "Marcar publicado",
+      "archivado": "Archivar",
+      "descartado": "Descartar"
+    },
+    "allStatuses": "Todos",
+    "allPlatforms": "Todas las redes",
+    "search": "Buscar por título o código",
+    "refresh": "Actualizar",
+    "new": "Nueva pieza",
+    "create": "Crear pieza",
+    "created": "Pieza {code} creada",
+    "edit": "Editar",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "today": "hoy",
+    "emptyMonth": "No hay piezas programadas este mes.",
+    "unscheduled": "Sin fecha",
+    "audiences": {
+      "ambos": "Motorizados y pasajeros",
+      "motorizado": "Motorizados",
+      "pasajero": "Pasajeros"
+    },
+    "productions": {
+      "ia": "IA",
+      "real": "Grabado",
+      "mixto": "Mixto"
+    },
+    "assetRoles": {
+      "final": "Final",
+      "original": "Original",
+      "portada": "Portada",
+      "fuente": "Fuente"
+    },
+    "fields": {
+      "title": "Título",
+      "pillar": "Pilar",
+      "pillarHelp": "Ej.: dinero, seguridad, humor",
+      "format": "Formato",
+      "formatHelp": "Ej.: subtitulos, dato, carrusel",
+      "audience": "Público",
+      "production": "Producción",
+      "scheduledFor": "Fecha planificada",
+      "scheduledForHelp": "Da nombre al código (K-AAAA-MM-DD-X)",
+      "usesCharacter": "Sale Kuu",
+      "notes": "Notas"
+    },
+    "byAgent": "por {agent}",
+    "createdAt": "Creada {date}",
+    "approvedAt": "aprobada {date}",
+    "reviewNote": "Cambios pedidos",
+    "approve": "Aprobar",
+    "approved": "Pieza aprobada",
+    "approvedCode": "{code} aprobada",
+    "requestChanges": "Pedir cambios",
+    "requestChangesHelp": "Qué hay que cambiar (lo leen los agentes y el equipo)",
+    "sendChanges": "Enviar",
+    "changesRequested": "Cambios pedidos",
+    "statusChanged": "Ahora está en «{status}»",
+    "backToApproval": "Guardado. La pieza vuelve a la cola de aprobación",
+    "variants": "Versiones por red",
+    "details": "Datos de la pieza",
+    "script": "Guion",
+    "noScript": "Sin guion cargado.",
+    "copyLink": "Copiar enlace",
+    "copiedLink": "Enlace copiado",
+    "approveHelp": "Revisa cada versión y apruébala para que llegue al teléfono de quien publica. Si algo no va, pide cambios.",
+    "approveEmpty": "No hay nada esperando aprobación.",
+    "variant": {
+      "add": "Añadir red",
+      "choosePlatform": "Elige una red",
+      "none": "Todavía no hay versiones por red.",
+      "delete": "Borrar versión",
+      "deleteTitle": "¿Borrar la versión de {platform}?",
+      "publishedAt": "Publicada {date}",
+      "missing": "Falta: {fields}",
+      "missingFields": {
+        "asset_id": "archivo final",
+        "scheduled_at": "hora"
+      },
+      "scheduledAt": "Fecha y hora (Caracas)",
+      "account": "Cuenta",
+      "file": "Archivo",
+      "cover": "Portada",
+      "noFile": "Sin archivo",
+      "noCover": "Sin portada",
+      "noTime": "Sin hora",
+      "title": "Título",
+      "titleHelp": "Para YouTube Shorts y la portada de Reels",
+      "caption": "Texto",
+      "hashtags": "Hashtags",
+      "hashtagsHelp": "De 3 a 6, separados por espacios",
+      "checklist": "Pasos extra para quien publica",
+      "checklistHelp": "Uno por línea. La etiqueta de IA se añade sola",
+      "aiLabel": "Etiqueta de contenido de IA",
+      "noAiLabel": "Sin etiqueta de IA",
+      "hook": "Gancho n.º"
+    },
+    "assets": {
+      "title": "Archivos",
+      "role": "Tipo",
+      "source": "Origen",
+      "sourceHelp": "remotion, higgsfield, buzzy…",
+      "upload": "Subir archivos",
+      "uploading": "Subiendo {name}…",
+      "uploaded": "{name} subido",
+      "none": "Todavía no hay archivos.",
+      "notUploaded": "Sin subir",
+      "download": "Descargar"
+    },
+    "metrics": {
+      "title": "Métricas",
+      "openPost": "Ver publicación",
+      "add": "Cargar métricas",
+      "addHelp": "Copia los números de las estadísticas de la red. Deja vacío lo que no veas.",
+      "saved": "Métricas guardadas",
+      "none": "Sin métricas",
+      "age": "Edad",
+      "hours": "{n} h",
+      "takenAt": "Tomadas el (Caracas)",
+      "takenAtHelp": "Vacío: ahora",
+      "fields": {
+        "views": "Vistas",
+        "reach": "Alcance",
+        "avg_watch_s": "Seg. vistos (prom.)",
+        "completion_rate": "Completado %",
+        "likes": "Me gusta",
+        "comments": "Comentarios",
+        "shares": "Compartidos",
+        "saves": "Guardados",
+        "follows": "Seguidores nuevos",
+        "profile_visits": "Visitas al perfil",
+        "link_clicks": "Clics al enlace"
+      }
+    },
+    "performance": {
+      "piece": "Pieza",
+      "platform": "Red",
+      "publishedAt": "Publicada",
+      "from": "Desde",
+      "to": "Hasta",
+      "empty": "Todavía no hay publicaciones.",
+      "totals": {
+        "publications": "Publicaciones",
+        "views": "Vistas",
+        "likes": "Me gusta",
+        "comments": "Comentarios",
+        "shares": "Compartidos",
+        "saves": "Guardados",
+        "completion": "Completado (prom.)"
+      }
+    },
+    "learnings": {
+      "new": "Nuevo aprendizaje",
+      "edit": "Editar aprendizaje",
+      "help": "Lo que los datos sugieren o demuestran, con las piezas que lo prueban.",
+      "statement": "Aprendizaje",
+      "evidence": "Evidencia",
+      "evidenceHelp": "Códigos de piezas y números",
+      "status": "Estado",
+      "statuses": {
+        "hipotesis": "Hipótesis",
+        "probado": "Probado",
+        "descartado": "Descartado"
+      }
+    },
+    "spend": {
+      "new": "Registrar gasto",
+      "total": "Total del mes",
+      "date": "Fecha",
+      "tool": "Herramienta",
+      "concept": "Concepto",
+      "amount": "Monto (USD)",
+      "notes": "Notas",
+      "delete": "Borrar",
+      "deleteTitle": "¿Borrar este gasto?",
+      "concepts": {
+        "suscripcion": "Suscripción",
+        "creditos": "Créditos",
+        "pauta": "Pauta",
+        "otro": "Otro"
+      }
+    },
+    "accounts": {
+      "new": "Añadir cuenta",
+      "edit": "Editar cuenta",
+      "help": "Las cuentas de Kuulis en cada red. Las claves y tokens nunca se guardan aquí.",
+      "empty": "Todavía no hay cuentas registradas.",
+      "handle": "Usuario",
+      "url": "Enlace",
+      "status": "Estado",
+      "connection": "Conexión",
+      "open": "Abrir",
+      "statuses": {
+        "pendiente": "Pendiente",
+        "activa": "Activa",
+        "suspendida": "Suspendida"
+      },
+      "connections": {
+        "manual": "Manual",
+        "api": "Por API"
+      }
+    },
+    "publish": {
+      "refresh": "Actualizar",
+      "previousDay": "Día anterior",
+      "nextDay": "Día siguiente",
+      "today": "Hoy",
+      "pending": "{n} por publicar",
+      "empty": "Nada que publicar este día",
+      "emptyHelp": "Cuando haya publicaciones aprobadas aparecerán aquí.",
+      "caracasTime": "hora de Caracas",
+      "publishedAt": "Publicado a las {time}",
+      "addLink": "Añadir enlace",
+      "cover": "Portada",
+      "downloadVideo": "Descargar video",
+      "downloadImage": "Descargar imagen",
+      "downloadCover": "Descargar portada",
+      "noFile": "Falta el archivo: avisa al equipo",
+      "title": "Título",
+      "caption": "Texto",
+      "hashtags": "Hashtags",
+      "checklist": "Antes de publicar",
+      "copy": "Copiar",
+      "copied": "{what} copiado",
+      "markDone": "Ya lo publiqué",
+      "confirmTitle": "¿Ya está publicado?",
+      "confirm": "Sí, publicado",
+      "postUrl": "Enlace de la publicación",
+      "postUrlHelp": "Opcional. Cópialo desde Compartir → Copiar enlace",
+      "badUrl": "El enlace debe empezar por https://",
+      "done": "¡Listo! Marcado como publicado",
+      "linkSaved": "Enlace guardado"
     }
   }
 }

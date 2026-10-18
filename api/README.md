@@ -50,6 +50,7 @@ uv run ruff check . && uv run ruff format --check .
 | `files` | Presigned S3 uploads/downloads. |
 | `realtime` | WebSocket fan-out through Redis pub/sub. Drivers also send `{"type": "location", lat, lng, heading?, speed?}` on it. |
 | `geo` | OSRM routes and Photon address search / reverse geocoding (`/geo/search`, `/geo/reverse`), limited to the service area and cached in Redis. |
+| `marketing` | Social media content registry (docs/marketing/09): pieces and their approval, versions per network, files in the `kuulis-marketing` bucket (`MARKETING_S3_*`), the day's posting cards, publications, manual metrics, learnings, spend and accounts. Contract in `docs/api/marketing.md`. |
 | `rides` | Quotes and pricing (Decimal, surge by Caracas time), rides and their state machine, driver presence (Redis GEO), matching, chat, mandatory ratings and `/admin/rides`. |
 
 The HTTP contract shared with the apps lives in `docs/api/`.
