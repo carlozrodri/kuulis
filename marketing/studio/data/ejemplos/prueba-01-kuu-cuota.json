@@ -1,0 +1,34 @@
+{
+  "codigo": "PRUEBA-01",
+  "salidas": [
+    {
+      "plantilla": "Subtitulos",
+      "redes": ["tiktok", "instagram", "youtube", "whatsapp"],
+      "props": {
+        "fondo": { "tipo": "color", "color": "noche" },
+        "gancho": { "texto": "Soy una IA y vengo a hablarte de plata.", "duracionS": 2.5 },
+        "subtitulos": [
+          { "desdeS": 0, "hastaS": 2.2, "texto": "Soy una IA… y vengo a hablarte de plata." },
+          { "desdeS": 2.2, "hastaS": 6, "texto": "Soy Kuu, la voz de Kuulis. Mira esta cuenta, motorizado." },
+          { "desdeS": 6, "hastaS": 9.5, "texto": "Si este mes ganaste $150 y la app te quita el 20 %…" },
+          { "desdeS": 9.5, "hastaS": 13, "texto": "…se te fueron $30." },
+          { "desdeS": 13, "hastaS": 17, "texto": "En Kuulis no hay comisión por carrera." },
+          { "desdeS": 17, "hastaS": 21, "texto": "Con $150 pagas $5. Y si el mes te fue mal, $0." },
+          { "desdeS": 21, "hastaS": 25, "texto": "Los primeros 3 meses, nada. Cuentas claras, y punto." }
+        ],
+        "textos": [
+          { "desdeS": 6, "hastaS": 13, "texto": "$150 → −20 % = −$30", "destacado": "−$30" },
+          { "desdeS": 13, "hastaS": 21, "texto": "Kuulis: $5 · mes flojo = $0", "destacado": "$5" },
+          { "desdeS": 21, "hastaS": 25, "texto": "3 meses sin cuota", "destacado": "3 meses" }
+        ],
+        "duracionS": 25,
+        "cierre": true
+      }
+    },
+    {
+      "plantilla": "Portada",
+      "redes": ["tiktok", "instagram", "youtube"],
+      "props": { "fondo": { "tipo": "color", "color": "verde" }, "titulo": "Soy una IA y vengo a hablarte de plata." }
+    }
+  ]
+}

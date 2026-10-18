@@ -55,11 +55,12 @@ aprueba todo lo que sale.
      ([09 §1.1](09-registro-datos-y-medicion.md#11-almacenamiento-de-archivos-decidido-2026-10-18)).
 
 ## Siguiente paso
-Cuando Carlos apruebe MK1: **MK4 · Estudio de plantillas** (Remotion), sin costo. Orden completo en
-[11](11-hoja-de-ruta.md).
+Cuando Carlos apruebe MK4: **MK5 · Registro y panel** (tablas en `api/apps/marketing`, bucket
+`kuulis-marketing` en MinIO y la página del publicador). Orden completo en [11](11-hoja-de-ruta.md).
 
 ## Avance
 | Paso | Estado |
 | --- | --- |
 | MK0 · Plan | Aprobado y fusionado 2026-10-18 (#76) |
-| MK1 · Marca para redes | En revisión 2026-10-18: [`marketing/`](../../marketing/README.md) con hechos, tono, identidad visual, biblia de Kuu, playbooks y los 5 guiones de la prueba |
+| MK1 · Marca para redes | Fusionado 2026-10-18 (#77): [`marketing/`](../../marketing/README.md) con hechos, tono, identidad visual, biblia de Kuu, playbooks y los 5 guiones de la prueba |
+| MK4 · Estudio de plantillas | En revisión 2026-10-18: [`marketing/studio/`](../../marketing/studio/README.md), 5 plantillas Remotion (Subtítulos, Dato, Cierre, Carrusel, Portada) que sacan los archivos por red y un manifiesto para S3 |

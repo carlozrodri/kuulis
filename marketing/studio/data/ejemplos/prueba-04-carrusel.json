@@ -1,0 +1,17 @@
+{
+  "codigo": "PRUEBA-04",
+  "salidas": [
+    {
+      "plantilla": "Carrusel",
+      "redes": ["instagram", "tiktok"],
+      "laminas": [
+        { "estilo": "noche", "titulo": "Carrera de $3. ¿Cuánto es tuyo?" },
+        { "estilo": "noche", "titulo": "Si una app te quita el 20 %:", "texto": "te quedan $2,40.", "destacado": "$2,40" },
+        { "estilo": "verde", "titulo": "En Kuulis:", "texto": "te quedas los $3.", "destacado": "$3" },
+        { "estilo": "verde", "titulo": "En un mes.", "texto": "50 carreras de $3 = $150. Con 20 % de comisión, se van $30.", "destacado": "$30" },
+        { "estilo": "verde", "titulo": "En Kuulis pagas $5.", "texto": "Si ganaste $100 o menos: $0. Nunca más de $30 al mes.", "destacado": "$0" },
+        { "estilo": "noche", "titulo": "3 meses sin cuota.", "texto": "Link en la bio · Comenta MOTO" }
+      ]
+    }
+  ]
+}

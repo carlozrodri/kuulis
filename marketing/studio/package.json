@@ -1,0 +1,36 @@
+{
+  "name": "kuulis-studio",
+  "private": true,
+  "type": "module",
+  "description": "Plantillas de video e imagen de Kuulis para redes (Remotion). Ver docs/marketing/11, MK4.",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "node scripts/render.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "node scripts/render.ts data/ejemplos/smoke.json --out out/smoke"
+  },
+  "dependencies": {
+    "@fontsource-variable/plus-jakarta-sans": "5.2.8",
+    "@remotion/bundler": "4.0.533",
+    "@remotion/cli": "4.0.533",
+    "@remotion/fonts": "4.0.533",
+    "@remotion/renderer": "4.0.533",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "remotion": "4.0.533",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.0",
+    "@types/react": "19.1.12",
+    "typescript": "5.9.2",
+    "vitest": "3.2.4"
+  },
+  "packageManager": "pnpm@10.18.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
