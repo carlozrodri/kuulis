@@ -1,4 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+// The S3 endpoint the API signs links for (AWS_S3_ENDPOINT); the CSP lets the panel talk to it.
+const STORAGE_ORIGIN = process.env.NUXT_STORAGE_ORIGIN || 'https://s3.top8.uk'
+
 export default defineNuxtConfig({
   // Internal admin panel: SPA served by the Nitro node server, no SEO needed.
   modules: ['@nuxt/ui', '@nuxtjs/i18n', '@nuxt/eslint'],
@@ -45,7 +49,10 @@ export default defineNuxtConfig({
           'style-src \'self\' \'unsafe-inline\'',
           'img-src \'self\' data: blob: https:',
           'font-src \'self\' data:',
-          'connect-src \'self\'',
+          // Uploads (attachments, marketing files) go straight to S3 with presigned PUTs, and the
+          // marketing previews play videos from S3 links: only that storage origin is allowed.
+          `media-src 'self' blob: ${STORAGE_ORIGIN}`,
+          `connect-src 'self' ${STORAGE_ORIGIN}`,
           'object-src \'none\'',
           'base-uri \'self\'',
           'form-action \'self\'',
