@@ -4265,6 +4265,14 @@
       "badUrl": "El enlace debe empezar por https://",
       "done": "¡Listo! Marcado como publicado",
       "linkSaved": "Enlace guardado"
+    },
+    "discardTitle": "¿Descartar esta pieza?",
+    "discardHelp": "Una pieza descartada no se puede editar ni recibir archivos. Para volver a trabajarla tendrás que pasarla a «Idea».",
+    "locked": {
+      "descartado": "Pieza descartada",
+      "archivado": "Pieza archivada",
+      "reopenHelp": "No se puede editar ni subir archivos. Pásala a «Idea» para volver a trabajarla.",
+      "help": "No se puede editar ni subir archivos."
     }
   }
 }

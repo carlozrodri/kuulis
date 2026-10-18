@@ -75,7 +75,15 @@ async function saveFields() {
 
 // ---- Status -----------------------------------------------------------------------------------
 const moving = ref<MarketingStatus | null>(null)
+// Discarding locks the piece (no edits, no uploads) until it goes back to "idea": confirm first.
+const discardOpen = ref(false)
+function pick(next: MarketingStatus) {
+  if (next === 'descartado') discardOpen.value = true
+  else move(next)
+}
+
 async function move(next: MarketingStatus) {
+  discardOpen.value = false
   moving.value = next
   try {
     content.value = await request<MarketingContent>(`/admin/marketing/contents/${id.value}/status`, { method: 'POST', body: { status: next } })
@@ -206,6 +214,18 @@ const scriptText = computed(() => JSON.stringify(content.value?.script ?? {}, nu
           :description="content.review_note"
         />
 
+        <UAlert
+          v-if="content.status === 'descartado' || content.status === 'archivado'"
+          color="neutral"
+          variant="subtle"
+          icon="i-lucide-lock"
+          :title="t(`marketing.locked.${content.status}`)"
+          :description="t(content.allowed_statuses.includes('idea') ? 'marketing.locked.reopenHelp' : 'marketing.locked.help')"
+          :actions="canManage && content.allowed_statuses.includes('idea')
+            ? [{ label: t('marketing.moveTo.idea'), icon: 'i-lucide-undo-2', loading: moving === 'idea', onClick: () => move('idea') }]
+            : []"
+        />
+
         <!-- Actions -->
         <div class="flex flex-wrap gap-2">
           <template v-if="canApprove && content.status === 'producido'">
@@ -232,7 +252,7 @@ const scriptText = computed(() => JSON.stringify(content.value?.script ?? {}, nu
               variant="outline"
               :loading="moving === next"
               :label="t(`marketing.moveTo.${next}`)"
-              @click="move(next)"
+              @click="pick(next)"
             />
           </template>
         </div>
@@ -284,7 +304,7 @@ const scriptText = computed(() => JSON.stringify(content.value?.script ?? {}, nu
             <MarketingAssetsCard
               :content-id="content.id"
               :assets="content.assets"
-              :can-upload="canManage"
+              :can-upload="editable"
               @updated="updated"
             />
           </div>
@@ -429,6 +449,29 @@ const scriptText = computed(() => JSON.stringify(content.value?.script ?? {}, nu
               :label="t('marketing.sendChanges')"
               :disabled="!changesNote.trim()"
               @click="requestChanges"
+            />
+          </div>
+        </template>
+      </UModal>
+
+      <UModal
+        v-model:open="discardOpen"
+        :title="t('marketing.discardTitle')"
+        :description="t('marketing.discardHelp')"
+      >
+        <template #footer>
+          <div class="flex w-full justify-end gap-2">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              :label="t('common.cancel')"
+              @click="discardOpen = false"
+            />
+            <UButton
+              color="error"
+              :label="t('marketing.moveTo.descartado')"
+              :loading="moving === 'descartado'"
+              @click="move('descartado')"
             />
           </div>
         </template>

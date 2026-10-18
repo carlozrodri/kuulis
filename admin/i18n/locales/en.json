@@ -4265,6 +4265,14 @@
       "badUrl": "The link must start with https://",
       "done": "Done! Marked as posted",
       "linkSaved": "Link saved"
+    },
+    "discardTitle": "Discard this piece?",
+    "discardHelp": "A discarded piece can't be edited or receive files. To work on it again you'll have to move it back to “Idea”.",
+    "locked": {
+      "descartado": "Discarded piece",
+      "archivado": "Archived piece",
+      "reopenHelp": "It can't be edited or receive files. Move it back to “Idea” to work on it again.",
+      "help": "It can't be edited or receive files."
     }
   }
 }
