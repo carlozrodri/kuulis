@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// A phone showing real app screens (captured from the passenger app on 2026-10-17, public/img/app). With several
-// screens, `active` picks the one on display and the others fade out. Each screen follows the visitor's theme.
+// A phone showing real app screens (captured by Carlos from the passenger app in dark mode on 2026-10-18,
+// public/img/app). With several screens, `active` picks the one on display and the others fade out.
 const props = withDefaults(defineProps<{ screens: string[], active?: number, eager?: boolean }>(), { active: 0, eager: false })
 </script>
 
@@ -10,24 +10,17 @@ const props = withDefaults(defineProps<{ screens: string[], active?: number, eag
     aria-hidden="true"
   >
     <div class="screen">
-      <picture
+      <img
         v-for="(screen, i) in props.screens"
         :key="screen"
         :class="{ on: i === active }"
+        :src="`/img/app/${screen}.webp`"
+        alt=""
+        width="590"
+        height="1278"
+        :loading="eager ? 'eager' : 'lazy'"
+        decoding="async"
       >
-        <source
-          :srcset="`/img/app/${screen}-oscuro.webp`"
-          media="(prefers-color-scheme: dark)"
-        >
-        <img
-          :src="`/img/app/${screen}-claro.webp`"
-          alt=""
-          width="590"
-          height="1278"
-          :loading="eager ? 'eager' : 'lazy'"
-          decoding="async"
-        >
-      </picture>
     </div>
     <slot />
   </div>
@@ -68,22 +61,19 @@ const props = withDefaults(defineProps<{ screens: string[], active?: number, eag
   background: var(--surface-alt);
 }
 
-picture {
+img {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   opacity: 0;
   transform: scale(1.04);
   transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
 }
 
-picture.on {
+img.on {
   opacity: 1;
   transform: none;
-}
-
-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 </style>
