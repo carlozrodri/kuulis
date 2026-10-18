@@ -55,8 +55,8 @@ aprueba todo lo que sale.
      ([09 §1.1](09-registro-datos-y-medicion.md#11-almacenamiento-de-archivos-decidido-2026-10-18)).
 
 ## Siguiente paso
-**MK4 · Estudio de plantillas** (Remotion) cuando Carlos apruebe MK1. MK1 entregó hechos permitidos, tono, biblia de «Kuu», playbooks de ganchos y los 5 guiones de
-la prueba Higgsfield vs Buzzy), sin costo, cuando Carlos lo pida. Orden completo en [11](11-hoja-de-ruta.md).
+Cuando Carlos apruebe MK1: **MK4 · Estudio de plantillas** (Remotion), sin costo. Orden completo en
+[11](11-hoja-de-ruta.md).
 
 ## Avance
 | Paso | Estado |
