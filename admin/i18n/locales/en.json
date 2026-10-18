@@ -38,7 +38,14 @@
     "risk": "Risk",
     "closings": "Closings",
     "analytics": "Analytics",
-    "referrals": "Referrals"
+    "referrals": "Referrals",
+    "marketingCalendar": "Calendar",
+    "marketingApprove": "Approve content",
+    "marketingPublish": "Post",
+    "marketingPerformance": "Performance",
+    "marketingLearnings": "Learnings",
+    "marketingSpend": "Spend",
+    "marketingAccounts": "Accounts"
   },
   "navGroups": {
     "operations": "Operations",
@@ -47,7 +54,8 @@
     "money": "Finance",
     "messaging": "Messaging",
     "platform": "App and system",
-    "administration": "Administration"
+    "administration": "Administration",
+    "marketing": "Social media"
   },
   "navShort": {
     "reports": "Conversations",
@@ -184,7 +192,8 @@
       "risk": "Risk",
       "analytics": "Analytics",
       "zones": "Zones",
-      "referrals": "Referrals"
+      "referrals": "Referrals",
+      "marketing": "Social media"
     },
     "permissions": {
       "users": {
@@ -289,6 +298,12 @@
       "referrals": {
         "view": "See the referral program",
         "manage": "Set up the program and pay or reject rewards"
+      },
+      "marketing": {
+        "view": "See content, performance and spend",
+        "manage": "Create and edit pieces, files, metrics and spend",
+        "approve": "Approve content or request changes",
+        "publish": "See the day's posts and mark them posted"
       }
     }
   },
@@ -458,7 +473,19 @@
     "zone_not_found": "The zone does not exist",
     "city_not_found": "The city does not exist",
     "zone_invalid": "The zone is not valid",
-    "geojson_invalid": "The GeoJSON is not valid"
+    "geojson_invalid": "The GeoJSON is not valid",
+    "marketing_content_locked": "This piece was already published or discarded: it can't be edited",
+    "marketing_invalid_transition": "The piece can't move to that status",
+    "marketing_not_ready": "Every network needs its final file and time before approval",
+    "marketing_asset_not_uploaded": "The file is not in storage yet",
+    "marketing_invalid_asset": "That file can't be used here",
+    "marketing_already_published": "This post is already marked as published",
+    "marketing_not_approved": "Only approved pieces can be posted",
+    "marketing_variant_exists": "The piece already has a version for that network",
+    "marketing_account_exists": "That account is already registered",
+    "marketing_storage_disabled": "Marketing storage is not configured yet",
+    "marketing_not_found": "Not found",
+    "month_invalid": "The month is not valid"
   },
   "vehicleTypes": {
     "moto": "Motorcycle",
@@ -3987,6 +4014,257 @@
         "budget_usd": "The budget must be between 0 and 1,000,000 USDT.",
         "dates": "The end date must be after the start date."
       }
+    }
+  },
+  "marketing": {
+    "statuses": {
+      "idea": "Idea",
+      "guion": "Script",
+      "revisado": "Reviewed",
+      "producido": "Produced",
+      "aprobado": "Approved",
+      "publicado": "Published",
+      "archivado": "Archived",
+      "descartado": "Discarded"
+    },
+    "moveTo": {
+      "idea": "Back to idea",
+      "guion": "Move to script",
+      "revisado": "Mark reviewed",
+      "producido": "Mark produced",
+      "aprobado": "Approve",
+      "publicado": "Mark published",
+      "archivado": "Archive",
+      "descartado": "Discard"
+    },
+    "allStatuses": "All",
+    "allPlatforms": "All networks",
+    "search": "Search by title or code",
+    "refresh": "Refresh",
+    "new": "New piece",
+    "create": "Create piece",
+    "created": "Piece {code} created",
+    "edit": "Edit",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "today",
+    "emptyMonth": "No pieces scheduled this month.",
+    "unscheduled": "No date",
+    "audiences": {
+      "ambos": "Drivers and riders",
+      "motorizado": "Drivers",
+      "pasajero": "Riders"
+    },
+    "productions": {
+      "ia": "AI",
+      "real": "Filmed",
+      "mixto": "Mixed"
+    },
+    "assetRoles": {
+      "final": "Final",
+      "original": "Original",
+      "portada": "Cover",
+      "fuente": "Source"
+    },
+    "fields": {
+      "title": "Title",
+      "pillar": "Pillar",
+      "pillarHelp": "E.g. money, safety, humor",
+      "format": "Format",
+      "formatHelp": "E.g. subtitulos, dato, carrusel",
+      "audience": "Audience",
+      "production": "Production",
+      "scheduledFor": "Planned date",
+      "scheduledForHelp": "Names the code (K-YYYY-MM-DD-X)",
+      "usesCharacter": "Kuu appears",
+      "notes": "Notes"
+    },
+    "byAgent": "by {agent}",
+    "createdAt": "Created {date}",
+    "approvedAt": "approved {date}",
+    "reviewNote": "Changes requested",
+    "approve": "Approve",
+    "approved": "Piece approved",
+    "approvedCode": "{code} approved",
+    "requestChanges": "Request changes",
+    "requestChangesHelp": "What needs to change (agents and the team read it)",
+    "sendChanges": "Send",
+    "changesRequested": "Changes requested",
+    "statusChanged": "Now in “{status}”",
+    "backToApproval": "Saved. The piece goes back to the approval queue",
+    "variants": "Versions per network",
+    "details": "Piece details",
+    "script": "Script",
+    "noScript": "No script loaded.",
+    "copyLink": "Copy link",
+    "copiedLink": "Link copied",
+    "approveHelp": "Review each version and approve it so it reaches the poster's phone. If something is off, request changes.",
+    "approveEmpty": "Nothing is waiting for approval.",
+    "variant": {
+      "add": "Add network",
+      "choosePlatform": "Choose a network",
+      "none": "No versions per network yet.",
+      "delete": "Delete version",
+      "deleteTitle": "Delete the {platform} version?",
+      "publishedAt": "Posted {date}",
+      "missing": "Missing: {fields}",
+      "missingFields": {
+        "asset_id": "final file",
+        "scheduled_at": "time"
+      },
+      "scheduledAt": "Date and time (Caracas)",
+      "account": "Account",
+      "file": "File",
+      "cover": "Cover",
+      "noFile": "No file",
+      "noCover": "No cover",
+      "noTime": "No time",
+      "title": "Title",
+      "titleHelp": "For YouTube Shorts and the Reels cover",
+      "caption": "Caption",
+      "hashtags": "Hashtags",
+      "hashtagsHelp": "3 to 6, separated by spaces",
+      "checklist": "Extra steps for the poster",
+      "checklistHelp": "One per line. The AI label step is added automatically",
+      "aiLabel": "AI content label",
+      "noAiLabel": "No AI label",
+      "hook": "Hook #"
+    },
+    "assets": {
+      "title": "Files",
+      "role": "Type",
+      "source": "Source",
+      "sourceHelp": "remotion, higgsfield, buzzy…",
+      "upload": "Upload files",
+      "uploading": "Uploading {name}…",
+      "uploaded": "{name} uploaded",
+      "none": "No files yet.",
+      "notUploaded": "Not uploaded",
+      "download": "Download"
+    },
+    "metrics": {
+      "title": "Metrics",
+      "openPost": "Open post",
+      "add": "Add metrics",
+      "addHelp": "Copy the numbers from the network's insights. Leave blank what you can't see.",
+      "saved": "Metrics saved",
+      "none": "No metrics",
+      "age": "Age",
+      "hours": "{n} h",
+      "takenAt": "Taken at (Caracas)",
+      "takenAtHelp": "Blank: now",
+      "fields": {
+        "views": "Views",
+        "reach": "Reach",
+        "avg_watch_s": "Avg. watch (s)",
+        "completion_rate": "Completion %",
+        "likes": "Likes",
+        "comments": "Comments",
+        "shares": "Shares",
+        "saves": "Saves",
+        "follows": "New followers",
+        "profile_visits": "Profile visits",
+        "link_clicks": "Link clicks"
+      }
+    },
+    "performance": {
+      "piece": "Piece",
+      "platform": "Network",
+      "publishedAt": "Posted",
+      "from": "From",
+      "to": "To",
+      "empty": "No posts yet.",
+      "totals": {
+        "publications": "Posts",
+        "views": "Views",
+        "likes": "Likes",
+        "comments": "Comments",
+        "shares": "Shares",
+        "saves": "Saves",
+        "completion": "Completion (avg.)"
+      }
+    },
+    "learnings": {
+      "new": "New learning",
+      "edit": "Edit learning",
+      "help": "What the data suggests or proves, with the pieces that show it.",
+      "statement": "Learning",
+      "evidence": "Evidence",
+      "evidenceHelp": "Piece codes and numbers",
+      "status": "Status",
+      "statuses": {
+        "hipotesis": "Hypothesis",
+        "probado": "Proven",
+        "descartado": "Discarded"
+      }
+    },
+    "spend": {
+      "new": "Add spend",
+      "total": "Month total",
+      "date": "Date",
+      "tool": "Tool",
+      "concept": "Concept",
+      "amount": "Amount (USD)",
+      "notes": "Notes",
+      "delete": "Delete",
+      "deleteTitle": "Delete this spend?",
+      "concepts": {
+        "suscripcion": "Subscription",
+        "creditos": "Credits",
+        "pauta": "Ads",
+        "otro": "Other"
+      }
+    },
+    "accounts": {
+      "new": "Add account",
+      "edit": "Edit account",
+      "help": "Kuulis accounts on each network. Passwords and tokens are never stored here.",
+      "empty": "No accounts registered yet.",
+      "handle": "Handle",
+      "url": "Link",
+      "status": "Status",
+      "connection": "Connection",
+      "open": "Open",
+      "statuses": {
+        "pendiente": "Pending",
+        "activa": "Active",
+        "suspendida": "Suspended"
+      },
+      "connections": {
+        "manual": "Manual",
+        "api": "By API"
+      }
+    },
+    "publish": {
+      "refresh": "Refresh",
+      "previousDay": "Previous day",
+      "nextDay": "Next day",
+      "today": "Today",
+      "pending": "{n} to post",
+      "empty": "Nothing to post this day",
+      "emptyHelp": "Approved posts will show up here.",
+      "caracasTime": "Caracas time",
+      "publishedAt": "Posted at {time}",
+      "addLink": "Add link",
+      "cover": "Cover",
+      "downloadVideo": "Download video",
+      "downloadImage": "Download image",
+      "downloadCover": "Download cover",
+      "noFile": "The file is missing: tell the team",
+      "title": "Title",
+      "caption": "Caption",
+      "hashtags": "Hashtags",
+      "checklist": "Before posting",
+      "copy": "Copy",
+      "copied": "{what} copied",
+      "markDone": "I posted it",
+      "confirmTitle": "Is it posted?",
+      "confirm": "Yes, posted",
+      "postUrl": "Post link",
+      "postUrlHelp": "Optional. Copy it from Share → Copy link",
+      "badUrl": "The link must start with https://",
+      "done": "Done! Marked as posted",
+      "linkSaved": "Link saved"
     }
   }
 }

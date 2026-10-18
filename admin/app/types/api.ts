@@ -2513,3 +2513,222 @@ export interface ReferralRanking {
   rewarded: number
   earned_usd: Decimal
 }
+
+// ---- Marketing (docs/marketing/09) -------------------------------------------------------------
+
+export const MARKETING_STATUSES = ['idea', 'guion', 'revisado', 'producido', 'aprobado', 'publicado', 'archivado', 'descartado'] as const
+export type MarketingStatus = typeof MARKETING_STATUSES[number]
+export const MARKETING_PLATFORMS = ['tiktok', 'instagram', 'youtube', 'whatsapp', 'facebook'] as const
+export type MarketingPlatform = typeof MARKETING_PLATFORMS[number]
+export const MARKETING_AUDIENCES = ['ambos', 'motorizado', 'pasajero'] as const
+export type MarketingAudience = typeof MARKETING_AUDIENCES[number]
+export const MARKETING_PRODUCTIONS = ['ia', 'real', 'mixto'] as const
+export type MarketingProduction = typeof MARKETING_PRODUCTIONS[number]
+export const MARKETING_ASSET_ROLES = ['final', 'original', 'portada', 'fuente'] as const
+export type MarketingAssetRole = typeof MARKETING_ASSET_ROLES[number]
+export type MarketingAssetKind = 'video' | 'imagen' | 'audio'
+export const LEARNING_STATUSES = ['hipotesis', 'probado', 'descartado'] as const
+export type LearningStatus = typeof LEARNING_STATUSES[number]
+export const SPEND_CONCEPTS = ['suscripcion', 'creditos', 'pauta', 'otro'] as const
+export type SpendConcept = typeof SPEND_CONCEPTS[number]
+export const ACCOUNT_STATUSES = ['pendiente', 'activa', 'suspendida'] as const
+export type MarketingAccountStatus = typeof ACCOUNT_STATUSES[number]
+export const ACCOUNT_CONNECTIONS = ['manual', 'api'] as const
+export type MarketingConnection = typeof ACCOUNT_CONNECTIONS[number]
+
+export interface MarketingContentSummary {
+  id: string
+  code: string
+  title: string
+  pillar: string | null
+  format: string | null
+  audience: MarketingAudience
+  status: MarketingStatus
+  production: MarketingProduction
+  uses_character: boolean
+  scheduled_for: Day | null
+  created_by_agent: string | null
+  approved_at: string | null
+  created_at: string
+  updated_at: string
+  platforms: MarketingPlatform[]
+  next_post_at: string | null
+}
+
+export interface MarketingAsset {
+  id: string
+  kind: MarketingAssetKind
+  role: MarketingAssetRole
+  source: string
+  model: string | null
+  prompt: string | null
+  credits_used: Decimal | null
+  cost_usd: Decimal | null
+  rights: string | null
+  s3_key: string
+  filename: string
+  content_type: string
+  size: number
+  width: number | null
+  height: number | null
+  duration_s: number | null
+  uploaded_at: string | null
+  created_at: string
+  download_url: string | null
+}
+
+export interface MarketingAssetUpload {
+  asset: MarketingAsset
+  upload_url: string
+  method: 'PUT'
+  headers: Record<string, string>
+}
+
+export interface MarketingMetricFields {
+  views: number | null
+  reach: number | null
+  avg_watch_s: number | null
+  /** 0..1 */
+  completion_rate: number | null
+  likes: number | null
+  comments: number | null
+  shares: number | null
+  saves: number | null
+  follows: number | null
+  profile_visits: number | null
+  link_clicks: number | null
+}
+
+export interface MarketingMetric extends MarketingMetricFields {
+  id: string
+  taken_at: string
+  age_h: number
+  source: MarketingConnection
+}
+
+export interface MarketingPublication {
+  id: string
+  variant_id: string
+  platform: MarketingPlatform
+  account: string | null
+  external_id: string | null
+  url: string | null
+  published_at: string
+  method: MarketingConnection
+  metrics: MarketingMetric[]
+}
+
+export interface MarketingVariant {
+  id: string
+  platform: MarketingPlatform
+  account: string | null
+  hook_index: number
+  title: string | null
+  caption: string
+  hashtags: string[]
+  checklist: string[]
+  ai_label: boolean
+  duration_s: number | null
+  asset_id: string | null
+  cover_asset_id: string | null
+  scheduled_at: string | null
+  utm_url: string
+  publication: MarketingPublication | null
+}
+
+export interface MarketingContent extends MarketingContentSummary {
+  script: Record<string, unknown>
+  notes: string | null
+  review_note: string | null
+  variants: MarketingVariant[]
+  assets: MarketingAsset[]
+  allowed_statuses: MarketingStatus[]
+}
+
+export interface MarketingVariantInput {
+  account: string | null
+  hook_index: number
+  title: string | null
+  caption: string
+  hashtags: string[]
+  checklist: string[]
+  ai_label: boolean
+  asset_id: string | null
+  cover_asset_id: string | null
+  scheduled_at: string | null
+}
+
+export interface PostingCard {
+  variant_id: string
+  content_id: string
+  code: string
+  content_title: string
+  platform: MarketingPlatform
+  account: string | null
+  scheduled_at: string
+  title: string | null
+  caption: string
+  /** Already with "#". */
+  hashtags: string[]
+  checklist: string[]
+  file_url: string | null
+  file_name: string | null
+  file_kind: MarketingAssetKind | null
+  cover_url: string | null
+  publication_id: string | null
+  published_at: string | null
+  published_url: string | null
+}
+
+export interface MarketingPerformanceRow {
+  publication_id: string
+  content_id: string
+  code: string
+  title: string
+  pillar: string | null
+  format: string | null
+  platform: MarketingPlatform
+  hook_index: number
+  url: string | null
+  published_at: string
+  snapshots: number
+  latest: MarketingMetric | null
+}
+
+export interface MarketingLearning {
+  id: string
+  statement: string
+  evidence: string | null
+  status: LearningStatus
+  platform: MarketingPlatform | null
+  pillar: string | null
+  format: string | null
+  reviewed_at: string | null
+  created_at: string
+}
+
+export interface MarketingSpend {
+  id: string
+  date: Day
+  tool: string
+  concept: SpendConcept
+  amount_usd: Decimal
+  notes: string | null
+}
+
+export interface MarketingSpendMonth {
+  month: string
+  total: Decimal
+  by_tool: Record<string, Decimal>
+  items: MarketingSpend[]
+}
+
+export interface MarketingAccount {
+  id: string
+  platform: MarketingPlatform
+  handle: string
+  url: string | null
+  status: MarketingAccountStatus
+  connection: MarketingConnection
+  notes: string | null
+}

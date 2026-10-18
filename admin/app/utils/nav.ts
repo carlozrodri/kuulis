@@ -12,7 +12,7 @@ export interface NavEntry {
   shortLabel?: string
 }
 
-export type NavGroupKey = 'operations' | 'people' | 'support' | 'money' | 'messaging' | 'platform' | 'administration'
+export type NavGroupKey = 'operations' | 'people' | 'support' | 'money' | 'messaging' | 'marketing' | 'platform' | 'administration'
 
 /** Sections in menu order, each folding its pages. */
 export const NAV_GROUPS: { key: NavGroupKey, icon: string }[] = [
@@ -21,6 +21,7 @@ export const NAV_GROUPS: { key: NavGroupKey, icon: string }[] = [
   { key: 'support', icon: 'i-lucide-life-buoy' },
   { key: 'money', icon: 'i-lucide-landmark' },
   { key: 'messaging', icon: 'i-lucide-megaphone' },
+  { key: 'marketing', icon: 'i-lucide-clapperboard' },
   { key: 'platform', icon: 'i-lucide-smartphone' },
   { key: 'administration', icon: 'i-lucide-shield-check' },
 ]
@@ -54,6 +55,13 @@ export const NAV: NavEntry[] = [
   { key: 'notifications', icon: 'i-lucide-bell', to: '/notifications', permission: 'notifications.send', group: 'messaging' },
   { key: 'announcements', icon: 'i-lucide-megaphone', to: '/announcements', permission: 'announcements.view', group: 'messaging' },
   { key: 'emailTemplates', icon: 'i-lucide-mail', to: '/email-templates', permission: 'notifications.send', group: 'messaging' },
+  { key: 'marketingCalendar', icon: 'i-lucide-calendar-days', to: '/marketing', permission: 'marketing.view', group: 'marketing' },
+  { key: 'marketingApprove', icon: 'i-lucide-badge-check', to: '/marketing/aprobar', permission: 'marketing.approve', group: 'marketing' },
+  { key: 'marketingPublish', icon: 'i-lucide-smartphone-charging', to: '/marketing/publicar', permission: 'marketing.publish', group: 'marketing' },
+  { key: 'marketingPerformance', icon: 'i-lucide-chart-column', to: '/marketing/rendimiento', permission: 'marketing.view', group: 'marketing' },
+  { key: 'marketingLearnings', icon: 'i-lucide-lightbulb', to: '/marketing/aprendizajes', permission: 'marketing.view', group: 'marketing' },
+  { key: 'marketingSpend', icon: 'i-lucide-receipt', to: '/marketing/gasto', permission: 'marketing.view', group: 'marketing' },
+  { key: 'marketingAccounts', icon: 'i-lucide-at-sign', to: '/marketing/cuentas', permission: 'marketing.view', group: 'marketing' },
   { key: 'appStatus', icon: 'i-lucide-power', to: '/app-status', permission: 'app_status.view', group: 'platform' },
   { key: 'flags', icon: 'i-lucide-toggle-right', to: '/flags', permission: 'flags.view', group: 'platform' },
   { key: 'versions', icon: 'i-lucide-smartphone', to: '/versions', permission: 'releases.view', group: 'platform' },

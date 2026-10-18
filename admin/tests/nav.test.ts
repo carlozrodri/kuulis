@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { activeNavEntry, NAV, NAV_GROUPS, navTree } from '../app/utils/nav'
+import { activeNavEntry, homePath, NAV, NAV_GROUPS, navTree } from '../app/utils/nav'
 
 const none = () => false
 
@@ -35,5 +35,20 @@ describe('admin menu', () => {
     expect(activeNavEntry('/drivers/123')?.key).toBe('drivers')
     expect(activeNavEntry('/')?.key).toBe('dashboard')
     expect(activeNavEntry('/support/canned')?.key).toBe('cannedReplies')
+    expect(activeNavEntry('/marketing/piezas/abc')?.key).toBe('marketingCalendar')
+    expect(activeNavEntry('/marketing/publicar')?.key).toBe('marketingPublish')
+  })
+
+  it('sends the person who posts straight to the posting cards', () => {
+    const can = (p: string) => p === 'marketing.publish'
+    expect(homePath(false, can)).toBe('/marketing/publicar')
+    const tree = navTree(false, can)
+    expect(tree.find(n => n.kind === 'entry' && n.entry.key === 'marketingPublish')).toBeTruthy()
+  })
+
+  it('shows the approval queue only to who can approve', () => {
+    const team = (p: string) => ['marketing.view', 'marketing.manage', 'marketing.publish'].includes(p)
+    const group = navTree(false, team).find(n => n.kind === 'group' && n.key === 'marketing')
+    expect(group?.kind === 'group' && group.entries.map(e => e.key)).not.toContain('marketingApprove')
   })
 })
