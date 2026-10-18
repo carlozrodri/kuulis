@@ -210,7 +210,8 @@
     "file_too_large": [
       "apps/drivers/services.py",
       "apps/drivers/verification.py",
-      "apps/files/router.py"
+      "apps/files/router.py",
+      "apps/marketing/services.py"
     ],
     "file_type_not_allowed": [
       "apps/drivers/services.py",
@@ -286,6 +287,40 @@
     "lost_item_too_late": [
       "apps/support/services.py"
     ],
+    "marketing_account_exists": [
+      "apps/marketing/services.py"
+    ],
+    "marketing_already_published": [
+      "apps/marketing/services.py"
+    ],
+    "marketing_asset_not_uploaded": [
+      "apps/marketing/services.py"
+    ],
+    "marketing_content_locked": [
+      "apps/marketing/services.py"
+    ],
+    "marketing_invalid_asset": [
+      "apps/marketing/services.py"
+    ],
+    "marketing_invalid_transition": [
+      "apps/marketing/services.py"
+    ],
+    "marketing_not_approved": [
+      "apps/marketing/services.py"
+    ],
+    "marketing_not_found": [
+      "apps/marketing/router.py",
+      "apps/marketing/services.py"
+    ],
+    "marketing_not_ready": [
+      "apps/marketing/services.py"
+    ],
+    "marketing_storage_disabled": [
+      "apps/marketing/storage.py"
+    ],
+    "marketing_variant_exists": [
+      "apps/marketing/services.py"
+    ],
     "mock_location": [
       "apps/risk/services.py"
     ],
@@ -293,7 +328,8 @@
       "apps/finance/services.py"
     ],
     "month_invalid": [
-      "apps/analytics/router.py"
+      "apps/analytics/router.py",
+      "apps/marketing/router.py"
     ],
     "month_not_closed": [
       "apps/subscriptions/services.py"

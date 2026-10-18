@@ -82,6 +82,14 @@ class BaseAppSettings(BaseSettings):
     # Days between "delete my account" and erasing the personal data (signing in cancels it).
     ACCOUNT_DELETION_GRACE_DAYS: int = 30
     STORAGE_MAX_UPLOAD_MB: int = 20
+    # Social media content (docs/marketing/09): its own bucket and, ideally, a key limited to it.
+    # Endpoint and region are the ones above; empty credentials reuse AWS_ACCESS_KEY_ID/SECRET.
+    MARKETING_S3_BUCKET: str = ""
+    MARKETING_S3_ACCESS_KEY_ID: str = ""
+    MARKETING_S3_SECRET_ACCESS_KEY: str = ""
+    MARKETING_MAX_UPLOAD_MB: int = 500
+    # Download links in the posting package: long enough to download a video on a slow connection.
+    MARKETING_DOWNLOAD_URL_SECONDS: int = 3600
 
     # --- App updates (doc 09) ---------------------------------------------------
     # Private key (PEM, "\n" escapes allowed) that signs the OTA manifests. Its certificate ships
@@ -203,6 +211,12 @@ class BaseAppSettings(BaseSettings):
     @property
     def storage_enabled(self) -> bool:
         return bool(self.AWS_ACCESS_KEY_ID and self.AWS_SECRET_ACCESS_KEY and self.AWS_S3_BUCKET)
+
+    @property
+    def marketing_storage_enabled(self) -> bool:
+        key = self.MARKETING_S3_ACCESS_KEY_ID or self.AWS_ACCESS_KEY_ID
+        secret = self.MARKETING_S3_SECRET_ACCESS_KEY or self.AWS_SECRET_ACCESS_KEY
+        return bool(self.MARKETING_S3_BUCKET and key and secret)
 
     @property
     def admin_url(self) -> str:
