@@ -1,11 +1,13 @@
 import { AbsoluteFill } from 'remotion'
-import { color, font } from '../brand'
+import { color, font, safe } from '../brand'
 import { Background, Highlighted, PosterHeadline, Wordmark } from '../components/brand'
 import type { LaminaProps } from '../schema'
 
 /** One carousel slide (F-CARRUSEL). The text is always set by the template, never by the image model. */
 export const Lamina = ({ formato, estilo, imagen, titulo, texto, destacado, indice, total }: LaminaProps) => {
   const pad = 80
+  // 9:16 (TikTok): keep text and the n/N counter out of the buttons column on the right.
+  const padRight = formato === 'vertical' ? safe.right : pad
   const fondoColor = estilo === 'verde' ? color.primary : color.night
   return (
     <AbsoluteFill style={{ backgroundColor: fondoColor }}>
@@ -13,6 +15,7 @@ export const Lamina = ({ formato, estilo, imagen, titulo, texto, destacado, indi
       <AbsoluteFill
         style={{
           padding: pad,
+          paddingRight: padRight,
           paddingTop: formato === 'vertical' ? 260 : pad,
           paddingBottom: formato === 'vertical' ? 520 : 170,
           justifyContent: 'center',
@@ -40,7 +43,7 @@ export const Lamina = ({ formato, estilo, imagen, titulo, texto, destacado, indi
         style={{
           top: 'auto',
           height: formato === 'vertical' ? 520 : 150,
-          padding: `0 ${pad}px`,
+          padding: `0 ${padRight}px 0 ${pad}px`,
           flexDirection: 'row',
           alignItems: formato === 'vertical' ? 'flex-start' : 'center',
           justifyContent: 'space-between',

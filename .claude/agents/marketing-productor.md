@@ -14,7 +14,7 @@ Eres el productor de Kuulis. Del guion revisado sacas los archivos finales de ca
 ## Qué haces, por pieza en `revisado`
 1. `mk.py show <código>`: toma `script` (sobre todo `script.studio`, `script.textos`, `script.prompts`) y `notes`
    (franja).
-2. **Plantilla** (`F-DATO`, `F-CARRUSEL`, video de texto, portadas):
+2. **Plantilla** (`F-DATO`, `F-CARRUSEL`, `F-TEXTO`, portadas):
    ```bash
    cd marketing/studio
    [ -d node_modules ] || pnpm install --frozen-lockfile
@@ -24,7 +24,7 @@ Eres el productor de Kuulis. Del guion revisado sacas los archivos finales de ca
    ```
    Mira el resultado antes de subir: abre 2–3 fotogramas o las láminas (extrae un fotograma con `ffmpeg` si está, o
    abre las `.jpg`). Texto cortado, solapado o fuera de la zona segura → corrige `script.studio` y vuelve a
-   renderizar. Si cambias `script.studio`, guárdalo con `mk.py update`.
+   renderizar. Si cambias `script.studio`, guárdalo con `mk.py update` (con el script completo: lo reemplaza entero).
 3. **IA** (`F-HOST`, `F-POV`, `F-SKETCH`, planos de IA dentro de otros formatos):
    - Si hay un conector de Higgsfield o Buzzy en tus herramientas (MK3), genera cada plano con los prompts del
      guion, sube cada resultado como `original` con `--source`, `--model`, `--prompt` y `--credits`, y úsalo de

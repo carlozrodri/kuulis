@@ -40,6 +40,8 @@ export const PosterHeadline = ({ text, size, style }: { text: string; size: numb
         color: color.white,
         textTransform: 'uppercase',
         textWrap: 'balance',
+        // A "\n" in the headline is a deliberate line break.
+        whiteSpace: 'pre-line',
         ...style,
       }}
     >

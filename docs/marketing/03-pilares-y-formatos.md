@@ -25,6 +25,7 @@ Los porcentajes son **supuestos de partida**; el recomendador los ajusta cada se
 | `F-SKETCH` | Mini sketch de humor (2 personajes, una situación) | IA (personajes ficticios evidentes, con etiqueta de IA) | 20–45 s | CALLE |
 | `F-RESPUESTA` | Respuesta en video a un comentario | Personaje | 10–30 s | Todos |
 | `F-DATO` | Dato animado con tipografía de marca (motion graphics) | Remotion, automático | 6–12 s | CUENTAS, PRECIO |
+| `F-TEXTO` | Video de texto: gancho y frases en pantalla sobre fondo de marca (plantilla `Subtitulos`), sin voz; se le pone sonido en la red | Remotion, automático | 15–30 s | CALLE, PRECIO, CUENTAS |
 | `F-TENDENCIA` | Adaptación de una tendencia del momento al mundo Kuulis | IA o plantilla, rápido (24–48 h) | 7–20 s | CALLE |
 
 ## 3. Ganchos (los primeros 2 segundos)

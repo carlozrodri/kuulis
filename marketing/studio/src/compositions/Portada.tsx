@@ -5,7 +5,8 @@ import type { PortadaProps } from '../schema'
 
 /**
  * Cover image. On Instagram the grid crops a vertical cover to its central 4:5 (1080×1350), so the
- * headline stays inside that band on the vertical format.
+ * headline stays inside that band on the vertical format; it also keeps clear of TikTok's buttons
+ * (right) and caption (bottom), so it ends at the safe zone, not at the bottom of the 4:5 band.
  */
 export const Portada = ({ formato, fondo, titulo }: PortadaProps) => (
   <AbsoluteFill>
@@ -14,8 +15,8 @@ export const Portada = ({ formato, fondo, titulo }: PortadaProps) => (
       style={{
         top: formato === 'vertical' ? 285 + 80 : 80,
         left: safe.left + 20,
-        right: safe.left + 20,
-        height: 1350 - 160,
+        right: formato === 'vertical' ? safe.right : safe.left + 20,
+        height: formato === 'vertical' ? 1920 - (285 + 80) - safe.bottom : 1350 - 160,
         justifyContent: 'space-between',
       }}
     >

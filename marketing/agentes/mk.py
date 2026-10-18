@@ -181,10 +181,14 @@ def cmd_variant(a: argparse.Namespace) -> Any:
     body = load_json(a.json)
     piece = call("GET", f"/admin/marketing/contents/{cid}")
     current = next((v for v in piece["variants"] if v["platform"] == body.get("platform")), None)
+    platform = body.get("platform")
     if current is None:
-        return call("POST", f"/admin/marketing/contents/{cid}/variants", body)
-    body.pop("platform", None)
-    return call("PATCH", f"/admin/marketing/contents/{cid}/variants/{current['id']}", body)
+        piece = call("POST", f"/admin/marketing/contents/{cid}/variants", body)
+    else:
+        body.pop("platform", None)
+        piece = call("PATCH", f"/admin/marketing/contents/{cid}/variants/{current['id']}", body)
+    # The API answers with the whole piece: print only this platform's version.
+    return next((v for v in piece["variants"] if v["platform"] == platform), piece)
 
 
 def cmd_upload(a: argparse.Namespace) -> Any:

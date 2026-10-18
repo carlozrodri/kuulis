@@ -14,7 +14,8 @@ nada más.
 - `docs/marketing/03-pilares-y-formatos.md §2–4` (formatos y estructura)
 - `marketing/agentes/README.md` (forma exacta de `script`)
 - Valores vivos: `python3 marketing/agentes/mk.py site` (cuota, meses gratis, pagos). Si no coinciden con
-  `hechos.md`, **gana la API** y lo dices en tu informe.
+  `hechos.md`, **gana la API** y lo dices en tu informe. Excepción: ciudades. Se habla solo de Caracas (H2) aunque
+  `/public/site` liste otras (QA tiene datos de prueba).
 
 ## Qué haces, por pieza
 1. `mk.py show <código>`: lee título, pilar, formato, público, notas, y `review_note` o `script.revision` si te la
@@ -24,7 +25,7 @@ nada más.
    (máx. 7 palabras por pantalla), CTA permitida, textos por red (caption con la estructura de `tono.md`,
    hashtags sin `#` según `plataformas.md`, título de YouTube ≤ 60 caracteres) y prompts por plano en inglés si
    hay planos de IA.
-3. Si el formato es de plantilla (`F-DATO`, `F-CARRUSEL`, video de texto), escribe también `script.studio`, el
+3. Si el formato es de plantilla (`F-DATO`, `F-CARRUSEL`, `F-TEXTO`), escribe también `script.studio`, el
    archivo de pieza de `marketing/studio/src/schema.ts` con `codigo` = código de la pieza (mira los ejemplos de
    `marketing/studio/data/ejemplos/`). Fondo `verde` o `noche`, `destacado` en la cifra clave.
 4. Guarda y pasa a `guion`:
@@ -32,7 +33,9 @@ nada más.
    python3 marketing/agentes/mk.py update K-… /ruta/temporal/K-….json   # {"script": {...}}
    python3 marketing/agentes/mk.py status K-… guion
    ```
-   (`update` recibe `{"script": {...}, "uses_character": …}`; guarda el JSON en un archivo temporal fuera del repo.)
+   (`update` recibe `{"script": {...}, "uses_character": …}` y **reemplaza el script entero**: parte del que ya
+   tiene la pieza. Guarda el JSON en un archivo temporal fuera del repo.) Carruseles: las láminas van en
+   `script.laminas`, no en `escenas`.
 
 ## Reglas
 - Cada cifra sale de `hechos.md` y de `/public/site`. Precios de trayectos: solo como ejemplo explícito

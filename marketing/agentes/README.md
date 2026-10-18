@@ -47,6 +47,7 @@ Todos los agentes leen y escriben esta forma; los campos que un agente no toca s
   "gancho_elegido": 0,
   "duracion_s": 25,
   "escenas": [{"desde_s": 0, "hasta_s": 2, "plano": "…", "voz": "…", "texto": "…"}],
+  "laminas": [{"titulo": "…", "texto": "…", "destacado": "…"}],
   "cta": "Link en la bio para descargar (Android).",
   "textos": {
     "tiktok": {"caption": "…", "hashtags": ["Kuulis", "Caracas", "Motorizados"]},
@@ -60,6 +61,14 @@ Todos los agentes leen y escriben esta forma; los campos que un agente no toca s
   "produccion": {"estado": "hecho | espera_mk3", "archivos": ["tiktok.mp4"], "notas": "…"}
 }
 ```
+
+- `escenas` es para videos y `laminas` para carruseles (una entrada por lámina, en orden).
+- Máximo 7 palabras por pantalla: vale para el gancho, los `textos` en pantalla y el **título** de cada lámina.
+  Los subtítulos de la voz y el `texto` de una lámina pueden ser más largos (lámina: hasta ~20 palabras).
+- `mk.py update K-… '{"script": …}'` **reemplaza el script entero**: lee la pieza (`mk.py show`), cambia lo tuyo
+  y guarda el script completo, para no borrar lo que escribió otro agente.
+- `production` de la pieza: `plantilla` para lo que sale solo de Remotion, `ia` si lleva generación de IA,
+  `mixto` si combina, `real` si es grabado.
 
 `studio` es el archivo de pieza de [`../studio/src/schema.ts`](../studio/src/schema.ts) (el que recibe
 `pnpm render`).
