@@ -1,0 +1,89 @@
+# 08 · Arquitectura de agentes de contenido y marketing
+
+## 1. Idea general
+Un equipo pequeño de agentes especializados, cada uno con un trabajo claro, que se pasan el trabajo en orden
+y dejan todo registrado. Las personas aprueban lo que sale; los agentes hacen el resto.
+
+```
+                    ┌──────────────────────── datos de Kuulis (registros, viajes, UTM) ───────────────┐
+                    │                                                                                  │
+   tendencias ──► ESTRATEGA ──► GUIONISTA ──► REVISOR ──► PRODUCTOR ──► [APROBACIÓN HUMANA] ──► PUBLICADOR
+                    ▲              (3 ganchos)  (marca,     (IA +          (Carlos, en el hilo      (manual F1,
+                    │                           hechos,     Remotion)       o en el panel)           API F2–F3)
+                    │                           riesgos)                                                │
+                    │                                                                                   ▼
+               RECOMENDADOR ◄──────────────────────── ANALISTA ◄──────────── métricas de TikTok / IG / YouTube
+               (aprendizajes,                         (24 h, 72 h, 7 d)
+                experimentos)
+                                    COMUNIDAD: sugiere respuestas a comentarios y DMs (una persona publica en F1)
+```
+
+## 2. Los agentes
+| Agente | Entra | Sale | Cuándo | Reglas clave |
+| --- | --- | --- | --- | --- |
+| **Estratega** | Aprendizajes, calendario base ([04](04-calendario-y-flujo-diario.md)), tendencias, reserva de piezas, datos de oferta y demanda | Calendario semanal (pilar, formato, plataforma, franja), alertas de reserva baja, propuestas F-TENDENCIA | Domingos + revisión de tendencias 2 veces al día | Respeta la mezcla de la fase; nunca tendencias sensibles |
+| **Guionista** | Una entrada del calendario + biblia de marca + biblia del personaje | Guion con 3 ganchos, texto en pantalla, subtítulos, descripción y hashtags por red, CTA con UTM | Diario | Solo hechos de [01](01-estrategia-y-posicionamiento.md); estructura de [03](03-pilares-y-formatos.md) |
+| **Revisor de marca y cumplimiento** | Guion (y luego el video) | Aprobado / cambios pedidos / rechazado, con motivo | Antes de producir y antes de publicar | Lista de [10](10-riesgos-y-cumplimiento.md); verifica cada cifra contra la fuente; exige etiqueta de IA si toca |
+| **Productor** | Guion aprobado | Prompts de Higgsfield/voz, renders de Remotion, lista de tomas para grabación real, versiones por plataforma (sin marcas de agua cruzadas), portada | Diario | Usa las plantillas de marca; registra herramienta, modelo y créditos gastados |
+| **Publicador** | Paquete aprobado | Publicación programada (API) o paquete listo para publicar a mano; registro del enlace y la hora | En la franja | Nunca publica sin aprobación; F1 siempre manual |
+| **Analista** | APIs de métricas, carga manual, eventos de la web y de la app | Instantáneas de métricas por publicación, informe diario corto y semanal | Diario 06:00 + domingo | Compara contra la mediana de la cuenta, no contra cifras de manual |
+| **Recomendador** | Métricas + atributos de cada pieza | Aprendizajes con evidencia, ajuste de pesos de pilares y formatos, experimentos A/B propuestos | Diario (ligero) y semanal (profundo) | Toda recomendación cita las piezas y números que la respaldan; distingue «probado» de «hipótesis» |
+| **Comunidad** | Comentarios y DMs | Respuestas sugeridas, preguntas frecuentes nuevas, ideas de F-RESPUESTA, alertas de crisis | Cada pocas horas | Nunca discute; escala quejas de seguridad a soporte de inmediato |
+
+## 3. Dónde viven
+Todo en el monorepo, para que cualquier sesión de Claude (o una persona) los use igual:
+
+```
+.claude/agents/            Definición de cada agente (Markdown, formato inspirado en agency-agents, ver 07)
+  marketing-estratega.md
+  marketing-guionista.md
+  marketing-revisor.md
+  marketing-productor.md
+  marketing-publicador.md
+  marketing-analista.md
+  marketing-recomendador.md
+  marketing-comunidad.md
+marketing/
+  brand/                   Biblia de marca, hechos permitidos, personaje (texto + parámetros + referencias)
+  studio/                  Proyecto Remotion: plantillas de subtítulos, carruseles, datos, portadas, cierres
+  playbooks/               Fórmulas de ganchos, guías por plataforma (se actualizan con lo aprendido)
+api/apps/marketing/        Tablas, endpoints y tareas (registro de piezas, publicaciones, métricas, aprendizajes)
+admin/app/pages/marketing/ Panel: calendario, aprobación, rendimiento, aprendizajes, consumo de créditos
+```
+
+Los archivos grandes (videos, imágenes) no van a git: van al almacenamiento S3 que ya usa la API, y el
+registro guarda la ruta. Detalle de datos en [09](09-registro-datos-y-medicion.md).
+
+## 4. Cómo se ejecutan
+- **Motor:** Claude (Claude Code) trabajando sobre el repo, con los agentes como subagentes. No hace falta un
+  servidor nuevo de agentes.
+- **Programación:** rutinas programadas (tareas recurrentes en la nube de Claude) que se disparan a las horas
+  del flujo diario: métricas y aprendizaje temprano, guiones y producción después, informe los domingos.
+- **Acceso a datos:** los agentes leen y escriben en la API de Kuulis con un token de servicio de rol
+  `marketing` (sin acceso a datos personales de usuarios), nunca directo a la base de datos.
+- **Aprobación:** el paquete del día llega al hilo de marketing del proyecto con botones de decisión
+  (aprobar, cambiar, descartar), y queda también en el panel. Lo aprobado cambia de estado en el registro y
+  pasa al publicador.
+- **Generación de IA:** si la herramienta tiene API, el productor la llama directamente y registra el costo; si
+  no (posible caso de Higgsfield), el productor deja los prompts exactos y una persona los ejecuta y sube el
+  resultado al panel. En F3 se pasa a APIs de pago por uso (Veo, Kling, GPT Image) para automatizar del todo.
+- **Credenciales:** tokens de TikTok, Meta, YouTube y herramientas de IA en las variables de entorno de Coolify
+  o en los secretos del entorno de Claude; nunca en el repo ni en el chat.
+
+## 5. Cómo aprende el sistema
+1. Cada pieza se registra con sus **atributos**: pilar, formato, gancho (tipo y texto), duración, personaje
+   sí/no, real o IA, herramienta, hora, día, audio, plataforma.
+2. El analista guarda métricas a las 24 h, 72 h y 7 días.
+3. El recomendador compara grupos de piezas por atributo (por ejemplo, «gancho de número que duele» contra
+   «POV») usando la mediana de la cuenta como referencia, y solo declara un aprendizaje cuando hay al menos
+   5 piezas por grupo y la diferencia se mantiene en dos semanas.
+4. Los aprendizajes confirmados actualizan los pesos del calendario, los playbooks y las instrucciones de los
+   agentes (con un PR al repo, para que quede la historia de por qué cambió algo).
+5. Cada semana se proponen **1 o 2 experimentos** controlados (mismo guion con dos ganchos, misma pieza en dos
+   horarios) para responder preguntas concretas.
+
+## 6. Qué decide siempre una persona
+- Publicar cualquier pieza (hasta que Carlos diga lo contrario por escrito).
+- Gastar dinero: suscripciones, créditos extra, pauta.
+- Responder a crisis, quejas de seguridad o prensa.
+- Cambiar el personaje, el tono o los hechos permitidos.
