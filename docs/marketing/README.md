@@ -55,8 +55,8 @@ aprueba todo lo que sale.
      ([09 §1.1](09-registro-datos-y-medicion.md#11-almacenamiento-de-archivos-decidido-2026-10-18)).
 
 ## Siguiente paso
-Cuando Carlos apruebe MK5: **MK6 · Agentes** (`.claude/agents/marketing-*.md`, rutinas del flujo diario y el
-paquete diario en el hilo). Orden completo en [11](11-hoja-de-ruta.md).
+Cuando MK6 corra una semana completa sin intervención técnica: **MK2 · Cuentas** en redes. Orden completo en
+[11](11-hoja-de-ruta.md).
 
 ## Avance
 | Paso | Estado |
@@ -64,4 +64,5 @@ paquete diario en el hilo). Orden completo en [11](11-hoja-de-ruta.md).
 | MK0 · Plan | Aprobado y fusionado 2026-10-18 (#76) |
 | MK1 · Marca para redes | Fusionado 2026-10-18 (#77): [`marketing/`](../../marketing/README.md) con hechos, tono, identidad visual, biblia de Kuu, playbooks y los 5 guiones de la prueba |
 | MK4 · Estudio de plantillas | Fusionado 2026-10-18 (#78): [`marketing/studio/`](../../marketing/studio/README.md), 5 plantillas Remotion (Subtítulos, Dato, Cierre, Carrusel, Portada) que sacan los archivos por red y un manifiesto para S3 |
-| MK5 · Registro y panel | En revisión 2026-10-18: `api/apps/marketing` ([contrato](../api/marketing.md)), bucket `kuulis-marketing`, roles Marketing y Publicador, panel (calendario, aprobar, rendimiento, aprendizajes, gasto, cuentas) y la página Publicar para el teléfono |
+| MK5 · Registro y panel | Fusionado 2026-10-18 (#79, arreglos #80 y #81): `api/apps/marketing` ([contrato](../api/marketing.md)), bucket `kuulis-marketing`, roles Marketing y Publicador, panel (calendario, aprobar, rendimiento, aprendizajes, gasto, cuentas) y la página Publicar para el teléfono |
+| MK6 · Agentes | En revisión 2026-10-18: 8 agentes en [`.claude/agents/`](../../.claude/agents/), flujo diario y semanal en [`marketing/agentes/`](../../marketing/agentes/README.md), cliente `mk.py` del registro y tokens de servicio para que los agentes usen la API |

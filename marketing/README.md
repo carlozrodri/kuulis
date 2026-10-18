@@ -8,6 +8,7 @@ Material de trabajo del contenido en redes de Kuulis. El plan está en
 | [`brand/`](brand/) | Hechos permitidos, tono, identidad visual, biblia del personaje «Kuu», autorización de imagen | Todos los agentes, sobre todo guionista y revisor |
 | [`playbooks/`](playbooks/) | Fórmulas de ganchos, guía por plataforma, hashtags | Estratega, guionista, publicador |
 | [`guiones/`](guiones/) | Plantilla de guion y guiones (empezando por los 5 de la prueba de herramientas) | Guionista, productor |
+| [`agentes/`](agentes/README.md) | Flujo diario y semanal de los agentes (`.claude/agents/marketing-*.md`) y `mk.py`, el cliente del registro | El orquestador y todos los agentes |
 | [`studio/`](studio/README.md) | Plantillas de video e imagen en Remotion: de un JSON a los archivos de cada red | Productor |
 
 Reglas:
