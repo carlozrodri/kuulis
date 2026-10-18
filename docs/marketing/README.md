@@ -50,7 +50,7 @@ aprueba todo lo que sale.
   5. **Pauta $0 las primeras 4 semanas**, luego solo ganadores con $3–5 al día.
   6. **Se arranca antes del lanzamiento** (captar motorizados).
   7. **Carlos se suscribe a Higgsfield y Buzzy cuando todo esté montado** y conecta las cuentas para que Claude
-     genere por MCP (ver [08 §4](08-arquitectura-de-agentes.md#4-cómo-se-ejecutan)). **Todo el contenido
+     genere por MCP (las dos tienen MCP oficial) (ver [08 §4](08-arquitectura-de-agentes.md#4-cómo-se-ejecutan)). **Todo el contenido
      generado se guarda en S3**: MinIO del homelab, o Cloudflare R2 si no sirve
      ([09 §1.1](09-registro-datos-y-medicion.md#11-almacenamiento-de-archivos-decidido-2026-10-18)).
 

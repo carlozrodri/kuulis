@@ -71,9 +71,11 @@ el MinIO del homelab, o Cloudflare R2 si MinIO no sirve. El registro guarda la r
     `cloud.higgsfield.ai`) y un CLI oficial. Se conecta el MCP como conector de Claude: Carlos inicia sesión
     una vez y no hace falta pasar contraseñas. La API con clave queda para tareas programadas del servidor.
     Hay servidores MCP «comunitarios» que usan tokens de sesión del navegador: no se usan.
-  - **Buzzy** no tiene MCP ni API pública conocida a 2026-10-18. Hasta que la tenga, el productor deja los
-    prompts exactos y quien tenga acceso los ejecuta en la web y sube el resultado al panel (o, si se habilita,
-    Claude lo hace en el navegador conectado de Carlos). Se revisa cada mes si sacaron API.
+  - **Buzzy** también tiene **MCP oficial** (<https://www.buzzy.now/es/mcp>, servidor `https://mcp.buzzy.now/mcp`):
+    se añade en Claude como conector personalizado y Carlos inicia sesión una vez con su cuenta de Buzzy. Genera
+    imágenes, videos, storyboards, anuncios, animaciones y proyectos completos con sus modelos (Seedance, Kling,
+    Veo, Midjourney, Nano Banana, etc.). Su página no dice qué planes lo incluyen ni cuántos créditos gasta
+    cada llamada: se verifica con el plan Basic el primer día de MK3.
   - En F3 se puede pasar a APIs de pago por uso (Veo, Kling, GPT Image) para automatizar del todo.
 - **Credenciales:** **nunca se pegan en el chat ni en el repo.** OAuth para los MCP (Higgsfield, Meta, Google);
   las claves que haga falta guardar (API de Higgsfield, TikTok, almacenamiento) van a las variables de entorno
