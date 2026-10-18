@@ -1,0 +1,29 @@
+{
+  "codigo": "SMOKE",
+  "salidas": [
+    {
+      "plantilla": "Subtitulos",
+      "redes": ["tiktok", "whatsapp"],
+      "props": {
+        "fondo": { "tipo": "color", "color": "noche" },
+        "gancho": { "texto": "Prueba de humo.", "duracionS": 1 },
+        "voz": "Si esto se ve bien, las plantillas funcionan.",
+        "duracionS": 2,
+        "cierre": false
+      }
+    },
+    {
+      "plantilla": "Carrusel",
+      "redes": ["instagram"],
+      "laminas": [
+        { "titulo": "Lámina uno.", "texto": "Texto con $3 destacado.", "destacado": "$3" },
+        { "estilo": "noche", "titulo": "Lámina dos." }
+      ]
+    },
+    {
+      "plantilla": "Portada",
+      "redes": ["tiktok"],
+      "props": { "fondo": { "tipo": "color", "color": "verde" }, "titulo": "Portada." }
+    }
+  ]
+}

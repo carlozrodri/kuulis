@@ -26,6 +26,7 @@ jobs:
       admin: ${{ steps.filter.outputs.admin }}
       mobile: ${{ steps.filter.outputs.mobile }}
       web: ${{ steps.filter.outputs.web }}
+      studio: ${{ steps.filter.outputs.studio }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -43,6 +44,9 @@ jobs:
               - '.github/workflows/ci.yml'
             web:
               - 'web/**'
+              - '.github/workflows/ci.yml'
+            studio:
+              - 'marketing/studio/**'
               - '.github/workflows/ci.yml'
 
   api:
@@ -182,6 +186,30 @@ jobs:
         continue-on-error: true
         run: npm audit --omit=dev --audit-level=high
 
+  # Remotion video templates for social media. The smoke render downloads Remotion's own headless Chrome.
+  studio:
+    needs: changes
+    if: needs.changes.outputs.studio == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: marketing/studio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: marketing/studio/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: marketing/studio/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm smoke
+
   secrets:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -196,7 +224,7 @@ jobs:
   # Single required check: fails if any job failed or was cancelled; skipped jobs (folder untouched) pass.
   ci:
     if: always()
-    needs: [changes, api, admin, web, mobile, secrets]
+    needs: [changes, api, admin, web, mobile, studio, secrets]
     runs-on: ubuntu-latest
     steps:
       - name: All jobs passed or were skipped

@@ -1,0 +1,18 @@
+{
+  "codigo": "DATO-CUOTA",
+  "salidas": [
+    {
+      "plantilla": "Dato",
+      "redes": ["tiktok", "instagram", "youtube", "whatsapp"],
+      "props": {
+        "fondo": "verde",
+        "pasos": [
+          { "cifra": "0 %", "texto": "de comisión por carrera", "duracionS": 2.5 },
+          { "cifra": "$0", "texto": "de cuota si ganaste $100 o menos en el mes", "duracionS": 3 },
+          { "cifra": "$30", "texto": "lo máximo que pagas al mes, ganes lo que ganes", "duracionS": 3 },
+          { "cifra": "3", "texto": "meses sin cuota al empezar", "duracionS": 2.5 }
+        ]
+      }
+    }
+  ]
+}
