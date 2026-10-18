@@ -9,8 +9,25 @@ momento qué se publicó, dónde, con qué herramienta, cuánto costó y qué re
 | Biblia de marca, hechos permitidos, personaje, playbooks, definiciones de agentes | Repo (`marketing/`, `.claude/agents/`) | Versionado: se ve quién cambió qué y por qué |
 | Plantillas de video (Remotion) | Repo (`marketing/studio/`) | Es código |
 | Piezas, versiones, publicaciones, métricas, aprendizajes, experimentos, gasto | Base de datos de la API (`api/apps/marketing`) | Consultable, alimenta el panel y los agentes |
-| Videos, imágenes, audios | Almacenamiento S3 que ya usa la API | Pesan demasiado para git |
+| Videos, imágenes, audios (todo lo generado, también lo descartado) | S3: MinIO del homelab, bucket propio (ver §1.1) | Pesan demasiado para git; decidido que todo se guarda |
 | Informes semanales | Panel + resumen en el hilo de marketing del proyecto | Lectura rápida |
+
+### 1.1 Almacenamiento de archivos (decidido, 2026-10-18)
+**Todo el contenido que se genere se guarda en S3**, incluidas las versiones descartadas (sirven para comparar
+herramientas y para no pagar dos veces por lo mismo).
+
+- **Principal: MinIO del homelab**, el mismo servicio S3 que ya usa la API (`AWS_*`), pero en un **bucket
+  propio `kuulis-marketing`** con una clave de acceso solo para ese bucket, para no mezclarlo con documentos
+  de motorizados ni con su política de borrado.
+- **Si MinIO no sirve** (espacio, ancho de banda para descargar videos desde el teléfono en Caracas):
+  **Cloudflare R2**, que no cobra la salida de datos, en un bucket distinto al de backups.
+- **Copia fuera de casa:** lo publicado y lo aprobado se copia también a R2 cada noche, como ya se hace con los
+  backups, para no perder el archivo de marca si falla el homelab. (Supuesto: los descartes no se copian.)
+- **Estructura:** `marketing/{entorno}/{año}/{mes}/{código-de-pieza}/` con `original/` (lo que devolvió la
+  herramienta), `final/{red}.mp4`, `portada.jpg` y `fuentes/` (audio, imágenes intermedias). Los nombres
+  llevan el código de la pieza para encontrarlos desde el registro.
+- **Acceso:** la persona que publica descarga con enlaces temporales firmados; nada es público.
+- **Tamaño estimado:** ~2 piezas al día × 3 redes × ~20 MB + originales ≈ 5–8 GB al mes. Se revisa al mes 1.
 
 ## 2. Modelo de datos (propuesta)
 Sigue las convenciones de la API: una app por dominio, migraciones con Alembic, lógica en `services.py`,

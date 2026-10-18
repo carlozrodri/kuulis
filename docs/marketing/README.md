@@ -2,7 +2,7 @@
 
 Plan para crear contenido con potencial viral (videos cortos, imágenes y carruseles) para TikTok, Instagram
 Reels y YouTube Shorts, con un equipo de agentes que generen, revisen, publiquen, midan y recomienden mejoras.
-**Estado: plan propuesto (2026-10-18); Carlos ya decidió herramientas y agentes, quedan 6 decisiones.** No se ha suscrito ni pagado nada.
+**Estado: plan aprobado (2026-10-18), sin decisiones pendientes.** No se ha suscrito ni pagado nada.
 
 | Doc | Qué contiene |
 | --- | --- |
@@ -41,22 +41,19 @@ aprueba todo lo que sale.
 - **Sin contenido real grabado por ahora** (2026-10-18): todo sale de IA, plantillas y pantallas de la app.
   Las entrevistas en la calle y las historias de motorizados quedan en pausa (no se simulan con IA).
 
-## Decisiones que necesito de Carlos
-Respuesta corta por número (por ejemplo «1A, 2 sí…») o «apruebo todo» para la opción recomendada en todas.
+- **Respuestas del 2026-10-18 (todas):**
+  1. Personaje: **«Kuu»**, presentadora caraqueña declarada como IA (concepto A de [05](05-personaje-de-marca.md)).
+  2. **Las cuentas aún no existen**; se crean en MK2.
+  3. **Publica una persona en Caracas con un teléfono real**; solo recibe lo que tiene que publicar: archivo,
+     título, texto, hashtags y hora (paquete en [04 §4](04-calendario-y-flujo-diario.md#4-quién-publica)).
+  4. **Carlos aprueba cada día** el paquete en el hilo de marketing.
+  5. **Pauta $0 las primeras 4 semanas**, luego solo ganadores con $3–5 al día.
+  6. **Se arranca antes del lanzamiento** (captar motorizados).
+  7. **Carlos se suscribe a Higgsfield y Buzzy cuando todo esté montado** y conecta las cuentas para que Claude
+     genere por MCP (ver [08 §4](08-arquitectura-de-agentes.md#4-cómo-se-ejecutan)). **Todo el contenido
+     generado se guarda en S3**: MinIO del homelab, o Cloudflare R2 si no sirve
+     ([09 §1.1](09-registro-datos-y-medicion.md#11-almacenamiento-de-archivos-decidido-2026-10-18)).
 
-1. **Personaje:** A) «Kuu», presentadora caraqueña declarada como IA **(recomendado)**; B) motorizado veterano;
-   C) solo la mascota «el Punto». Ver [05](05-personaje-de-marca.md).
-2. **Cuentas:** ¿ya existen cuentas de Kuulis en TikTok, Instagram, YouTube y Facebook? Si no, crearlas con el
-   mismo nombre (@kuulis o el disponible más cercano) y TikTok como cuenta empresa **(recomendado)**.
-3. **Quién publica en F1:** una persona desde el teléfono con el paquete que preparan los agentes
-   **(recomendado)**; o automático desde el inicio (TikTok quedaría privado hasta pasar su auditoría).
-4. **Aprobación:** Carlos aprueba cada día el paquete en el hilo de marketing (unos 5 minutos)
-   **(recomendado)**; o aprueba el calendario semanal y confía en el revisor para cada pieza.
-5. **Pauta pagada:** $0 las primeras 4 semanas y luego promocionar solo las piezas ganadoras con $3–5 al día
-   **(recomendado)**; o pauta desde el inicio.
-6. **Momento:** ¿el contenido arranca antes del lanzamiento público (captar motorizados con lista de espera)
-   **(recomendado)**, o cuando la app ya esté abierta a pasajeros en Caracas?
-
-**Siguiente paso:** empiezo **MK1 · Marca para redes** (biblia de marca y del personaje, playbooks y los 5
-guiones de la prueba Higgsfield vs Buzzy), sin costo. Conviene suscribirse a las dos herramientas cuando los
-guiones estén listos, para aprovechar desde el primer día los 7 días de modelos ilimitados.
+## Siguiente paso
+**MK1 · Marca para redes** (hechos permitidos, tono, biblia de «Kuu», playbooks de ganchos y los 5 guiones de
+la prueba Higgsfield vs Buzzy), sin costo, cuando Carlos lo pida. Orden completo en [11](11-hoja-de-ruta.md).

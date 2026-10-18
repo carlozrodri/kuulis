@@ -42,13 +42,30 @@ Los horarios son orientativos (hora de Venezuela). Lo importante es el orden: **
 guion → revisión → producción → aprobación → publicación → datos**.
 
 ## 4. Quién publica
-- **F1: publica una persona desde el teléfono**, con el paquete que dejan los agentes (video final, texto,
-  hashtags, portada, enlace con UTM). Motivos: TikTok fuerza a privado lo que se publica por API sin
+- **F1: publica una persona en Caracas desde un teléfono real** (decidido, 2026-10-18), con el paquete que
+  dejan los agentes. Esa persona solo necesita lo que tiene que publicar; no ve el sistema por dentro. Motivos: TikTok fuerza a privado lo que se publica por API sin
   auditoría; publicar desde la app permite usar los sonidos y las herramientas nativas; y reduce el riesgo de
   que una cuenta nueva sea marcada por automatización.
 - **F2: Instagram y YouTube por API** (programado desde el sistema), TikTok sigue manual mientras se tramita
   la auditoría de su API.
 - **F3: todo programado** desde el panel, con aprobación previa obligatoria.
+
+### Paquete de publicación (lo que recibe la persona)
+Una tarjeta por publicación, ordenadas por hora, en una página sencilla para teléfono dentro del panel (rol
+`publicador`, solo ve sus tarjetas del día) y, mientras esa página no exista, un mensaje diario con lo mismo.
+Cada tarjeta trae:
+
+| Campo | Ejemplo |
+| --- | --- |
+| Red y cuenta | TikTok · @kuulis |
+| Fecha y hora (Caracas) | Mar 4 nov · 19:30 |
+| Archivo listo para esa red | Botón «Descargar video» (enlace temporal al almacenamiento S3), ya con subtítulos y sin marcas de agua de otras redes |
+| Portada | Imagen o segundo del video que se elige como portada |
+| Título | Solo para YouTube Shorts y portada de Reels |
+| Texto (caption) | Listo para copiar con un toque |
+| Hashtags | Listos para copiar (3 a 6, ver [02](02-plataformas-y-algoritmos.md)) |
+| Ajustes a marcar | «Etiqueta de contenido de IA: activar», música de la biblioteca comercial si aplica, ubicación Caracas |
+| Al terminar | Pegar el enlace de la publicación y tocar «Publicado» |
 
 Cada publicación manual se registra igual que una automática: quien publica pega el enlace de la publicación
 en el panel (o en el hilo) y el sistema la asocia a la pieza (ver [09](09-registro-datos-y-medicion.md)).

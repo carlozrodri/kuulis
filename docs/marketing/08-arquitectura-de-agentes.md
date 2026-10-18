@@ -51,8 +51,8 @@ api/apps/marketing/        Tablas, endpoints y tareas (registro de piezas, publi
 admin/app/pages/marketing/ Panel: calendario, aprobación, rendimiento, aprendizajes, consumo de créditos
 ```
 
-Los archivos grandes (videos, imágenes) no van a git: van al almacenamiento S3 que ya usa la API, y el
-registro guarda la ruta. Detalle de datos en [09](09-registro-datos-y-medicion.md).
+Los archivos grandes (videos, imágenes) no van a git: **todo lo que se genera se guarda en S3** (decidido):
+el MinIO del homelab, o Cloudflare R2 si MinIO no sirve. El registro guarda la ruta. Detalle de datos en [09](09-registro-datos-y-medicion.md).
 
 ## 4. Cómo se ejecutan
 - **Motor:** Claude (Claude Code) trabajando sobre el repo, con los agentes como subagentes. No hace falta un
@@ -64,11 +64,20 @@ registro guarda la ruta. Detalle de datos en [09](09-registro-datos-y-medicion.m
 - **Aprobación:** el paquete del día llega al hilo de marketing del proyecto con botones de decisión
   (aprobar, cambiar, descartar), y queda también en el panel. Lo aprobado cambia de estado en el registro y
   pasa al publicador.
-- **Generación de IA:** si la herramienta tiene API, el productor la llama directamente y registra el costo; si
-  no (posible caso de Higgsfield), el productor deja los prompts exactos y una persona los ejecuta y sube el
-  resultado al panel. En F3 se pasa a APIs de pago por uso (Veo, Kling, GPT Image) para automatizar del todo.
-- **Credenciales:** tokens de TikTok, Meta, YouTube y herramientas de IA en las variables de entorno de Coolify
-  o en los secretos del entorno de Claude; nunca en el repo ni en el chat.
+- **Generación de IA (decidido, 2026-10-18):** Carlos se suscribe a Higgsfield y Buzzy **cuando todo lo demás
+  esté montado** y conecta las cuentas para que los agentes generen directamente.
+  - **Higgsfield** tiene un **MCP oficial** (servidor alojado en `mcp.higgsfield.ai`, entra con OAuth y gasta
+    los créditos del plan, sin clave) y además una API REST con clave (`api.higgsfield.ai`, claves desde
+    `cloud.higgsfield.ai`) y un CLI oficial. Se conecta el MCP como conector de Claude: Carlos inicia sesión
+    una vez y no hace falta pasar contraseñas. La API con clave queda para tareas programadas del servidor.
+    Hay servidores MCP «comunitarios» que usan tokens de sesión del navegador: no se usan.
+  - **Buzzy** no tiene MCP ni API pública conocida a 2026-10-18. Hasta que la tenga, el productor deja los
+    prompts exactos y quien tenga acceso los ejecuta en la web y sube el resultado al panel (o, si se habilita,
+    Claude lo hace en el navegador conectado de Carlos). Se revisa cada mes si sacaron API.
+  - En F3 se puede pasar a APIs de pago por uso (Veo, Kling, GPT Image) para automatizar del todo.
+- **Credenciales:** **nunca se pegan en el chat ni en el repo.** OAuth para los MCP (Higgsfield, Meta, Google);
+  las claves que haga falta guardar (API de Higgsfield, TikTok, almacenamiento) van a las variables de entorno
+  de Coolify o a los secretos del entorno de Claude, que Carlos carga directamente.
 
 ## 5. Cómo aprende el sistema
 1. Cada pieza se registra con sus **atributos**: pilar, formato, gancho (tipo y texto), duración, personaje

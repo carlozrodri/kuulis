@@ -19,8 +19,8 @@ abiertamente la voz de Kuulis creada con IA**, como un presentador, y eso se dic
 | Riesgo | Si no se declara IA, parece engaño | **Alto:** un motorizado falso hablando a motorizados reales destruye la confianza si se descubre | Más infantil; menos alcance que una cara humana |
 | Herramienta | Higgsfield AI Influencer Studio + voz | Igual | Remotion / animación 2D; Higgsfield o Runway para planos especiales |
 
-**Recomendación:** A como protagonista y C como elemento gráfico de apoyo (transiciones, subtítulos, sello
-final). Descartar B.
+**Decidido (2026-10-18):** A como protagonista y C como elemento gráfico de apoyo (transiciones, subtítulos,
+sello final). B descartado.
 
 ## 3. Biblia del personaje (concepto A, borrador)
 - **Nombre:** «Kuu» (corto, sale de la marca, fácil de decir). Alternativas: «Vale», «Ari».
