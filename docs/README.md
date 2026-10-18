@@ -6,6 +6,7 @@
 | [decisions.md](decisions.md) | Decisiones técnicas tomadas y por qué (ADRs cortos) |
 | [scaling.md](scaling.md) | Plan de capacidad para 5000+ usuarios activos y cómo crecer |
 | [deployment.md](deployment.md) | Runbook de Coolify: entornos, variables, dominios, backups, rollback |
+| [infra/analisis-cloudflare.md](infra/analisis-cloudflare.md) | Análisis (2026-10-18): migrar la infra a Cloudflare, costos y recomendación |
 | [conventions.md](conventions.md) | Ramas, commits, estructura de código, i18n, errores |
 | [roadmap.md](roadmap.md) | Qué está hecho y qué viene después |
 | [pending.md](pending.md) | Lista de trabajo pendiente concreto |
