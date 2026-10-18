@@ -130,6 +130,31 @@ async def test_scheduler_backs_up_once_per_interval(store, monkeypatch):
     assert "database" not in await tasks.run_due()  # the next one waits BACKUP_EVERY_MINUTES
 
 
+async def test_failed_daily_job_is_retried_the_same_day(store, monkeypatch):
+    from kuulis.core.redis import redis_client
+
+    monkeypatch.setattr(tasks, "backup_store", lambda: store)
+    monkeypatch.setattr(settings, "BACKUP_MIRROR_FILES", False)
+    monkeypatch.setattr(tasks, "local_now", lambda: datetime(2026, 10, 20, 3, 1))  # a Tuesday
+    real_export = services.export_ledger
+
+    async def timeout(_store):
+        raise TimeoutError("Read timeout on endpoint URL")
+
+    monkeypatch.setattr(services, "export_ledger", timeout)
+    assert "ledger" in await tasks.run_due()
+    assert "ledger" not in await tasks.run_due()  # waits RETRY_MINUTES, not until tomorrow
+    done_key = f"{tasks.DONE_KEY}ledger:2026-10-20"
+    assert 0 < await redis_client.ttl(done_key) <= tasks.RETRY_MINUTES * 60
+    assert (await services.status())["last_ledger_error"]
+
+    monkeypatch.setattr(services, "export_ledger", real_export)
+    await redis_client.delete(done_key)  # RETRY_MINUTES went by
+    assert "ledger" in await tasks.run_due()
+    assert not (await services.status()).get("last_ledger_error")
+    assert await redis_client.ttl(done_key) > 86400
+
+
 async def test_failures_and_stale_backups_alert(store, monkeypatch):
     from kuulis.core.db import SessionLocal
 
