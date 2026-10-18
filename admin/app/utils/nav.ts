@@ -70,6 +70,7 @@ export const NAV: NavEntry[] = [
   { key: 'approvals', icon: 'i-lucide-stamp', to: '/approvals', group: 'administration' },
   { key: 'team', icon: 'i-lucide-users-round', to: '/team', adminOnly: true, group: 'administration' },
   { key: 'roles', icon: 'i-lucide-shield-check', to: '/roles', adminOnly: true, group: 'administration' },
+  { key: 'serviceTokens', icon: 'i-lucide-key-round', to: '/service-tokens', adminOnly: true, group: 'administration' },
   { key: 'audit', icon: 'i-lucide-scroll-text', to: '/audit', adminOnly: true, group: 'administration' },
   { key: 'legal', icon: 'i-lucide-scale', to: '/legal', adminOnly: true, group: 'administration' },
   { key: 'profile', icon: 'i-lucide-user-cog', to: '/profile' },

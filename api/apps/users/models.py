@@ -70,6 +70,7 @@ class User(BaseModel):
     # Set per request from the access token (apps/users/dependencies.py), never stored.
     auth_sid = None  # str | None (not annotated: not a column)
     auth_mfa = False
+    auth_scopes = None  # frozenset[str] | None: set when the request came with a service token
 
     @property
     def can_access_admin(self) -> bool:

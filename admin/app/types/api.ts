@@ -1347,6 +1347,26 @@ export interface RolesOverview {
   roles: StaffRole[]
 }
 
+/** A key a program (the marketing agents) uses to act as a staff account; GET /admin/service-tokens. */
+export interface ServiceToken {
+  id: string
+  name: string
+  user_id: string
+  user_email: string
+  user_name: string
+  prefix: string
+  permissions: string[]
+  expires_at: string | null
+  last_used_at: string | null
+  revoked_at: string | null
+  created_at: string
+}
+
+/** POST /admin/service-tokens: the whole key comes only in this response. */
+export interface ServiceTokenCreated extends ServiceToken {
+  token: string
+}
+
 export interface StaffMember {
   id: string
   email: string

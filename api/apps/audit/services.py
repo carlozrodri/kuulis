@@ -142,9 +142,11 @@ def stage(session: Session) -> None:
 def audited(action: str, entity_type: str, id_param: str | None = None) -> Callable:
     """Dependency for an admin endpoint (or a sensitive read): every successful call leaves an
     audit row."""
-    from apps.users.dependencies import CurrentUser  # avoids an import cycle
+    # CurrentActor: a service token's writes are logged as its staff account. The route's own
+    # guard (Can, StaffUser…) decides whether the token may call it at all.
+    from apps.users.dependencies import CurrentActor  # avoids an import cycle
 
-    async def _open(request: Request, user: CurrentUser) -> None:
+    async def _open(request: Request, user: CurrentActor) -> None:
         body: dict[str, Any] | None = None
         if request.method in ("POST", "PUT", "PATCH", "DELETE"):
             try:

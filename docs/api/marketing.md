@@ -14,7 +14,8 @@ Plan y modelo de datos en [`docs/marketing/09`](../marketing/09-registro-datos-y
 | `marketing.publish` | Ver las tarjetas del día y marcar publicado |
 
 La migración crea dos roles: **Marketing** (`view`, `manage`, `publish`) y **Publicador** (`publish`, solo la
-página Publicar). Los admin tienen todo.
+página Publicar). Los admin tienen todo. MK6 añade **Agentes de marketing** (`view`, `manage`, `publish`,
+`approve`) para la cuenta del token de servicio de los agentes; solo registra la aprobación que Carlos da en el hilo.
 
 ## Ciclo de una pieza
 

@@ -9,6 +9,9 @@ from apps.staff.schemas import (
     InviteAccept,
     PermissionGroup,
     RolesOverview,
+    ServiceTokenCreate,
+    ServiceTokenCreated,
+    ServiceTokenRead,
     StaffInvite,
     StaffMember,
     StaffRoleCreate,
@@ -115,6 +118,36 @@ async def update_member(
     user = await services.update_member(session, admin, user, data)
     note(before=before, after=snapshot(user, MEMBER_FIELDS))
     return await services.member_of(session, user)
+
+
+@router.get("/service-tokens", response_model=list[ServiceTokenRead])
+async def service_tokens(_: AdminUser, session: DBSession) -> list[ServiceTokenRead]:
+    return await services.list_service_tokens(session)
+
+
+@router.post(
+    "/service-tokens",
+    dependencies=[audit("service_token.create", "service_token")],
+    response_model=ServiceTokenCreated,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_service_token(
+    data: ServiceTokenCreate, admin: VerifiedAdminUser, session: DBSession
+) -> ServiceTokenCreated:
+    token, plain = await services.create_service_token(session, admin, data)
+    note(entity_id=token.id)
+    return ServiceTokenCreated(**token.model_dump(), token=plain)
+
+
+@router.post(
+    "/service-tokens/{token_id}/revoke",
+    dependencies=[audit("service_token.revoke", "service_token", "token_id")],
+    response_model=ServiceTokenRead,
+)
+async def revoke_service_token(
+    token_id: uuid.UUID, _: VerifiedAdminUser, session: DBSession
+) -> ServiceTokenRead:
+    return await services.revoke_service_token(session, token_id)
 
 
 @public_router.post("/invite/accept", status_code=status.HTTP_204_NO_CONTENT)

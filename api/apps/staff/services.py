@@ -1,16 +1,20 @@
 """Staff roles and permissions (doc 06)."""
 
+import hashlib
+import secrets
 import uuid
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.auth import services as auth_services
 from apps.auth.models import UserTotp
-from apps.staff.models import StaffRole
+from apps.staff.models import StaffRole, StaffServiceToken
 from apps.staff.permissions import ALL_PERMISSIONS
 from apps.staff.schemas import (
+    ServiceTokenCreate,
+    ServiceTokenRead,
     StaffInvite,
     StaffMember,
     StaffRoleCreate,
@@ -21,6 +25,7 @@ from apps.users import services as users
 from apps.users.models import Role, User
 from apps.users.tasks import send_templated_email
 from kuulis.core.exceptions import (
+    AppError,
     AuthenticationError,
     ConflictError,
     NotFoundError,
@@ -183,3 +188,115 @@ async def update_member(session: AsyncSession, actor: User, user: User, data: St
     if changes.get("is_active") is False or "role" in changes or "staff_role_id" in changes:
         await auth_services.revoke_all(str(user.id))  # new powers apply from the next sign-in
     return user
+
+
+# --- Service tokens -----------------------------------------------------------------------------
+
+SERVICE_TOKEN_PREFIX = "kst_"
+# last_used_at is written at most this often, not on every request.
+TOKEN_TOUCH_EVERY = timedelta(minutes=5)
+
+
+class ServiceTokenInvalidError(AuthenticationError):
+    code = "service_token_invalid"
+    message = "Service token not valid"
+
+
+class ServiceTokenPermissionsError(AppError):
+    code = "service_token_permissions"
+    message = "The account's role does not have those permissions"
+
+
+class ServiceTokenAccountError(AppError):
+    code = "service_token_account"
+    message = "Service tokens act as an active staff account with a role"
+
+
+class ServiceTokenNotFoundError(NotFoundError):
+    code = "service_token_not_found"
+    message = "Service token not found"
+
+
+def _hash(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+async def user_from_service_token(session: AsyncSession, token: str) -> User:
+    """The staff account behind ``token``, with ``auth_scopes`` set to what the token allows."""
+    row = await session.scalar(
+        select(StaffServiceToken).where(StaffServiceToken.token_hash == _hash(token))
+    )
+    now = datetime.now(UTC)
+    if row is None or row.revoked_at is not None or (row.expires_at and row.expires_at <= now):
+        raise ServiceTokenInvalidError()
+    user = await users.get_by_id(session, row.user_id)
+    if user is None or not user.is_active or user.role != Role.STAFF:
+        raise ServiceTokenInvalidError()
+    if row.last_used_at is None or now - row.last_used_at >= TOKEN_TOUCH_EVERY:
+        row.last_used_at = now
+        await session.flush()
+    user.auth_scopes = frozenset(row.permissions)
+    return user
+
+
+def service_token_read(token: StaffServiceToken, email: str, full_name: str) -> ServiceTokenRead:
+    return ServiceTokenRead(
+        id=token.id,
+        name=token.name,
+        user_id=token.user_id,
+        user_email=email,
+        user_name=full_name,
+        prefix=token.prefix,
+        permissions=sorted(token.permissions),
+        expires_at=token.expires_at,
+        last_used_at=token.last_used_at,
+        revoked_at=token.revoked_at,
+        created_at=token.created_at,
+    )
+
+
+async def list_service_tokens(session: AsyncSession) -> list[ServiceTokenRead]:
+    rows = await session.execute(
+        select(StaffServiceToken, User.email, User.full_name)
+        .join(User, User.id == StaffServiceToken.user_id)
+        .order_by(StaffServiceToken.revoked_at.is_not(None), StaffServiceToken.created_at.desc())
+    )
+    return [service_token_read(t, email, name) for t, email, name in rows.all()]
+
+
+async def create_service_token(
+    session: AsyncSession, actor: User, data: ServiceTokenCreate
+) -> tuple[ServiceTokenRead, str]:
+    """Creates the token; the plain key is returned once and never stored."""
+    user = await users.get_by_id(session, data.user_id)
+    if user is None or user.role != Role.STAFF or not user.is_active or user.deleted_at:
+        raise ServiceTokenAccountError()
+    missing = sorted(set(data.permissions) - await permissions_of(session, user))
+    if missing:
+        raise ServiceTokenPermissionsError(details={"missing": missing})
+    plain = SERVICE_TOKEN_PREFIX + secrets.token_urlsafe(32)
+    token = StaffServiceToken(
+        name=data.name,
+        user_id=user.id,
+        token_hash=_hash(plain),
+        prefix=plain[:12],
+        permissions=data.permissions,
+        expires_at=data.expires_at,
+        created_by_id=actor.id,
+    )
+    session.add(token)
+    await session.flush()
+    await session.refresh(token)
+    return service_token_read(token, user.email, user.full_name), plain
+
+
+async def revoke_service_token(session: AsyncSession, token_id: uuid.UUID) -> ServiceTokenRead:
+    token = await session.get(StaffServiceToken, token_id)
+    if token is None:
+        raise ServiceTokenNotFoundError()
+    if token.revoked_at is None:
+        token.revoked_at = datetime.now(UTC)
+        await session.flush()
+        await session.refresh(token)
+    user = await users.get_by_id(session, token.user_id)
+    return service_token_read(token, user.email if user else "", user.full_name if user else "")

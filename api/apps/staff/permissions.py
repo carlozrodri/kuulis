@@ -113,4 +113,10 @@ DEFAULT_ROLES: dict[str, tuple[str, tuple[str, ...]]] = {
     ),
     # The person in Caracas who posts from a phone: only the day's posting cards.
     "publicador": ("Publicador", ("marketing.publish",)),
+    # The account behind the MK6 agents' service token (marketing/agentes): approve only records
+    # the decision Carlos takes on the thread's card, never on its own.
+    "agentes": (
+        "Agentes de marketing",
+        ("marketing.view", "marketing.manage", "marketing.publish", "marketing.approve"),
+    ),
 }
