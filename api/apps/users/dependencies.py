@@ -45,12 +45,23 @@ def has_admin_session(user: User) -> bool:
     return user.can_access_admin and (user.auth_mfa or not settings.ADMIN_TOTP_REQUIRED)
 
 
+def is_service_token(token: str) -> bool:
+    from apps.staff.services import SERVICE_TOKEN_PREFIX
+
+    return token.startswith(SERVICE_TOKEN_PREFIX)
+
+
 async def get_current_user(
     session: DBSession,
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
 ) -> User:
     if credentials is None:
         raise AuthenticationError()
+    if is_service_token(credentials.credentials):
+        # Service tokens only open the endpoints that name a permission (see require_permission).
+        raise AuthenticationError(
+            "Service tokens can't use this endpoint", code="service_token_not_allowed"
+        )
     user = await user_from_token(session, credentials.credentials)
     set_log_field("user_id", user.id)
     return user
@@ -59,13 +70,37 @@ async def get_current_user(
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
+async def get_actor(
+    session: DBSession,
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
+) -> User:
+    """The signed-in user, or the staff account behind a service token (``user.auth_scopes``
+    holds what the token may do). Only :func:`require_permission` and the audit log use it."""
+    if credentials is None:
+        raise AuthenticationError()
+    if not is_service_token(credentials.credentials):
+        return await get_current_user(session, credentials)
+    from apps.staff.services import user_from_service_token
+
+    user = await user_from_service_token(session, credentials.credentials)
+    set_log_field("user_id", user.id)
+    return user
+
+
+CurrentActor = Annotated[User, Depends(get_actor)]
+
+
+def _check_roles(user: User, roles: tuple[Role, ...]) -> None:
+    if user.role not in roles:
+        raise PermissionDeniedError()
+    if user.can_access_admin and not has_admin_session(user):
+        # A staff account signed in from the app (password only): no admin powers there.
+        raise PermissionDeniedError("Sign in to the admin panel", code="admin_mfa_required")
+
+
 def require_roles(*roles: Role):
     async def _checker(user: CurrentUser) -> User:
-        if user.role not in roles:
-            raise PermissionDeniedError()
-        if user.can_access_admin and not has_admin_session(user):
-            # A staff account signed in from the app (password only): no admin powers there.
-            raise PermissionDeniedError("Sign in to the admin panel", code="admin_mfa_required")
+        _check_roles(user, roles)
         return user
 
     _checker.admin_roles = roles  # type: ignore[attr-defined]  # found by the audit coverage test
@@ -93,14 +128,24 @@ VerifiedAdminUser = Annotated[User, Depends(_verified_admin)]
 
 def require_permission(permission: str, *, verified: bool = False):
     """Staff whose role has ``permission`` (admins have all of them); ``verified`` also asks for a
-    fresh second-factor code, like :data:`VerifiedAdminUser`."""
+    fresh second-factor code, like :data:`VerifiedAdminUser`. A service token works here too
+    when it carries ``permission`` and its account's role still has it, never for ``verified``."""
     from apps.staff.permissions import ALL_PERMISSIONS
     from apps.staff.services import permissions_of
 
     if permission not in ALL_PERMISSIONS:
         raise ValueError(f"Unknown permission {permission!r}")
 
-    async def _checker(user: StaffUser, session: DBSession) -> User:
+    async def _checker(user: CurrentActor, session: DBSession) -> User:
+        scopes = getattr(user, "auth_scopes", None)
+        if scopes is None:
+            _check_roles(user, (Role.STAFF, Role.ADMIN))
+        elif verified or permission not in scopes:
+            raise PermissionDeniedError(
+                "This service token does not allow this",
+                code="service_token_forbidden",
+                details={"permission": permission},
+            )
         if permission not in await permissions_of(session, user):
             raise PermissionDeniedError(
                 "Your role does not allow this", details={"permission": permission}

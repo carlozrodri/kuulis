@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
@@ -78,6 +78,42 @@ class StaffUpdate(BaseModel):
     staff_role_id: uuid.UUID | None = None
     role: Literal[Role.STAFF, Role.ADMIN] | None = None
     is_active: bool | None = None
+
+
+class ServiceTokenCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=80)
+    user_id: uuid.UUID
+    permissions: list[str] = Field(min_length=1, max_length=100)
+    expires_at: datetime | None = None
+
+    _check = field_validator("permissions")(_known)
+
+    @field_validator("expires_at")
+    @classmethod
+    def _future(cls, value: datetime | None) -> datetime | None:
+        if value is not None and value.tzinfo is None:
+            raise ValueError("expires_at needs a time zone")
+        if value is not None and value <= datetime.now(UTC):
+            raise ValueError("expires_at must be in the future")
+        return value
+
+
+class ServiceTokenRead(BaseModel):
+    id: uuid.UUID
+    name: str
+    user_id: uuid.UUID
+    user_email: str
+    user_name: str
+    prefix: str  # the first characters of the key, to recognise it
+    permissions: list[str]
+    expires_at: datetime | None
+    last_used_at: datetime | None
+    revoked_at: datetime | None
+    created_at: datetime
+
+
+class ServiceTokenCreated(ServiceTokenRead):
+    token: str  # the whole key: shown only in this response
 
 
 class InviteAccept(BaseModel):

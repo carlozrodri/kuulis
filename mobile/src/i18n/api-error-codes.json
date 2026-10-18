@@ -554,6 +554,24 @@
     "service_paused": [
       "apps/control/services.py"
     ],
+    "service_token_account": [
+      "apps/staff/services.py"
+    ],
+    "service_token_forbidden": [
+      "apps/users/dependencies.py"
+    ],
+    "service_token_invalid": [
+      "apps/staff/services.py"
+    ],
+    "service_token_not_allowed": [
+      "apps/users/dependencies.py"
+    ],
+    "service_token_not_found": [
+      "apps/staff/services.py"
+    ],
+    "service_token_permissions": [
+      "apps/staff/services.py"
+    ],
     "service_unavailable": [
       "kuulis/core/exceptions.py"
     ],

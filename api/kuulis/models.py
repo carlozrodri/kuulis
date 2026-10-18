@@ -55,7 +55,7 @@ from apps.safety.models import (  # noqa: F401
     SafetyAlert,
     TrustedContact,
 )
-from apps.staff.models import StaffRole  # noqa: F401
+from apps.staff.models import StaffRole, StaffServiceToken  # noqa: F401
 from apps.subscriptions.models import Charge, FeeSchedule  # noqa: F401
 from apps.support.models import CannedResponse, HelpArticle, LostItemRequest  # noqa: F401
 from apps.updates.models import AppUpdate  # noqa: F401

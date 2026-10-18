@@ -59,7 +59,8 @@ Sin cambios.
   `require_permission("wallet.adjust")` que reemplaza a `StaffUser`/`AdminUser` en cada endpoint admin.
 - Tabla `pending_approvals` (`action`, `payload`, `requested_by`, `approved_by`, `status`, `expires_at`).
 - Endpoints: `GET /admin/audit`, `GET /admin/staff`, `POST /admin/staff/invite`, `PATCH /admin/staff/{id}`,
-  `GET/PUT /admin/roles`, `GET /admin/approvals`, `POST /admin/approvals/{id}/approve|reject`.
+  `GET/PUT /admin/roles`, `GET /admin/approvals`, `POST /admin/approvals/{id}/approve|reject`,
+  `GET/POST /admin/service-tokens`, `POST /admin/service-tokens/{id}/revoke` (ver «Tokens de servicio»).
 - Error `permission_denied` (403) con `details.permission`.
 
 ## Criterios de aceptación
@@ -150,3 +151,32 @@ Sin cambios.
   cambio quedó esperando aprobación.
 - Mientras Carlos sea el único admin, las tarifas y los tramos no tienen quién los apruebe; se puede apagar
   `approval_fares` en Configuración hasta que haya un segundo admin.
+
+### Tokens de servicio (2026-10-18, MK6 de marketing)
+Para que un programa (los agentes de marketing, [`docs/marketing/08`](../marketing/08-arquitectura-de-agentes.md))
+use la API sin la sesión del panel ni el 2FA de una persona.
+- Tabla `staff_service_tokens`: nombre, cuenta del equipo con la que actúa (`user_id`), SHA-256 de la clave
+  (la clave nunca se guarda), prefijo para reconocerla, permisos, vencimiento opcional, último uso (se anota como
+  mucho cada 5 minutos), revocado y quién lo creó.
+- La clave es `kst_` + 43 caracteres aleatorios y se envía como `Authorization: Bearer kst_…`. Solo se muestra
+  una vez, al crearla.
+- **Qué abre:** solo los endpoints con `Can("permiso")`, cuando el token lleva ese permiso **y** el rol actual de
+  la cuenta también lo tiene (si el rol pierde un permiso, el token también). Nunca los que piden código 2FA
+  reciente (`verified`: ajustes de saldo, recargas, cierres, suscripciones), ni los de solo admin, ni los de
+  usuario (`/users/me`, viajes…): ahí responde 401 `service_token_not_allowed`.
+- La cuenta debe ser **staff con rol y activa** (no admin). Desactivarla o quitarle el rol apaga sus tokens.
+- Lo que hace el token queda en la auditoría a nombre de esa cuenta.
+- Endpoints (solo admin; crear y revocar piden código 2FA reciente y se auditan como
+  `service_token.create` y `service_token.revoke`):
+  - `GET /admin/service-tokens` → lista sin la clave.
+  - `POST /admin/service-tokens` `{name, user_id, permissions, expires_at?}` → 201 con `token` (la clave entera).
+    Permisos fuera del rol de la cuenta: 400 `service_token_permissions` con `details.missing`; cuenta que no es
+    staff activa con rol: 400 `service_token_account`.
+  - `POST /admin/service-tokens/{id}/revoke` → deja de funcionar al instante.
+- Errores al usarlo: 401 `service_token_invalid` (no existe, revocado, vencido o cuenta inactiva), 403
+  `service_token_forbidden` (el token no lleva ese permiso o el endpoint pide 2FA), 403 `permission_denied` (el
+  rol ya no lo tiene).
+- Admin: **Administración → Tokens de servicio**: lista con estado, crear (cuenta, permisos limitados a su rol,
+  vencimiento) mostrando la clave una sola vez con botón de copiar, y revocar con confirmación.
+- La clave se guarda en las variables de entorno de quien la usa (Coolify o los secretos del entorno de Claude),
+  nunca en un chat ni en el repositorio.

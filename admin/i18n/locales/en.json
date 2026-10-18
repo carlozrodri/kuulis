@@ -21,6 +21,7 @@
     "audit": "Audit log",
     "team": "Team",
     "roles": "Roles",
+    "serviceTokens": "Service tokens",
     "approvals": "Approvals",
     "legal": "Legal",
     "privacy": "Privacy",
@@ -4273,6 +4274,39 @@
       "archivado": "Archived piece",
       "reopenHelp": "It can't be edited or receive files. Move it back to “Idea” to work on it again.",
       "help": "It can't be edited or receive files."
+    }
+  },
+  "serviceTokens": {
+    "help": "Keys that let a program (the marketing agents) use the API as a team account. They only open screens that ask for a permission, and only with the permissions you tick. Keep them in environment variables, never in a chat or the repository.",
+    "create": "Create token",
+    "createHelp": "The token acts as the account you pick and can never do more than its role.",
+    "name": "Name",
+    "namePlaceholder": "Marketing agents",
+    "account": "Account",
+    "accountHelp": "A team account with a role (not an admin). What the token does is audited under its name.",
+    "permissions": "Permissions",
+    "permissionsHelp": "Only those of that account's role. If the role loses a permission, so does the token.",
+    "expires": "Expires",
+    "expiresHelp": "Optional. Without a date it works until you revoke it.",
+    "lastUsed": "Last used",
+    "never": "Never",
+    "noExpiry": "No expiry",
+    "empty": "No tokens yet.",
+    "noAccounts": "There are no active team accounts with a role. Invite one first (for example “Marketing agents” with the Marketing role).",
+    "createdTitle": "Token created",
+    "onceTitle": "Copy it now: it won't be shown again",
+    "onceHelp": "Paste it straight into the environment variable where it will be used. If you lose it, revoke it and create another.",
+    "copy": "Copy",
+    "copied": "Token copied",
+    "done": "Done",
+    "revoke": "Revoke",
+    "revokeTitle": "Revoke this token?",
+    "revokeHelp": "“{name}” stops working at once. This can't be undone.",
+    "revoked": "Token revoked",
+    "states": {
+      "active": "Active",
+      "expired": "Expired",
+      "revoked": "Revoked"
     }
   }
 }

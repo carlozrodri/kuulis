@@ -21,6 +21,7 @@
     "audit": "Auditoría",
     "team": "Equipo",
     "roles": "Roles",
+    "serviceTokens": "Tokens de servicio",
     "approvals": "Aprobaciones",
     "legal": "Legal",
     "privacy": "Privacidad",
@@ -4273,6 +4274,39 @@
       "archivado": "Pieza archivada",
       "reopenHelp": "No se puede editar ni subir archivos. Pásala a «Idea» para volver a trabajarla.",
       "help": "No se puede editar ni subir archivos."
+    }
+  },
+  "serviceTokens": {
+    "help": "Claves para que un programa (los agentes de marketing) use la API como una cuenta del equipo. Solo abren las pantallas que piden un permiso, y solo con los permisos que marques. Guárdalas en las variables de entorno, nunca en un chat ni en el repositorio.",
+    "create": "Crear token",
+    "createHelp": "El token actúa como la cuenta que elijas y nunca puede más que su rol.",
+    "name": "Nombre",
+    "namePlaceholder": "Agentes de marketing",
+    "account": "Cuenta",
+    "accountHelp": "Una cuenta del equipo con rol (no administradora). Lo que haga el token queda en la auditoría a su nombre.",
+    "permissions": "Permisos",
+    "permissionsHelp": "Solo los del rol de esa cuenta. Si el rol pierde un permiso, el token también.",
+    "expires": "Vence",
+    "expiresHelp": "Opcional. Sin fecha, sirve hasta que lo revoques.",
+    "lastUsed": "Último uso",
+    "never": "Nunca",
+    "noExpiry": "Sin vencimiento",
+    "empty": "Todavía no hay tokens.",
+    "noAccounts": "No hay cuentas del equipo activas con rol. Invita primero una cuenta (por ejemplo «Agentes de marketing» con el rol Marketing).",
+    "createdTitle": "Token creado",
+    "onceTitle": "Cópialo ahora: no se vuelve a mostrar",
+    "onceHelp": "Pégalo directamente en la variable de entorno donde se usará. Si lo pierdes, revócalo y crea otro.",
+    "copy": "Copiar",
+    "copied": "Token copiado",
+    "done": "Listo",
+    "revoke": "Revocar",
+    "revokeTitle": "¿Revocar este token?",
+    "revokeHelp": "«{name}» deja de funcionar al instante. No se puede deshacer.",
+    "revoked": "Token revocado",
+    "states": {
+      "active": "Activo",
+      "expired": "Vencido",
+      "revoked": "Revocado"
     }
   }
 }
