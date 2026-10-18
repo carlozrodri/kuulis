@@ -69,6 +69,8 @@ def call(
         raise ApiError(
             exc.code, err.get("code", "?"), err.get("message", ""), err.get("details")
         ) from exc
+    except urllib.error.URLError as exc:
+        raise ApiError(0, "unreachable", f"{API}: {exc.reason}") from exc
     return json.loads(raw) if raw else None
 
 

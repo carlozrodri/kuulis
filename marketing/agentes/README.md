@@ -22,8 +22,8 @@ siempre por PR.
 ## Acceso a la API
 
 - `KUULIS_API`: `https://kuulis-qa.top8.uk/api/v1` mientras producción esté apagada; luego la de producción.
-- `KUULIS_MK_TOKEN`: **token de servicio** creado en el panel (Equipo › Tokens de servicio) para una cuenta de
-  staff con rol Marketing. Permisos: `marketing.view`, `marketing.manage`, `marketing.publish` y
+- `KUULIS_MK_TOKEN`: **token de servicio** creado en el panel (Administración › Tokens de servicio) para una cuenta de
+  staff con el rol **Agentes de marketing** (lo crea la migración). Permisos: `marketing.view`, `marketing.manage`, `marketing.publish` y
   `marketing.approve` (este último solo para registrar la decisión que Carlos toma en el hilo).
 - El token va en los **secretos del entorno de Claude** (configuración del entorno), nunca en el chat ni en el
   repo. Si falta, el flujo se detiene en el paso 0 y avisa una sola vez.
