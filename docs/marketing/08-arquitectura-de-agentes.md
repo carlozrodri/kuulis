@@ -24,7 +24,7 @@ y dejan todo registrado. Las personas aprueban lo que sale; los agentes hacen el
 | **Estratega** | Aprendizajes, calendario base ([04](04-calendario-y-flujo-diario.md)), tendencias, reserva de piezas, datos de oferta y demanda | Calendario semanal (pilar, formato, plataforma, franja), alertas de reserva baja, propuestas F-TENDENCIA | Domingos + revisión de tendencias 2 veces al día | Respeta la mezcla de la fase; nunca tendencias sensibles |
 | **Guionista** | Una entrada del calendario + biblia de marca + biblia del personaje | Guion con 3 ganchos, texto en pantalla, subtítulos, descripción y hashtags por red, CTA con UTM | Diario | Solo hechos de [01](01-estrategia-y-posicionamiento.md); estructura de [03](03-pilares-y-formatos.md) |
 | **Revisor de marca y cumplimiento** | Guion (y luego el video) | Aprobado / cambios pedidos / rechazado, con motivo | Antes de producir y antes de publicar | Lista de [10](10-riesgos-y-cumplimiento.md); verifica cada cifra contra la fuente; exige etiqueta de IA si toca |
-| **Productor** | Guion aprobado | Prompts de Higgsfield/voz, renders de Remotion, lista de tomas para grabación real, versiones por plataforma (sin marcas de agua cruzadas), portada | Diario | Usa las plantillas de marca; registra herramienta, modelo y créditos gastados |
+| **Productor** | Guion aprobado | Prompts de Higgsfield y Buzzy, voz, renders de Remotion, grabaciones de pantalla de la app, versiones por plataforma (sin marcas de agua cruzadas), portada | Diario | Usa las plantillas de marca; registra herramienta, modelo y créditos gastados |
 | **Publicador** | Paquete aprobado | Publicación programada (API) o paquete listo para publicar a mano; registro del enlace y la hora | En la franja | Nunca publica sin aprobación; F1 siempre manual |
 | **Analista** | APIs de métricas, carga manual, eventos de la web y de la app | Instantáneas de métricas por publicación, informe diario corto y semanal | Diario 06:00 + domingo | Compara contra la mediana de la cuenta, no contra cifras de manual |
 | **Recomendador** | Métricas + atributos de cada pieza | Aprendizajes con evidencia, ajuste de pesos de pilares y formatos, experimentos A/B propuestos | Diario (ligero) y semanal (profundo) | Toda recomendación cita las piezas y números que la respaldan; distingue «probado» de «hipótesis» |
@@ -34,7 +34,7 @@ y dejan todo registrado. Las personas aprueban lo que sale; los agentes hacen el
 Todo en el monorepo, para que cualquier sesión de Claude (o una persona) los use igual:
 
 ```
-.claude/agents/            Definición de cada agente (Markdown, formato inspirado en agency-agents, ver 07)
+.claude/agents/            Definición de cada agente (Markdown propio de Kuulis)
   marketing-estratega.md
   marketing-guionista.md
   marketing-revisor.md

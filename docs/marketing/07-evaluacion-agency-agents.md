@@ -38,10 +38,10 @@ centrados en China (Douyin, Xiaohongshu, WeChat, Bilibili…). En `paid-media/` 
 - **La mitad del departamento es para China** y no aplica.
 
 ## 4. Veredicto
-**No instalarlo como sistema. Construir agentes propios de Kuulis, inspirados en su formato.**
+**Decidido (2026-10-18): Carlos lo descarta por completo.** Se construyen agentes propios de Kuulis.
 
-- Se toman como referencia (con atribución MIT): la estructura de secciones, el bucle de aprendizaje de
-  Carousel Growth Engine y la regla de borrador primero de Multi-Platform Publisher.
+- No se copia nada del repositorio. Las ideas generales (agente con reglas y entregables claros, bucle de
+  aprendizaje, borrador antes de publicar) son prácticas comunes y se escriben desde cero para Kuulis.
 - Los agentes propios viven en el repo (ver [08](08-arquitectura-de-agentes.md)), llevan dentro la verdad de la
   marca, las reglas de [10](10-riesgos-y-cumplimiento.md) y leen datos reales de Kuulis, no cifras de manual.
 - Coste de esta decisión: escribir 6–8 archivos de agente bien pensados, una vez. Es menos trabajo que limpiar

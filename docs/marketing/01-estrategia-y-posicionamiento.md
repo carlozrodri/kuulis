@@ -73,8 +73,10 @@ Detalle por plataforma en [02](02-plataformas-y-algoritmos.md).
 ## 7. Principios
 1. **Probar mucho, barato y rápido.** La viralidad no se garantiza; se aumenta la probabilidad con volumen,
    ganchos fuertes y aprender de los datos cada semana.
-2. **Real gana a perfecto.** En Caracas, un video grabado con teléfono a un motorizado real suele rendir más
-   que un comercial pulido. La IA ayuda, no sustituye la calle.
+2. **Que no parezca un comercial.** **Decidido (2026-10-18): por ahora no hay acceso a contenido real
+   grabado**, así que todo sale de IA (personaje y escenas), plantillas de marca y grabaciones de pantalla de
+   la app real. Para que rinda, la IA tiene que sentirse de calle: escenas reconocibles de Caracas, humor,
+   ritmo de video casero, nada de estética de anuncio. Cuando haya acceso a grabar gente real, se suma.
 3. **Un mensaje por pieza.** Si el video dice dos cosas, son dos videos.
 4. **Cada pieza deja datos.** Nada se publica sin su registro (id, gancho, pilar, formato, herramientas,
    enlace con UTM). Así los agentes aprenden qué rinde.

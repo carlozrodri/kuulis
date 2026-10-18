@@ -4,16 +4,19 @@ Revisado el **2026-10-18**. Los precios de estas herramientas cambian casi cada 
 contradicen; las cifras son **aproximadas** y se confirman en la página oficial el día de pagar.
 No se ha suscrito ni pagado nada.
 
+**Decidido (2026-10-18):** Carlos aprueba **Higgsfield Plus** y **Buzzy Basic** para probar la calidad.
+Los precios de esos dos planes son los que Carlos vio en sus páginas ese día (tabla de §3).
+
 ## 1. Resumen
 | Herramienta | Qué hace bien | Estado hoy | Precio aproximado | Para Kuulis |
 | --- | --- | --- | --- | --- |
-| **Higgsfield** (incl. AI Influencer Studio) | Personaje consistente, video con movimiento de cámara, muchos modelos de video en un solo sitio (agregador) | Activo; AI Influencer Studio renovado el 2026-10-03 | Starter ~$15–19/mes · Plus ~$49–59/mes (~$39–47 anual) · Ultra ~$129/mes. Créditos mensuales que **vencen a los 30 días** | **Suscribir primero** (Plus, mensual) |
+| **Higgsfield** (incl. AI Influencer Studio) | Personaje consistente, video con movimiento de cámara, muchos modelos de video en un solo sitio (agregador) | Activo; AI Influencer Studio renovado el 2026-10-03 | **Plus €59/mes** (visto por Carlos): 1200 créditos/mes (~600 imágenes Nano Banana Pro o ~80 videos Seedance 2.5), 30 generaciones gratis de AI Influencer, hasta 6 videos en paralelo. Créditos que **vencen cada mes** | **Aprobado** (Plus, mensual): personaje |
 | **Remotion** | Video programado en React: plantillas de marca, subtítulos, datos animados, carruseles, todo automatizable | Activo, código abierto con licencia propia | **Gratis** para empresas de hasta 3 personas; luego $25/mes por asiento o $0,01 por render (mínimo $100/mes) | **Usar desde el día 1** (gratis) |
 | **Midjourney** | La mejor estética de imagen fija (portadas, fondos, conceptos) | Activo, V8.x | Basic $10 · Standard $30 · Pro $60/mes | Opcional en F2; no hace falta para arrancar |
 | **Runway** | Edición de video con IA, Gen-4.5, herramientas de postproducción | Activo | Standard ~$12–15 · Pro ~$28–35 · Max ~$95/mes; ~12 créditos por segundo de Gen-4.5 | No ahora: Higgsfield cubre lo mismo para este uso |
 | **Sora (OpenAI)** | Fue de los mejores generadores de video | **Descontinuado:** la app cerró en abril de 2026 y la API el 24-09-2026 | — | **Descartado** |
 | **DALL-E (OpenAI)** | Imagen | **Retirado** de la API en mayo de 2026; lo reemplaza GPT Image | GPT Image: ~$0,01–0,17 por imagen según calidad | Útil vía API para piezas automáticas (carruseles, fondos) |
-| **Buzzy (buzzy.now)** | Lienzo «agéntico» para crear video con IA | Producto nuevo; **sin tabla de precios oficial verificable**; hay otro «Buzzy» distinto (de Creati) que confunde | Desconocido; prueba gratis de 2 videos según terceros | Probar gratis; no suscribir hasta ver precios y términos |
+| **Buzzy (buzzy.now)** | Lienzo «agéntico» para crear video con IA; muchos modelos (Seedance, MiniMax, Wan, GPT Image, Midjourney, Nano Banana) | Producto nuevo, poco historial | **Basic $19/mes** (visto por Carlos): 2000 créditos/mes (~300 imágenes o ~60 videos), 1 tarea a la vez; algunos modelos ilimitados por 7 días | **Aprobado** (Basic, mensual): volumen de escenas e imágenes y prueba de calidad |
 | **Veo 3.1 (Google)** | Video con audio sincronizado, muy realista | Activo, por API | Fast ~$0,10–0,12/s · Standard ~$0,40/s | Por API en F3 para automatizar; también disponible dentro de Higgsfield |
 | **Kling 3** | Video realista barato, buen movimiento humano | Activo | Desde ~$7/mes (consumo) | Disponible dentro de Higgsfield; no suscribir aparte |
 | **Voz con licencia comercial** (p. ej. ElevenLabs) | Voz fija del personaje, doblaje, locución | Activo | Desde ~$5/mes el plan más bajo con uso comercial; ~$22/mes el siguiente | **Suscribir con el personaje** |
@@ -35,25 +38,39 @@ No se ha suscrito ni pagado nada.
   avanzada de video real (quitar objetos, extender planos).
 - **Sora y DALL-E** ya no son opciones: OpenAI cerró Sora y retiró DALL-E. Cualquier plan que los nombre está
   desactualizado.
-- **Buzzy** es demasiado nuevo para apostar: sin precios publicados, sin historial. Se puede probar la cuenta
-  gratis para comparar, nada más.
+- **Buzzy** es nuevo y tiene poco historial, pero su precio es competitivo: por $19 da más créditos que el
+  Plus de Higgsfield y acceso a Midjourney V8.2, GPT Image y Nano Banana sin pagarlos aparte. Lo que hay que
+  vigilar: el plan Basic hace **una tarea a la vez** y **no incluye la subida de caras reales ni el agente
+  director del lienzo** (son del plan superior), así que no sirve para fijar el personaje; los modelos
+  «ilimitados» lo son solo 7 días. Encaja como fábrica de escenas, fondos, planos POV, sketches e imágenes de
+  carrusel, mientras Higgsfield se queda con el personaje.
 
 ## 3. Qué suscribir y cuándo
-| Momento | Qué | Coste mensual aprox. | Por qué |
+| Momento | Qué | Coste mensual | Por qué |
 | --- | --- | --- | --- |
-| **F0, mes 1** | Higgsfield **Plus, mensual** (no anual) + voz con licencia comercial (plan bajo) | ~$55–65 | Crear y probar el personaje; con el mes de uso se ve cuántos créditos se gastan de verdad |
-| F0 | Remotion, CapCut, editores nativos | $0 | Plantillas y edición |
-| F1, mes 2 | Mantener o bajar de plan según el consumo real del mes 1 | ~$25–65 | Decidir con datos |
-| F2 | Opcional: Midjourney Basic si las portadas lo piden; pauta pagada sobre ganadores | +$10 + pauta | Solo si los datos lo justifican |
-| F3 | APIs por uso (Veo/Kling vía proveedor, GPT Image) para automatizar | Según volumen | Automatización completa |
+| **Mes 1** | **Higgsfield Plus** (€59, mensual) | ~$64–69 según el cambio | Personaje consistente (AI Influencer, 30 generaciones gratis), videos del personaje hablando |
+| **Mes 1** | **Buzzy Basic** ($19, mensual) | $19 | Escenas de Caracas, POV, sketches, imágenes de carrusel; comparar calidad con Higgsfield |
+| Mes 1 | Voz con licencia comercial (plan bajo) | ~$5 | Voz fija del personaje, si la de Higgsfield no basta |
+| Mes 1 | Remotion, CapCut, editores nativos | $0 | Plantillas y edición |
+| **Mes 2** | Quedarse con una o las dos según la prueba de abajo y el consumo real de créditos | Según resultado | Decidir con datos |
+| F2–F3 | Pauta pagada sobre ganadores; APIs por uso para automatizar | Según volumen | Solo si los datos lo justifican |
 
-**Regla:** nunca plan anual hasta tener 2 meses de datos. Revisar el consumo de créditos cada semana
-(lo registra el sistema, ver [09](09-registro-datos-y-medicion.md)).
+**Total del mes 1: unos $90–95.** Regla: nunca plan anual hasta tener 2 meses de datos; el consumo de créditos
+se registra cada semana (ver [09](09-registro-datos-y-medicion.md)).
 
-## 4. Equipo físico mínimo para lo real
-Un teléfono con buena cámara (ya existe), un micrófono inalámbrico de solapa (~$20–40), un estabilizador o
-trípode pequeño (~$15–30). Es la inversión con mejor retorno de todo el plan: el contenido real de la calle
-suele rendir más que el generado.
+### Prueba de calidad Higgsfield vs Buzzy (mes 1)
+1. **Primeros 7 días** (aprovechar los modelos ilimitados de los dos): los mismos **5 guiones** del banco de ideas
+   se producen en ambas herramientas: personaje hablando a cámara, POV en moto por Caracas, sketch de dos
+   personajes, imagen de carrusel con texto y una escena de noche.
+2. Cada resultado se puntúa del 1 al 5 en: realismo, que se vea Caracas (no «Latinoamérica genérica»),
+   consistencia del personaje, texto legible, tiempo de producción y créditos gastados.
+3. Las mejores versiones se publican y sus métricas se comparan en el registro (herramienta como atributo).
+4. Al final del mes: se queda la herramienta que dé mejor calidad por dólar en cada tipo de pieza, o las dos si
+   cada una gana en lo suyo.
+
+## 4. Equipo físico
+No hace falta por ahora (no hay contenido real, decidido). Cuando lo haya: micrófono de solapa inalámbrico
+(~$20–40) y trípode o estabilizador pequeño (~$15–30).
 
 ## 5. Fuentes consultadas
 - [Higgsfield: nuevo AI Influencer](https://higgsfield.ai/blog/new-ai-influencer) ·

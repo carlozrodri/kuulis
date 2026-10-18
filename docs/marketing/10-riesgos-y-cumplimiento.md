@@ -62,7 +62,7 @@ conviene confirmarlos con un abogado en Venezuela antes de F2.
 | Riesgo | Mitigación |
 | --- | --- |
 | Gastar en suscripciones sin resultados | Plan mensual, revisión de consumo semanal, decisión con datos al final de cada mes |
-| Contenido de IA que «se nota» y genera rechazo | Mezcla con contenido real; el personaje es declarado; medir comentarios negativos por pieza |
+| Contenido de IA que «se nota» y genera rechazo (más riesgo ahora que todo es IA) | Escenas y humor muy caraqueños, pantallas reales de la app como prueba, personaje declarado; medir comentarios negativos por pieza; sumar contenido real en cuanto haya acceso |
 | Viralidad sin conversión | Medir hasta registros y viajes (ver [09](09-registro-datos-y-medicion.md)); premiar formatos que convierten, no solo que se ven |
 | Demanda que no se puede atender (pasajeros sin motorizados) | Mezcla 60/40 a favor de motorizados en F1; el estratega lee el mapa de oferta y demanda |
 | Dependencia de una herramienta que cierra (como pasó con Sora) | Plantillas propias en Remotion y biblia del personaje con referencias exportadas, para poder migrar |

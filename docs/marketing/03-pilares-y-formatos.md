@@ -6,10 +6,10 @@ Cada pieza pertenece a un solo pilar. El pilar se registra con la pieza para sab
 | Código | Pilar | Para quién | Qué hace | Peso en F1 |
 | --- | --- | --- | --- | --- |
 | `CUENTAS` | **Cuentas claras** | Motorizado | Muestra con números que se queda con todo: comparativas de cuánto le queda de una carrera, la tabla de la cuota, «mes flojo = $0» | 25 % |
-| `CALLE` | **La calle caraqueña** | Ambos | Humor y situaciones reales de moverse en Caracas: tráfico, regateo, lluvia, la cola, el «¿cuánto me cobras, pana?» | 25 % |
+| `CALLE` | **La calle caraqueña** | Ambos | Humor y situaciones reales de moverse en Caracas: tráfico, regateo, lluvia, la cola, el «¿cuánto me cobras, pana?» | 35 % |
 | `PRECIO` | **Precio antes de montarte** | Pasajero | La cotización real de la app en $ y Bs; retos «adivina cuánto cuesta» | 15 % |
 | `CONFIANZA` | **Sé quién te lleva** | Pasajero y familia | PIN, viaje compartido, verificación de motorizados, SOS, explicados de forma simple | 15 % |
-| `GENTE` | **Motorizados de verdad** | Ambos | Historias reales de motorizados (con autorización), un día con…, por qué se unieron | 10 % |
+| `GENTE` | **Motorizados de verdad** | Ambos | Historias reales de motorizados (con autorización), un día con…, por qué se unieron. **En pausa** hasta que haya acceso a contenido real; su peso pasa a `CALLE` | 0 % (10 % cuando haya grabación) |
 | `COMO` | **Cómo se usa** | Ambos | Tutoriales cortos: instalar el APK, pedir, registrarse como motorizado, recargar la billetera | 10 % |
 
 Los porcentajes son **supuestos de partida**; el recomendador los ajusta cada semana según los resultados.
@@ -17,15 +17,15 @@ Los porcentajes son **supuestos de partida**; el recomendador los ajusta cada se
 ## 2. Formatos base
 | Código | Formato | Producción | Duración | Pilares típicos |
 | --- | --- | --- | --- | --- |
-| `F-CALLE` | Entrevista o pregunta en la calle («¿Cuánto pagaste por tu última carrera?») | Real, teléfono + micrófono de solapa | 20–40 s | CALLE, PRECIO |
-| `F-POV` | POV del motorizado o del pasajero con texto en pantalla | Real o IA (planos sin caras reconocibles) | 7–15 s | CALLE, CUENTAS |
+| `F-CALLE` | Entrevista o pregunta en la calle («¿Cuánto pagaste por tu última carrera?») | Real, teléfono + micrófono de solapa. **En pausa** (sin acceso a contenido real); no se simula con IA, porque entrevistas falsas serían testimonios inventados | 20–40 s | CALLE, PRECIO |
+| `F-POV` | POV del motorizado o del pasajero con texto en pantalla | IA (planos subjetivos sin caras: casco, manubrio, tráfico) | 7–15 s | CALLE, CUENTAS |
 | `F-HOST` | El personaje de marca habla a cámara (explica, reacciona, responde comentarios) | IA (Higgsfield) + voz | 15–35 s | CUENTAS, CONFIANZA, COMO |
 | `F-CARRUSEL` | Carrusel de 5 a 7 imágenes con números | Plantilla Remotion/Figma + datos reales | — | CUENTAS, PRECIO |
 | `F-PANTALLA` | Grabación de pantalla de la app con voz o personaje encima | App real + edición | 10–25 s | PRECIO, COMO, CONFIANZA |
-| `F-SKETCH` | Mini sketch de humor (2 personajes, una situación) | Real con actores o IA | 20–45 s | CALLE |
-| `F-RESPUESTA` | Respuesta en video a un comentario | Personaje o persona real | 10–30 s | Todos |
+| `F-SKETCH` | Mini sketch de humor (2 personajes, una situación) | IA (personajes ficticios evidentes, con etiqueta de IA) | 20–45 s | CALLE |
+| `F-RESPUESTA` | Respuesta en video a un comentario | Personaje | 10–30 s | Todos |
 | `F-DATO` | Dato animado con tipografía de marca (motion graphics) | Remotion, automático | 6–12 s | CUENTAS, PRECIO |
-| `F-TENDENCIA` | Adaptación de una tendencia del momento al mundo Kuulis | Real o IA, rápido (24–48 h) | 7–20 s | CALLE |
+| `F-TENDENCIA` | Adaptación de una tendencia del momento al mundo Kuulis | IA o plantilla, rápido (24–48 h) | 7–20 s | CALLE |
 
 ## 3. Ganchos (los primeros 2 segundos)
 Cada guion propone **3 ganchos alternativos**; el agente revisor elige uno y los otros se guardan para
@@ -48,7 +48,7 @@ introducciones al inicio.
 GANCHO (0–2 s)     Una frase + texto en pantalla. Movimiento inmediato.
 TENSIÓN (2–8 s)    El problema real, con un detalle concreto de Caracas.
 GIRO (8–20 s)      Cómo lo resuelve Kuulis, con UN dato verificable.
-PRUEBA (20–28 s)   Captura real de la app, número real o persona real.
+PRUEBA (20–28 s)   Captura real de la app o número real.
 CIERRE (últimos 3 s) Llamada a la acción suave + bucle hacia el inicio si se puede.
 ```
 Llamadas a la acción permitidas: «Link en la bio para descargar (Android)», «Comenta MOTO y te mando el
@@ -58,8 +58,8 @@ registro», «Mándaselo al pana que maneja moto». Nunca prometer lo que la app
 | # | Idea | Pilar | Formato |
 | --- | --- | --- | --- |
 | 1 | «Carrera de $3: cuánto le queda al motorizado en una app con comisión vs en Kuulis» | CUENTAS | F-CARRUSEL |
-| 2 | Motorizado real cuenta qué hace con lo que antes pagaba de comisión | GENTE | F-CALLE |
-| 3 | «¿Cuánto pagaste en tu última moto?» en Chacao, Sabana Grande y La Candelaria | CALLE | F-CALLE |
+| 2 | El personaje hace la cuenta: «$20 de comisión a la semana son $80 al mes. ¿Qué harías con eso?» | CUENTAS | F-HOST |
+| 3 | «¿Cuánto pagaste en tu última moto?»: el personaje pregunta a la audiencia y responde en video a los comentarios | CALLE | F-HOST → F-RESPUESTA |
 | 4 | El personaje explica la cuota: «Si ganaste $100 o menos este mes, pagas $0» | CUENTAS | F-HOST |
 | 5 | POV: regateando con un mototaxi bajo la lluvia | CALLE | F-POV |
 | 6 | «Adivina el precio» con la cotización real en $ y Bs | PRECIO | F-PANTALLA |
@@ -72,7 +72,7 @@ registro», «Mándaselo al pana que maneja moto». Nunca prometer lo que la app
 | 13 | Tipos de pasajero en moto (el que se agarra fuerte, el que da indicaciones…) | CALLE | F-SKETCH |
 | 14 | Tipos de motorizado (con respeto, celebrando el oficio) | CALLE | F-SKETCH |
 | 15 | «Paga como quieran: efectivo $, Bs, pago móvil, Zelle, Binance» | PRECIO | F-CARRUSEL |
-| 16 | Un día con un motorizado de Kuulis | GENTE | F-CALLE (serie) |
+| 16 | Caracas vista desde el casco: recorrido POV de Altamira a La Candelaria con el precio en pantalla | CALLE | F-POV |
 | 17 | Pedir moto para tu abuela desde tu teléfono (pedir para otra persona) | CONFIANZA | F-PANTALLA |
 | 18 | «Lo que nadie te dice de las comisiones» | CUENTAS | F-HOST |
 | 19 | Tendencia del momento adaptada (se elige la semana que toque) | CALLE | F-TENDENCIA |
@@ -83,7 +83,7 @@ números genéricos explicados como ejemplo (ver [10](10-riesgos-y-cumplimiento.
 
 ## 6. Series fijas (desde F2)
 Las series crean hábito y suben la retención de la cuenta:
-- **«Cuentas claras»** (lunes): un número del mes de un motorizado, con su permiso.
+- **«Cuentas claras»** (lunes): una cuenta con números de ejemplo (y, cuando haya contenido real, el número del mes de un motorizado con su permiso).
 - **«¿Cuánto es?»** (miércoles): reto de precio entre dos zonas.
 - **«El pana responde»** (viernes): el personaje responde comentarios.
 - **«Calle»** (fin de semana): humor caraqueño.

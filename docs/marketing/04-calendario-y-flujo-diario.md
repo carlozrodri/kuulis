@@ -15,12 +15,12 @@ patrones.
 | Día | Pieza A (mañana) | Pieza B (noche) |
 | --- | --- | --- |
 | Lunes | CUENTAS · F-CARRUSEL | CALLE · F-POV |
-| Martes | CONFIANZA · F-HOST | CALLE · F-CALLE |
-| Miércoles | PRECIO · F-PANTALLA («¿Cuánto es?») | GENTE · F-CALLE |
+| Martes | CONFIANZA · F-HOST | CALLE · F-POV |
+| Miércoles | PRECIO · F-PANTALLA («¿Cuánto es?») | CALLE · F-SKETCH |
 | Jueves | CUENTAS · F-HOST | CALLE · F-TENDENCIA |
 | Viernes | COMO · F-PANTALLA | Todos · F-RESPUESTA |
 | Sábado | CALLE · F-SKETCH | PRECIO · F-DATO |
-| Domingo | GENTE · reposteo del mejor de la semana con gancho nuevo | Descanso o tendencia |
+| Domingo | Reposteo del mejor de la semana con gancho nuevo | Descanso o tendencia |
 
 El calendario concreto de cada semana lo propone el agente estratega los domingos, a partir de esta plantilla
 y de lo que aprendió el recomendador (ver [08](08-arquitectura-de-agentes.md)).
@@ -31,7 +31,7 @@ y de lo que aprendió el recomendador (ver [08](08-arquitectura-de-agentes.md)).
 06:30  Recomendador: actualiza el registro de aprendizajes y propone ajustes del día.
 07:00  Guionista: escribe los guiones del día siguiente (2 piezas, 3 ganchos cada una) sobre el calendario.
 07:30  Revisor de marca: valida hechos, tono, riesgos y disclosure. Rechaza o pide cambios.
-08:00  Productor: prepara prompts y genera assets (IA o plantillas Remotion); lista de tomas para lo que se graba real.
+08:00  Productor: prepara prompts y genera assets (Higgsfield, Buzzy, plantillas Remotion, pantallas de la app).
        → Paquete del día en el hilo del proyecto: guion, ganchos, borrador del video, textos y hashtags por red.
        → Carlos aprueba, pide cambios o descarta (objetivo: 5 minutos al día).
 Mañana / noche  Publicación en las franjas del calendario (manual en F1; ver abajo).
@@ -58,9 +58,10 @@ Siempre debe haber **al menos 7 piezas aprobadas en reserva** para no depender d
 falta de internet, un día sin tiempo para aprobar). El estratega avisa cuando la reserva baja de 5.
 
 ## 6. Grabación real
-Una **sesión semanal de grabación** de 2 a 3 horas con motorizados reales y en la calle produce el material de
-F-CALLE, F-POV y GENTE para toda la semana. Quién graba lo decide Carlos (pregunta del README). Los agentes
-entregan la lista de tomas, las preguntas para la calle y el formulario de autorización de imagen.
+**Decidido (2026-10-18): por ahora no hay acceso a contenido real.** Todo se produce con IA, plantillas y
+grabaciones de pantalla de la app (que Claude puede sacar del build de QA). Cuando haya alguien que pueda
+grabar, se añade una sesión semanal de 2 a 3 horas con motorizados reales; los agentes entregarán la lista de
+tomas, las preguntas para la calle y el formulario de autorización de imagen.
 
 ## 7. Reacción a tendencias
 El estratega revisa tendencias dos veces al día (Centro Creativo de TikTok, audios en subida en Reels,
