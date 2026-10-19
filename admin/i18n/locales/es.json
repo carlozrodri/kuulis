@@ -4057,6 +4057,7 @@
       "pasajero": "Pasajeros"
     },
     "productions": {
+      "plantilla": "Plantilla",
       "ia": "IA",
       "real": "Grabado",
       "mixto": "Mixto"

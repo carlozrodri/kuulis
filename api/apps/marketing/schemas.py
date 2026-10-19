@@ -11,7 +11,8 @@ Status = Literal[
 STATUSES: tuple[str, ...] = Status.__args__  # type: ignore[attr-defined]
 Platform = Literal["tiktok", "instagram", "youtube", "whatsapp", "facebook"]
 Audience = Literal["motorizado", "pasajero", "ambos"]
-Production = Literal["real", "ia", "mixto"]
+# plantilla: made only from the Remotion templates (no AI generation, no filming).
+Production = Literal["real", "ia", "mixto", "plantilla"]
 AssetKind = Literal["video", "imagen", "audio"]
 AssetRole = Literal["original", "final", "portada", "fuente"]
 LearningStatus = Literal["hipotesis", "probado", "descartado"]

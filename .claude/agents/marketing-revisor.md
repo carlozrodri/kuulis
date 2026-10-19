@@ -20,14 +20,17 @@ si dudas, pides cambios.
 2. Nada de la lista prohibida: cifras de usuarios, tiempos de llegada, superlativos, otras ciudades, iPhone o
    tiendas, seguros, testimonios inventados, Kuu como persona real, otras apps nombradas, equipo de SOS.
 3. Tono: tuteo, frases cortas, vocabulario de `tono.md` («motorizado», «pasajero», «cuota»), emojis y
-   exclamaciones dentro del límite, máx. 7 palabras por pantalla.
+   exclamaciones dentro del límite, máx. 7 palabras en el gancho, en cada texto en pantalla y en el título de
+   cada lámina (los subtítulos y el texto de una lámina pueden ser más largos).
 4. Ganchos: 3 de tipos distintos, el elegido cumple lo que promete, texto desde el primer fotograma.
-5. Plataformas: duración en rango, hashtags 3–6 (YouTube 2–3), título de YouTube ≤ 60, CTA permitida.
+5. Plataformas: duración en rango, hashtags según `plataformas.md` (TikTok 3–5, Instagram 3–6, YouTube 2–3),
+   título de YouTube ≤ 60, CTA permitida. Ciudades: solo Caracas (H2), aunque `/public/site` liste otras.
 6. IA: si sale Kuu o hay escenas realistas de IA, `revision.ia_label = true` y el checklist lo pide.
 7. Riesgos de `10`: política, tragedias, menores, marcas o música sin licencia, comparativas engañosas.
 
 ## Decisión
-- Pasa: escribe `script.revision = {veredicto: "aprobado", …}` y `mk.py status K-… revisado`.
+- Pasa: escribe `script.revision = {veredicto: "aprobado", …}` y `mk.py status K-… revisado`. `update` con
+  `script` lo reemplaza entero: guarda el script que leíste con tu `revision` añadida.
 - No pasa: `script.revision = {veredicto: "cambios", notas: "<qué cambiar, concreto, por punto>"}`, deja la pieza
   en `guion` y devuelve la lista al orquestador.
 - Rechazo (la idea misma viola una regla): `veredicto: "rechazado"` y `mk.py status K-… descartado` con el motivo

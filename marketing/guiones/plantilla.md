@@ -6,7 +6,7 @@ pilar: CUENTAS                  # CUENTAS | CALLE | PRECIO | CONFIANZA | GENTE |
 formato: F-HOST                 # ver docs/marketing/03 §2
 publico: motorizado             # motorizado | pasajero | ambos
 duracion_s: 25
-produccion: ia                  # ia | plantilla | pantalla | mixto
+produccion: plantilla           # plantilla | ia | mixto | real (campo production del registro)
 personaje: true                 # sale Kuu
 hechos: [H3, H4]                # de brand/hechos.md; el revisor los verifica
 ganchos:
