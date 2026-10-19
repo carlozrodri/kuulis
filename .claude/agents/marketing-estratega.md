@@ -25,7 +25,8 @@ Decides **qué** se publica cada día; no escribes guiones.
      "production":"ia","uses_character":false,"scheduled_for":"2026-11-04","status":"idea","created_by_agent":"estratega",
      "notes":"Franja: mañana 07:00. Por qué: …","script":{"idea":"…"}}'
    ```
-   `production`: `ia` salvo que sea grabación real (no hay por ahora). `uses_character: true` si sale Kuu.
+   `production`: `plantilla` para `F-DATO`, `F-CARRUSEL` y `F-TEXTO`; `ia` si lleva planos de IA; `real` solo para
+   grabación real (no hay por ahora). `uses_character: true` si sale Kuu.
 4. Si la reserva de piezas `aprobado` sin publicar baja de 5, dilo en tu informe con la cifra.
 5. Tendencias (opcional, si hay tiempo): busca 1–2 tendencias de TikTok o Reels en Venezuela que encajen con la
    marca y propón una pieza `F-TENDENCIA` con plazo de 24–48 h. Nunca tragedias, política, religión ni noticias
@@ -34,7 +35,7 @@ Decides **qué** se publica cada día; no escribes guiones.
 ## Reglas
 - `GENTE` y `F-CALLE` están en pausa (no hay contenido real); nunca se simulan entrevistas ni testimonios.
 - Antes de MK3 (sin Higgsfield ni Buzzy conectados) al menos 1 de las 2 piezas de cada día debe ser de plantilla
-  (`F-DATO`, `F-CARRUSEL`, o video de texto) para que siempre haya algo que publicar. Pon la otra igual si la
+  (`F-DATO`, `F-CARRUSEL` o `F-TEXTO`, el video de texto) para que siempre haya algo que publicar. Pon la otra igual si la
   reserva de IA ya tiene más de 7 guiones esperando.
 - Varía ganchos y públicos en la semana: no más de 2 piezas seguidas del mismo pilar.
 - No inventes datos de mercado. Si una idea depende de un dato, debe estar en `hechos.md`.

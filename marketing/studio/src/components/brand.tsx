@@ -40,6 +40,8 @@ export const PosterHeadline = ({ text, size, style }: { text: string; size: numb
         color: color.white,
         textTransform: 'uppercase',
         textWrap: 'balance',
+        // A "\n" in the text forces a line break where the writer wants it.
+        whiteSpace: 'pre-line',
         ...style,
       }}
     >
@@ -71,7 +73,8 @@ export const CaptionBox = ({ children }: { children: ReactNode }) => (
       fontFamily: font.sans,
       fontWeight: 800,
       fontSize: 58,
-      lineHeight: 1.25,
+      // Tall enough that a wrapped line's box doesn't cover the line above (¿, ñ, descenders).
+      lineHeight: 1.65,
       color: color.white,
       backgroundColor: 'rgba(20, 32, 27, 0.72)',
       padding: '10px 22px',

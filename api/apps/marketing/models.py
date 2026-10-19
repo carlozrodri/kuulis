@@ -45,7 +45,7 @@ class MarketingContent(BaseModel):
     # Hooks, on-screen text, subtitles, CTA... as the script template has them (marketing/guiones).
     script: Mapped[dict] = mapped_column(JSONB, default=dict, server_default=text("'{}'::jsonb"))
     uses_character: Mapped[bool] = mapped_column(Boolean, default=False)
-    production: Mapped[str] = mapped_column(String(8), default="ia", server_default="ia")
+    production: Mapped[str] = mapped_column(String(16), default="ia", server_default="ia")
     scheduled_for: Mapped[date | None] = mapped_column(Date)
     notes: Mapped[str | None] = mapped_column(Text)
     # Last "changes requested" from the approval queue.

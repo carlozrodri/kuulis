@@ -44,12 +44,16 @@ export const Subtitulos = (props: SubtitulosProps) => {
   )
 }
 
+const HOOK_START_SCALE = 1.06
+const HOOK_EXTRA_RIGHT = Math.ceil((1080 - safe.left - safe.right) * (1 - 1 / HOOK_START_SCALE))
+
 /** The hook sits in the safe zone's upper third, already visible on frame 0, with a small push-in. */
 const Hook = ({ text }: { text: string }) => {
   const frame = useCurrentFrame()
-  const scale = interpolate(frame, [0, 20], [1.06, 1], { extrapolateRight: 'clamp' })
+  const scale = interpolate(frame, [0, 20], [HOOK_START_SCALE, 1], { extrapolateRight: 'clamp' })
   return (
-    <Zone style={{ top: 250, left: safe.left, right: safe.right, height: 520 }}>
+    // The push-in starts 6 % larger: narrow the box so the first frame still fits the safe zone.
+    <Zone style={{ top: 250, left: safe.left, right: safe.right + HOOK_EXTRA_RIGHT, height: 520 }}>
       <PosterHeadline
         text={text}
         size={128}

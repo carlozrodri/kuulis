@@ -61,6 +61,9 @@ Todos los agentes leen y escriben esta forma; los campos que un agente no toca s
 }
 ```
 
+Cualquier `mk.py update` que lleve `script` lo reemplaza entero: se lee con `mk.py show`, se cambia lo propio y
+se manda completo. En un carrusel `duracion_s` es 0 y cada lámina es una escena («Lámina n/N»).
+
 `studio` es el archivo de pieza de [`../studio/src/schema.ts`](../studio/src/schema.ts) (el que recibe
 `pnpm render`).
 
@@ -109,4 +112,4 @@ El orquestador trabaja sobre **mañana** (`D+1`): así Carlos aprueba hoy y la p
 - Los agentes no ven datos personales de usuarios: solo el registro de marketing y `/public/site`.
 - Todo lo que un agente decide queda en el registro (campo `script`, `notes`, aprendizajes), no solo en el chat.
 - Antes de MK3 (sin generador de IA conectado) se producen solo formatos de plantilla: `F-DATO`, `F-CARRUSEL` y
-  videos de texto con `Subtitulos` sobre fondo de marca. Las piezas de IA se guionizan y quedan en reserva.
+  `F-TEXTO` (video de texto con `Subtitulos` sobre fondo de marca), con `production: plantilla`. Las piezas de IA se guionizan y quedan en reserva.

@@ -5,7 +5,7 @@ import type { PortadaProps } from '../schema'
 
 /**
  * Cover image. On Instagram the grid crops a vertical cover to its central 4:5 (1080×1350), so the
- * headline stays inside that band on the vertical format.
+ * headline stays inside that band (and the safe zone) on the vertical format.
  */
 export const Portada = ({ formato, fondo, titulo }: PortadaProps) => (
   <AbsoluteFill>
@@ -14,12 +14,13 @@ export const Portada = ({ formato, fondo, titulo }: PortadaProps) => (
       style={{
         top: formato === 'vertical' ? 285 + 80 : 80,
         left: safe.left + 20,
-        right: safe.left + 20,
-        height: 1350 - 160,
+        right: formato === 'vertical' ? safe.right : safe.left + 20,
+        // Vertical: end above the bottom safe margin so the wordmark clears the caption.
+        height: formato === 'vertical' ? 1920 - safe.bottom - (285 + 80) : 1350 - 160,
         justifyContent: 'space-between',
       }}
     >
-      <PosterHeadline text={titulo} size={170} style={{ textShadow: '0 4px 28px rgba(7,18,14,0.55)' }} />
+      <PosterHeadline text={titulo} size={formato === 'vertical' ? 150 : 170} style={{ textShadow: '0 4px 28px rgba(7,18,14,0.55)' }} />
       <Wordmark size={64} />
     </Zone>
   </AbsoluteFill>

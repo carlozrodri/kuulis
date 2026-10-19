@@ -4058,6 +4058,7 @@
     },
     "productions": {
       "ia": "IA",
+      "plantilla": "Plantilla",
       "real": "Grabado",
       "mixto": "Mixto"
     },

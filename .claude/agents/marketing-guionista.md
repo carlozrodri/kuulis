@@ -24,7 +24,7 @@ nada más.
    (máx. 7 palabras por pantalla), CTA permitida, textos por red (caption con la estructura de `tono.md`,
    hashtags sin `#` según `plataformas.md`, título de YouTube ≤ 60 caracteres) y prompts por plano en inglés si
    hay planos de IA.
-3. Si el formato es de plantilla (`F-DATO`, `F-CARRUSEL`, video de texto), escribe también `script.studio`, el
+3. Si el formato es de plantilla (`F-DATO`, `F-CARRUSEL`, `F-TEXTO`), escribe también `script.studio`, el
    archivo de pieza de `marketing/studio/src/schema.ts` con `codigo` = código de la pieza (mira los ejemplos de
    `marketing/studio/data/ejemplos/`). Fondo `verde` o `noche`, `destacado` en la cifra clave.
 4. Guarda y pasa a `guion`:

@@ -59,6 +59,8 @@ Un JSON por pieza; `codigo` nombra la carpeta de salida y luego el registro (MK5
 - `fondo.src` acepta una ruta dentro de `public/` o una URL (por ejemplo, un enlace firmado de S3).
 - Si no hay `subtitulos` con tiempos, `voz` se corta sola en frases de hasta 4 palabras repartidas en el video.
   Con tiempos reales (de la transcripción) quedan mejor.
+- En los titulares (gancho, `titulo` de lámina y portada) un `\n` fuerza el salto de línea; si no, el corte se
+  equilibra solo.
 - `destacado` pinta en amarillo esa parte del texto. Las cifras siempre deben salir de
   [`../brand/hechos.md`](../brand/hechos.md).
 

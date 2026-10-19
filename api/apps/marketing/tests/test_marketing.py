@@ -200,6 +200,16 @@ async def test_codes_follow_the_planned_day(client, admin_headers) -> None:
     assert sorted(i["code"] for i in listed["items"]) == ["K-2026-11-04-A", "K-2026-11-04-B"]
 
 
+async def test_template_pieces_record_their_production(client, admin_headers) -> None:
+    created = await client.post(
+        f"{API}/contents",
+        json={"title": "Carrusel", "format": "F-CARRUSEL", "production": "plantilla"},
+        headers=admin_headers,
+    )
+    assert created.status_code == 201, created.text
+    assert created.json()["production"] == "plantilla"
+
+
 async def test_assets_must_belong_to_the_piece_and_be_uploaded(
     client, admin_headers, bucket
 ) -> None:

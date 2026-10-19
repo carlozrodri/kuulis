@@ -20,11 +20,12 @@ Los porcentajes son **supuestos de partida**; el recomendador los ajusta cada se
 | `F-CALLE` | Entrevista o pregunta en la calle («¿Cuánto pagaste por tu última carrera?») | Real, teléfono + micrófono de solapa. **En pausa** (sin acceso a contenido real); no se simula con IA, porque entrevistas falsas serían testimonios inventados | 20–40 s | CALLE, PRECIO |
 | `F-POV` | POV del motorizado o del pasajero con texto en pantalla | IA (planos subjetivos sin caras: casco, manubrio, tráfico) | 7–15 s | CALLE, CUENTAS |
 | `F-HOST` | El personaje de marca habla a cámara (explica, reacciona, responde comentarios) | IA (Higgsfield) + voz | 15–35 s | CUENTAS, CONFIANZA, COMO |
-| `F-CARRUSEL` | Carrusel de 5 a 7 imágenes con números | Plantilla Remotion/Figma + datos reales | — | CUENTAS, PRECIO |
+| `F-CARRUSEL` | Carrusel de 5 a 9 láminas con números (la plantilla admite hasta 10) | Plantilla Remotion/Figma + datos reales | — | CUENTAS, PRECIO |
 | `F-PANTALLA` | Grabación de pantalla de la app con voz o personaje encima | App real + edición | 10–25 s | PRECIO, COMO, CONFIANZA |
 | `F-SKETCH` | Mini sketch de humor (2 personajes, una situación) | IA (personajes ficticios evidentes, con etiqueta de IA) | 20–45 s | CALLE |
 | `F-RESPUESTA` | Respuesta en video a un comentario | Personaje | 10–30 s | Todos |
 | `F-DATO` | Dato animado con tipografía de marca (motion graphics) | Remotion, automático | 6–12 s | CUENTAS, PRECIO |
+| `F-TEXTO` | Video de texto: gancho, subtítulos y textos grandes sobre fondo de marca (plantilla `Subtitulos`, sin voz; la música se pone en cada red) | Remotion, automático | 15–30 s | CALLE, PRECIO, CUENTAS |
 | `F-TENDENCIA` | Adaptación de una tendencia del momento al mundo Kuulis | IA o plantilla, rápido (24–48 h) | 7–20 s | CALLE |
 
 ## 3. Ganchos (los primeros 2 segundos)

@@ -14,7 +14,7 @@ Eres el productor de Kuulis. Del guion revisado sacas los archivos finales de ca
 ## Qué haces, por pieza en `revisado`
 1. `mk.py show <código>`: toma `script` (sobre todo `script.studio`, `script.textos`, `script.prompts`) y `notes`
    (franja).
-2. **Plantilla** (`F-DATO`, `F-CARRUSEL`, video de texto, portadas):
+2. **Plantilla** (`F-DATO`, `F-CARRUSEL`, `F-TEXTO`, portadas):
    ```bash
    cd marketing/studio
    [ -d node_modules ] || pnpm install --frozen-lockfile
