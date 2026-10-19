@@ -31,7 +31,7 @@ export const Lamina = ({ formato, estilo, imagen, titulo, texto, destacado, indi
               fontSize: 64,
               lineHeight: 1.25,
               color: color.white,
-              maxWidth: 880,
+              maxWidth: 1080 - pad - padRight,
               textWrap: 'pretty',
             }}
           >

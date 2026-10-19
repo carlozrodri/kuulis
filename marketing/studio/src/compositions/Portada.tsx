@@ -20,7 +20,7 @@ export const Portada = ({ formato, fondo, titulo }: PortadaProps) => (
         justifyContent: 'space-between',
       }}
     >
-      <PosterHeadline text={titulo} size={170} style={{ textShadow: '0 4px 28px rgba(7,18,14,0.55)' }} />
+      <PosterHeadline text={titulo} size={formato === 'vertical' ? 150 : 170} style={{ textShadow: '0 4px 28px rgba(7,18,14,0.55)' }} />
       <Wordmark size={64} />
     </Zone>
   </AbsoluteFill>
