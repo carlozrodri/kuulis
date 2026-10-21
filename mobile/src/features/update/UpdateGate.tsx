@@ -7,7 +7,7 @@ import { Card, IconTile, Screen, Txt } from '@/components/ui';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { useActiveRide } from '@/hooks/useRides';
 import { trackOnce } from '@/lib/analytics';
-import { appVersion, formatMegabytes } from '@/lib/appVersion';
+import { appVersion, formatMegabytes, fromPlayStore } from '@/lib/appVersion';
 import { isActiveStatus } from '@/lib/ride';
 import { space } from '@/theme';
 
@@ -53,24 +53,28 @@ function UpdateRequiredScreen() {
         </Txt>
         <Txt color="muted">{t('update.required.body')}</Txt>
       </View>
-      <Card style={{ gap: space.xs }}>
-        <Txt variant="label" color="muted">
-          {latest
-            ? t('update.required.version', {
-                version: latest.version,
-                build: latest.build,
-                size: formatMegabytes(latest.size),
-              })
-            : t('update.required.checking')}
+      {fromPlayStore ? null : (
+        <Card style={{ gap: space.xs }}>
+          <Txt variant="label" color="muted">
+            {latest
+              ? t('update.required.version', {
+                  version: latest.version,
+                  build: latest.build,
+                  size: formatMegabytes(latest.size),
+                })
+              : t('update.required.checking')}
+          </Txt>
+          {latest?.notes ? <Txt>{latest.notes}</Txt> : null}
+          <Txt variant="caption" color="muted">
+            {t('update.required.current', { version: appVersion.version, build: appVersion.build })}
+          </Txt>
+        </Card>
+      )}
+      {fromPlayStore ? null : (
+        <Txt variant="caption" color="muted" style={{ marginTop: space.md }}>
+          {t('update.unknownSources.hint')}
         </Txt>
-        {latest?.notes ? <Txt>{latest.notes}</Txt> : null}
-        <Txt variant="caption" color="muted">
-          {t('update.required.current', { version: appVersion.version, build: appVersion.build })}
-        </Txt>
-      </Card>
-      <Txt variant="caption" color="muted" style={{ marginTop: space.md }}>
-        {t('update.unknownSources.hint')}
-      </Txt>
+      )}
     </Screen>
   );
 }

@@ -51,8 +51,14 @@ export const APP_VERSION_HEADERS: Record<string, string> = {
   ...(updateHeader ? { 'X-App-Update': updateHeader } : {}),
 };
 
-/** Only installed Android builds can download and install an APK (dev clients report build 0 or skip). */
-export const canSelfUpdate = Platform.OS === 'android' && appVersion.build > 0;
+/** Installed from Google Play (EAS profile `play`). */
+export const fromPlayStore = Platform.OS === 'android' && appVersion.build > 0 && config.appStore === 'play';
+
+/**
+ * Only installed Android builds of the APK we distribute download and install an update (dev clients report
+ * build 0); Google Play forbids it and updates the app itself.
+ */
+export const canSelfUpdate = Platform.OS === 'android' && appVersion.build > 0 && !fromPlayStore;
 
 /** 12_345_678 bytes → "11.8" (MB, one decimal). */
 export function formatMegabytes(bytes: number): string {

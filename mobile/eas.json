@@ -41,6 +41,16 @@
       "android": {
         "buildType": "apk"
       }
+    },
+    "play": {
+      "extends": "production",
+      "env": {
+        "APP_ENV": "production",
+        "APP_STORE": "play"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {

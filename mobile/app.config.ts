@@ -49,7 +49,14 @@ const UPDATES_CERTIFICATE = `./certs/updates-${APP_ENV}.pem`;
 const UPDATES_ENABLED = APP_ENV !== 'local' && existsSync(UPDATES_CERTIFICATE);
 const UPDATES_CHANNEL = APP_ENV === 'production' ? 'production' : 'qa';
 
-const suffix = APP_ENV === 'production' ? '' : `.${APP_ENV}`;
+/**
+ * Where the Android build is distributed: "apk" (our own download page, updates itself) or "play" (Google Play,
+ * which forbids self-updating, so the installer permission and the APK updater are left out). EAS profile `play`.
+ */
+const APP_STORE = (process.env.APP_STORE ?? 'apk') as 'apk' | 'play';
+
+/** Production keeps the brand's id (permanent on Google Play); QA and local builds keep theirs. */
+const APP_ID = APP_ENV === 'production' ? 'com.kuulis.app' : `uk.top8.kuulis.${APP_ENV}`;
 const nameSuffix = APP_ENV === 'production' ? '' : ` (${APP_ENV.toUpperCase()})`;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -81,7 +88,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   userInterfaceStyle: 'automatic',
   ios: {
     supportsTablet: true,
-    bundleIdentifier: `uk.top8.kuulis${suffix}`,
+    bundleIdentifier: APP_ID,
     usesAppleSignIn: true,
     infoPlist: {
       NSCameraUsageDescription: 'Kuulis usa la cámara para fotografiar tus documentos, tu selfie y tu moto.',
@@ -91,7 +98,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
   },
   android: {
-    package: `uk.top8.kuulis${suffix}`,
+    package: APP_ID,
     googleServicesFile: GOOGLE_SERVICES_FILE,
     adaptiveIcon: {
       backgroundColor: '#E6F4FE',
@@ -102,7 +109,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     predictiveBackGestureEnabled: false,
     // The APK is distributed outside the stores (doc 09): the app downloads updates and opens the system
     // installer. `permissions` only adds to what plugins and libraries already declare (nothing is dropped).
-    permissions: ['android.permission.REQUEST_INSTALL_PACKAGES'],
+    // Google Play forbids that permission, so the Play build blocks it even if a library asks for it.
+    ...(APP_STORE === 'play'
+      ? { blockedPermissions: ['android.permission.REQUEST_INSTALL_PACKAGES'] }
+      : { permissions: ['android.permission.REQUEST_INSTALL_PACKAGES'] }),
   },
   web: {
     bundler: 'metro',
@@ -164,6 +174,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   extra: {
     appEnv: APP_ENV,
+    appStore: APP_STORE,
     apiUrl: API_URLS[APP_ENV],
     googleWebClientId: GOOGLE_WEB_CLIENT_ID,
     googleIosClientId: GOOGLE_IOS_CLIENT_ID,

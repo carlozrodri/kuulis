@@ -564,5 +564,23 @@
   "photos": {
     "night": "Una autopista de Caracas de noche, con las luces de los carros.",
     "avila": "Altamira, en Caracas, con el Ávila al fondo."
+  },
+  "deleteAccount": {
+    "metaTitle": "Eliminar tu cuenta · Kuulis",
+    "metaDescription": "Cómo eliminar tu cuenta de Kuulis y qué datos borramos, desde la app o sin ella.",
+    "title": "Eliminar tu cuenta.",
+    "lead": "Puedes eliminar tu cuenta de Kuulis cuando quieras, desde la app o escribiéndonos.",
+    "inAppTitle": "Desde la app",
+    "step1": "Abre Kuulis y entra a Perfil → Ajustes.",
+    "step2": "En Privacidad, toca «Eliminar mi cuenta».",
+    "step3": "Lee lo que se borra, marca la casilla y confirma.",
+    "noAppTitle": "Si ya no tienes la app",
+    "noAppBody": "Escríbenos desde el formulario de contacto con el email o el teléfono con que te registraste y pide eliminar tu cuenta. Te pediremos confirmarlo por email antes de hacerlo:",
+    "contactLink": "ir a Contacto",
+    "whatTitle": "Qué borramos y qué se queda",
+    "erased": "Borramos tu nombre, email, foto, contactos de confianza, lugares guardados, mensajes del chat, notificaciones y, si eres motorizado, tus documentos, cédula, teléfono y placa.",
+    "kept": "Los viajes, pagos, cuotas y reportes se guardan sin datos que te identifiquen, porque los necesitamos para la contabilidad y la seguridad de todos. El saldo de la billetera no se puede retirar ni devolver.",
+    "grace": "Cerramos tu sesión en todos tus equipos y tienes 30 días para arrepentirte: si vuelves a entrar antes, recuperas tu cuenta. Pasado ese plazo, los datos se borran para siempre. No se puede eliminar una cuenta con un viaje en curso, con reportes abiertos o con una cuota pendiente.",
+    "privacyLink": "Lee la política de privacidad completa"
   }
 }

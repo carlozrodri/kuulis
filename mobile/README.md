@@ -40,8 +40,13 @@ src/
 ## Environments
 
 `APP_ENV` (`local` | `qa` | `production`) picks the API URL and the app identity in `app.config.ts`, so QA and
-production builds can be installed side by side (`uk.top8.kuulis.qa` vs `uk.top8.kuulis`). EAS build profiles in
+production builds can be installed side by side (`uk.top8.kuulis.qa` vs `com.kuulis.app`). EAS build profiles in
 `eas.json` set it for each build.
+
+`APP_STORE` (`apk` | `play`) says where an Android build is distributed. The `play` profile builds an AAB for
+Google Play without `REQUEST_INSTALL_PACKAGES` and without the APK updater (Play forbids self-updating): a
+mandatory update sends people to the app's page in Play. OTA updates keep working. Production needs its own
+`google-services.production.json` (Firebase Android app for `com.kuulis.app`) and `certs/updates-production.pem`.
 
 ## Pending before store builds
 
@@ -122,6 +127,6 @@ maestro test -e DRIVER_EMAIL=$DRIVER_EMAIL -e DRIVER_PASSWORD=$DRIVER_PASSWORD .
 ### Mapas
 Android usa Google Maps (`react-native-maps`) con la clave `GOOGLE_MAPS_ANDROID_API_KEY`. El Maps SDK para
 Android no cobra por cargas de mapa en apps móviles, pero exige la clave con restricción por paquete y huella
-del certificado (`uk.top8.kuulis` y `uk.top8.kuulis.qa`). Rutas y búsqueda ya son propias (OSRM y Photon, doc
+del certificado (`com.kuulis.app` y `uk.top8.kuulis.qa`). Rutas y búsqueda ya son propias (OSRM y Photon, doc
 02). Si Google cambia las condiciones, la alternativa es MapLibre con teselas propias (OpenMapTiles en el VPS):
 cambia solo `components/map/RideMap.tsx`, que es la única pieza que dibuja mapas.
