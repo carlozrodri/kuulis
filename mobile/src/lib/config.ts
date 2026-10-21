@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 
 type Extra = {
   appEnv: 'local' | 'qa' | 'production';
+  appStore: 'apk' | 'play';
   apiUrl: string;
   googleWebClientId?: string;
   googleIosClientId?: string;
@@ -12,6 +13,8 @@ const extra = (Constants.expoConfig?.extra ?? {}) as Partial<Extra>;
 
 export const config = {
   appEnv: extra.appEnv ?? 'local',
+  /** Where this build was distributed: our APK (updates itself) or Google Play (Play updates it). */
+  appStore: extra.appStore ?? 'apk',
   apiUrl: extra.apiUrl ?? 'http://localhost:8000/api/v1',
   easProjectId: extra.eas?.projectId,
   googleWebClientId: extra.googleWebClientId || process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || undefined,

@@ -10,6 +10,7 @@ export const LOCALIZED_PAGES = {
   'ayuda': { es: '/ayuda', en: '/help' },
   'ayuda-slug': { es: '/ayuda/[slug]', en: '/help/[slug]' },
   'contacto': { es: '/contacto', en: '/contact' },
+  'eliminar-cuenta': { es: '/eliminar-cuenta', en: '/delete-account' },
 } as const
 
 /** The /en path of a Spanish path: /motorizados → /en/drivers, /ayuda/x → /en/help/x, /legal → /en/legal. */

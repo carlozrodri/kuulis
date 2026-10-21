@@ -564,5 +564,23 @@
   "photos": {
     "night": "A Caracas highway at night, lit by passing cars.",
     "avila": "Altamira, in Caracas, with El Ávila behind it."
+  },
+  "deleteAccount": {
+    "metaTitle": "Delete your account · Kuulis",
+    "metaDescription": "How to delete your Kuulis account and what data we erase, with or without the app.",
+    "title": "Delete your account.",
+    "lead": "You can delete your Kuulis account at any time, from the app or by writing to us.",
+    "inAppTitle": "From the app",
+    "step1": "Open Kuulis and go to Profile → Settings.",
+    "step2": "Under Privacy, tap “Delete my account”.",
+    "step3": "Read what gets erased, tick the box and confirm.",
+    "noAppTitle": "If you no longer have the app",
+    "noAppBody": "Write to us from the contact form with the email or phone you signed up with and ask us to delete your account. We will ask you to confirm by email first:",
+    "contactLink": "go to Contact",
+    "whatTitle": "What we erase and what stays",
+    "erased": "We erase your name, email, photo, trusted contacts, saved places, chat messages, notifications and, for drivers, your documents, ID number, phone and plate.",
+    "kept": "Rides, payments, fees and reports are kept without anything that identifies you, because we need them for accounting and everyone's safety. The wallet balance cannot be withdrawn or refunded.",
+    "grace": "We sign you out on all your devices and you have 30 days to change your mind: if you sign in again before then, you get your account back. After that, the data is erased for good. An account cannot be deleted with a ride in progress, open reports or an unpaid fee.",
+    "privacyLink": "Read the full privacy policy"
   }
 }

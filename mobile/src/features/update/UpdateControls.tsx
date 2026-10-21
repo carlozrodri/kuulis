@@ -1,9 +1,11 @@
+import * as Application from 'expo-application';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Linking, View } from 'react-native';
 
 import { Download, Settings } from '@/components/icons';
 import { Button, ErrorText, Notice, Txt } from '@/components/ui';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
+import { fromPlayStore } from '@/lib/appVersion';
 import { useStore } from '@/lib/store';
 import { space } from '@/theme';
 
@@ -29,8 +31,35 @@ export function useInstaller() {
   return { state, busy, start: () => void start() };
 }
 
-/** "Actualizar" (showing the download percentage while it runs) plus what went wrong, if anything. */
+/** The app's page in Google Play, in the Play app when it is there. */
+async function openPlayStore() {
+  const id = Application.applicationId ?? '';
+  await Linking.openURL(`market://details?id=${id}`).catch(() =>
+    Linking.openURL(`https://play.google.com/store/apps/details?id=${id}`).catch(() => undefined),
+  );
+}
+
+/**
+ * "Actualizar" (showing the download percentage while it runs) plus what went wrong, if anything. A build from
+ * Google Play opens its page in Play instead: Play installs the update.
+ */
 export function InstallControls({ size = 'md' }: { size?: 'sm' | 'md' }) {
+  const { t } = useTranslation();
+  if (fromPlayStore) {
+    return (
+      <Button
+        title={t('update.playStore')}
+        icon={Download}
+        size={size}
+        style={size === 'sm' ? { alignSelf: 'flex-start' } : undefined}
+        onPress={() => void openPlayStore()}
+      />
+    );
+  }
+  return <ApkInstallControls size={size} />;
+}
+
+function ApkInstallControls({ size }: { size: 'sm' | 'md' }) {
   const { t } = useTranslation();
   const { state, busy, start } = useInstaller();
   const title =

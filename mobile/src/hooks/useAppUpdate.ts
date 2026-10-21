@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { api, setUpdateRequiredHandler } from '@/lib/api';
-import { appVersion, canSelfUpdate } from '@/lib/appVersion';
+import { appVersion, canSelfUpdate, fromPlayStore } from '@/lib/appVersion';
 import { secureStorage } from '@/lib/storage';
 import { createStore, useStore } from '@/lib/store';
 import type { AppVersionCheck } from '@/lib/types';
@@ -60,7 +60,10 @@ export function useAppUpdate() {
 
   const data = canSelfUpdate ? query.data : undefined;
   const latest = data?.latest ?? null;
-  const required = canSelfUpdate && (!!data?.update_required || forced > appVersion.build);
+  // A Play build only learns of a mandatory update from a refused ride action (426); it sends people to Play.
+  const required =
+    (canSelfUpdate && (!!data?.update_required || forced > appVersion.build)) ||
+    (fromPlayStore && forced > appVersion.build);
   const available = !!latest && latest.build > appVersion.build && (required || !!data?.update_available);
 
   return {

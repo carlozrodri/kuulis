@@ -1847,6 +1847,7 @@
     "downloading": "Descargando… {{percent}} %",
     "verifying": "Verificando el archivo…",
     "installing": "Abriendo el instalador…",
+    "playStore": "Actualizar en Google Play",
     "banner": {
       "title": "Nueva versión disponible",
       "body": "Kuulis {{version}} ya está lista ({{size}} MB).",
