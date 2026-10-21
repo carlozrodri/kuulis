@@ -74,7 +74,7 @@ arriba aunque el homelab se caiga. La API y el admin siguen en Coolify. La web l
 visitante (los límites de uso dependen de ella); por eso **no** se reenvía `/api` a través del Worker.
 
 Una vez, en el panel de Cloudflare (el dominio ya está en la cuenta):
-1. **Workers & Pages → Create → Import a repository** → `carlozrodri/kuulis`. Nombre `kuulis-web`, rama de
+1. **Workers & Pages → Create → Import a repository** → `carlozrodri/kuulis`. Nombre `kuulis`, rama de
    producción `main` (mientras producción esté apagada, `qa`; ver abajo).
 2. Build: directorio raíz `web`, comando de build `pnpm install --frozen-lockfile && pnpm build:cloudflare`,
    comando de deploy `npx wrangler deploy` (lee `web/wrangler.jsonc`).
