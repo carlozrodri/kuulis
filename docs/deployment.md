@@ -67,6 +67,37 @@ Dockerfile, `base_directory` `/web`, puerto 3000, `watch_paths` `web/**`, domini
 Variables: `NUXT_PUBLIC_APP_ENV` (`qa`/`production`), `NUXT_PUBLIC_SITE_URL` (`https://<dominio>`),
 `NUXT_API_INTERNAL` (`http://<contenedor de la API>:8000/api/v1`, opcional) y `NUXT_PUBLIC_SUPPORT_EMAIL`.
 
+### Web pública en Cloudflare (producción)
+En producción la web pública (`web/`) corre en Cloudflare Workers en `kuulis.com`: gratis, cerca de Venezuela y
+arriba aunque el homelab se caiga. La API y el admin siguen en Coolify. La web llama a la API en su propio host
+(`api.kuulis.com`): el navegador con CORS, el render del servidor directo. Así la API ve la IP real de cada
+visitante (los límites de uso dependen de ella); por eso **no** se reenvía `/api` a través del Worker.
+
+Una vez, en el panel de Cloudflare (el dominio ya está en la cuenta):
+1. **Workers & Pages → Create → Import a repository** → `carlozrodri/kuulis`. Nombre `kuulis-web`, rama de
+   producción `main` (mientras producción esté apagada, `qa`; ver abajo).
+2. Build: directorio raíz `web`, comando de build `pnpm install --frozen-lockfile && pnpm build:cloudflare`,
+   comando de deploy `npx wrangler deploy` (lee `web/wrangler.jsonc`).
+3. **Variables de build**: `NUXT_PUBLIC_API_BASE` (la CSP se escribe al compilar) y `PNPM_VERSION=10.18.0`.
+4. **Variables del Worker** (Settings → Variables): `NUXT_PUBLIC_APP_ENV=production`,
+   `NUXT_PUBLIC_SITE_URL=https://kuulis.com`, `NUXT_PUBLIC_API_BASE` y `NUXT_API_INTERNAL` (las dos
+   `https://api.kuulis.com/api/v1`), `NUXT_PUBLIC_SUPPORT_EMAIL`.
+5. **Settings → Domains & Routes → Custom domain**: `kuulis.com` y `www.kuulis.com`. Si el DNS tiene un registro
+   para `kuulis.com` o `www` que apunta al homelab, se borra antes; el comodín `*` de NPM sigue para el resto.
+6. La API acepta la web por CORS (`CORS_ORIGINS` de producción ya incluye `https://kuulis.com` y `www`).
+
+API en `api.kuulis.com`: proxy host en NPM con Websockets Support hacia Traefik, y en Coolify el dominio
+`https://api.kuulis.com/api` en la app de la API. Dejar ese registro en **solo DNS** (nube gris): con el proxy
+de Cloudflare la API vería IPs de Cloudflare hasta que NPM restaure `CF-Connecting-IP`.
+
+**Mientras producción esté apagada** (para tener `kuulis.com` ya, por ejemplo para Google Play): rama `qa` y las
+dos variables de la API en `https://kuulis.top8.uk/api/v1` (también la de build), y añadir
+`https://kuulis.com,https://www.kuulis.com` a `CORS_ORIGINS` de `kuulis-api-qa` en Coolify. Muestra los datos y
+los textos legales de QA. Al encender producción se cambian rama y variables y se vuelve a desplegar.
+
+Probar en local: `pnpm build:cloudflare` y `npx wrangler dev --var NUXT_API_INTERNAL:<api> --var
+NUXT_PUBLIC_API_BASE:<api>` (con `NUXT_PUBLIC_API_BASE=<api>` también en el build).
+
 ## Variables de entorno
 Están puestas en Coolify (no en el repo). Lista completa en `api/.env.example` y `admin/.env.example`.
 

@@ -9,9 +9,10 @@ class ProductionSettings(BaseAppSettings):
     DOCS_ENABLED: bool = False
     STORAGE_PREFIX: str = "production"
     PUBLIC_URL: str = "https://kuulis-prod.top8.uk"
-    FRONTEND_URL: str = "https://kuulis-prod.top8.uk"
+    # Public website on Cloudflare Workers; it calls the API from the browser (docs/deployment.md).
+    FRONTEND_URL: str = "https://kuulis.com"
     ADMIN_URL: str = "https://admin.kuulis-prod.top8.uk"
-    CORS_ORIGINS: CSVList = ["https://kuulis-prod.top8.uk"]
+    CORS_ORIGINS: CSVList = ["https://kuulis-prod.top8.uk", "https://kuulis.com", "https://www.kuulis.com"]
     EMAIL_ENABLED: bool = True
     DB_POOL_SIZE: int = 10
     DB_MAX_OVERFLOW: int = 5
