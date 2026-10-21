@@ -2,7 +2,7 @@
 // `pnpm build:cloudflare`; the Docker image (Coolify) keeps using `pnpm build`.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "kuulis-web",
+  "name": "kuulis",
   "main": ".output/server/index.mjs",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
