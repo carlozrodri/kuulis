@@ -11,13 +11,16 @@ cp .env.example .env
 pnpm dev          # http://localhost:3001 (proxies /api to the FastAPI dev server on :8000)
 pnpm lint && pnpm typecheck && pnpm test
 pnpm build        # .output/ node server, used by the Dockerfile
+pnpm build:cloudflare  # .output/ for Cloudflare Workers (production, see docs/deployment.md)
 pnpm e2e          # Playwright + axe on the build (or E2E_BASE_URL=https://kuulis.top8.uk E2E_API_URL=https://kuulis.top8.uk pnpm e2e)
 pnpm og           # regenerate the link-preview images in public/og/ after a headline changes
 ```
 
 - Data comes from the API: `GET /public/site` (cities, driver requirements, fee tiers) and `GET /legal`.
-- In QA/production the site and the API share the domain (`https://<host>` and `https://<host>/api`), so the
-  browser needs no CORS. The server renderer reaches the API at `NUXT_API_INTERNAL` when set.
+- In QA (Coolify) the site and the API share the domain (`https://<host>` and `https://<host>/api`), so the
+  browser needs no CORS. In production the site runs on Cloudflare Workers at `kuulis.com` and calls the API on
+  `api.kuulis.com` (`NUXT_PUBLIC_API_BASE`, with CORS). The server renderer reaches the API at
+  `NUXT_API_INTERNAL` when set.
 - `robots.txt` blocks crawlers unless `NUXT_PUBLIC_APP_ENV=production`.
 - `pnpm e2e` needs Chromium once: `pnpm exec playwright install chromium`. Not part of CI yet.
 - Keep it light: no UI library, no client-side state store; the target is cheap Android phones on slow data.

@@ -25,7 +25,7 @@ async function helpPages(apiBase: string): Promise<{ es?: string, en?: string }[
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
   const site = config.public.siteUrl.replace(/\/$/, '')
-  const apiBase = config.apiInternal || `${getRequestURL(event).origin}${config.public.apiBase}`
+  const apiBase = config.apiInternal || absoluteApiBase(config.public.apiBase, getRequestURL(event).origin)
   const pages = [...PAGES, ...(await helpPages(apiBase))]
   const urls = pages.flatMap((page) => {
     const links = [

@@ -1,8 +1,8 @@
-/** Calls the Kuulis API: same origin in the browser, the internal address while server rendering. */
+/** Calls the Kuulis API: `apiBase` in the browser, the internal address while server rendering. */
 export function useApi() {
   const config = useRuntimeConfig()
   const base = import.meta.server
-    ? (config.apiInternal || `${useRequestURL().origin}${config.public.apiBase}`)
+    ? (config.apiInternal || absoluteApiBase(config.public.apiBase, useRequestURL().origin))
     : config.public.apiBase
   return {
     request: <T>(path: string, options: Parameters<typeof $fetch>[1] = {}) =>

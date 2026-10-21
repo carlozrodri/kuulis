@@ -27,6 +27,7 @@ node_modules/
 .pnpm-store/
 dist/
 .output/
+.wrangler/
 .nuxt/
 .nitro/
 .cache/

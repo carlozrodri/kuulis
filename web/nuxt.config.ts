@@ -1,5 +1,9 @@
 import { LOCALIZED_PAGES } from './i18n/pages'
 
+// The API's origin when it lives on another host (the site on Cloudflare Workers): the browser calls it directly,
+// so the CSP must allow it. Read at build time, so NUXT_PUBLIC_API_BASE goes in the build's environment too.
+const apiOrigin = /^https?:\/\//.test(process.env.NUXT_PUBLIC_API_BASE ?? '') ? new URL(process.env.NUXT_PUBLIC_API_BASE!).origin : ''
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   // Public website (doc 08): server rendered for fast first paint on slow Android phones and for
@@ -32,7 +36,8 @@ export default defineNuxtConfig({
     // network). Empty: the same host the visitor used (https://<host>/api/v1).
     apiInternal: '',
     public: {
-      // The browser always calls the API on the same origin (/api is routed to it).
+      // Where the browser calls the API: a path on the same origin (Coolify routes /api to it), or a full URL
+      // when the site runs on Cloudflare Workers and the API on its own host (NUXT_PUBLIC_API_BASE).
       apiBase: '/api/v1',
       appEnv: 'local',
       // Canonical origin for links in sitemap.xml and Open Graph (NUXT_PUBLIC_SITE_URL).
@@ -59,7 +64,7 @@ export default defineNuxtConfig({
           'style-src \'self\' \'unsafe-inline\'',
           'img-src \'self\' data: https:',
           'font-src \'self\' data:',
-          'connect-src \'self\'',
+          `connect-src 'self'${apiOrigin ? ` ${apiOrigin}` : ''}`,
           'object-src \'none\'',
           'base-uri \'self\'',
           'form-action \'self\'',
