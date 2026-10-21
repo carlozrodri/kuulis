@@ -8,6 +8,8 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "directory": ".output/public", "binding": "ASSETS" },
   "observability": { "enabled": true },
+  // Pull requests get a preview build (`wrangler preview`), which needs this block even when empty.
+  "previews": {},
   // The NUXT_* variables live in the Cloudflare dashboard (they differ while the site still points at QA), so a
   // deploy must not wipe them.
   "keep_vars": true
