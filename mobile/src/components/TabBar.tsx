@@ -9,7 +9,7 @@ import { radius, space, useTheme } from '@/theme';
 const ICONS: Record<string, Icon> = { index: House, rides: Route, wallet: Wallet, notifications: Bell, profile: User };
 
 /** Floating dark pill navigation; the active item sits in a `primary` circle. */
-export function TabBar({ state, descriptors, navigation, badges = {} }: BottomTabBarProps & { badges?: Record<string, boolean> }) {
+export function TabBar({ state, descriptors, emitter, navigateToTab, badges = {} }: BottomTabBarProps & { badges?: Record<string, boolean> }) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -24,12 +24,12 @@ export function TabBar({ state, descriptors, navigation, badges = {} }: BottomTa
           const focused = state.index === index;
           const { options } = descriptors[route.key];
           // Tabs hidden with `href: null` (e.g. the wallet outside driver mode).
-          if (StyleSheet.flatten(options.tabBarItemStyle)?.display === 'none') return null;
+          if (options.hidden) return null;
           const TabIcon = ICONS[route.name] ?? House;
           const label = options.title ?? route.name;
           const onPress = () => {
-            const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-            if (!focused && !event.defaultPrevented) navigation.navigate(route.name, route.params);
+            const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+            if (!focused && !event.defaultPrevented) navigateToTab(route.key);
           };
           return (
             <Pressable
@@ -38,7 +38,7 @@ export function TabBar({ state, descriptors, navigation, badges = {} }: BottomTa
               accessibilityLabel={badges[route.name] ? `${label} •` : label}
               accessibilityState={{ selected: focused }}
               onPress={onPress}
-              onLongPress={() => navigation.emit({ type: 'tabLongPress', target: route.key })}
+              onLongPress={() => emitter.emit({ type: 'tabLongPress', target: route.key })}
               hitSlop={6}
               style={[styles.item, focused && { backgroundColor: theme.primary }]}>
               <TabIcon size={22} color={focused ? theme.onPrimary : theme.navIcon} strokeWidth={2} />

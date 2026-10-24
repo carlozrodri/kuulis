@@ -1,5 +1,6 @@
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { AndroidImportance, AndroidNotificationVisibility } from 'expo-notifications';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
@@ -27,11 +28,11 @@ Notifications.setNotificationHandler({
   }),
 });
 
-const IMPORTANCE: Record<ChannelImportance, Notifications.AndroidImportance> = {
-  max: Notifications.AndroidImportance.MAX,
-  high: Notifications.AndroidImportance.HIGH,
-  default: Notifications.AndroidImportance.DEFAULT,
-  low: Notifications.AndroidImportance.LOW,
+const IMPORTANCE: Record<ChannelImportance, AndroidImportance> = {
+  max: AndroidImportance.MAX,
+  high: AndroidImportance.HIGH,
+  default: AndroidImportance.DEFAULT,
+  low: AndroidImportance.LOW,
 };
 
 /**
@@ -46,7 +47,7 @@ async function createNotificationChannels(): Promise<string[]> {
         description: i18n.t(channel.descriptionKey),
         importance: IMPORTANCE[channel.importance],
         ...(channel.vibrationPattern ? { vibrationPattern: channel.vibrationPattern, enableVibrate: true } : {}),
-        ...(channel.publicOnLockScreen ? { lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC } : {}),
+        ...(channel.publicOnLockScreen ? { lockscreenVisibility: AndroidNotificationVisibility.PUBLIC } : {}),
       })
         .then((result) => (result ? channel.id : null))
         .catch(() => null),

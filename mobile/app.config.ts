@@ -160,6 +160,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     ['expo-audio', { microphonePermission: false }],
     './plugins/withCrashLog',
+    // SDK 58 turns R8 on for release builds. Off until it is tested on its own (libraries that use reflection,
+    // like Google Sign-In and maps, may need keep rules).
+    ['expo-build-properties', { android: { enableMinifyInReleaseBuilds: false } }],
     ...(GOOGLE_MAPS_ANDROID_API_KEY
       ? [['react-native-maps', { androidGoogleMapsApiKey: GOOGLE_MAPS_ANDROID_API_KEY }] as [string, object]]
       : []),

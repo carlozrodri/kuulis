@@ -127,7 +127,7 @@ export function ReportsScreen() {
               color={theme.primary}
               style={{ margin: space.md }}
             />
-          ) : null
+          ) : undefined
         }
         ListEmptyComponent={
           reports.isPending ? (

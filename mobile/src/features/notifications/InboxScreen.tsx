@@ -89,7 +89,7 @@ export function InboxScreen() {
         keyExtractor={(item) => item.id}
         stickySectionHeadersEnabled={false}
         contentContainerStyle={{ paddingHorizontal: space.lg, paddingBottom: TAB_BAR_SPACE + insets.bottom, flexGrow: 1 }}
-        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={theme.primary} />}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => void refetch()} tintColor={theme.primary} />}
         ItemSeparatorComponent={() => <View style={{ height: space.sm }} />}
         ListHeaderComponent={
           <View style={styles.header}>

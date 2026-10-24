@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 
 import { useTheme } from '@/theme';
 
-export const unstable_settings = { initialRouteName: 'login' };
+export const unstable_settings = { anchor: 'login' };
 
 export default function AuthLayout() {
   const theme = useTheme();

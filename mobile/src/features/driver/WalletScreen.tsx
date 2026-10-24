@@ -281,7 +281,7 @@ export function WalletScreen() {
               color={theme.primary}
               style={{ margin: space.md }}
             />
-          ) : null
+          ) : undefined
         }
         ListEmptyComponent={
           entries.isPending ? (

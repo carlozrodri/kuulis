@@ -204,7 +204,7 @@ export function PlacePickerScreen() {
             <Txt variant="caption" color="muted" align="center" style={{ marginTop: space.lg }}>
               {t('search.hint')}
             </Txt>
-          ) : null
+          ) : undefined
         }
         renderItem={({ item, index }) => (
           <ListRow
