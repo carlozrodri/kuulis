@@ -38,6 +38,8 @@ fondo claro. Nada de degradados de colores ajenos a la marca.
 - Subtítulos: y 1150–1450.
 
 ## Firma de marca
+- **Logo:** «K punto», archivos y reglas en [`logo/`](logo/README.md). En video sobre verde o noche, siempre la
+  versión `-negativo`.
 - **Cierre** de 1 segundo: fondo verde, logotipo «kuulis.» blanco con el punto amarillo que «aterriza».
   Nunca al inicio (el inicio es del gancho).
 - **Marca de agua:** ninguna. Las redes ya muestran la cuenta.
