@@ -2,6 +2,7 @@
 prints a 7-day download link for each.
 
 Usage: upload.py <apk> <key> <latest key> <profile> [runtime version]
+       upload.py --bundle <aab> <key>   (Google Play bundle: uploaded as is, with no metadata)
 The metadata (<key without .apk>.json) has the version, build number (versionCode), size, SHA-256,
 MD5 and runtime version; the admin publishes a build to a channel from it, the app checks the MD5
 before installing, and the compiler sends JS updates instead of a new APK while the runtime version
@@ -21,8 +22,6 @@ from pathlib import Path
 import boto3
 from botocore.config import Config
 
-path, key, latest, profile = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
-expected_runtime = sys.argv[5] if len(sys.argv) > 5 else None
 bucket = os.environ["AWS_S3_BUCKET"]
 s3 = boto3.client(
     "s3",
@@ -32,6 +31,30 @@ s3 = boto3.client(
     region_name=os.environ.get("AWS_S3_REGION", "us-east-1"),
     config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
 )
+
+
+def upload(path: str, target: str, content_type: str) -> None:
+    s3.upload_file(
+        path,
+        bucket,
+        target,
+        ExtraArgs={
+            "ContentType": content_type,
+            "ContentDisposition": f'attachment; filename="{target.rsplit("/", 1)[-1]}"',
+        },
+    )
+    url = s3.generate_presigned_url(
+        "get_object", Params={"Bucket": bucket, "Key": target}, ExpiresIn=7 * 24 * 3600
+    )
+    print(f"Uploaded s3://{bucket}/{target}\n{url}")
+
+
+if sys.argv[1] == "--bundle":
+    upload(sys.argv[2], sys.argv[3], "application/octet-stream")
+    sys.exit(0)
+
+path, key, latest, profile = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+expected_runtime = sys.argv[5] if len(sys.argv) > 5 else None
 
 
 def aapt2(*args: str) -> str:
@@ -97,19 +120,7 @@ meta = {
 }
 
 for target in (key, latest):
-    s3.upload_file(
-        path,
-        bucket,
-        target,
-        ExtraArgs={
-            "ContentType": "application/vnd.android.package-archive",
-            "ContentDisposition": f'attachment; filename="{target.rsplit("/", 1)[-1]}"',
-        },
-    )
-    url = s3.generate_presigned_url(
-        "get_object", Params={"Bucket": bucket, "Key": target}, ExpiresIn=7 * 24 * 3600
-    )
-    print(f"Uploaded s3://{bucket}/{target}\n{url}")
+    upload(path, target, "application/vnd.android.package-archive")
 
 # Written last: the admin only lists builds whose APK is already in place.
 s3.put_object(
