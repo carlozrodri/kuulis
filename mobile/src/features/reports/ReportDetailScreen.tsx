@@ -235,7 +235,7 @@ export function ReportDetailScreen() {
                 </Txt>
               ) : null}
             </View>
-          ) : null
+          ) : undefined
         }
       />
       {replyable ? (

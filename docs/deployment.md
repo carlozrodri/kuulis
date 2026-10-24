@@ -340,7 +340,7 @@ a entrar), las ubicaciones en vivo (los motorizados las reenvían en segundos), 
 
 ## Compilador de APK (`kuulis-builder-qa`)
 App de Coolify en QA que compila el APK en nuestro servidor, sin la cola de EAS Build (~25 min).
-- Imagen: `mobile/builder/Dockerfile` (base `/mobile`), con JDK 17, Android SDK 36 y NDK 27.
+- Imagen: `mobile/builder/Dockerfile` (base `/mobile`), con JDK 17, Android SDK 37 y NDK 27.
 - Al arrancar compila con `eas build --local --profile qa` (mismas credenciales y variables de EAS que en
   la nube) y sube el APK a S3 en `builds/qa/` (con fecha y hash) y como `builds/qa/kuulis-qa-qa-latest.apk`.
   El enlace firmado de 7 días queda en los logs del contenedor.

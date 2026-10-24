@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, TextInput, type TextInputInstance, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ArrowUpDown, ChevronLeft, LocateFixed, MapPin, MapPinned, SearchX, X } from '@/components/icons';
@@ -39,7 +39,7 @@ export function SearchScreen() {
   const [field, setField] = useState<DraftField>(params.field === 'pickup' ? 'pickup' : 'dropoff');
   const [texts, setTexts] = useState<Record<DraftField, string>>({ pickup: '', dropoff: '' });
   const [debounced, setDebounced] = useState('');
-  const inputs = { pickup: useRef<TextInput>(null), dropoff: useRef<TextInput>(null) };
+  const inputs = { pickup: useRef<TextInputInstance>(null), dropoff: useRef<TextInputInstance>(null) };
   const query = texts[field];
 
   useEffect(() => {
@@ -204,7 +204,7 @@ export function SearchScreen() {
             <Txt variant="caption" color="muted" align="center" style={{ marginTop: space.lg }}>
               {t('search.hint')}
             </Txt>
-          ) : null
+          ) : undefined
         }
         renderItem={({ item, index }) => (
           <ListRow

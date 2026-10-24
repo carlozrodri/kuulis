@@ -96,7 +96,7 @@ export function ChargesScreen() {
               color={theme.primary}
               style={{ margin: space.md }}
             />
-          ) : null
+          ) : undefined
         }
         ListEmptyComponent={
           charges.isPending ? (

@@ -99,7 +99,7 @@ export function HistoryScreen() {
             ) : null}
           </View>
         }
-        ListFooterComponent={history.isFetchingNextPage ? <ActivityIndicator color={theme.primary} style={{ margin: space.md }} /> : null}
+        ListFooterComponent={history.isFetchingNextPage ? <ActivityIndicator color={theme.primary} style={{ margin: space.md }} /> : undefined}
         ListEmptyComponent={
           history.isPending ? (
             <View style={{ gap: space.sm }}>
