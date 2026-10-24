@@ -22,8 +22,11 @@ export default defineNuxtConfig({
         { name: 'twitter:card', content: 'summary_large_image' },
       ],
       link: [
+        // The «K punto» icons (marketing/brand/logo/web): the .ico for browsers without SVG favicons.
+        { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-        { rel: 'apple-touch-icon', href: '/icon-192.png' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/site.webmanifest' },
         // Every page opens with a poster headline: fetch its face with the HTML.
         { rel: 'preload', href: '/fonts/archivo-poster.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
       ],

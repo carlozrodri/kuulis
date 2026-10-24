@@ -212,6 +212,12 @@ _PAYMENT = {
 
 
 @cache
+def _logo() -> Image.Image:
+    """The «K punto» logo, negative version (white on the green band), 64 px high."""
+    return Image.open(ASSETS / "kuulis-horizontal-negativo.png").convert("RGBA")
+
+
+@cache
 def _font(weight: str, size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(str(ASSETS / f"PlusJakartaSans_{weight}.ttf"), size)
 
@@ -282,10 +288,8 @@ def render(receipt: RideReceipt, lang: str) -> bytes:
 
     # Header band: brand and receipt title.
     c.draw.rectangle((0, 0, WIDTH, 260), fill=PRIMARY)
-    brand = _font("800ExtraBold", 72)
-    c.draw.text((PAD, 64), "kuulis", font=brand, fill=WHITE)
-    dot = PAD + c.draw.textlength("kuulis", font=brand) + 8
-    c.draw.ellipse((dot, 124, dot + 18, 142), fill=ACCENT)
+    logo = _logo()
+    c.image.paste(logo, (PAD, 72), logo)
     c.draw.text((PAD, 168), t["title"], font=_font("700Bold", 40), fill=WHITE)
     c.y = 316
 

@@ -19,8 +19,10 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 import { ChevronRight, CircleCheck, Eye, EyeOff, type Icon, Info, TriangleAlert, X } from '@/components/icons';
+import { LOGO_COLORS, LOGO_K, LOGO_K_NEGATIVE, LOGO_LETTERS, LOGO_RATIO, LOGO_VIEWBOX } from '@/components/logo';
 import { elevation, fonts, radius, space, type Theme, type TypeVariant, type, useTheme } from '@/theme';
 
 /** Space the floating tab bar takes at the bottom of tab screens (bar + gap). */
@@ -614,17 +616,27 @@ export function Divider({ label }: { label?: string }) {
   );
 }
 
-/** The kuulis. wordmark: the dot is always the accent yellow. */
-export function Wordmark({ size = 34, color }: { size?: number; color?: string }) {
+/**
+ * The «K punto» logo. `size` is the old wordmark font size, so screens keep their scale. `tone`: `auto` is the color
+ * version on light surfaces and the negative one in the dark theme; `negative` (white k and letters) for the green hero.
+ */
+export function Wordmark({ size = 34, tone = 'auto' }: { size?: number; tone?: 'auto' | 'negative' }) {
   const theme = useTheme();
+  const negative = tone === 'negative' || theme.scheme === 'dark';
+  const height = Math.round(size * 0.8);
   return (
-    <Text
+    <Svg
+      width={height * LOGO_RATIO}
+      height={height}
+      viewBox={LOGO_VIEWBOX}
+      accessible
       accessibilityRole="header"
-      accessibilityLabel="Kuulis"
-      maxFontSizeMultiplier={1.2}
-      style={{ fontFamily: fonts.extrabold, fontSize: size, letterSpacing: -size * 0.03, color: color ?? theme.primary }}>
-      kuulis<Text style={{ color: theme.accent }}>.</Text>
-    </Text>
+      accessibilityLabel="Kuulis">
+      <Path d={negative ? LOGO_K_NEGATIVE : LOGO_K} fill={negative ? LOGO_COLORS.white : LOGO_COLORS.green} />
+      <Circle cx={174} cy={194} r={negative ? 30.25 : 31} fill={LOGO_COLORS.yellow} />
+      <Path d={LOGO_LETTERS} fill={negative ? LOGO_COLORS.white : LOGO_COLORS.ink} />
+      <Circle cx={956.15} cy={204.22} r={21.31} fill={LOGO_COLORS.yellow} />
+    </Svg>
   );
 }
 

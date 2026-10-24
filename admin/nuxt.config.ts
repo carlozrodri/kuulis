@@ -12,6 +12,12 @@ export default defineNuxtConfig({
     head: {
       title: 'Kuulis Admin',
       meta: [{ name: 'robots', content: 'noindex, nofollow' }],
+      // The «K punto» icons (marketing/brand/logo/web).
+      link: [
+        { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+      ],
     },
   },
   css: ['~/assets/css/main.css'],

@@ -517,7 +517,11 @@ class _Missing(dict):
 
 
 def layout(locale: str, heading: str, body_html: str, preheader: str = "") -> str:
-    """The branded frame: wordmark, white card, footer with the site."""
+    """The branded frame: the «K punto» logo, white card, footer with the site.
+
+    The logo is a PNG the website serves (email clients do not show SVG); with images off, its alt
+    text keeps the brand name in its place.
+    """
     footer = (
         "Recibes este correo por tu cuenta de Kuulis."
         if locale == "es"
@@ -535,7 +539,9 @@ def layout(locale: str, heading: str, body_html: str, preheader: str = "") -> st
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
  style="max-width:560px;">
 <tr><td style="padding:0 4px 16px;font-family:Arial,Helvetica,sans-serif;font-size:24px;
-font-weight:bold;color:{BRAND};letter-spacing:-0.5px;">Kuulis</td></tr>
+font-weight:bold;color:{BRAND};letter-spacing:-0.5px;">
+<img src="{site}/brand/kuulis-email.png" width="160" height="34" alt="Kuulis"
+ style="display:block;border:0;width:160px;height:34px;"></td></tr>
 <tr><td style="background:#ffffff;border:1px solid {LINE};border-radius:12px;padding:28px 24px;
 font-family:Arial,Helvetica,sans-serif;color:{INK};">
 <h1 style="margin:0 0 16px;font-size:22px;line-height:28px;font-weight:bold;color:{INK};">

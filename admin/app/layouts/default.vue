@@ -148,11 +148,14 @@ const localeItems = computed(() =>
     >
       <template #header="{ collapsed }">
         <div class="flex items-center gap-2 font-semibold">
-          <UIcon
-            name="i-lucide-shield-check"
-            class="size-5 text-primary"
+          <KuulisLogo
+            :symbol="collapsed"
+            class="h-5"
           />
-          <span v-if="!collapsed">Kuulis Admin</span>
+          <span
+            v-if="!collapsed"
+            class="text-(--ui-text-muted)"
+          >Admin</span>
           <UBadge
             v-if="!collapsed && config.public.appEnv !== 'production'"
             color="warning"

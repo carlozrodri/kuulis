@@ -43,7 +43,7 @@ export function HeroHeader({
       </Svg>
       <View style={styles.top}>
         {leading}
-        <Wordmark size={30} color={theme.onHero} />
+        <Wordmark size={30} tone="negative" />
       </View>
       {title ? (
         <Txt variant="display" style={{ color: theme.onHero, marginTop: space.lg }}>

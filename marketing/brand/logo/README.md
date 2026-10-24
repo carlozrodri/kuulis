@@ -1,7 +1,8 @@
 # Logo de Kuulis: «K punto»
 
-**Estado:** aprobado por Carlos (2026-10-24). Los archivos de la app y de la web todavía no se han cambiado: aquí
-están listos para reemplazar (ver §9).
+**Estado:** aprobado por Carlos (2026-10-24) y aplicado el mismo día en la app (íconos, splash y `Wordmark`), la web
+(favicon, manifiesto, cabecera, pie, tarjetas y las imágenes `og/`), el panel (favicon, barra lateral y login), los
+correos y el recibo del viaje. Ver §9 y §12.
 
 ## 1. La idea
 El punto final es la pierna de la k: **«kuulis.» y «y punto» en una sola letra.** El punto amarillo ya era el rasgo
@@ -115,3 +116,19 @@ python fondos.py .. ../pruebas/fondos.html
 ```
 `export_assets.py` usa `render_png.py` y `export_variants.py` del skill de diseño de logos (necesita Chrome u otro
 renderizador de SVG).
+
+## 12. Dónde está aplicado
+| Lugar | Archivo |
+| --- | --- |
+| App: ícono, ícono adaptable (fondo `#0E7C5A`), monocromo, splash, favicon web | `mobile/assets/`, `mobile/app.config.ts` |
+| App: logo en pantallas (cabecera verde, inicio del pasajero, perfil, «Acerca de») | `Wordmark` en `mobile/src/components/ui.tsx`, trazos en `mobile/src/components/logo.ts` |
+| Web: favicon, `.ico`, apple-touch, íconos 192/512, maskable, manifiesto | `web/public/`, `<head>` en `web/nuxt.config.ts` |
+| Web: cabecera, pie y tarjetas de enlaces | `web/app/components/KuulisWordmark.vue` (`tone="negative"` sobre oscuro) |
+| Web: imágenes para compartir (og:image) | `web/scripts/og-images.mjs` → `web/public/og/` (`pnpm og`) |
+| Web: archivos para terceros | `web/public/brand/` (SVG y el PNG de los correos) |
+| Panel: favicon, barra lateral (símbolo al plegarla), pantallas de acceso | `admin/public/`, `admin/app/components/KuulisLogo.vue`, `admin/app/layouts/` |
+| Correos | `api/apps/notifications/emails.py` (PNG servido por la web en `/brand/kuulis-email.png`) |
+| Recibo del viaje (imagen) | `api/apps/rides/receipt.py`, `api/apps/rides/assets/kuulis-horizontal-negativo.png` |
+
+Las capturas de la app que muestra la web (`web/public/img/app/`) todavía tienen el logotipo anterior: se cambian
+cuando se tomen capturas nuevas de la app.
