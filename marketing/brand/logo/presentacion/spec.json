@@ -1,0 +1,34 @@
+{
+  "brand": "Kuulis",
+  "tagline": "Viajes en moto por Caracas. Cuentas claras, y punto.",
+  "brief": "Viajes en moto en Caracas con precio fijo antes de salir y cero comisión para el motorizado. La marca ya tiene su rasgo propio: el punto amarillo de «kuulis.», que en la app marca el destino. El símbolo tenía que funcionar como ícono de app a 16 px, en un color y sobre la noche caraqueña, sin taxis, pines ni motos de clip-art.",
+  "adjectives": ["directa", "cálida", "segura", "ágil", "honesta"],
+  "criteria": "Éxito: se reconoce a 16 px, funciona en un color y en negativo, se distingue de Bolt e inDrive (verdes claros) y nace del punto que ya es de Kuulis.",
+  "mockups": ["app-icon", "signage", "tshirt", "social", "website", "sticker"],
+  "nav": ["Pasajeros", "Motorizados", "Seguridad"],
+  "brand_color": "#0E7C5A",
+  "greyscale": false,
+  "final": true,
+  "designer": "Kuulis",
+  "concepts": [
+    {
+      "name": "K punto",
+      "symbol": "../svg/kuulis-simbolo.svg",
+      "lockup": "../svg/kuulis-horizontal.svg",
+      "stacked": "../svg/kuulis-vertical.svg",
+      "symbol_on_tile": "../svg/kuulis-simbolo-negativo.svg",
+      "stacked_on_tile": "../svg/kuulis-vertical-negativo.svg",
+      "symbol_on_dark": "../svg/kuulis-simbolo-negativo.svg",
+      "lockup_on_dark": "../svg/kuulis-horizontal-negativo.svg",
+      "stacked_on_dark": "../svg/kuulis-vertical-negativo.svg",
+      "idea": "El punto final es la pierna de la k: «kuulis.» y «y punto» en una sola letra.",
+      "rationale": [
+        "Nace del punto amarillo que la marca ya usa como destino y como final de cada titular",
+        "Una letra, un punto: se lee a 16 px y en un solo color",
+        "Verde profundo con amarillo: se separa de los verdes claros de la categoría"
+      ]
+    }
+  ],
+  "recommendation": "K punto: el punto que llega. Símbolo para el ícono de app y el favicon; logotipo horizontal para la web y la chaqueta de Kuu.",
+  "next_steps": ["Cambiar los íconos de la app y del sitio", "Animación del cierre: el punto que aterriza", "Búsqueda de marca registrada (SAPI)"]
+}

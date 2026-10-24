@@ -101,7 +101,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: APP_ID,
     googleServicesFile: GOOGLE_SERVICES_FILE,
     adaptiveIcon: {
-      backgroundColor: '#E6F4FE',
+      backgroundColor: '#0E7C5A',
       foregroundImage: './assets/android-icon-foreground.png',
       backgroundImage: './assets/android-icon-background.png',
       monochromeImage: './assets/android-icon-monochrome.png',
