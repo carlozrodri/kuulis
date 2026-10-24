@@ -24,6 +24,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { setAnalyticsEnabled, startAnalytics, track } from '@/lib/analytics';
 import { screenName, usageAllowed } from '@/lib/analyticsCore';
 import { installCrashReporting, reportError, setCrashRoute } from '@/lib/crashReport';
+import { homeRoute } from '@/lib/homeRoute';
 import {
   keepPersistedQueries,
   PERSIST_BUSTER,
@@ -80,19 +81,21 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
 
   if (!ready) return null;
 
+  const home = homeRoute({ signedIn: !!user, pendingLegal, hasMode: !!mode });
+
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.background }, animation: 'fade' }}>
-      <Stack.Protected guard={!user}>
+      <Stack.Protected guard={!user} redirectTo={home}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
       {/* New or updated terms (doc 07): nothing else opens until they are accepted. */}
-      <Stack.Protected guard={!!user && pendingLegal}>
+      <Stack.Protected guard={!!user && pendingLegal} redirectTo={home}>
         <Stack.Screen name="accept-terms" />
       </Stack.Protected>
-      <Stack.Protected guard={!!user && !pendingLegal && !mode}>
+      <Stack.Protected guard={!!user && !pendingLegal && !mode} redirectTo={home}>
         <Stack.Screen name="welcome" />
       </Stack.Protected>
-      <Stack.Protected guard={!!user && !pendingLegal && !!mode}>
+      <Stack.Protected guard={!!user && !pendingLegal && !!mode} redirectTo={home}>
         <Stack.Screen name="(app)" />
       </Stack.Protected>
       {/* Legal texts open from the sign-up form, the acceptance screen and Profile. */}
