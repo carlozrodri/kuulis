@@ -23,7 +23,7 @@ Revisado: 2026-10-18 (contra `docs/product/`, `api/apps/config/schemas.py` y `/p
 | H9 | El motorizado ve los datos del viaje y el pasajero ve **nombre, foto, moto y placa** del motorizado | «Sabes quién te lleva» | docs `produccion/11`, app |
 | H10 | **PIN de inicio**: el viaje no empieza sin el PIN del pasajero | «Sin tu PIN, el viaje no arranca» | `produccion/11`; `PinScreen` |
 | H11 | **Viaje compartido en vivo** con un enlace | «Comparte tu viaje y te siguen en vivo» | `produccion/11` |
-| H12 | Botón **SOS**: llama al número de emergencia y envía el enlace del viaje a tus contactos | «Con un toque llamas a emergencias y avisas a tus contactos» | `produccion/11` (nunca prometer un equipo de Kuulis que responda) |
+| H12 | Botón **SOS** (se mantiene presionado 2 s, `SOS_HOLD_MS`): llama al número de emergencia y envía el enlace del viaje a tus contactos | «Mantén el SOS 2 segundos: llamas a emergencias y avisas a tus contactos» | `produccion/11` (nunca prometer un equipo de Kuulis que responda) |
 | H13 | **Chat** en la app y **calificación** después de cada viaje | «Chateas dentro de la app» | app |
 | H14 | **Pedir para otra persona**, con su propio enlace y PIN | «Pide una moto para tu mamá desde tu teléfono» | `produccion/23` |
 | H15 | Motorizados **verificados**: cédula, RIF, licencia, certificado médico, carnet de circulación, selfie y fotos de la moto; **21 años o más**; moto **2013 o más nueva** | «Motorizados verificados con sus documentos» | `/public/site` `driver` |
