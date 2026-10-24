@@ -1,5 +1,8 @@
 # Infraestructura propia
 
+> Mapa completo de la infraestructura en [`docs/infra/`](../docs/infra/README.md) y su descripción en Terraform en
+> [`terraform/`](terraform/README.md).
+
 Servicios que Kuulis aloja en Coolify en vez de usar servidores públicos. Cada carpeta es una app de
 Coolify (build pack Dockerfile, `base_directory` = la carpeta, sin dominio público). La API los llama por la red
 interna de Coolify con un **alias de red fijo** (Coolify → app → Advanced → Network aliases): `kuulis-osrm` y
