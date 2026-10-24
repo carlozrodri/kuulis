@@ -1,0 +1,16 @@
+# Estado y secretos: nunca al repo (el estado guarda contraseñas de las bases y URLs internas).
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!terraform.tfvars.example
+*.tfplan
+tfplan*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc

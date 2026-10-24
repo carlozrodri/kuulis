@@ -1,0 +1,7 @@
+# Copiar a terraform.tfvars (ignorado por git) solo si hace falta cambiar algo. Las credenciales NO van aquí:
+# van en variables de entorno (README → Credenciales).
+
+# cloudflare_account_id = "1e6a34cfe895e17e830e8d7824b429b2"
+
+# Adoptar también el comodín *.top8.uk (compartido con otros proyectos del homelab).
+# manage_shared_dns = false
