@@ -358,6 +358,12 @@ App de Coolify en QA que compila el APK en nuestro servidor, sin la cola de EAS 
 - Junto a cada APK sube `<nombre>.json` con versión, build (`versionCode`), tamaño, SHA-256, MD5 y runtime.
   El perfil `qa` sube el build en cada compilación (`autoIncrement`, numerado por EAS).
 
+### Bundle para Google Play (`kuulis-builder-play`)
+Misma imagen y mismas variables que `kuulis-builder-qa`, más `BUILD_PROFILE=play` y `APP_ENV=production`.
+Compila el `.aab` del perfil `play` (paquete `com.kuulis.app`) en cada cambio, sin exportar OTA, y lo sube a
+`builds/play/` con un enlace de 7 días en los logs. El admin no lo lista: se sube a mano en Play Console
+(Prueba cerrada → Crear versión). Usa la llave de subida guardada en EAS (la creó el primer build en la nube).
+
 ## Publicar una versión del APK (doc 09)
 1. El compilador deja el APK en `builds/<entorno>/` (ver arriba).
 2. En el admin, **Versiones → Compilaciones disponibles → Publicar**: canal, notas y si es **obligatoria**.

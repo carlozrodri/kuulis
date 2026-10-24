@@ -46,7 +46,8 @@
       "extends": "production",
       "env": {
         "APP_ENV": "production",
-        "APP_STORE": "play"
+        "APP_STORE": "play",
+        "API_URL": "https://kuulis-qa.top8.uk/api/v1"
       },
       "android": {
         "buildType": "app-bundle"
