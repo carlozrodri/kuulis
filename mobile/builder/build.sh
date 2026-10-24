@@ -7,8 +7,8 @@
 # publishes it from Versiones. Otherwise it builds a new APK. FORCE_APK=1 always builds the APK.
 #
 # Env: EXPO_TOKEN, EXPO_OWNER (Expo account), AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_ENDPOINT,
-# AWS_S3_BUCKET, optional AWS_S3_REGION, BUILD_PROFILE (eas.json profile, default qa), APP_ENV (default qa)
-# and FORCE_APK.
+# AWS_S3_BUCKET, optional AWS_S3_REGION, BUILD_PROFILE (eas.json profile, default qa), APP_ENV (default qa),
+# FORCE_APK and BUILD_NONCE (change it and restart to rebuild the same source, e.g. after new EAS env vars).
 #
 # BUILD_PROFILE=play builds the Google Play bundle (.aab) every time, with no OTA export: it goes to
 # builds/play/ with a 7-day link and is uploaded to Play Console by hand (the admin does not list it).
@@ -25,7 +25,7 @@ python3 -m http.server 8080 --directory "$STATUS_DIR" > /dev/null 2>&1 &
 
 SOURCE_ID=$(cd /src && find . -type f -not -path './builder/*' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -c1-10)
 NAME="kuulis-${APP_ENV}-${PROFILE}-$(date -u +%Y%m%d-%H%M)-${SOURCE_ID}.apk"
-MARK="/cache/built-${PROFILE}-${SOURCE_ID}"
+MARK="/cache/built-${PROFILE}-${SOURCE_ID}${BUILD_NONCE:+-${BUILD_NONCE}}"
 if [ "$PROFILE" = "play" ]; then NAME="${NAME%.apk}.aab"; fi
 
 # Google Play bundle: built and uploaded as is (Play Console takes it by hand).
