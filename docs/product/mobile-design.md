@@ -87,6 +87,19 @@ bienvenida y motorizado). Es la fuente visual; los valores de abajo son la fuent
 | `muted` | `#5B6A63` | `#9AADA4` | Texto secundario |
 | `border` | `#DCE6E0` | `#23322B` | Bordes y separadores |
 | `success` / `warning` / `danger` / `info` | `#147A3A` / `#B45309` / `#B42318` / `#1D4ED8` | `#4ADE80` / `#FBBF24` / `#F87171` / `#60A5FA` | Estados |
+| `dangerStrong` / `onDangerStrong` | `#B42318` / `#FFFFFF` | `#B42318` / `#FFFFFF` | Relleno rojo con texto blanco: SOS, aviso sin conexión, contadores |
+
+### Reglas de accesibilidad (2026-10-25)
+Las comprueba `mobile/__tests__/accessibility.test.ts`.
+- Texto sobre su fondo: 4,5:1 en claro y oscuro. Nunca bajar el contraste del texto con `opacity`.
+- Texto blanco solo sobre rellenos pensados para él (`hero`, `nav`, `dangerStrong`); en oscuro `danger` es un
+  rojo claro y el blanco encima no se lee.
+- Contorno de controles sin marcar (radio, casilla, interruptor apagado, estrella vacía): `muted`, 3:1.
+- Todo `Pressable` lleva `accessibilityRole`; los íconos sin texto llevan `accessibilityLabel`. Interruptores con
+  rol `switch` y estado `checked`; grupos de opciones con `radiogroup` y `radio`.
+- Área táctil mínima de 48 px (con `hitSlop` si el aspecto es más pequeño).
+- Etiquetas cortas en espacios estrechos: dos líneas en vez de cortar con «…»; los montos se encogen.
+- Inglés: *ride* (no *trip*), *passenger* (no *rider*), *motorcycle* para el vehículo y ortografía de EE. UU.
 
 ### Tipografía y forma
 - Fuente **Plus Jakarta Sans** (Google Fonts, vía `@expo-google-fonts/plus-jakarta-sans`).

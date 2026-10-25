@@ -18,7 +18,7 @@ export function CheckRow({ checked, onChange, children }: { checked: boolean; on
       <View
         style={[
           styles.box,
-          { borderColor: checked ? theme.primary : theme.border, backgroundColor: checked ? theme.primary : theme.surface },
+          { borderColor: checked ? theme.primary : theme.muted, backgroundColor: checked ? theme.primary : theme.surface },
         ]}>
         {checked ? <Check size={16} color={theme.onPrimary} strokeWidth={3} /> : null}
       </View>

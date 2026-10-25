@@ -135,7 +135,7 @@ export function CategoryCard({
       <View
         style={[
           styles.radio,
-          { borderColor: selected ? accent : theme.border },
+          { borderColor: selected ? accent : theme.muted },
         ]}
       >
         {selected ? (

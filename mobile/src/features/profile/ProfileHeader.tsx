@@ -66,7 +66,7 @@ export function ProfileHeader({ mode, rating }: { mode: AppMode; rating: number 
           <Txt variant="title" align="center" numberOfLines={2} style={{ color: theme.onHero }}>
             {user?.full_name || t('profile.noName')}
           </Txt>
-          <Txt align="center" numberOfLines={1} style={{ color: theme.onHero, opacity: 0.85 }}>
+          <Txt align="center" numberOfLines={1} style={{ color: theme.onHero }}>
             {user?.email}
           </Txt>
         </View>

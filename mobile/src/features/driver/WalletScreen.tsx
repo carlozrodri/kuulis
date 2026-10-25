@@ -352,7 +352,7 @@ function BalanceCard({
       </Svg>
       <View style={styles.cardTop}>
         <View style={{ flex: 1, gap: 2 }}>
-          <Txt variant="label" style={{ color: theme.onHero, opacity: 0.85 }}>
+          <Txt variant="label" style={{ color: theme.onHero }}>
             {t("wallet.balance")}
           </Txt>
           {loading ? (
@@ -369,9 +369,12 @@ function BalanceCard({
               <Pressable
                 accessibilityRole="button"
                 onPress={onRetry}
-                hitSlop={8}
+                hitSlop={14}
               >
-                <Txt variant="bodyStrong" style={{ color: theme.accent }}>
+                <Txt
+                  variant="bodyStrong"
+                  style={{ color: theme.onHero, textDecorationLine: "underline" }}
+                >
                   {t("common.retry")}
                 </Txt>
               </Pressable>

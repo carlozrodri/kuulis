@@ -24,6 +24,9 @@ const light = {
   warning: '#B45309',
   danger: '#B42318',
   info: '#1D4ED8',
+  // Solid red fill with white text (SOS button and banner, offline pill, unread badges).
+  dangerStrong: '#B42318',
+  onDangerStrong: '#FFFFFF',
   // Soft tints for pills, banners and icon tiles.
   successSoft: '#DCF3E4',
   warningSoft: '#FFF4E0',
@@ -63,6 +66,9 @@ const dark: ThemeColors = {
   warning: '#FBBF24',
   danger: '#F87171',
   info: '#60A5FA',
+  // The light red of the dark theme is too pale for white text (2.8:1), so the solid fill stays deep red.
+  dangerStrong: '#B42318',
+  onDangerStrong: '#FFFFFF',
   successSoft: '#12291C',
   warningSoft: '#2B2210',
   dangerSoft: '#2C1515',

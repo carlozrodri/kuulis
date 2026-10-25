@@ -373,7 +373,7 @@
       "phone": "Teléfono con WhatsApp",
       "phoneHint": "Número venezolano o con código de país",
       "phoneInvalid": "Revisa el número, parece incompleto",
-      "how": "Durante un viaje, Tu seguridad les envía por WhatsApp un enlace para seguir la moto en vivo. Si activas el SOS, te ofrecemos avisarles.",
+      "how": "Durante un viaje, abre «Tu seguridad» para enviarles por WhatsApp un enlace y que sigan la moto en vivo. Si activas el SOS, te ofrecemos avisarles.",
       "saved": "Contacto guardado",
       "add": "Agregar contacto",
       "edit": "Editar contacto",
@@ -1812,7 +1812,7 @@
     "delete": {
       "intro": "Cerramos tu sesión en todos tus equipos. Tienes 30 días para arrepentirte: si vuelves a entrar antes, recuperas tu cuenta tal como estaba.",
       "erasedTitle": "Lo que borramos",
-      "erasedBody": "Tu nombre, email, foto, contacto de confianza, lugares guardados, mensajes del chat, notificaciones y, si eres motorizado, tus documentos, cédula, teléfono y placa.",
+      "erasedBody": "Tu nombre, correo, foto, contacto de confianza, lugares guardados, mensajes del chat, notificaciones y, si eres motorizado, tus documentos, cédula, teléfono y placa.",
       "keptTitle": "Lo que se queda sin tu nombre",
       "keptBody": "Los viajes, pagos, cuotas y reportes se guardan sin datos que te identifiquen, porque los necesitamos para la contabilidad y la seguridad de todos.",
       "balanceTitle": "Pierdes tu saldo de {{amount}} USDT",
@@ -1822,8 +1822,8 @@
     },
     "export": {
       "title": "Descargar mis datos",
-      "rowHint": "Te enviamos una copia por email",
-      "body": "Preparamos un archivo con tu perfil, tus viajes, las calificaciones que recibiste (sin el autor), los movimientos de tu billetera y tus reportes, y te lo enviamos por email. El enlace dura 24 horas.",
+      "rowHint": "Te enviamos una copia por correo",
+      "body": "Preparamos un archivo con tu perfil, tus viajes, las calificaciones que recibiste (sin el autor), los movimientos de tu billetera y tus reportes, y te lo enviamos por correo. El enlace dura 24 horas.",
       "button": "Enviarme mis datos",
       "sentTitle": "Revisa tu correo",
       "sentBody": "Enviamos el enlace a {{email}}. Si no lo ves, revisa la carpeta de spam.",

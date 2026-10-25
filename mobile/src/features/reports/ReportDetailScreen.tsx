@@ -343,7 +343,7 @@ function MessageBubble({ message }: { message: ReportMessage }) {
         ) : null}
         <Txt
           variant="micro"
-          style={{ color: mine ? theme.onPrimary : theme.muted, opacity: 0.75, alignSelf: "flex-end" }}
+          style={{ color: mine ? theme.onPrimary : theme.muted, alignSelf: "flex-end" }}
         >
           {time}
         </Txt>
@@ -542,7 +542,7 @@ function CsatCard({ report }: { report: Report }) {
           >
             <Star
               size={36}
-              color={theme.accent}
+              color={n <= score ? theme.accent : theme.muted}
               fill={n <= score ? theme.accent : "transparent"}
               strokeWidth={2}
             />

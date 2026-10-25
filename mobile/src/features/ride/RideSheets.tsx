@@ -262,7 +262,7 @@ function ReasonRow({
           </Txt>
         ) : null}
       </View>
-      <View style={[styles.radio, { borderColor: selected ? theme.primary : theme.border, backgroundColor: selected ? theme.primary : 'transparent' }]}>
+      <View style={[styles.radio, { borderColor: selected ? theme.primary : theme.muted, backgroundColor: selected ? theme.primary : 'transparent' }]}>
         {selected ? <Check size={14} color={theme.onPrimary} strokeWidth={3} /> : null}
       </View>
     </Pressable>
