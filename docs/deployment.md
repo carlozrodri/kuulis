@@ -269,6 +269,9 @@ Orden a seguir; no saltar pasos.
 5. Si algo falla: rollback (abajo).
 
 ## Contingencia del homelab
+> Plan de producción del 2026-10-25: producción sale del homelab a dos VPS ([`docs/infra/produccion-2-vps.md`](infra/produccion-2-vps.md)).
+> Lo de abajo describe la situación actual, con todo en casa.
+
 Todo corre en el servidor de casa de Carlos. Si se va la luz o internet, la app deja de responder hasta que
 vuelva; no se pierden datos (Postgres y Redis persisten en disco).
 - Aviso a los usuarios: página de estado externa (ver `docs/produccion/03-observabilidad-y-alertas.md`).
