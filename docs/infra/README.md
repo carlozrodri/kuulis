@@ -134,9 +134,9 @@ Proyecto **kuulis** (`cexs6860hwyfto1mwzjrsflw`). Fuente: GitHub App privada de 
 | `kuulis-postgres-production` | `pvx2gkfbo18zcld9x55t0tgp` | parado; backup Coolify cada 6 h, 14 días, **desactivado** |
 | `kuulis-redis-production` | `mgtsa16kwmktv0jl55belww8` | parado, sin `redis.conf` propio todavía |
 
-Plan decidido (2026-10-21): producción irá en un **VPS** añadido como servidor remoto a este Coolify (Postgres,
-Redis, API, worker, OSRM, Photon), con DNS de Cloudflare apuntando directo al VPS sin NPM; el admin pasará a
-Cloudflare con Access. Nada de eso existe aún.
+Plan decidido (2026-10-25, sustituye al de un solo VPS del 2026-10-21): producción irá en **dos VPS** gestionadas por
+este Coolify (vm1: API; vm2: worker, Postgres, Redis, OSRM, Photon), el admin en Cloudflare Workers y el homelab solo
+para QA. Detalle en [produccion-2-vps.md](produccion-2-vps.md). Nada de eso existe aún.
 
 ### Volúmenes
 

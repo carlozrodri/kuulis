@@ -8,8 +8,8 @@ Ordenado por prioridad. Lo que depende de terceros o de Carlos está en `blocker
 - [ ] Rotar el token de Expo que se pegó en un chat (Carlos lo deja para más adelante, 2026-10-11).
 - [ ] Protección de ramas `qa` y `main` en GitHub (Carlos, cuando quiera; ver `deployment.md`). Hasta
       entonces, no fusionar con el check `ci` en rojo.
-- [ ] Preparar el VPS de contingencia (apagado) y el dominio de marca antes de lanzar (ver
-      `produccion/02-infraestructura-produccion.md`).
+- [ ] Montar producción en las dos VPS (vm1 API, vm2 resto) y responder sus preguntas antes de lanzar (ver
+      `infra/produccion-2-vps.md`; sustituye al VPS de contingencia).
 - [ ] Verificar QA y producción de punta a punta cuando estén los dominios en NPM (login admin, registro
       desde la app, email de verificación, push, WebSocket).
 - [ ] Activar los backups en QA y producción con el bucket de R2 y hacer el simulacro de restauración
