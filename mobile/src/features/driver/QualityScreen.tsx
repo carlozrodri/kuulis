@@ -2,11 +2,11 @@ import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { RefreshControl, StyleSheet, View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import {
   ChevronLeft,
   CircleCheck,
   CirclePause,
-  CircleX,
   Gauge,
   type Icon,
   Percent,
@@ -18,9 +18,7 @@ import {
   TriangleAlert,
 } from '@/components/icons';
 import {
-  Button,
   Card,
-  EmptyState,
   IconButton,
   IconTile,
   Row,
@@ -33,7 +31,6 @@ import {
 } from '@/components/ui';
 import { PausePanel } from '@/features/quality/PausePanel';
 import { useDriverQuality, useQualityPause } from '@/hooks/useQuality';
-import { apiErrorMessage } from '@/i18n';
 import { cancelRateTone, formatPercent, LEVEL_TONE, meterPosition, pauseRules } from '@/lib/quality';
 import { formatRating } from '@/lib/ride';
 import type { DriverQuality, QualityLevel, QualityThresholds } from '@/lib/types';
@@ -89,10 +86,7 @@ export function QualityScreen() {
           </Row>
         </View>
       ) : !data ? (
-        <>
-          <EmptyState icon={CircleX} title={t('common.error')} body={apiErrorMessage(quality.error)} />
-          <Button title={t('common.retry')} variant="secondary" onPress={() => void quality.refetch()} />
-        </>
+        <ErrorState error={quality.error} onRetry={() => quality.refetch()} />
       ) : (
         <View style={{ gap: space.lg, paddingBottom: space.xl }}>
           {pause ? <PausePanel pause={pause} variant="driver" showQualityLink={false} /> : null}

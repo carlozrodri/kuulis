@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import { ChevronDown, CircleX, Flag, HandCoins, MapPin, MessageCircle, Navigation, Power, ShieldCheck, Timer, UserX } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
@@ -23,6 +24,7 @@ import { useUserLocation } from '@/hooks/useLocation';
 import { rideKeys, useActiveRide, useCancelRide, useDriverRideAction, useQueuedActions, useRide } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
 import { ApiError } from '@/lib/api';
+import { isNotFound } from '@/lib/errorKind';
 import { confirmHaptic, heavyHaptic } from '@/lib/feedback';
 import { amountToPay, hasDiscount } from '@/lib/money';
 import {
@@ -36,6 +38,7 @@ import {
   googleMapsAppUrl,
   googleMapsNavigationUrl,
   haversineMeters,
+  isNoShow,
   nextDriverAction,
   pickupWait,
   wazeNavigationUrl,
@@ -66,7 +69,7 @@ export function DriveScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
   const active = useActiveRide();
   const rideId = params.id || active.data?.id;
-  const { data: ride, isError, error } = useRide(rideId);
+  const { data: ride, isError, error, refetch } = useRide(rideId);
   const action = useDriverRideAction();
   // Doc 20: a step still in the queue (no signal, or sent before the app was closed) shows "Enviando…".
   const queuedSteps = useQueuedActions(rideId, 'ride_step');
@@ -86,8 +89,17 @@ export function DriveScreen() {
       <View style={[styles.center, { backgroundColor: theme.background }]}>
         {isError || (!rideId && !active.isPending) ? (
           <>
-            <EmptyState icon={CircleX} title={t('ride.notFound')} body={isError ? apiErrorMessage(error) : undefined} />
-            <Button title={t('common.back')} variant="secondary" onPress={goHome} />
+            {isError ? (
+              <ErrorState
+                error={error}
+                title={isNotFound(error) ? t('ride.notFound') : undefined}
+                onRetry={() => refetch()}
+                style={{ alignSelf: 'stretch' }}
+              />
+            ) : (
+              <EmptyState icon={CircleX} title={t('ride.notFound')} />
+            )}
+            <Button title={t('ride.backHome')} variant="ghost" onPress={goHome} />
           </>
         ) : (
           <ActivityIndicator color={theme.primary} size="large" />
@@ -103,6 +115,8 @@ export function DriveScreen() {
   const distance = me ? haversineMeters(me, target) : null;
   const PaymentIcon = PAYMENT_ICONS[ride.payment_method];
   const ended = !next;
+  // Cancelled (by anyone, or a no-show): nothing left to collect, so the sheet says so instead of the fare.
+  const cancelled = ride.status.startsWith('cancelled');
   const collect = formatFare(amountToPay(ride));
   const credit = hasDiscount(ride) ? formatFare(ride.discount) : null;
 
@@ -150,7 +164,11 @@ export function DriveScreen() {
         ? t('drive.stage.waiting', { name: riderName })
         : ride.status === 'in_progress'
           ? t('drive.stage.toDropoff', { name: riderName })
-          : t(`ride.status.${ride.status}`);
+          : isNoShow(ride)
+            ? t('drive.ended.noShow')
+            : cancelled
+              ? t(`drive.ended.${ride.status}`)
+              : t(`ride.status.${ride.status}`);
 
   return (
     <MapSheetLayout
@@ -194,7 +212,9 @@ export function DriveScreen() {
           </View>
         )
       }>
-      <ProgressSteps total={3} current={ride.status === 'driver_assigned' ? 1 : ride.status === 'driver_arrived' ? 2 : 3} />
+      {!cancelled ? (
+        <ProgressSteps total={3} current={ride.status === 'driver_assigned' ? 1 : ride.status === 'driver_arrived' ? 2 : 3} />
+      ) : null}
       {!ended ? <SignalIndicator /> : null}
       <View style={{ gap: 2 }}>
         <Txt variant="heading" accessibilityRole="header">
@@ -205,6 +225,7 @@ export function DriveScreen() {
             {target.address}
           </Txt>
         ) : null}
+        {cancelled ? <Txt color="muted">{t('drive.ended.body')}</Txt> : null}
         {!ended && distance != null && ride.status !== 'driver_arrived' ? (
           <Txt color="muted">
             {t('drive.distanceEta', {
@@ -246,31 +267,33 @@ export function DriveScreen() {
 
       {!ended ? <RideNote ride={ride} /> : null}
 
-      <View style={[styles.collectBox, { backgroundColor: theme.surfaceAlt }]}>
-        <View style={styles.collect}>
-          {PaymentIcon ? <PaymentIcon size={22} color={theme.scheme === 'dark' ? theme.primary : theme.primaryPressed} /> : null}
-          <View style={{ flex: 1 }}>
-            <Txt variant="micro" color="muted">
-              {t('drive.collect')}
+      {!cancelled ? (
+        <View style={[styles.collectBox, { backgroundColor: theme.surfaceAlt }]}>
+          <View style={styles.collect}>
+            {PaymentIcon ? <PaymentIcon size={22} color={theme.scheme === 'dark' ? theme.primary : theme.primaryPressed} /> : null}
+            <View style={{ flex: 1 }}>
+              <Txt variant="micro" color="muted">
+                {t('drive.collect')}
+              </Txt>
+              <Txt variant="bodyStrong">{t(`payment.${ride.payment_method}`)}</Txt>
+            </View>
+            <Txt style={{ fontFamily: fonts.extrabold, fontSize: 28, color: theme.text }} tabular>
+              {collect}
             </Txt>
-            <Txt variant="bodyStrong">{t(`payment.${ride.payment_method}`)}</Txt>
           </View>
-          <Txt style={{ fontFamily: fonts.extrabold, fontSize: 28, color: theme.text }} tabular>
-            {collect}
-          </Txt>
+          <VesLine ves={ride.total_ves} align="right" />
+          {credit ? (
+            <View style={[styles.credit, { backgroundColor: theme.accentSoft }]}>
+              <HandCoins size={18} color={theme.onAccentSoft} strokeWidth={2.2} />
+              <Txt variant="label" style={{ color: theme.onAccentSoft, flex: 1 }}>
+                {ride.status === 'completed'
+                  ? t('drive.promo.credited', { discount: credit })
+                  : t('drive.promo.willCredit', { discount: credit })}
+              </Txt>
+            </View>
+          ) : null}
         </View>
-        <VesLine ves={ride.total_ves} align="right" />
-        {credit ? (
-          <View style={[styles.credit, { backgroundColor: theme.accentSoft }]}>
-            <HandCoins size={18} color={theme.onAccentSoft} strokeWidth={2.2} />
-            <Txt variant="label" style={{ color: theme.onAccentSoft, flex: 1 }}>
-              {ride.status === 'completed'
-                ? t('drive.promo.credited', { discount: credit })
-                : t('drive.promo.willCredit', { discount: credit })}
-            </Txt>
-          </View>
-        ) : null}
-      </View>
+      ) : null}
 
       {canDriverCancel(ride.status) ? (
         <Button title={t('ride.cancel')} variant="danger" size="sm" loading={cancel.isPending} onPress={() => setCancelOpen(true)} />

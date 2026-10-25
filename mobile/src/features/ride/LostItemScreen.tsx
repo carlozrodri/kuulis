@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshControl, StyleSheet, TextInput, View } from 'react-native';
 
-import { Backpack, Check, CircleX, MessageCircle, MessagesSquare, PackageSearch, X } from '@/components/icons';
+import { ErrorState } from '@/components/ErrorState';
+import { Backpack, Check, MessageCircle, MessagesSquare, PackageSearch, X } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { Button, EmptyState, IconTile, Notice, Screen, Skeleton, Txt } from '@/components/ui';
 import { RideContextCard } from '@/features/reports/components';
@@ -65,17 +66,7 @@ export function LostItemScreen() {
           <Skeleton height={90} radius={radius.card} />
         </View>
       ) : error || !ride.data ? (
-        <View>
-          <EmptyState icon={CircleX} title={t('common.error')} body={apiErrorMessage(error)} />
-          <Button
-            title={t('common.retry')}
-            variant="secondary"
-            onPress={() => {
-              void ride.refetch();
-              void item.refetch();
-            }}
-          />
-        </View>
+        <ErrorState error={error} onRetry={() => Promise.all([ride.refetch(), item.refetch()])} />
       ) : (
         <View style={{ gap: space.md }}>
           <RideContextCard ride={ride.data} />

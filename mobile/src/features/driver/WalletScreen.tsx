@@ -11,9 +11,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
+import { ErrorState } from "@/components/ErrorState";
 import {
   ArrowUpRight,
-  CircleX,
   FileText,
   HandCoins,
   Hourglass,
@@ -23,7 +23,6 @@ import {
   Wallet,
 } from "@/components/icons";
 import {
-  Button,
   EmptyState,
   ListRow,
   Notice,
@@ -291,18 +290,7 @@ export function WalletScreen() {
               ))}
             </View>
           ) : entries.isError ? (
-            <View>
-              <EmptyState
-                icon={CircleX}
-                title={t("common.error")}
-                body={apiErrorMessage(entries.error)}
-              />
-              <Button
-                title={t("common.retry")}
-                variant="secondary"
-                onPress={() => void entries.refetch()}
-              />
-            </View>
+            <ErrorState error={entries.error} onRetry={() => entries.refetch()} />
           ) : (
             <EmptyState
               icon={HandCoins}

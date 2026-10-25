@@ -68,6 +68,8 @@ export { default as WifiOff } from 'lucide-react-native/icons/wifi-off';
 export { default as Wifi } from 'lucide-react-native/icons/wifi';
 export { default as Siren } from 'lucide-react-native/icons/siren';
 export { default as SearchX } from 'lucide-react-native/icons/search-x';
+export { default as ServerCrash } from 'lucide-react-native/icons/server-crash';
+export { default as CloudOff } from 'lucide-react-native/icons/cloud-off';
 export { default as Zap } from 'lucide-react-native/icons/zap';
 export { default as Coins } from 'lucide-react-native/icons/coins';
 export { default as Bitcoin } from 'lucide-react-native/icons/bitcoin';

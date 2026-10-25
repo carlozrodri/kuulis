@@ -8,12 +8,11 @@ import {
   View,
 } from "react-native";
 
-import { CalendarClock, CircleX, FileText } from "@/components/icons";
+import { ErrorState } from "@/components/ErrorState";
+import { CalendarClock, FileText } from "@/components/icons";
 import {
-  Button,
   Card,
   Chip,
-  EmptyState,
   Notice,
   Screen,
   Skeleton,
@@ -95,18 +94,7 @@ export function StatementScreen() {
           <Skeleton height={220} radius={radius.card} />
         </View>
       ) : !data ? (
-        <>
-          <EmptyState
-            icon={CircleX}
-            title={t("common.error")}
-            body={apiErrorMessage(statement.error)}
-          />
-          <Button
-            title={t("common.retry")}
-            variant="secondary"
-            onPress={() => void statement.refetch()}
-          />
-        </>
+        <ErrorState error={statement.error} onRetry={() => statement.refetch()} />
       ) : (
         <View
           style={{

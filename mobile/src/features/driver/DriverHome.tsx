@@ -3,6 +3,7 @@ import { type ReactElement, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshControl, type RefreshControlProps, StyleSheet, View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import {
   Bike,
   Calendar,
@@ -17,7 +18,6 @@ import {
 import {
   Button,
   Card,
-  EmptyState,
   ListRow,
   Notice,
   ProgressSteps,
@@ -31,7 +31,6 @@ import {
 import { AnnouncementBanners } from '@/features/control/AnnouncementBanners';
 import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { useAppConfig, useDriverProfile } from '@/hooks/useDriver';
-import { apiErrorMessage } from '@/i18n';
 import { trackOnce } from '@/lib/analytics';
 import { documentChecklist, nextDriverStep, requirementChecklist } from '@/lib/driver';
 import type { DriverProfile } from '@/lib/types';
@@ -44,7 +43,6 @@ type RefreshEl = ReactElement<RefreshControlProps>;
 
 /** Driver mode home: onboarding until approved, then the online/offline dashboard. */
 export function DriverHome() {
-  const { t } = useTranslation();
   const profile = useDriverProfile();
   const { config } = useAppConfig();
   const refresh = <RefreshControl refreshing={profile.isRefetching} onRefresh={() => void profile.refetch()} />;
@@ -65,8 +63,7 @@ export function DriverHome() {
   if (profile.isError) {
     return (
       <Screen tabBar refreshControl={refresh}>
-        <EmptyState icon={CircleX} title={t('common.error')} body={apiErrorMessage(profile.error)} />
-        <Button title={t('common.retry')} variant="secondary" onPress={() => void profile.refetch()} />
+        <ErrorState error={profile.error} onRetry={() => profile.refetch()} />
       </Screen>
     );
   }

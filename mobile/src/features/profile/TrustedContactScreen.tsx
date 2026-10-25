@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import { ChevronLeft, HeartHandshake, Phone, Plus, Trash, User as UserIcon } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { Button, Card, Field, IconButton, IconTile, ListRow, Notice, Row, Screen, Txt } from '@/components/ui';
@@ -50,7 +51,7 @@ export function TrustedContactScreen() {
       {contacts.isPending ? (
         <ActivityIndicator color={theme.primary} />
       ) : contacts.isError ? (
-        <Notice tone="danger">{apiErrorMessage(contacts.error)}</Notice>
+        <ErrorState inline error={contacts.error} onRetry={() => contacts.refetch()} />
       ) : list.length ? (
         <Card style={{ paddingVertical: space.xxs, marginBottom: space.md }}>
           {list.map((contact, index) => (

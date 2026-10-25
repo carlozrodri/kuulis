@@ -2,11 +2,11 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { RefreshControl, View } from 'react-native';
 
-import { BookOpen, CircleX, Flag } from '@/components/icons';
+import { ErrorState } from '@/components/ErrorState';
+import { BookOpen, Flag } from '@/components/icons';
 import { Button, EmptyState, IconTile, Screen, Skeleton, Txt } from '@/components/ui';
 import { FlowHeader } from '@/features/wallet/components';
 import { useHelpArticles } from '@/hooks/useHelp';
-import { apiErrorMessage } from '@/i18n';
 import { isHelpTopic } from '@/lib/support';
 import { radius, space, useTheme } from '@/theme';
 
@@ -41,10 +41,7 @@ export function HelpTopicScreen() {
             <Skeleton height={64} radius={radius.card} />
           </View>
         ) : articles.isError ? (
-          <View>
-            <EmptyState icon={CircleX} title={t('common.error')} body={apiErrorMessage(articles.error)} />
-            <Button title={t('common.retry')} variant="secondary" onPress={() => void articles.refetch()} />
-          </View>
+          <ErrorState error={articles.error} onRetry={() => articles.refetch()} />
         ) : items.length ? (
           <ArticleList articles={items} />
         ) : (

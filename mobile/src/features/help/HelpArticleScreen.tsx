@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, RefreshControl, StyleSheet, View } from 'react-native';
 
-import { CircleX, Flag, ThumbsDown, ThumbsUp } from '@/components/icons';
-import { Button, EmptyState, Screen, Skeleton, StatusPill, Txt } from '@/components/ui';
+import { ErrorState } from '@/components/ErrorState';
+import { Flag, ThumbsDown, ThumbsUp } from '@/components/icons';
+import { Button, Screen, Skeleton, StatusPill, Txt } from '@/components/ui';
 import { Markdown } from '@/features/legal/Markdown';
 import { FlowHeader } from '@/features/wallet/components';
 import { useHelpArticle, useHelpFeedback } from '@/hooks/useHelp';
-import { apiErrorMessage } from '@/i18n';
 import { selectionHaptic } from '@/lib/feedback';
 import { articleLink } from '@/lib/support';
 import { radius, space, useTheme } from '@/theme';
@@ -59,10 +59,7 @@ export function HelpArticleScreen() {
       }>
       {!data ? (
         article.isError ? (
-          <View>
-            <EmptyState icon={CircleX} title={t('common.error')} body={apiErrorMessage(article.error)} />
-            <Button title={t('common.retry')} variant="secondary" onPress={() => void article.refetch()} />
-          </View>
+          <ErrorState error={article.error} onRetry={() => article.refetch()} />
         ) : (
           <View style={{ gap: space.sm }}>
             <Skeleton height={18} width="40%" />

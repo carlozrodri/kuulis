@@ -15,9 +15,9 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ErrorState } from "@/components/ErrorState";
 import {
   ChevronLeft,
-  CircleX,
   Lock,
   MessagesSquare,
   Paperclip,
@@ -143,18 +143,7 @@ export function ReportDetailScreen() {
         {header}
         <View style={{ padding: space.lg, gap: space.sm }}>
           {report.isError ? (
-            <>
-              <EmptyState
-                icon={CircleX}
-                title={t("common.error")}
-                body={apiErrorMessage(report.error)}
-              />
-              <Button
-                title={t("common.retry")}
-                variant="secondary"
-                onPress={() => void report.refetch()}
-              />
-            </>
+            <ErrorState error={report.error} onRetry={() => report.refetch()} />
           ) : (
             <>
               <Skeleton height={72} radius={radius.card} />
@@ -209,18 +198,7 @@ export function ReportDetailScreen() {
           messages.isPending ? (
             <ActivityIndicator color={theme.primary} style={{ marginTop: space.xl }} />
           ) : messages.isError ? (
-            <View>
-              <EmptyState
-                icon={CircleX}
-                title={t("common.error")}
-                body={apiErrorMessage(messages.error)}
-              />
-              <Button
-                title={t("common.retry")}
-                variant="secondary"
-                onPress={() => void messages.refetch()}
-              />
-            </View>
+            <ErrorState error={messages.error} onRetry={() => messages.refetch()} />
           ) : (
             <EmptyState icon={MessagesSquare} title={t("support.thread.empty")} />
           )
