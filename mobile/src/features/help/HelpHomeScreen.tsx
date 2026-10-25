@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import {
   ChevronRight,
-  CircleX,
   Flag,
   Mail,
   MessageCircle,
@@ -101,10 +101,7 @@ export function HelpHomeScreen() {
                 ))}
               </View>
             ) : all.isError ? (
-              <View>
-                <EmptyState icon={CircleX} title={t('common.error')} body={apiErrorMessage(all.error)} />
-                <Button title={t('common.retry')} variant="secondary" onPress={() => void all.refetch()} />
-              </View>
+              <ErrorState error={all.error} onRetry={() => all.refetch()} />
             ) : groups.length ? (
               <View style={styles.grid}>
                 {groups.map(({ topic, articles }) => {

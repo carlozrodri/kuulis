@@ -960,7 +960,9 @@
       "retry": "Buscar otro motorizado"
     },
     "passengerCancelled": {
-      "title": "Cancelaste este viaje"
+      "title": "Cancelaste este viaje",
+      "body": "Si lo cancelaste por error, puedes pedir el mismo viaje otra vez.",
+      "retry": "Pedir de nuevo"
     },
     "toast": {
       "assigned": "¡{{name}} aceptó tu viaje!",
@@ -1204,7 +1206,8 @@
     "subtitleDriver": "Los viajes que has hecho como motorizado",
     "empty": "Aún no tienes viajes",
     "emptyPassenger": "Cuando pidas tu primera moto, la verás aquí.",
-    "emptyDriver": "Conéctate para recibir tu primer viaje."
+    "emptyDriver": "Conéctate para recibir tu primer viaje.",
+    "requestRide": "Pedir una moto"
   },
   "drive": {
     "home": {
@@ -1273,7 +1276,14 @@
       "confirmBody": "El viaje se cancela y no cuenta en tu tasa de cancelación.",
       "done": "Listo. El viaje se canceló y no cuenta en tu contra."
     },
-    "retrying": "Sin señal: lo reintentamos solo, no hace falta tocar de nuevo."
+    "retrying": "Sin señal: lo reintentamos solo, no hace falta tocar de nuevo.",
+    "ended": {
+      "cancelled_by_passenger": "El pasajero canceló el viaje",
+      "cancelled_by_admin": "Kuulis canceló este viaje",
+      "cancelled_by_driver": "Cancelaste este viaje",
+      "noShow": "El pasajero no llegó",
+      "body": "No tienes nada que cobrar. Sigue conectado y te llegará otra solicitud."
+    }
   },
   "money": {
     "rate": {
@@ -2415,5 +2425,27 @@
     "sentBody": "Le enviaste el viaje a {{name}}. Puedes reenviarlo si hace falta.",
     "sendAgain": "Enviar de nuevo",
     "send": "Enviar a {{name}} por WhatsApp"
+  },
+  "states": {
+    "offline": {
+      "title": "Sin conexión a internet",
+      "body": "Revisa tus datos o el wifi. Cuando vuelva la conexión lo intentamos de nuevo solos."
+    },
+    "unreachable": {
+      "title": "No pudimos conectar con Kuulis",
+      "body": "La señal parece débil. Acércate a una ventana o cambia a wifi e inténtalo de nuevo."
+    },
+    "server": {
+      "title": "Kuulis no responde ahora",
+      "body": "Tenemos un problema en nuestros servidores y ya lo estamos revisando. Inténtalo de nuevo en un momento."
+    },
+    "notFound": {
+      "title": "No encontramos lo que buscas",
+      "body": "Puede que ya no exista o que se haya borrado."
+    },
+    "generic": {
+      "title": "Algo salió mal",
+      "body": "No pudimos cargar esta información. Inténtalo de nuevo."
+    }
   }
 }

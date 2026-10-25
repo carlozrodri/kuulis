@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import { Backpack, Banknote, ChevronLeft, CircleEllipsis, LifeBuoy, MessageCircle, Star, UserX } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
@@ -10,6 +11,7 @@ import { DiscountNote, VesLine } from '@/components/Money';
 import { Button, IconButton, type SheetOption, Sheet, StatusPill, Txt } from '@/components/ui';
 import { useAppConfig } from '@/hooks/useDriver';
 import { useLostItem, useRide } from '@/hooks/useRides';
+import { isNotFound } from '@/lib/errorKind';
 import { amountToPay, hasDiscount } from '@/lib/money';
 import { decodePolyline, formatDistance, formatDuration, formatFare, isActiveStatus, rideRole } from '@/lib/ride';
 import { lostItemState, type RideHelpOption, rideHelpOptions } from '@/lib/support';
@@ -32,7 +34,8 @@ export function RideDetailScreen() {
   const { user } = useAuth();
   const { mode } = useMode();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: ride } = useRide(id);
+  const rideQuery = useRide(id);
+  const ride = rideQuery.data;
   const route = useMemo(() => decodePolyline(ride?.polyline), [ride?.polyline]);
   const { config } = useAppConfig();
   const [helpOpen, setHelpOpen] = useState(false);
@@ -41,7 +44,19 @@ export function RideDetailScreen() {
   if (!ride) {
     return (
       <View style={[styles.center, { backgroundColor: theme.background }]}>
-        <ActivityIndicator color={theme.primary} size="large" />
+        {rideQuery.isError ? (
+          <>
+            <ErrorState
+              error={rideQuery.error}
+              title={isNotFound(rideQuery.error) ? t('ride.notFound') : undefined}
+              onRetry={() => rideQuery.refetch()}
+              style={{ alignSelf: 'stretch' }}
+            />
+            <Button title={t('common.back')} variant="ghost" onPress={() => router.back()} />
+          </>
+        ) : (
+          <ActivityIndicator color={theme.primary} size="large" />
+        )}
       </View>
     );
   }
@@ -251,7 +266,7 @@ function LostItemCard({ item, ride, role }: { item: LostItem; ride: Ride; role: 
 
 const styles = StyleSheet.create({
   lostItem: { gap: space.xs, borderRadius: 16, padding: space.md },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.lg, gap: space.md },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderRadius: 16, padding: space.md },
   priceBox: { gap: 4, borderRadius: 16, padding: space.md },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },

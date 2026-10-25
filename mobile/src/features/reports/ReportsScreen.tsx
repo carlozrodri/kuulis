@@ -10,15 +10,14 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ErrorState } from "@/components/ErrorState";
 import {
   ChevronRight,
-  CircleX,
   Flag,
   MessagesSquare,
   Route,
 } from "@/components/icons";
 import {
-  Button,
   Card,
   EmptyState,
   IconTile,
@@ -28,7 +27,6 @@ import {
 } from "@/components/ui";
 import { FlowHeader } from "@/features/wallet/components";
 import { useMyReports } from "@/hooks/useReports";
-import { apiErrorMessage } from "@/i18n";
 import { isUrgentCategory } from "@/lib/reports";
 import { conversationState, isUnread, lastActivity } from "@/lib/support";
 import type { Report } from "@/lib/types";
@@ -137,18 +135,7 @@ export function ReportsScreen() {
               ))}
             </View>
           ) : reports.isError ? (
-            <View>
-              <EmptyState
-                icon={CircleX}
-                title={t("common.error")}
-                body={apiErrorMessage(reports.error)}
-              />
-              <Button
-                title={t("common.retry")}
-                variant="secondary"
-                onPress={() => void reports.refetch()}
-              />
-            </View>
+            <ErrorState error={reports.error} onRetry={() => reports.refetch()} />
           ) : (
             <EmptyState
               icon={MessagesSquare}

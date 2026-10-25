@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CircleX, Repeat, Route } from '@/components/icons';
+import { ErrorState } from '@/components/ErrorState';
+import { Bike, Repeat, Route } from '@/components/icons';
 import { Button, Card, EmptyState, Skeleton, StatusPill, TAB_BAR_SPACE, type Tone, Txt } from '@/components/ui';
 import { DriverStatsPanel } from '@/features/driver/DriverStatsPanel';
 import { useDriverStats, useRideHistory } from '@/hooks/useRides';
-import { apiErrorMessage } from '@/i18n';
 import { amountToPay } from '@/lib/money';
 import { formatFare, isActiveStatus } from '@/lib/ride';
 import type { Ride, RideStatus } from '@/lib/types';
@@ -108,12 +108,12 @@ export function HistoryScreen() {
               ))}
             </View>
           ) : history.isError ? (
-            <View>
-              <EmptyState icon={CircleX} title={t('common.error')} body={apiErrorMessage(history.error)} />
-              <Button title={t('common.retry')} variant="secondary" onPress={() => void history.refetch()} />
-            </View>
+            <ErrorState error={history.error} onRetry={() => history.refetch()} />
           ) : (
-            <EmptyState icon={Route} title={t('history.empty')} body={role === 'driver' ? t('history.emptyDriver') : t('history.emptyPassenger')} />
+            <View>
+              <EmptyState icon={Route} title={t('history.empty')} body={role === 'driver' ? t('history.emptyDriver') : t('history.emptyPassenger')} />
+              {role === 'passenger' ? <Button title={t('history.requestRide')} icon={Bike} onPress={() => router.navigate('/')} /> : null}
+            </View>
           )
         }
       />

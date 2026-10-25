@@ -960,7 +960,9 @@
       "retry": "Find another driver"
     },
     "passengerCancelled": {
-      "title": "You cancelled this ride"
+      "title": "You cancelled this ride",
+      "body": "If you cancelled by mistake, you can request the same ride again.",
+      "retry": "Request again"
     },
     "toast": {
       "assigned": "{{name}} accepted your ride!",
@@ -1204,7 +1206,8 @@
     "subtitleDriver": "Rides you've driven",
     "empty": "No rides yet",
     "emptyPassenger": "When you request your first moto, you'll see it here.",
-    "emptyDriver": "Go online to get your first ride."
+    "emptyDriver": "Go online to get your first ride.",
+    "requestRide": "Request a ride"
   },
   "drive": {
     "home": {
@@ -1273,7 +1276,14 @@
       "confirmBody": "The ride is cancelled and doesn't count toward your cancellation rate.",
       "done": "Done. The ride was cancelled and doesn't count against you."
     },
-    "retrying": "No signal: we keep retrying, no need to tap again."
+    "retrying": "No signal: we keep retrying, no need to tap again.",
+    "ended": {
+      "cancelled_by_passenger": "The passenger cancelled the ride",
+      "cancelled_by_admin": "Kuulis cancelled this ride",
+      "cancelled_by_driver": "You cancelled this ride",
+      "noShow": "The passenger did not show up",
+      "body": "There is nothing to collect. Stay online and another request will come in."
+    }
   },
   "money": {
     "rate": {
@@ -2415,5 +2425,27 @@
     "sentBody": "You sent the ride to {{name}}. You can send it again if needed.",
     "sendAgain": "Send again",
     "send": "Send to {{name}} on WhatsApp"
+  },
+  "states": {
+    "offline": {
+      "title": "No internet connection",
+      "body": "Check your mobile data or wifi. We will try again by ourselves when you are back online."
+    },
+    "unreachable": {
+      "title": "We could not reach Kuulis",
+      "body": "Your signal looks weak. Move closer to a window or switch to wifi and try again."
+    },
+    "server": {
+      "title": "Kuulis is not responding",
+      "body": "Our servers are having a problem and we are already on it. Please try again in a moment."
+    },
+    "notFound": {
+      "title": "We could not find it",
+      "body": "It may no longer exist or it may have been deleted."
+    },
+    "generic": {
+      "title": "Something went wrong",
+      "body": "We could not load this information. Please try again."
+    }
   }
 }

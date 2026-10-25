@@ -10,9 +10,9 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ChevronDown, CircleX, Receipt } from "@/components/icons";
+import { ErrorState } from "@/components/ErrorState";
+import { ChevronDown, Receipt } from "@/components/icons";
 import {
-  Button,
   EmptyState,
   Skeleton,
   StatusPill,
@@ -20,7 +20,6 @@ import {
   Txt,
 } from "@/components/ui";
 import { useCharges, useSubscription } from "@/hooks/useWallet";
-import { apiErrorMessage } from "@/i18n";
 import { formatFare } from "@/lib/ride";
 import type { Charge, ChargeStatus, SubscriptionSummary } from "@/lib/types";
 import { feeTierFor, formatTierBound, reducedFrom, toCents } from "@/lib/wallet";
@@ -106,18 +105,7 @@ export function ChargesScreen() {
               ))}
             </View>
           ) : charges.isError ? (
-            <View>
-              <EmptyState
-                icon={CircleX}
-                title={t("common.error")}
-                body={apiErrorMessage(charges.error)}
-              />
-              <Button
-                title={t("common.retry")}
-                variant="secondary"
-                onPress={() => void charges.refetch()}
-              />
-            </View>
+            <ErrorState error={charges.error} onRetry={() => charges.refetch()} />
           ) : (
             <EmptyState
               icon={Receipt}

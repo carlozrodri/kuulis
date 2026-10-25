@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ErrorState } from '@/components/ErrorState';
 import { Backpack, ChevronLeft, MessageCircle, Send } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { EmptyState, IconButton, Notice, Txt } from '@/components/ui';
@@ -159,6 +160,10 @@ export function ChatScreen() {
         ListEmptyComponent={
           messages.isPending ? (
             <ActivityIndicator color={theme.primary} style={{ marginTop: space.xl }} />
+          ) : messages.isError ? (
+            <View style={{ transform: [{ scaleY: -1 }] }}>
+              <ErrorState error={messages.error} onRetry={() => messages.refetch()} />
+            </View>
           ) : (
             // Inverted list: flip the empty state back.
             <View style={{ transform: [{ scaleY: -1 }] }}>

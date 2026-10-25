@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
 
+import { ErrorState } from "@/components/ErrorState";
 import {
   CircleCheck,
-  CircleX,
   Info,
   MessageCircle,
   TriangleAlert,
@@ -257,18 +257,7 @@ function TransferFlow() {
             <Skeleton height={52} />
           </View>
         ) : (
-          <>
-            <EmptyState
-              icon={CircleX}
-              title={t("common.error")}
-              body={apiErrorMessage(wallet.error)}
-            />
-            <Button
-              title={t("common.retry")}
-              variant="secondary"
-              onPress={() => void wallet.refetch()}
-            />
-          </>
+          <ErrorState error={wallet.error} onRetry={() => wallet.refetch()} />
         )}
       </Screen>
     );

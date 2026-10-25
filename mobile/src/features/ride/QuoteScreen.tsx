@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import { BadgePercent, Bike, ChevronLeft, CircleX, Clock, TicketPercent, WifiOff, X, Zap } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
@@ -287,18 +288,14 @@ export function QuoteScreen() {
           message={pickupRestriction.message}
           onUse={usePickup}
         />
-      ) : quoteError ? (
-        <Notice
-          tone={outside || dropoffRestricted ? 'warning' : 'danger'}
-          icon={CircleX}
-          title={outside ? t('quote.outsideTitle') : dropoffRestricted ? t('zones.dropoffTitle') : t('common.error')}>
+      ) : quoteError && (outside || dropoffRestricted) ? (
+        <Notice tone="warning" icon={CircleX} title={outside ? t('quote.outsideTitle') : t('zones.dropoffTitle')}>
           <Txt variant="caption" style={{ fontSize: 14, lineHeight: 20 }}>
             {localizedZoneMessage(dropoffRestriction?.message, i18n.language) || apiErrorMessage(quoteError)}
           </Txt>
-          {!outside && !dropoffRestricted ? (
-            <Button title={t('common.retry')} variant="secondary" size="sm" style={{ alignSelf: 'flex-start' }} onPress={() => void quote.refetch()} />
-          ) : null}
         </Notice>
+      ) : quoteError ? (
+        <ErrorState inline error={quoteError} onRetry={() => quote.refetch()} />
       ) : (
         <Card
           selected

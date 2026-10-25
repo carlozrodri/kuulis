@@ -2,7 +2,8 @@ import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Share, StyleSheet, View } from "react-native";
 
-import { CircleX, Info, Receipt, Share2 } from "@/components/icons";
+import { ErrorState } from "@/components/ErrorState";
+import { Info, Receipt, SearchX, Share2 } from "@/components/icons";
 import {
   Button,
   Card,
@@ -15,7 +16,6 @@ import {
   Txt,
 } from "@/components/ui";
 import { useReceipt } from "@/hooks/useWallet";
-import { apiErrorMessage } from "@/i18n";
 import { formatAmount } from "@/lib/money";
 import type { Receipt as ReceiptData } from "@/lib/types";
 import { receiptShareText } from "@/lib/wallet";
@@ -60,25 +60,10 @@ export function ReceiptScreen() {
         </View>
       ) : receipt.data ? (
         <ReceiptCard receipt={receipt.data} />
+      ) : receipt.error ? (
+        <ErrorState error={receipt.error} onRetry={() => receipt.refetch()} />
       ) : (
-        <>
-          <EmptyState
-            icon={CircleX}
-            title={t("common.error")}
-            body={
-              receipt.error
-                ? apiErrorMessage(receipt.error)
-                : t("errors.receipt_not_found")
-            }
-          />
-          {receipt.error ? (
-            <Button
-              title={t("common.retry")}
-              variant="secondary"
-              onPress={() => void receipt.refetch()}
-            />
-          ) : null}
-        </>
+        <EmptyState icon={SearchX} title={t("errors.receipt_not_found")} />
       )}
     </Screen>
   );
