@@ -378,6 +378,5 @@ Orden propuesto. Los pasos marcados con **(Carlos)** los hace Carlos o necesitan
 9. **Margen de presupuesto**: no hacer nada por ahora; cuando haga falta, otra VM para la API o lo que lo necesite.
    **Decidido.**
 10. **Entorno `production` de Coolify**: se reutiliza, y la base se limpia de lo que no se necesite. **Decidido.**
-
 11. **Build server**: `node-1`, con 4 hilos, 8 GB y 100 GB recomendados. **Decidido.**
 12. **Base de producción**: se conserva lo que tiene y solo se borra lo que no sirva para producción. **Decidido.**
