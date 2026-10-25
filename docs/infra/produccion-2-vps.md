@@ -191,7 +191,8 @@ vm2 se usa la IP de Tailscale.
 - **Se reutiliza el entorno `production`** de Coolify (decidido): sus apps se mueven a las VPS (API a vm1; worker,
   Postgres y Redis a vm2) y se completan las variables. OSRM y Photon de producción son apps nuevas en vm2 (las de
   hoy se quedan para QA). La base de producción **se limpia** antes de abrir: se vacían las cuentas y datos de
-  prueba del 2026-10-09 y lo que dejen la prueba de carga y el smoke (ver checklist). Carlos crea y mueve las apps en
+  prueba del 2026-10-09 que no sirvan para producción y lo que dejen la prueba de carga y el smoke; lo demás se
+  conserva (decidido, ver checklist). Carlos crea y mueve las apps en
   la UI (los cambios por la API de Coolify necesitan su OK).
 
 ### Builds en el homelab, nunca en producción (decidido)
@@ -201,8 +202,15 @@ despliegue. En su lugar:
 
 1. Un servidor del homelab marcado en Coolify como **build server** (Servers → servidor → «Use it as a build
    server»). Coolify no deja desplegar apps en un build server, así que no puede ser el servidor `localhost` que corre
-   QA: sirve `pc grande` (`192.168.0.30`, ya en Coolify) o `node-1` (`192.168.0.68`, hoy vacío). Recomendado
-   `node-1`, que no comparte CPU con la prueba de carga.
+   QA. **Decidido: `node-1`** (`192.168.0.68`, hoy vacío), con el registro también ahí. Recursos:
+
+   | | Mínimo | Recomendado | Por qué |
+   | --- | --- | --- | --- |
+   | CPU | 2 hilos | 4 hilos | La imagen de la API tarda ~1–2 min; OSRM/Photon, más, una vez al mes |
+   | RAM | 6 GB | 8 GB | El preprocesado de OSRM usa ~3 GB y Photon ~2 GB; con 8 GB caben a la vez con la API |
+   | Disco | 60 GB | 100 GB | Caché de build (~15 GB) + registro: ~1 GB por imagen de API/worker y ~3 GB por OSRM/Photon, guardando las 5 últimas de cada una (~40 GB) |
+
+   Los builders de APK/AAB no cambian: siguen en `localhost` y no usan este servidor.
 2. Un **registro de imágenes privado en el homelab** (contenedor `registry:2` con usuario y contraseña), alcanzable
    solo por Tailscale. Gratis y sin límite de tamaño; las imágenes de la API pesan ~1 GB y el plan gratis de GHCR
    para repos privados se quedaría corto. Docker exige HTTPS para un registro: certificado con `tailscale cert` para
@@ -328,9 +336,9 @@ Orden propuesto. Los pasos marcados con **(Carlos)** los hace Carlos o necesitan
 16. Simular la caída del homelab (parar Coolify y el registro 10 min) y comprobar que la app sigue funcionando.
 
 **Limpieza y encendido** (`deployment.md` → Encender producción)
-17. **Limpiar la base de producción**: borrar las cuentas sintéticas de la prueba de carga, las de pruebas de
-    2026-10-09 y lo que no haga falta (o, si no hay nada que conservar, base vacía y migraciones desde cero).
-    Hacer antes un dump a R2 por si acaso.
+17. **Limpiar la base de producción** (decidido: se conserva lo que tiene y solo se borra lo que no sirve para
+    producción): cuentas sintéticas de la prueba de carga, cuentas y viajes de prueba, datos de smoke. Antes, un dump a
+    R2 por si acaso; la lista exacta de qué borrar se revisa con Carlos sobre la base real.
 18. `GET https://api.kuulis.com/api/health/ready` en `ok` con base, Redis, OSRM y Photon en `true` y el commit de
     `main`.
 19. Primer admin, cambio de contraseña, configuración inicial (Caracas, tarifas, tramos, tasas, Binance).
@@ -371,9 +379,5 @@ Orden propuesto. Los pasos marcados con **(Carlos)** los hace Carlos o necesitan
    **Decidido.**
 10. **Entorno `production` de Coolify**: se reutiliza, y la base se limpia de lo que no se necesite. **Decidido.**
 
-### Abiertas
-
-1. ¿Qué servidor del homelab hace de build server? Recomendado: `node-1` (vacío hoy; el `localhost` no puede porque
-   corre QA y Coolify no despliega apps en un build server).
-2. ¿Se conserva algo de la base de producción actual (datos de 2026-10-09) o se empieza vacía? Recomendado: **vacía**,
-   con un dump a R2 antes por si acaso.
+11. **Build server**: `node-1`, con 4 hilos, 8 GB y 100 GB recomendados. **Decidido.**
+12. **Base de producción**: se conserva lo que tiene y solo se borra lo que no sirva para producción. **Decidido.**
