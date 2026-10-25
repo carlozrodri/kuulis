@@ -73,7 +73,9 @@ trata como un fallo y sigue; `http_not_json` cuenta esas respuestas.
 
 Opciones (`env`): `SCENARIOS` (`drivers,riders,browsers,admins`), `SCALE` (multiplica motorizados,
 viajes y pasajeros), `DRIVERS` (600), `RIDES` (150 viajes simultáneos), `BROWSERS` (1500),
-`DURATION`, `RAMP`, `LOCATION_S` (4), `ARRIVE_S` (20), `TRIP_S` (60), `P_ACCOUNTS` / `D_ACCOUNTS`
+`DURATION`, `RAMP`, `LOCATION_S` (4), `ARRIVE_S` (20), `TRIP_S` (60), `SEARCH` (`0` quita las búsquedas
+de direcciones: antes de cada cotización se hace un `/geo/reverse` y 2–3 `/geo/search`, como al escribir en la
+app; necesitan photon encendido), `P_ACCOUNTS` / `D_ACCOUNTS`
 (cuentas sembradas). Cada prueba guarda en `/data/runs/<id>/`: `summary.json` de k6,
 `metrics.csv.gz` (cada petición), `node.jsonl` (CPU y RAM cada 5 s), `push.jsonl` y
 `campaign.jsonl`.

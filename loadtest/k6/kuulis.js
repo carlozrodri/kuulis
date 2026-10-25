@@ -40,6 +40,7 @@ const RAMP_S = seconds(__ENV.RAMP || '5m');
 const LOCATION_S = parseFloat(__ENV.LOCATION_S || '4');
 const ARRIVE_S = parseFloat(__ENV.ARRIVE_S || '20');
 const TRIP_S = parseFloat(__ENV.TRIP_S || '60');
+const SEARCH = __ENV.SEARCH !== '0'; // address search (Photon) before each quote, like the app
 const ADMIN_TOKENS = JSON.parse(__ENV.ADMIN_TOKENS || '[]');
 // API server clock minus this machine's (measured by the runner) for cross-machine times.
 const CLOCK_OFFSET_MS = parseInt(__ENV.CLOCK_OFFSET_MS || '0', 10);
@@ -146,6 +147,24 @@ function randomPoint() {
   const lat = a.min_lat + (a.max_lat - a.min_lat) * jitter(0.15, 0.85);
   const lng = a.min_lng + (a.max_lng - a.min_lng) * jitter(0.15, 0.85);
   return { lat, lng };
+}
+
+const PLACES = ['Plaza Venezuela', 'Sabana Grande', 'Altamira', 'Chacaito', 'Las Mercedes', 'El Rosal',
+  'Los Palos Grandes', 'La Candelaria', 'Bello Monte', 'Chacao', 'El Paraiso', 'La Castellana'];
+
+// The app reverse-geocodes the pickup and searches the destination while the rider types
+// (350 ms debounce, from 3 letters): a few searches with a longer prefix each time.
+async function searchPlace(session, near) {
+  if (!SEARCH) return;
+  await session.call('GET', `/geo/reverse?lat=${near.lat}&lng=${near.lng}`, undefined, 'geo_reverse');
+  const place = PLACES[Math.floor(Math.random() * PLACES.length)];
+  const steps = 2 + Math.floor(Math.random() * 2);
+  for (let i = 0; i < steps; i += 1) {
+    const q = place.slice(0, Math.min(place.length, 3 + Math.ceil(((place.length - 3) * (i + 1)) / steps)));
+    await session.call('GET', `/geo/search?q=${encodeURIComponent(q)}&lat=${near.lat}&lng=${near.lng}`,
+      undefined, 'geo_search');
+    await sleep(jitter(400, 1200));
+  }
 }
 
 let logged = 0;
@@ -480,6 +499,7 @@ async function rideOnce(session) {
   }
   const pickup = randomPoint();
   const dropoff = randomPoint();
+  await searchPlace(session, pickup);
   const quote = await session.call('POST', '/rides/quote', {
     pickup: Object.assign({ address: 'Carga origen' }, pickup),
     dropoff: Object.assign({ address: 'Carga destino' }, dropoff),
@@ -557,8 +577,10 @@ export async function browser() {
     const quotes = Math.random() < 0.6 ? 1 + Math.floor(Math.random() * 2) : 0;
     for (let q = 0; q < quotes; q += 1) {
       await sleep(jitter(3000, 8000));
+      const pickup = randomPoint();
+      await searchPlace(session, pickup);
       await session.call('POST', '/rides/quote', {
-        pickup: Object.assign({ address: 'Carga origen' }, randomPoint()),
+        pickup: Object.assign({ address: 'Carga origen' }, pickup),
         dropoff: Object.assign({ address: 'Carga destino' }, randomPoint()),
         vehicle_type: 'moto',
       }, 'ride_quote');
