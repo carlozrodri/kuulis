@@ -17,7 +17,7 @@ export const Dato = ({ fondo, pasos, cierre }: DatoProps) => {
     <AbsoluteFill style={{ backgroundColor: fondo === 'verde' ? color.primary : color.night }}>
       {steps.map((s, i) => (
         <Sequence key={i} from={s.from} durationInFrames={s.frames} name={`Paso ${i + 1}`}>
-          <Step cifra={s.cifra} texto={s.texto} />
+          <Step cifra={s.cifra} texto={s.texto} gancho={i === 0} />
         </Sequence>
       ))}
       {cierre && (
@@ -29,11 +29,12 @@ export const Dato = ({ fondo, pasos, cierre }: DatoProps) => {
   )
 }
 
-const Step = ({ cifra, texto }: { cifra?: string; texto: string }) => {
+/** The first step is the hook: its line is readable from frame 1 (only the slide moves). */
+const Step = ({ cifra, texto, gancho = false }: { cifra?: string; texto: string; gancho?: boolean }) => {
   const frame = useCurrentFrame()
   const { fps } = useVideoConfig()
   const pop = spring({ frame, fps, config: { damping: 12, stiffness: 140 } })
-  const lineIn = interpolate(frame, [6, 14], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+  const lineIn = interpolate(frame, gancho ? [0, 10] : [6, 14], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
   return (
     <Zone style={{ top: safe.top + 200, left: safe.left, right: safe.right, bottom: safe.bottom, justifyContent: 'center' }}>
       {cifra && (
@@ -61,7 +62,7 @@ const Step = ({ cifra, texto }: { cifra?: string; texto: string }) => {
           fontSize: 72,
           lineHeight: 1.15,
           color: color.white,
-          opacity: lineIn,
+          opacity: gancho ? 1 : lineIn,
           transform: `translateY(${(1 - lineIn) * 30}px)`,
           textWrap: 'balance',
         }}
