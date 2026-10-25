@@ -26,13 +26,13 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends openjdk-17-jdk-headless unzip python3-boto3 \
  && rm -rf /var/lib/apt/lists/*
 
-# Android SDK: the versions React Native 0.86 / Expo SDK 57 compile with (node_modules/react-native/gradle/libs.versions.toml).
+# Android SDK: the versions React Native 0.88 / Expo SDK 58 compile with (node_modules/react-native/gradle/libs.versions.toml).
 RUN mkdir -p $ANDROID_HOME/cmdline-tools \
  && curl -fsSL -o /tmp/tools.zip https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip \
  && unzip -q /tmp/tools.zip -d /tmp/tools && mv /tmp/tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest \
  && rm -rf /tmp/tools /tmp/tools.zip \
  && yes | sdkmanager --licenses > /dev/null \
- && sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "ndk;$ANDROID_NDK_VERSION" "cmake;3.22.1" > /dev/null
+ && sdkmanager "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "ndk;$ANDROID_NDK_VERSION" "cmake;3.22.1" > /dev/null
 
 RUN npm install -g eas-cli@latest
 

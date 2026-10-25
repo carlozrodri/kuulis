@@ -29,7 +29,10 @@ const photos = [
             class="logo"
             aria-label="Kuulis"
           >
-            <KuulisWordmark :size="32" />
+            <KuulisWordmark
+              :size="32"
+              tone="negative"
+            />
           </NuxtLinkLocale>
           <p>{{ t('footer.tagline') }}</p>
         </div>

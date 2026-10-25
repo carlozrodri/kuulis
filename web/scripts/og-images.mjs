@@ -13,6 +13,8 @@ const inline = (path, type) => `data:${type};base64,${readFileSync(resolve(root,
 const jakarta = inline('node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2', 'font/woff2')
 const poster = inline('public/fonts/archivo-poster.woff2', 'font/woff2')
 const photo = inline('public/img/fotos/caracas-noche-1280.webp', 'image/webp')
+// The «K punto» logo in its negative version (white on the night photo).
+const logo = inline('public/brand/kuulis-horizontal-negativo.svg', 'image/svg+xml')
 
 /** Page key (the file name) → where its headline lives in the locale file. Keep in sync with OG_PAGES in useLocaleSeo. */
 const PAGES = { home: 'home.hero.title', drivers: 'drivers.title', safety: 'safety.title', download: 'download.title' }
@@ -28,13 +30,12 @@ const html = title => `<!doctype html><html><head><style>
 * { margin: 0; box-sizing: border-box; }
 body { width: 1200px; height: 630px; background: #07120e url(${photo}) 60% 40% / cover; color: #fff; font-family: Jakarta; position: relative; overflow: hidden; }
 body::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(7 18 14 / 94%) 0%, rgb(7 18 14 / 75%) 55%, rgb(7 18 14 / 35%) 100%); }
-.wordmark { position: absolute; left: 80px; top: 64px; font-size: 44px; font-weight: 800; letter-spacing: -0.03em; }
-.wordmark span { color: #ffc83d; }
+.logo { position: absolute; left: 80px; top: 64px; height: 44px; }
 h1 { position: absolute; left: 80px; bottom: 110px; width: 820px; font-family: Poster; font-size: 104px; font-weight: 900; font-stretch: 66%; line-height: 0.9; text-transform: uppercase; text-wrap: balance; }
 .dot { display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.05em; border-radius: 50%; background: #ffc83d; }
 .route { position: absolute; left: 0; bottom: 0; width: 1200px; height: 90px; }
 </style></head><body>
-<div class="wordmark">kuulis<span>.</span></div>
+<img class="logo" src="${logo}" alt="Kuulis">
 <h1>${headline(title)}</h1>
 <svg class="route" viewBox="0 0 1200 90" preserveAspectRatio="none" fill="none">
   <path d="M-20 70 C 220 76, 330 26, 560 40 S 900 80, 1220 18" stroke="#ffc83d" stroke-width="5" stroke-linecap="round" />

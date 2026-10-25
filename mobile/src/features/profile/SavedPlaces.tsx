@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import { Ellipsis, Pencil, Plus, Trash } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { Card, IconButton, ListRow, Sheet, Skeleton } from '@/components/ui';
@@ -44,6 +45,10 @@ export function SavedPlacesCard() {
         <Skeleton height={44} radius={radius.tile} />
       </Card>
     );
+  }
+
+  if (places.isError && !places.data) {
+    return <ErrorState inline error={places.error} onRetry={() => places.refetch()} />;
   }
 
   const list = places.data ?? [];

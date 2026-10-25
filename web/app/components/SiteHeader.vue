@@ -106,7 +106,10 @@ onBeforeUnmount(() => {
         class="brand"
         aria-label="Kuulis"
       >
-        <KuulisWordmark :size="28" />
+        <KuulisWordmark
+          :size="28"
+          tone="negative"
+        />
       </NuxtLinkLocale>
 
       <nav

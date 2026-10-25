@@ -340,7 +340,7 @@ a entrar), las ubicaciones en vivo (los motorizados las reenvían en segundos), 
 
 ## Compilador de APK (`kuulis-builder-qa`)
 App de Coolify en QA que compila el APK en nuestro servidor, sin la cola de EAS Build (~25 min).
-- Imagen: `mobile/builder/Dockerfile` (base `/mobile`), con JDK 17, Android SDK 36 y NDK 27.
+- Imagen: `mobile/builder/Dockerfile` (base `/mobile`), con JDK 17, Android SDK 37 y NDK 27.
 - Al arrancar compila con `eas build --local --profile qa` (mismas credenciales y variables de EAS que en
   la nube) y sube el APK a S3 en `builds/qa/` (con fecha y hash) y como `builds/qa/kuulis-qa-qa-latest.apk`.
   El enlace firmado de 7 días queda en los logs del contenedor.
@@ -357,6 +357,12 @@ App de Coolify en QA que compila el APK en nuestro servidor, sin la cola de EAS 
   el mismo paso de Gradle mucho rato, casi siempre es falta de memoria en la VM.
 - Junto a cada APK sube `<nombre>.json` con versión, build (`versionCode`), tamaño, SHA-256, MD5 y runtime.
   El perfil `qa` sube el build en cada compilación (`autoIncrement`, numerado por EAS).
+
+### Bundle para Google Play (`kuulis-builder-play`)
+Misma imagen y mismas variables que `kuulis-builder-qa`, más `BUILD_PROFILE=play` y `APP_ENV=production`.
+Compila el `.aab` del perfil `play` (paquete `com.kuulis.app`) en cada cambio, sin exportar OTA, y lo sube a
+`builds/play/` con un enlace de 7 días en los logs. El admin no lo lista: se sube a mano en Play Console
+(Prueba cerrada → Crear versión). Usa la llave de subida guardada en EAS (la creó el primer build en la nube).
 
 ## Publicar una versión del APK (doc 09)
 1. El compilador deja el APK en `builds/<entorno>/` (ver arriba).

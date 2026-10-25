@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ErrorState } from '@/components/ErrorState';
 import { Backpack, ChevronLeft, MessageCircle, Send } from '@/components/icons';
 import { showToast } from '@/components/Toast';
 import { EmptyState, IconButton, Notice, Txt } from '@/components/ui';
@@ -113,7 +114,7 @@ export function ChatScreen() {
               : { backgroundColor: theme.surface, borderBottomLeftRadius: 6 },
           ]}>
           <Txt style={{ color: mine ? theme.onPrimary : theme.text }}>{item.text}</Txt>
-          <Txt variant="micro" style={{ color: mine ? theme.onPrimary : theme.muted, opacity: 0.75, alignSelf: 'flex-end' }}>
+          <Txt variant="micro" style={{ color: mine ? theme.onPrimary : theme.muted, alignSelf: 'flex-end' }}>
             {sending
               ? t('offline.sending')
               : new Date(item.created_at).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })}
@@ -159,6 +160,10 @@ export function ChatScreen() {
         ListEmptyComponent={
           messages.isPending ? (
             <ActivityIndicator color={theme.primary} style={{ marginTop: space.xl }} />
+          ) : messages.isError ? (
+            <View style={{ transform: [{ scaleY: -1 }] }}>
+              <ErrorState error={messages.error} onRetry={() => messages.refetch()} />
+            </View>
           ) : (
             // Inverted list: flip the empty state back.
             <View style={{ transform: [{ scaleY: -1 }] }}>
@@ -176,6 +181,7 @@ export function ChatScreen() {
                 <Pressable
                   key={key}
                   accessibilityRole="button"
+                  hitSlop={4}
                   onPress={() => submit(t(`chat.quick.${key}`))}
                   style={({ pressed }) => [styles.quickChip, { backgroundColor: theme.surfaceAlt, opacity: pressed ? 0.7 : 1 }]}>
                   <Txt variant="label" style={{ color: theme.scheme === 'dark' ? theme.primary : theme.primaryPressed }}>
@@ -237,8 +243,8 @@ const styles = StyleSheet.create({
   lostItem: { flexDirection: 'row', alignItems: 'center', gap: space.xs, paddingHorizontal: space.md, paddingVertical: space.xs },
   bubble: { maxWidth: '80%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10, gap: 2 },
   composer: { borderTopWidth: StyleSheet.hairlineWidth, paddingTop: space.xs, paddingHorizontal: space.md, gap: space.xs },
-  quick: { gap: space.xs, paddingVertical: 2 },
-  quickChip: { borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 8 },
+  quick: { gap: space.xs, paddingVertical: 4 },
+  quickChip: { borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 8, minHeight: 44, justifyContent: 'center' },
   inputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: space.xs },
   input: { flex: 1, minHeight: 48, maxHeight: 120, borderRadius: 24, paddingHorizontal: space.md, paddingTop: 13, paddingBottom: 13, fontFamily: fonts.medium, fontSize: 16 },
   send: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },

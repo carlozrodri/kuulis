@@ -15,6 +15,12 @@ const API_URLS = {
 } as const;
 
 /**
+ * API_URL overrides the environment's API. The Play build uses it to reach QA during the closed test, while the
+ * production server does not exist yet.
+ */
+const API_URL = process.env.API_URL || API_URLS[APP_ENV];
+
+/**
  * Google Sign-In client ids (Google Cloud console). The web client id is the `aud` of the id token the API
  * verifies; the iOS client id is required for the native iOS flow. Without them the Google button is hidden.
  */
@@ -72,7 +78,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   runtimeVersion: { policy: 'fingerprint' },
   updates: {
     enabled: UPDATES_ENABLED,
-    url: `${API_URLS[APP_ENV]}/updates/manifest`,
+    url: `${API_URL}/updates/manifest`,
     // Checks on every launch in the background and applies on the next one: never restarts a ride.
     checkAutomatically: 'ON_LOAD',
     fallbackToCacheTimeout: 0,
@@ -101,7 +107,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: APP_ID,
     googleServicesFile: GOOGLE_SERVICES_FILE,
     adaptiveIcon: {
-      backgroundColor: '#E6F4FE',
+      backgroundColor: '#0E7C5A',
       foregroundImage: './assets/android-icon-foreground.png',
       backgroundImage: './assets/android-icon-background.png',
       monochromeImage: './assets/android-icon-monochrome.png',
@@ -160,6 +166,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     ['expo-audio', { microphonePermission: false }],
     './plugins/withCrashLog',
+    // SDK 58 turns R8 on for release builds. Off until it is tested on its own (libraries that use reflection,
+    // like Google Sign-In and maps, may need keep rules).
+    ['expo-build-properties', { android: { enableMinifyInReleaseBuilds: false } }],
     ...(GOOGLE_MAPS_ANDROID_API_KEY
       ? [['react-native-maps', { androidGoogleMapsApiKey: GOOGLE_MAPS_ANDROID_API_KEY }] as [string, object]]
       : []),
@@ -175,7 +184,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     appEnv: APP_ENV,
     appStore: APP_STORE,
-    apiUrl: API_URLS[APP_ENV],
+    apiUrl: API_URL,
     googleWebClientId: GOOGLE_WEB_CLIENT_ID,
     googleIosClientId: GOOGLE_IOS_CLIENT_ID,
     // EAS project "kuulis" on expo.dev. Needed to sign Expo Go manifests and for push tokens.

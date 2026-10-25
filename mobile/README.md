@@ -46,7 +46,8 @@ production builds can be installed side by side (`uk.top8.kuulis.qa` vs `com.kuu
 `APP_STORE` (`apk` | `play`) says where an Android build is distributed. The `play` profile builds an AAB for
 Google Play without `REQUEST_INSTALL_PACKAGES` and without the APK updater (Play forbids self-updating): a
 mandatory update sends people to the app's page in Play. OTA updates keep working. Production needs its own
-`google-services.production.json` (Firebase Android app for `com.kuulis.app`) and `certs/updates-production.pem`.
+`google-services.production.json` (Firebase Android app for `com.kuulis.app`) and `certs/updates-production.pem`. `API_URL` overrides the environment's API: the `play` profile points at QA during
+the closed test, until the production server exists.
 
 ## Pending before store builds
 

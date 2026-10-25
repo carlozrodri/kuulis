@@ -203,6 +203,8 @@ export function SettingsScreen() {
             chevron={false}
             divider
             accessibilityHint={t('privacy.usage.hint')}
+            accessibilityRole="switch"
+            accessibilityState={{ checked: usage.value, disabled: usage.busy }}
             onPress={() => usage.toggle(!usage.value)}
             right={
               <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
@@ -210,9 +212,9 @@ export function SettingsScreen() {
                   value={usage.value}
                   onValueChange={usage.toggle}
                   disabled={usage.busy}
-                  trackColor={{ false: usage.theme.border, true: usage.theme.primary }}
+                  trackColor={{ false: usage.theme.muted, true: usage.theme.primary }}
                   thumbColor={usage.theme.surface}
-                  ios_backgroundColor={usage.theme.border}
+                  ios_backgroundColor={usage.theme.muted}
                 />
               </View>
             }

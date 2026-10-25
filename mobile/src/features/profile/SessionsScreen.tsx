@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import { ChevronLeft, MonitorSmartphone, Smartphone } from '@/components/icons';
 import { showToast } from '@/components/Toast';
-import { Button, Card, IconButton, IconTile, ListRow, Notice, Row, Screen, Txt } from '@/components/ui';
+import { Button, Card, IconButton, IconTile, ListRow, Row, Screen, Txt } from '@/components/ui';
 import { apiErrorMessage } from '@/i18n';
 import { api } from '@/lib/api';
 import { space } from '@/theme';
@@ -34,7 +35,7 @@ function lastUsed(iso: string, locale: string): string {
 export function SessionsScreen() {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
-  const { data, isLoading, error } = useQuery({ queryKey: SESSIONS_KEY, queryFn: () => api<SessionInfo[]>('/auth/sessions') });
+  const { data, isLoading, error, refetch } = useQuery({ queryKey: SESSIONS_KEY, queryFn: () => api<SessionInfo[]>('/auth/sessions') });
   const [closing, setClosing] = useState<string | null>(null);
 
   async function close(session: SessionInfo) {
@@ -65,7 +66,7 @@ export function SessionsScreen() {
         <Txt color="muted">{t('profile.sessions.subtitle')}</Txt>
       </View>
       {isLoading ? <ActivityIndicator /> : null}
-      {error ? <Notice tone="danger">{apiErrorMessage(error)}</Notice> : null}
+      {error && !data ? <ErrorState inline error={error} onRetry={() => refetch()} /> : null}
       {data ? (
         <Card style={{ paddingVertical: space.xxs }}>
           {data.map((session, index) => (

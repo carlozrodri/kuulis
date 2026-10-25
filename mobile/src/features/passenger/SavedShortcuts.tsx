@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.xs,
-    minHeight: 44,
+    minHeight: 48,
     maxWidth: 200,
     borderRadius: radius.pill,
     borderWidth: 1,

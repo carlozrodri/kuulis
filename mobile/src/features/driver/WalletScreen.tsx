@@ -11,9 +11,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
+import { ErrorState } from "@/components/ErrorState";
 import {
   ArrowUpRight,
-  CircleX,
   FileText,
   HandCoins,
   Hourglass,
@@ -23,7 +23,6 @@ import {
   Wallet,
 } from "@/components/icons";
 import {
-  Button,
   EmptyState,
   ListRow,
   Notice,
@@ -281,7 +280,7 @@ export function WalletScreen() {
               color={theme.primary}
               style={{ margin: space.md }}
             />
-          ) : null
+          ) : undefined
         }
         ListEmptyComponent={
           entries.isPending ? (
@@ -291,18 +290,7 @@ export function WalletScreen() {
               ))}
             </View>
           ) : entries.isError ? (
-            <View>
-              <EmptyState
-                icon={CircleX}
-                title={t("common.error")}
-                body={apiErrorMessage(entries.error)}
-              />
-              <Button
-                title={t("common.retry")}
-                variant="secondary"
-                onPress={() => void entries.refetch()}
-              />
-            </View>
+            <ErrorState error={entries.error} onRetry={() => entries.refetch()} />
           ) : (
             <EmptyState
               icon={HandCoins}
@@ -352,7 +340,7 @@ function BalanceCard({
       </Svg>
       <View style={styles.cardTop}>
         <View style={{ flex: 1, gap: 2 }}>
-          <Txt variant="label" style={{ color: theme.onHero, opacity: 0.85 }}>
+          <Txt variant="label" style={{ color: theme.onHero }}>
             {t("wallet.balance")}
           </Txt>
           {loading ? (
@@ -369,9 +357,12 @@ function BalanceCard({
               <Pressable
                 accessibilityRole="button"
                 onPress={onRetry}
-                hitSlop={8}
+                hitSlop={14}
               >
-                <Txt variant="bodyStrong" style={{ color: theme.accent }}>
+                <Txt
+                  variant="bodyStrong"
+                  style={{ color: theme.onHero, textDecorationLine: "underline" }}
+                >
                   {t("common.retry")}
                 </Txt>
               </Pressable>

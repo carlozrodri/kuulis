@@ -24,8 +24,7 @@ export function HeroHeader({
 
   return (
     <View
-      style={[styles.hero, { backgroundColor: theme.hero, paddingTop: insets.top + space.lg }]}
-      accessibilityRole="header">
+      style={[styles.hero, { backgroundColor: theme.hero, paddingTop: insets.top + space.lg }]}>
       <Svg width={width} height={130} viewBox="0 0 390 130" preserveAspectRatio="none" style={styles.mountains}>
         <Path
           d="M0 130 L0 78 C40 58 70 34 110 50 C150 66 170 22 215 24 C260 26 280 64 320 56 C350 50 370 40 390 44 L390 130 Z"
@@ -43,15 +42,15 @@ export function HeroHeader({
       </Svg>
       <View style={styles.top}>
         {leading}
-        <Wordmark size={30} color={theme.onHero} />
+        <Wordmark size={30} tone="negative" />
       </View>
       {title ? (
-        <Txt variant="display" style={{ color: theme.onHero, marginTop: space.lg }}>
+        <Txt variant="display" accessibilityRole="header" style={{ color: theme.onHero, marginTop: space.lg }}>
           {title}
         </Txt>
       ) : null}
       {subtitle ? (
-        <Txt style={{ color: theme.onHero, opacity: 0.9, marginTop: space.xs }}>{subtitle}</Txt>
+        <Txt style={{ color: theme.onHero, marginTop: space.xs }}>{subtitle}</Txt>
       ) : null}
       {children}
     </View>

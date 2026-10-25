@@ -7,8 +7,11 @@
 # publishes it from Versiones. Otherwise it builds a new APK. FORCE_APK=1 always builds the APK.
 #
 # Env: EXPO_TOKEN, EXPO_OWNER (Expo account), AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_ENDPOINT,
-# AWS_S3_BUCKET, optional AWS_S3_REGION, BUILD_PROFILE (eas.json profile, default qa), APP_ENV (default qa)
-# and FORCE_APK.
+# AWS_S3_BUCKET, optional AWS_S3_REGION, BUILD_PROFILE (eas.json profile, default qa), APP_ENV (default qa),
+# FORCE_APK and BUILD_NONCE (change it and restart to rebuild the same source, e.g. after new EAS env vars).
+#
+# BUILD_PROFILE=play builds the Google Play bundle (.aab) every time, with no OTA export: it goes to
+# builds/play/ with a 7-day link and is uploaded to Play Console by hand (the admin does not list it).
 set -uo pipefail
 
 PROFILE="${BUILD_PROFILE:-qa}"
@@ -22,7 +25,23 @@ python3 -m http.server 8080 --directory "$STATUS_DIR" > /dev/null 2>&1 &
 
 SOURCE_ID=$(cd /src && find . -type f -not -path './builder/*' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -c1-10)
 NAME="kuulis-${APP_ENV}-${PROFILE}-$(date -u +%Y%m%d-%H%M)-${SOURCE_ID}.apk"
-MARK="/cache/built-${PROFILE}-${SOURCE_ID}"
+MARK="/cache/built-${PROFILE}-${SOURCE_ID}${BUILD_NONCE:+-${BUILD_NONCE}}"
+if [ "$PROFILE" = "play" ]; then NAME="${NAME%.apk}.aab"; fi
+
+# Google Play bundle: built and uploaded as is (Play Console takes it by hand).
+build_play() {
+  status "Building the Google Play bundle (runtime ${RUNTIME})"
+  if ! eas build --local --platform android --profile "$PROFILE" --non-interactive --output "/out/${NAME}"; then
+    status "Build failed (see the container logs)"
+    return 1
+  fi
+  status "Built ${NAME} ($(du -h "/out/${NAME}" | cut -f1)), uploading to S3"
+  python3 /src/builder/upload.py --bundle "/out/${NAME}" "builds/play/${NAME}" \
+    | tee -a "$STATUS_DIR/index.html" || { status "Upload failed"; return 1; }
+  echo "builds/play/${NAME}" > "$MARK"
+  rm -rf /work "/out/${NAME}"
+  status "Done"
+}
 
 build() {
   if [ -f "$MARK" ]; then
@@ -36,6 +55,10 @@ build() {
   RUNTIME=$(npx expo-updates runtimeversion:resolve --platform android \
     | python3 -c 'import json, sys; print(json.load(sys.stdin)["runtimeVersion"] or "")')
   if [ -z "$RUNTIME" ]; then status "Could not resolve the runtime version"; return 1; fi
+  if [ "$PROFILE" = "play" ]; then
+    build_play
+    return
+  fi
   if [ "${FORCE_APK:-0}" != "1" ] && APK_RUNTIME=$(python3 /src/builder/ota.py has-apk "$RUNTIME"); then
     status "Native code unchanged (runtime ${RUNTIME}): exporting a JS update"
     rm -rf /out/update

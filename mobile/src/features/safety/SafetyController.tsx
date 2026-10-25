@@ -106,20 +106,20 @@ function SosBanner({ alertId }: { alertId: string }) {
 
   return (
     <View style={[styles.bannerWrap, { top: insets.top + 4 }]} pointerEvents="box-none">
-      <View accessibilityRole="alert" style={[styles.banner, { backgroundColor: theme.danger }]}>
-        <Siren size={18} color="#FFFFFF" strokeWidth={2.4} />
-        <Txt variant="label" style={styles.bannerText} numberOfLines={2}>
+      <View accessibilityRole="alert" style={[styles.banner, { backgroundColor: theme.dangerStrong }]}>
+        <Siren size={18} color={theme.onDangerStrong} strokeWidth={2.4} />
+        <Txt variant="label" style={[styles.bannerText, { color: theme.onDangerStrong }]} numberOfLines={2}>
           {t('safety.sos.active')}
         </Txt>
         {share ? (
           <Pressable accessibilityRole="button" hitSlop={8} onPress={() => sosSheetOpen.set(true)} style={styles.bannerAction}>
-            <Txt variant="micro" style={styles.bannerText}>
+            <Txt variant="micro" style={[styles.bannerText, { color: theme.onDangerStrong }]}>
               {t('safety.sos.notify')}
             </Txt>
           </Pressable>
         ) : null}
         <Pressable accessibilityRole="button" hitSlop={8} onPress={cancel} style={styles.bannerAction}>
-          <Txt variant="micro" style={styles.bannerText}>
+          <Txt variant="micro" style={[styles.bannerText, { color: theme.onDangerStrong }]}>
             {t('safety.sos.cancel')}
           </Txt>
         </Pressable>
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     maxWidth: 520,
   },
-  bannerText: { color: '#FFFFFF', flexShrink: 1 },
+  bannerText: { flexShrink: 1 },
   bannerAction: { backgroundColor: 'rgba(255, 255, 255, 0.22)', borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 8 },
   backdrop: { flex: 1, justifyContent: 'flex-end', padding: space.md },
   card: { borderRadius: radius.card, padding: space.lg, gap: space.sm },

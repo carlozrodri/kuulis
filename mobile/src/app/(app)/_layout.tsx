@@ -16,7 +16,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useMode } from '@/providers/ModeProvider';
 import { useTheme } from '@/theme';
 
-export const unstable_settings = { initialRouteName: '(tabs)' };
+export const unstable_settings = { anchor: '(tabs)' };
 
 /**
  * Signed-in area: the tabs plus full-screen flows pushed over them (driver onboarding, ride screens, wallet

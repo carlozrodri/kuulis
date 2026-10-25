@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 
+import { ErrorState } from "@/components/ErrorState";
 import {
   Bitcoin,
   CircleCheck,
-  CircleX,
   Hash,
   LifeBuoy,
   MessagesSquare,
@@ -19,7 +19,6 @@ import { showToast } from "@/components/Toast";
 import {
   Button,
   Card,
-  EmptyState,
   ErrorText,
   Field,
   IconTile,
@@ -39,7 +38,7 @@ import {
   useTopUps,
   useWallet,
 } from "@/hooks/useWallet";
-import { apiErrorMessage, apiFormErrors } from "@/i18n";
+import { apiFormErrors } from "@/i18n";
 import { confirmHaptic } from "@/lib/feedback";
 import { formatAmount } from "@/lib/money";
 import type { TopUp, TopUpInfo, TopUpStatus } from "@/lib/types";
@@ -110,21 +109,10 @@ export function TopUpScreen() {
             <Skeleton height={180} radius={radius.card} />
           </View>
         ) : (
-          <>
-            <EmptyState
-              icon={CircleX}
-              title={t("common.error")}
-              body={apiErrorMessage(error)}
-            />
-            <Button
-              title={t("common.retry")}
-              variant="secondary"
-              onPress={() => {
-                void wallet.refetch();
-                void info.refetch();
-              }}
-            />
-          </>
+          <ErrorState
+            error={error}
+            onRetry={() => Promise.all([wallet.refetch(), info.refetch()])}
+          />
         )}
       </Screen>
     );
@@ -447,15 +435,12 @@ function TopUpHistory() {
           <Skeleton height={56} />
         </View>
       ) : topUps.isError ? (
-        <View style={{ marginTop: space.sm }}>
-          <ErrorText>{apiErrorMessage(topUps.error)}</ErrorText>
-          <Button
-            title={t("common.retry")}
-            variant="secondary"
-            size="sm"
-            onPress={() => void topUps.refetch()}
-          />
-        </View>
+        <ErrorState
+          inline
+          error={topUps.error}
+          onRetry={() => topUps.refetch()}
+          style={{ marginTop: space.sm }}
+        />
       ) : !items.length ? (
         <Txt color="muted" style={{ marginTop: space.xs }}>
           {t("topUp.historyEmpty")}

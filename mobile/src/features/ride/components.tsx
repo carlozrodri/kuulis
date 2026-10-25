@@ -213,8 +213,8 @@ export function RoundAction({
       <View style={[styles.actionCircle, { backgroundColor: bg }]}>
         <ActionIcon size={24} color={fg} strokeWidth={2.2} />
         {badge ? (
-          <View style={[styles.badge, { backgroundColor: theme.danger, borderColor: theme.surface }]}>
-            <Txt variant="micro" style={{ color: '#FFFFFF', fontSize: 11 }}>
+          <View style={[styles.badge, { backgroundColor: theme.dangerStrong, borderColor: theme.surface }]}>
+            <Txt variant="micro" style={{ color: theme.onDangerStrong, fontSize: 11 }}>
               {badge > 9 ? '9+' : badge}
             </Txt>
           </View>
@@ -302,19 +302,19 @@ export function StarInput({ value, onChange }: { value: number; onChange: (stars
   const theme = useTheme();
   const { t } = useTranslation();
   return (
-    <View style={styles.stars} accessibilityRole="adjustable" accessibilityLabel={t('rating.starsA11y', { count: value })}>
+    <View style={styles.stars} accessibilityRole="radiogroup" accessibilityLabel={t('rating.starsA11y', { count: value })}>
       {[1, 2, 3, 4, 5].map((n) => (
         <Pressable
           key={n}
-          accessibilityRole="button"
+          accessibilityRole="radio"
           accessibilityLabel={t('rating.starN', { count: n })}
-          accessibilityState={{ selected: n <= value }}
+          accessibilityState={{ checked: n === value }}
           hitSlop={4}
           onPress={() => onChange(n)}
           style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.9 : 1 }] })}>
           <Star
             size={46}
-            color={n <= value ? theme.accent : theme.border}
+            color={n <= value ? theme.accent : theme.muted}
             fill={n <= value ? theme.accent : 'transparent'}
             strokeWidth={1.8}
           />

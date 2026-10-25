@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshControl, StyleSheet, View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import { Calendar, ChevronLeft, FileText, Plus, RefreshCw } from '@/components/icons';
 import { Button, Card, ErrorText, IconButton, IconTile, Notice, Row, Screen, Skeleton, StatusPill, Txt } from '@/components/ui';
 import { useAppConfig, useDriverProfile, useSetDocumentExpiry } from '@/hooks/useDriver';
@@ -82,7 +83,7 @@ export function MyDocumentsScreen() {
           ))}
         </View>
       ) : profile.isError ? (
-        <Notice tone="danger">{apiErrorMessage(profile.error)}</Notice>
+        <ErrorState inline error={profile.error} onRetry={() => profile.refetch()} />
       ) : (
         <View style={{ gap: space.sm }}>
           {items.map((item) => (

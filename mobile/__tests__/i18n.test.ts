@@ -13,6 +13,19 @@ it('es and en translations have the same keys', () => {
   expect(keys(en).sort()).toEqual(keys(es).sort());
 });
 
+it('es and en use the same {{placeholders}} in every string', () => {
+  const values = (obj: Record<string, unknown>, prefix = ''): [string, string][] =>
+    Object.entries(obj).flatMap(([k, v]) =>
+      v && typeof v === 'object' ? values(v as Record<string, unknown>, `${prefix}${k}.`) : [[`${prefix}${k}`, String(v)]],
+    );
+  const placeholders = (text: string) => [...text.matchAll(/{{\s*(\w+)\s*}}/g)].map((m) => m[1]).sort().join(',');
+  const english = Object.fromEntries(values(en));
+  const mismatched = values(es)
+    .filter(([key, text]) => placeholders(text) !== placeholders(english[key] ?? ''))
+    .map(([key]) => key);
+  expect(mismatched).toEqual([]);
+});
+
 it('every static translation key used in src exists in es', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const fs = require('fs') as typeof import('fs');

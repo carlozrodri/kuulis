@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, Modal, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ErrorState } from '@/components/ErrorState';
 import {
   Bell,
   Bike,
@@ -21,7 +22,7 @@ import {
   X,
 } from '@/components/icons';
 import { showToast } from '@/components/Toast';
-import { Button, Card, IconButton, IconTile, ListRow, Notice, Row, Skeleton, Txt } from '@/components/ui';
+import { Card, IconButton, IconTile, ListRow, Row, Skeleton, Txt } from '@/components/ui';
 import { Section } from '@/features/profile/components';
 import { SubScreen } from '@/features/profile/SubScreen';
 import { useNotificationPreferences, useUpdateNotificationPreferences } from '@/hooks/useNotifications';
@@ -71,9 +72,7 @@ export function NotificationSettingsScreen() {
     <SubScreen icon={Bell} tone="primary" title={t('notifications.settings.title')} subtitle={t('notifications.settings.subtitle')}>
       {!data ? (
         prefs.isError ? (
-          <Notice tone="danger" title={t('notifications.settings.loadError')}>
-            <Button title={t('common.retry')} variant="ghost" size="sm" onPress={() => void prefs.refetch()} />
-          </Notice>
+          <ErrorState inline error={prefs.error} title={t('notifications.settings.loadError')} onRetry={() => prefs.refetch()} />
         ) : (
           <View style={{ gap: space.md }}>
             <Skeleton height={140} radius={radius.card} />
@@ -225,9 +224,9 @@ function ToggleRow({
         <Switch
           value={value}
           onValueChange={onChange}
-          trackColor={{ false: theme.border, true: theme.primary }}
+          trackColor={{ false: theme.muted, true: theme.primary }}
           thumbColor={theme.surface}
-          ios_backgroundColor={theme.border}
+          ios_backgroundColor={theme.muted}
         />
       </View>
     </Pressable>
@@ -247,7 +246,7 @@ function DefaultRow({ selected, label, onPress }: { selected: boolean; label: st
       <View
         style={[
           styles.radio,
-          { borderColor: selected ? theme.primary : theme.border, backgroundColor: selected ? theme.primary : 'transparent' },
+          { borderColor: selected ? theme.primary : theme.muted, backgroundColor: selected ? theme.primary : 'transparent' },
         ]}>
         {selected ? <Check size={14} color={theme.onPrimary} strokeWidth={3} /> : null}
       </View>
@@ -286,7 +285,9 @@ function TimeSheet({
         <View style={[styles.handle, { backgroundColor: theme.border }]} />
         <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <View style={{ flex: 1 }}>
-            <Txt variant="heading">{title}</Txt>
+            <Txt variant="heading" accessibilityRole="header">
+              {title}
+            </Txt>
             <Txt color="muted" style={{ marginTop: 4 }}>
               {t('notifications.settings.caracasTime')}
             </Txt>

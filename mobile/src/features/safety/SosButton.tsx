@@ -86,12 +86,12 @@ export function SosButton({ ride }: { ride: Ride }) {
       onPressIn={pressIn}
       onPressOut={pressOut}
       hitSlop={8}
-      style={[styles.button, { backgroundColor: theme.danger }]}
+      style={[styles.button, { backgroundColor: theme.dangerStrong }]}
     >
       <Animated.View style={[styles.fill, { width }]} />
       <View style={styles.content}>
-        <Siren size={18} color='#FFFFFF' strokeWidth={2.4} />
-        <Txt variant='label' style={{ color: '#FFFFFF' }}>
+        <Siren size={18} color={theme.onDangerStrong} strokeWidth={2.4} />
+        <Txt variant='label' style={{ color: theme.onDangerStrong }}>
           {t('safety.sos.short')}
         </Txt>
       </View>
@@ -101,7 +101,7 @@ export function SosButton({ ride }: { ride: Ride }) {
 
 const styles = StyleSheet.create({
   button: {
-    height: 44,
+    minHeight: 48,
     minWidth: 88,
     borderRadius: radius.pill,
     overflow: 'hidden',

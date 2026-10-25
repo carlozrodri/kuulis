@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ErrorState } from '@/components/ErrorState';
 import {
   Bell,
   Bike,
@@ -49,7 +50,7 @@ export function InboxScreen() {
   const queryClient = useQueryClient();
   const open = useOpenNotification();
 
-  const { data, isLoading, refetch, isRefetching } = useQuery({
+  const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: NOTIFICATIONS_KEY,
     queryFn: () => api<Page<AppNotification>>('/notifications', { query: { limit: 50 } }),
   });
@@ -89,7 +90,7 @@ export function InboxScreen() {
         keyExtractor={(item) => item.id}
         stickySectionHeadersEnabled={false}
         contentContainerStyle={{ paddingHorizontal: space.lg, paddingBottom: TAB_BAR_SPACE + insets.bottom, flexGrow: 1 }}
-        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={theme.primary} />}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => void refetch()} tintColor={theme.primary} />}
         ItemSeparatorComponent={() => <View style={{ height: space.sm }} />}
         ListHeaderComponent={
           <View style={styles.header}>
@@ -120,6 +121,8 @@ export function InboxScreen() {
                 <Skeleton key={i} height={84} radius={radius.card} />
               ))}
             </View>
+          ) : error ? (
+            <ErrorState error={error} onRetry={() => refetch()} />
           ) : (
             <EmptyState icon={Bell} title={t('notifications.empty')} body={t('notifications.emptyBody')} />
           )

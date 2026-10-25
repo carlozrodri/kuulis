@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
+import { ErrorState } from '@/components/ErrorState';
 import { ChevronDown, CircleX, Clock, MessageCircle, RefreshCw, SearchX, Share2, ShieldCheck, Timer, UserRound, UserX } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { type MapInsets, MapSheetLayout } from '@/components/MapSheetLayout';
@@ -15,6 +16,7 @@ import { rememberPauseFromError } from '@/hooks/useQuality';
 import { applyRide, requestAgain, useActiveRide, useCancelRide, useRide } from '@/hooks/useRides';
 import { useSuspension } from '@/hooks/useSuspension';
 import { apiErrorMessage } from '@/i18n';
+import { isNotFound } from '@/lib/errorKind';
 import { amountToPay } from '@/lib/money';
 import {
   canPassengerCancel,
@@ -62,8 +64,17 @@ export function RideScreen() {
       <View style={[styles.center, { backgroundColor: theme.background }]}>
         {rideQuery.isError || (!rideId && !active.isPending) ? (
           <>
-            <EmptyState icon={CircleX} title={t('ride.notFound')} body={rideQuery.isError ? apiErrorMessage(rideQuery.error) : undefined} />
-            <Button title={t('common.back')} variant="secondary" onPress={goHome} />
+            {rideQuery.isError ? (
+              <ErrorState
+                error={rideQuery.error}
+                title={isNotFound(rideQuery.error) ? t('ride.notFound') : undefined}
+                onRetry={() => rideQuery.refetch()}
+                style={{ alignSelf: 'stretch' }}
+              />
+            ) : (
+              <EmptyState icon={CircleX} title={t('ride.notFound')} />
+            )}
+            <Button title={t('ride.backHome')} variant="ghost" onPress={goHome} />
           </>
         ) : (
           <ActivityIndicator color={theme.primary} size="large" />
@@ -404,11 +415,22 @@ function EndedSheet({ ride }: { ride: Ride }) {
                 ? t('ride.driverCancelled.title')
                 : t('ride.passengerCancelled.title')
         }
-        body={noDrivers ? t('ride.noDrivers.body') : byAdmin ? t('ride.adminCancelled.body') : byDriver ? t('ride.driverCancelled.body') : undefined}
+        body={
+          noDrivers
+            ? t('ride.noDrivers.body')
+            : byAdmin
+              ? t('ride.adminCancelled.body')
+              : byDriver
+                ? t('ride.driverCancelled.body')
+                : t('ride.passengerCancelled.body')
+        }
       />
-      {noDrivers || byDriver ? (
-        <Button title={noDrivers ? t('ride.noDrivers.retry') : t('ride.driverCancelled.retry')} loading={retrying} onPress={() => void retry()} />
-      ) : null}
+      <Button
+        title={noDrivers ? t('ride.noDrivers.retry') : byDriver ? t('ride.driverCancelled.retry') : t('ride.passengerCancelled.retry')}
+        variant={noDrivers || byDriver ? 'primary' : 'secondary'}
+        loading={retrying}
+        onPress={() => void retry()}
+      />
       <Button title={t('ride.backHome')} variant="ghost" onPress={goHome} />
     </>
   );

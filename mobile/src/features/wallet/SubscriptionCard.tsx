@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingTop: space.sm,
     marginTop: 2,
-    minHeight: 40,
+    minHeight: 48,
   },
   earnings: {
     borderRadius: 22,
