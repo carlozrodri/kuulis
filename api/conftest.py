@@ -13,6 +13,7 @@ from apps.staff.permissions import ALL_PERMISSIONS
 from apps.users.models import Role
 from apps.users.schemas import UserCreate
 from kuulis.asgi import app
+from kuulis.core.cache import local_drop
 from kuulis.core.db import SessionLocal, engine
 from kuulis.core.redis import redis_client
 from kuulis.models import metadata
@@ -39,6 +40,7 @@ async def _clean() -> AsyncIterator[None]:
     async with engine.begin() as conn:
         await conn.execute(text(f"TRUNCATE {tables} CASCADE"))
     await redis_client.flushdb()
+    local_drop()
 
 
 @pytest.fixture

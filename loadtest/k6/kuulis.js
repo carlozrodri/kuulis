@@ -41,6 +41,8 @@ const LOCATION_S = parseFloat(__ENV.LOCATION_S || '4');
 const ARRIVE_S = parseFloat(__ENV.ARRIVE_S || '20');
 const TRIP_S = parseFloat(__ENV.TRIP_S || '60');
 const SEARCH = __ENV.SEARCH !== '0'; // address search (Photon) before each quote, like the app
+// 'app' (default) asks for what the mobile app asks for; 'legacy' is the request mix of the October tests.
+const APP_MODEL = __ENV.APP_MODEL || 'app';
 const ADMIN_TOKENS = JSON.parse(__ENV.ADMIN_TOKENS || '[]');
 // API server clock minus this machine's (measured by the runner) for cross-machine times.
 const CLOCK_OFFSET_MS = parseInt(__ENV.CLOCK_OFFSET_MS || '0', 10);
@@ -563,16 +565,43 @@ export async function browser() {
   if (!(await session.fresh())) return;
   await loadArea(session);
 
+  const ages = {};
+  const stale = (key, ms) => {
+    const now = Date.now();
+    if (ages[key] && now - ages[key] < ms) return false;
+    ages[key] = now;
+    return true;
+  };
+  const clientId = `lt-${index}`;
+  let cold = true;
   while (Date.now() < end) {
-    // App opens: same calls as the home screen, with the socket open while in the foreground.
     const rt = new Realtime(session);
     const opened = rt.open();
-    await session.call('GET', '/config/public', undefined, 'config_public');
-    await session.call('GET', '/users/me', undefined, 'users_me');
-    await session.call('GET', '/rides/active', undefined, 'ride_active');
-    await session.call('GET', '/rides/pending-rating', undefined, 'ride_pending_rating');
-    await session.call('GET', '/rates', undefined, 'rates');
-    await session.call('GET', '/notifications/unread-count', undefined, 'notifications_unread');
+    if (APP_MODEL === 'legacy') {
+      await session.call('GET', '/config/public', undefined, 'config_public');
+      await session.call('GET', '/users/me', undefined, 'users_me');
+      await session.call('GET', '/rides/active', undefined, 'ride_active');
+      await session.call('GET', '/rides/pending-rating', undefined, 'ride_pending_rating');
+      await session.call('GET', '/rates', undefined, 'rates');
+      await session.call('GET', '/notifications/unread-count', undefined, 'notifications_unread');
+    } else {
+      // What the mobile app asks for: everything on a cold start, then on each return to the foreground
+      // only the bootstrap (AppState listener) and the React Query caches that went stale.
+      const at = randomPoint();
+      if (cold) {
+        await session.call('GET', '/users/me', undefined, 'users_me');
+        await session.call('GET', '/config/public', undefined, 'config_public');
+      }
+      await session.call('GET', `/app/bootstrap?mode=passenger&lat=${at.lat.toFixed(5)}&lng=${at.lng.toFixed(5)}&client_id=${clientId}`,
+        undefined, 'app_bootstrap');
+      if (stale('active', 15000)) await session.call('GET', '/rides/active', undefined, 'ride_active');
+      if (stale('rating', 60000)) await session.call('GET', '/rides/pending-rating', undefined, 'ride_pending_rating');
+      if (cold) await session.call('GET', '/notifications?limit=50', undefined, 'notifications_list');
+      if (stale('history', 300000)) {
+        await session.call('GET', '/rides?role=passenger&limit=20&offset=0', undefined, 'ride_history');
+      }
+      cold = false;
+    }
     await opened;
     const quotes = Math.random() < 0.6 ? 1 + Math.floor(Math.random() * 2) : 0;
     for (let q = 0; q < quotes; q += 1) {
@@ -585,8 +614,10 @@ export async function browser() {
         vehicle_type: 'moto',
       }, 'ride_quote');
     }
-    if (Math.random() < 0.3) await session.call('GET', '/rides?limit=20', undefined, 'ride_history');
-    if (Math.random() < 0.2) await session.call('GET', '/notifications?limit=20', undefined, 'notifications_list');
+    if (APP_MODEL === 'legacy') {
+      if (Math.random() < 0.3) await session.call('GET', '/rides?limit=20', undefined, 'ride_history');
+      if (Math.random() < 0.2) await session.call('GET', '/notifications?limit=20', undefined, 'notifications_list');
+    }
     await sleep(jitter(5000, 15000));
     rt.close();
     await sleep(jitter(20000, 60000)); // app in the background

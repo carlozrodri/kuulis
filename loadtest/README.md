@@ -75,7 +75,9 @@ Opciones (`env`): `SCENARIOS` (`drivers,riders,browsers,admins`), `SCALE` (multi
 viajes y pasajeros), `DRIVERS` (600), `RIDES` (150 viajes simultáneos), `BROWSERS` (1500),
 `DURATION`, `RAMP`, `LOCATION_S` (4), `ARRIVE_S` (20), `TRIP_S` (60), `SEARCH` (`0` quita las búsquedas
 de direcciones: antes de cada cotización se hace un `/geo/reverse` y 2–3 `/geo/search`, como al escribir en la
-app; necesitan photon encendido), `P_ACCOUNTS` / `D_ACCOUNTS`
+app; necesitan photon encendido), `APP_MODEL` (`app`, por defecto: los pasajeros que abren la app piden
+lo mismo que la app móvil, con `/app/bootstrap` y las cachés de React Query; `legacy`: la mezcla de las pruebas de
+octubre, seis peticiones en cada apertura), `P_ACCOUNTS` / `D_ACCOUNTS`
 (cuentas sembradas). Cada prueba guarda en `/data/runs/<id>/`: `summary.json` de k6,
 `metrics.csv.gz` (cada petición), `node.jsonl` (CPU y RAM cada 5 s), `push.jsonl` y
 `campaign.jsonl`.

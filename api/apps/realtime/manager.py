@@ -14,6 +14,7 @@ from typing import Any
 import orjson
 from fastapi import WebSocket
 
+from kuulis.core.cache import INVALIDATE_CHANNEL, local_drop
 from kuulis.core.redis import redis_client
 from kuulis.settings import settings
 
@@ -47,10 +48,13 @@ class ConnectionManager:
             if user_ids
             else [ws for sockets in self._connections.values() for ws in sockets]
         )
-        payload = {"event": message["event"], "data": message.get("data")}
+        if not targets:
+            return
+        # Serialized once for every socket (send_json would run the stdlib encoder per socket).
+        payload = orjson.dumps({"event": message["event"], "data": message.get("data")}).decode()
         for ws in list(targets):
             try:
-                await ws.send_json(payload)
+                await ws.send_text(payload)
             except Exception:  # Socket closed mid-send; cleanup happens on disconnect.
                 logger.debug("Failed to deliver realtime message", exc_info=True)
 
@@ -58,9 +62,14 @@ class ConnectionManager:
         while True:
             try:
                 pubsub = redis_client.pubsub()
-                await pubsub.subscribe(CHANNEL)
+                # The cache invalidations ride along: each API process drops its local copies.
+                await pubsub.subscribe(CHANNEL, INVALIDATE_CHANNEL)
                 async for raw in pubsub.listen():
-                    if raw.get("type") == "message":
+                    if raw.get("type") != "message":
+                        continue
+                    if raw["channel"] == INVALIDATE_CHANNEL:
+                        local_drop(raw["data"])
+                    else:
                         await self._deliver(orjson.loads(raw["data"]))
             except asyncio.CancelledError:
                 raise
