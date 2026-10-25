@@ -239,7 +239,8 @@ function IconChoice({ value, onChange }: { value: PlaceIcon; onChange: (icon: Pl
             <Pressable
               key={key}
               accessibilityRole="radio"
-              accessibilityState={{ selected }}
+              accessibilityState={{ checked: selected }}
+              hitSlop={2}
               accessibilityLabel={t(`profile.saved.icons.${key}`)}
               onPress={() => onChange(key)}
               style={({ pressed }) => [

@@ -32,14 +32,16 @@ export function ConnectionBanner() {
 
   if (!visible || !next) return null;
   const isOffline = visible === 'offline';
+  // White on the deep red (offline) or the dark ink pill (reconnecting).
+  const fg = theme.onDangerStrong;
   return (
     <View pointerEvents="none" style={[styles.wrap, { top: insets.top + 4 }]}>
       <View
         accessibilityRole="alert"
         accessibilityLiveRegion="polite"
-        style={[styles.pill, { backgroundColor: isOffline ? theme.danger : theme.nav }]}>
-        {isOffline ? <WifiOff size={16} color="#FFFFFF" strokeWidth={2.4} /> : <ActivityIndicator size="small" color="#FFFFFF" />}
-        <Txt variant="micro" style={{ color: '#FFFFFF' }}>
+        style={[styles.pill, { backgroundColor: isOffline ? theme.dangerStrong : theme.nav }]}>
+        {isOffline ? <WifiOff size={16} color={fg} strokeWidth={2.4} /> : <ActivityIndicator size="small" color={fg} />}
+        <Txt variant="micro" style={{ color: fg }}>
           {isOffline ? t('connection.offline') : t('connection.reconnecting')}
         </Txt>
       </View>

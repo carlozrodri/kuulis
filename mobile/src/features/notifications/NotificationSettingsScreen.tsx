@@ -224,9 +224,9 @@ function ToggleRow({
         <Switch
           value={value}
           onValueChange={onChange}
-          trackColor={{ false: theme.border, true: theme.primary }}
+          trackColor={{ false: theme.muted, true: theme.primary }}
           thumbColor={theme.surface}
-          ios_backgroundColor={theme.border}
+          ios_backgroundColor={theme.muted}
         />
       </View>
     </Pressable>
@@ -246,7 +246,7 @@ function DefaultRow({ selected, label, onPress }: { selected: boolean; label: st
       <View
         style={[
           styles.radio,
-          { borderColor: selected ? theme.primary : theme.border, backgroundColor: selected ? theme.primary : 'transparent' },
+          { borderColor: selected ? theme.primary : theme.muted, backgroundColor: selected ? theme.primary : 'transparent' },
         ]}>
         {selected ? <Check size={14} color={theme.onPrimary} strokeWidth={3} /> : null}
       </View>
@@ -285,7 +285,9 @@ function TimeSheet({
         <View style={[styles.handle, { backgroundColor: theme.border }]} />
         <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <View style={{ flex: 1 }}>
-            <Txt variant="heading">{title}</Txt>
+            <Txt variant="heading" accessibilityRole="header">
+              {title}
+            </Txt>
             <Txt color="muted" style={{ marginTop: 4 }}>
               {t('notifications.settings.caracasTime')}
             </Txt>

@@ -122,12 +122,13 @@ export function StatStrip({ stats, loading }: { stats: Stat[]; loading?: boolean
           ) : (
             <View style={styles.statValue}>
               {stat.icon ? <stat.icon size={18} color={theme.accent} fill={theme.accent} strokeWidth={2} /> : null}
-              <Txt variant="heading" tabular numberOfLines={1}>
+              <Txt variant="heading" tabular numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
                 {stat.value}
               </Txt>
             </View>
           )}
-          <Txt variant="caption" color="muted" numberOfLines={1} align="center">
+          {/* Two lines so "Km recorridos" fits on 320 px screens and with large text. */}
+          <Txt variant="caption" color="muted" numberOfLines={2} align="center">
             {stat.label}
           </Txt>
         </View>
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    minHeight: 44,
+    minHeight: 48,
     borderRadius: radius.pill,
     paddingHorizontal: space.sm,
   },

@@ -56,9 +56,9 @@
     },
     "driver": {
       "title": "Driver",
-      "body": "Earn with your motorcycle. No commission per trip"
+      "body": "Earn with your motorcycle. No commission per ride"
     },
-    "driverPromo": "Drivers: 3 months free from your first trip and never a commission. After that, a low monthly fee only in the months you work."
+    "driverPromo": "Drivers: 3 months free from your first ride and never a commission. After that, a low monthly fee only in the months you work."
   },
   "tabs": {
     "home": "Home",
@@ -197,13 +197,13 @@
     "stats": {
       "trips": "Rides",
       "rating": "Rating",
-      "km": "Km travelled",
+      "km": "Km traveled",
       "month": "This month"
     },
     "photo": {
       "change": "Change profile photo",
       "title": "Profile photo",
-      "subtitle": "A clear photo of your face helps people recognise you at pickup.",
+      "subtitle": "A clear photo of your face helps people recognize you at pickup.",
       "camera": "Take photo",
       "library": "Choose from gallery",
       "remove": "Remove photo",
@@ -214,7 +214,7 @@
       "title": "Complete your profile",
       "progress": "{{done}} of {{total}} done",
       "photo": "Add a photo",
-      "photoHint": "So people recognise you at pickup",
+      "photoHint": "So people recognize you at pickup",
       "name": "Add your first and last name",
       "nameHint": "Your driver or passenger sees it",
       "email": "Confirm your email",
@@ -279,9 +279,9 @@
       "done": "Your account will be deleted in 30 days"
     },
     "driver": {
-      "vehicle": "Your moto",
+      "vehicle": "Your motorcycle",
       "account": "Your driver account",
-      "application": "Earn with your moto",
+      "application": "Earn with your motorcycle",
       "earnings": "Your earnings",
       "earningsHint": "{{amount}} this month · {{rides}}",
       "status": {
@@ -373,7 +373,7 @@
       "phone": "WhatsApp number",
       "phoneHint": "Venezuelan number or with country code",
       "phoneInvalid": "Check the number, it looks incomplete",
-      "how": "During a ride, Your safety sends them a WhatsApp link to follow the moto live. If you press SOS, we offer to alert them.",
+      "how": "During a ride, open «Your safety» to send them a WhatsApp link to follow the motorcycle live. If you press SOS, we offer to alert them.",
       "saved": "Contact saved",
       "add": "Add contact",
       "edit": "Edit contact",
@@ -408,8 +408,8 @@
       "copy": "Copy code",
       "copied": "Code copied",
       "whatsapp": "Invite on WhatsApp",
-      "message": "Earn with your motorbike on Kuulis! No per-ride commission. Get the app, sign up as a driver and use my code {{code}}.",
-      "messageLink": "Earn with your motorbike on Kuulis! No per-ride commission. Sign up as a driver with my code {{code}}: {{link}}",
+      "message": "Earn with your motorcycle on Kuulis! No per-ride commission. Get the app, sign up as a driver and use my code {{code}}.",
+      "messageLink": "Earn with your motorcycle on Kuulis! No per-ride commission. Sign up as a driver with my code {{code}}: {{link}}",
       "invited_one": "{{count}} invited",
       "invited_other": "{{count}} invited",
       "rewarded_one": "{{count}} rewarded",
@@ -615,15 +615,15 @@
       },
       "suspended": {
         "title": "Account suspended",
-        "body": "You can't receive trips for now. Contact support to resolve it."
+        "body": "You can't receive rides for now. Contact support to resolve it."
       }
     },
     "home": {
       "approved": "Approved",
       "welcome": "You're now a Kuulis driver!",
-      "freeMonths": "Your 3 free months start with your first trip.",
+      "freeMonths": "Your 3 free months start with your first ride.",
       "offline": "You're offline",
-      "offlineBody": "Go online to start receiving trip requests near you.",
+      "offlineBody": "Go online to start receiving ride requests near you.",
       "connect": "Go online"
     }
   },
@@ -729,13 +729,13 @@
     "expiry_required": "Type the document's expiry date.",
     "document_already_expired": "That document has already expired. Upload a valid one.",
     "expiry_confirmed": "Our team already confirmed that date. To change it, upload the new document.",
-    "check_files_missing": "Some photos are missing. Take the selfie and the moto photos we asked for.",
+    "check_files_missing": "Some photos are missing. Take the selfie and the motorcycle photos we asked for.",
     "check_files_invalid": "A photo isn't valid. Take them again with the camera.",
     "check_not_requested": "This verification was already sent or is no longer pending.",
     "check_not_found": "We couldn't find this verification.",
-    "vehicle_change_pending": "You already have a moto change in review.",
-    "vehicle_same_plate": "That's the moto you already use. Type the new moto's plate.",
-    "vehicle_change_not_found": "You don't have a moto change in review.",
+    "vehicle_change_pending": "You already have a motorcycle change in review.",
+    "vehicle_same_plate": "That's the motorcycle you already use. Type the new motorcycle's plate.",
+    "vehicle_change_not_found": "You don't have a motorcycle change in review.",
     "document_not_found": "We couldn't find that document. Refresh the screen.",
     "report_closed": "This conversation is closed. Start a new one if you need help.",
     "report_not_closed": "You can rate it once we close the conversation.",
@@ -881,11 +881,11 @@
       "someoneElse": "Tap to request for someone else",
       "clear": "Request for me",
       "title": "Who is it for?",
-      "name": "Rider's name",
-      "phone": "Rider's phone",
+      "name": "Passenger's name",
+      "phone": "Passenger's phone",
       "phoneHint": "You will send them the live ride on WhatsApp.",
       "save": "Done",
-      "nameRequired": "Type the rider's name.",
+      "nameRequired": "Type the passenger's name.",
       "phoneInvalid": "Check the phone (e.g. 0414 123 4567)."
     },
     "note": {
@@ -1044,7 +1044,7 @@
     "share": "Share my ride",
     "shareHint": "Send the driver's details and your destination to someone you trust",
     "shareLive": "Share ride live",
-    "shareLiveHint": "A link to follow the moto on the map until the ride ends",
+    "shareLiveHint": "A link to follow the motorcycle on the map until the ride ends",
     "report": "Report a problem",
     "reportHint": "Tell the Kuulis team what happened",
     "sendContact": "Send to {{name}}",
@@ -1114,7 +1114,7 @@
       "passenger": {
         "plate": {
           "title": "Check the plate and photo",
-          "body": "Before getting on, make sure the moto and driver match the app."
+          "body": "Before getting on, make sure the motorcycle and driver match the app."
         },
         "pin": {
           "title": "Give your PIN only when you get on",
@@ -1226,7 +1226,7 @@
       "secondsLeft": "{{count}} seconds left",
       "fareA11y": "Fare {{fare}}",
       "toPickup": "Pickup {{distance}} away · {{time}}",
-      "trip": "{{distance}} trip · {{time}}",
+      "trip": "{{distance}} ride · {{time}}",
       "accept": "Accept",
       "decline": "Decline",
       "promoCredit": "+ {{discount}} credited by Kuulis (promotion)",
@@ -1402,8 +1402,8 @@
       "pickMonth": "Choose month",
       "earned": "Earned",
       "counted": "Counts for the fee",
-      "trips": "Completed trips",
-      "countedNote": "Trips during your free months don't count for the fee.",
+      "trips": "Completed rides",
+      "countedNote": "Rides during your free months don't count for the fee.",
       "fee": "{{month}} fee",
       "estimated": "Estimate",
       "originalFee": "Was {{fee}}: Kuulis lowered your fee",
@@ -1632,7 +1632,7 @@
       },
       "vehicle_mismatch": {
         "title": "Bike or person didn't match",
-        "body": "The plate, bike or person weren't the ones in the app"
+        "body": "The plate, motorcycle or person weren't the ones in the app"
       },
       "no_show": {
         "title": "They didn't show up",
@@ -1640,7 +1640,7 @@
       },
       "lost_item": {
         "title": "Lost item",
-        "body": "You left something on the bike or found something"
+        "body": "You left something on the motorcycle or found something"
       },
       "app_issue": {
         "title": "App problem",
@@ -1660,7 +1660,7 @@
       "harassment": "Tell us what they said or did. We handle it with full discretion.",
       "driving": "What happened? For example: going too fast, running a red light, no helmet…",
       "fare": "How much was charged or paid, and how much did the app show?",
-      "vehicle_mismatch": "What didn't match? The plate, the bike's color, the person…",
+      "vehicle_mismatch": "What didn't match? The plate, the motorcycle's color, the person…",
       "no_show": "How long did you wait? Could you reach them through the chat?",
       "lost_item": "What was left behind and what does it look like? If it was on a ride, we'll help you reach the other person.",
       "app_issue": "What were you doing and what happened? If you saw an error message, paste it here.",
@@ -1847,7 +1847,7 @@
     },
     "usage": {
       "title": "Share anonymous usage data",
-      "hint": "Helps us improve Kuulis: which screens you use and where riders lack drivers. Never your name, email, phone or exact location.",
+      "hint": "Helps us improve Kuulis: which screens you use and where passengers lack drivers. Never your name, email, phone or exact location.",
       "on": "Thanks, you are sharing anonymous usage data",
       "off": "Done, we no longer send usage data"
     }
@@ -2016,7 +2016,7 @@
     "banner": {
       "selfieTitle": "Verification pending",
       "selfieBody": "Take a live selfie to go online.",
-      "reverificationBody": "Send a selfie and photos of your moto to go online.",
+      "reverificationBody": "Send a selfie and photos of your motorcycle to go online.",
       "selfieAction": "Verify",
       "expiredTitle": "Document expired",
       "expiredBody": "{{docs}}. Upload the new one to go online again.",
@@ -2036,17 +2036,17 @@
       "selfieTitle": "Verify it's you",
       "selfieBody": "Before going online we need a live selfie. It takes less than a minute and you can go online as soon as you send it.",
       "selfieAction": "Take selfie",
-      "reverificationTitle": "Verify your identity and your moto",
-      "reverificationBody": "We need a live selfie and new photos of your moto. You can go online as soon as you send them.",
+      "reverificationTitle": "Verify your identity and your motorcycle",
+      "reverificationBody": "We need a live selfie and new photos of your motorcycle. You can go online as soon as you send them.",
       "reverificationAction": "Verify now",
       "later": "Not now"
     },
     "selfie": {
       "title": "Verify it's you",
-      "titleMoto": "Verify your identity and your moto",
+      "titleMoto": "Verify your identity and your motorcycle",
       "body": "For everyone's safety, every now and then we ask for a live selfie. It takes less than a minute.",
-      "bodyMoto_one": "We need a live selfie and {{count}} new photo of your moto with the plate visible.",
-      "bodyMoto_other": "We need a live selfie and {{count}} new photos of your moto with the plate visible.",
+      "bodyMoto_one": "We need a live selfie and {{count}} new photo of your motorcycle with the plate visible.",
+      "bodyMoto_other": "We need a live selfie and {{count}} new photos of your motorcycle with the plate visible.",
       "tips": {
         "light": {
           "title": "Find good light",
@@ -2067,17 +2067,17 @@
       "reviewBody": "Check that it's sharp, well lit and nothing covers it.",
       "previewA11y": "Your selfie",
       "retake": "Retake selfie",
-      "motoTitle": "Photos of your moto",
+      "motoTitle": "Photos of your motorcycle",
       "motoHint": "With the camera, right now, with the plate visible.",
       "motoTake": "Take a photo of the moto",
-      "photosMissing_one": "{{count}} photo of your moto missing",
-      "photosMissing_other": "{{count}} photos of your moto missing",
+      "photosMissing_one": "{{count}} photo of your motorcycle missing",
+      "photosMissing_other": "{{count}} photos of your motorcycle missing",
       "send": "Send",
       "uploading": "Uploading {{done}} of {{total}}…",
       "privacy": "Only our verification team sees these photos, to compare them with your ID and your registration.",
       "sentTitle": "Done, it's in review",
       "sentBody": "You can go online now. Our team will review your selfie in the next few hours.",
-      "sentBodyMoto": "You can go online now. Our team will review your selfie and the photos of your moto in the next few hours.",
+      "sentBodyMoto": "You can go online now. Our team will review your selfie and the photos of your motorcycle in the next few hours.",
       "sentNotify": "We'll notify you if we need anything else.",
       "connectNow": "Go online now",
       "nothingTitle": "No pending verifications",
@@ -2239,13 +2239,13 @@
       },
       "not_found": {
         "title": "{{name}} didn't find it",
-        "body": "Sorry. If you think it stayed on the motorbike, write to us and we'll look into it."
+        "body": "Sorry. If you think it stayed on the motorcycle, write to us and we'll look into it."
       }
     },
     "driver": {
       "title": "A passenger forgot something",
       "theyWrote": "What they described",
-      "ask": "Check your motorbike and bags. Do you have it?",
+      "ask": "Check your motorcycle and bags. Do you have it?",
       "hasIt": "I have it",
       "notFound": "I don't have it",
       "answer": "Answer",
@@ -2397,7 +2397,7 @@
     "hot": "High demand in {{name}}",
     "away": "{{distance}} away",
     "see": "View",
-    "showOnMap": "Centres the map on that area"
+    "showOnMap": "Centers the map on that area"
   },
   "zones": {
     "restrictedTitle": "We can’t pick you up here",
@@ -2418,7 +2418,7 @@
     "receiptNonFiscal": "Paid directly to the driver. Not a tax invoice."
   },
   "rideNote": {
-    "rider": "Rider: {{name}}",
+    "rider": "Passenger: {{name}}",
     "noteA11y": "Passenger's note: {{note}}",
     "forTitle": "This ride is for {{name}}",
     "sendBody": "Send them the live ride: they will see the driver, the plate and the start PIN.",

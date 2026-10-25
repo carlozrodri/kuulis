@@ -39,6 +39,9 @@ export type TxtProps = PropsWithChildren<{
   align?: TextStyle['textAlign'];
   style?: StyleProp<TextStyle>;
   numberOfLines?: number;
+  /** Shrinks a single line (amounts, short values) instead of cutting it with "…". */
+  adjustsFontSizeToFit?: boolean;
+  minimumFontScale?: number;
   tabular?: boolean;
   accessibilityRole?: ComponentProps<typeof Text>['accessibilityRole'];
   /** Inline links inside a paragraph. */
@@ -531,6 +534,8 @@ export function ListRow({
   divider = false,
   accessibilityLabel,
   accessibilityHint,
+  accessibilityRole = 'button',
+  accessibilityState,
 }: {
   title: string;
   subtitle?: string | null;
@@ -542,6 +547,9 @@ export function ListRow({
   divider?: boolean;
   accessibilityLabel?: string;
   accessibilityHint?: string;
+  /** `switch` (with `accessibilityState.checked`) for rows that toggle a setting. */
+  accessibilityRole?: 'button' | 'link' | 'switch';
+  accessibilityState?: { checked?: boolean; disabled?: boolean };
 }) {
   const theme = useTheme();
   const content = (
@@ -564,9 +572,11 @@ export function ListRow({
   if (!onPress) return content;
   return (
     <Pressable
-      accessibilityRole="button"
+      accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel ?? title}
       accessibilityHint={accessibilityHint}
+      accessibilityState={accessibilityState}
+      disabled={accessibilityState?.disabled}
       onPress={onPress}
       style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}>
       {content}
@@ -714,7 +724,9 @@ export function Sheet({
         <View style={[styles.handle, { backgroundColor: theme.border }]} />
         <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <View style={styles.flex}>
-            <Txt variant="heading">{title}</Txt>
+            <Txt variant="heading" accessibilityRole="header">
+              {title}
+            </Txt>
             {subtitle ? (
               <Txt color="muted" style={{ marginTop: 4 }}>
                 {subtitle}
