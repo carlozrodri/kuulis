@@ -60,6 +60,7 @@ ALLOWED_ENV = {
     "LOCATION_S",
     "ARRIVE_S",
     "TRIP_S",
+    "SEARCH",
     "P_ACCOUNTS",
     "D_ACCOUNTS",
 }
