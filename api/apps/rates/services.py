@@ -27,6 +27,7 @@ from apps.rates.schemas import (
     VesAmount,
 )
 from apps.users.models import User
+from kuulis.core.cache import local_get, local_invalidate, local_set
 from kuulis.core.pagination import PageParams, paginate
 from kuulis.core.redis import redis_client
 from kuulis.settings import settings
@@ -65,6 +66,7 @@ def _snapshot(row: ExchangeRate) -> dict:
 
 async def _cache(row: ExchangeRate) -> None:
     await redis_client.set(_current_key(row.source), orjson.dumps(_snapshot(row)).decode())
+    await local_invalidate(_current_key(row.source))
 
 
 async def _latest_row(session: AsyncSession, source: RateSource) -> ExchangeRate | None:
@@ -77,9 +79,14 @@ async def _latest_row(session: AsyncSession, source: RateSource) -> ExchangeRate
 
 
 async def _current_snapshot(session: AsyncSession, source: RateSource) -> dict | None:
-    raw = await redis_client.get(_current_key(source))
+    key = _current_key(source)
+    if (snapshot := local_get(key)) is not None:
+        return snapshot
+    raw = await redis_client.get(key)
     if raw:
-        return orjson.loads(raw)
+        snapshot = orjson.loads(raw)
+        local_set(key, snapshot)
+        return snapshot
     row = await _latest_row(session, source)
     if row is None:
         return None

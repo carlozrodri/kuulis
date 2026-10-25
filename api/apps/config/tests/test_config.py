@@ -1,6 +1,6 @@
 from apps.config import services
 from apps.config.models import AppSetting
-from apps.config.schemas import AppConfig
+from apps.config.schemas import AppConfig, AppConfigUpdate
 from conftest import set_config
 from kuulis.core.cache import cache_get
 from kuulis.core.db import SessionLocal
@@ -300,3 +300,40 @@ async def test_public_site_for_the_website(client):
     assert site["free_months"] == 3
     assert site["fee_tiers"][0] == {"above": "0.00", "fee": "0.00"}
     assert "topup_binance_pay_id" not in site
+
+
+async def test_process_copy_skips_redis_until_invalidated() -> None:
+    from kuulis.core.cache import cache_delete
+
+    async with SessionLocal() as session:
+        first = await services.get_app_config(session)
+        # Gone from Redis but still served from this process's copy.
+        await cache_delete(services.CACHE_KEY)
+        assert await services.get_app_config(session) is first
+        assert await cache_get(services.CACHE_KEY) is None
+
+        await services.update_app_config(session, AppConfigUpdate(driver_min_age=25))
+        await session.commit()
+        await services.invalidate_cache()
+        assert (await services.get_app_config(session)).driver_min_age == 25
+
+
+async def test_invalidation_reaches_the_realtime_listener() -> None:
+    import asyncio
+
+    from apps.realtime.manager import manager
+    from kuulis.core.cache import INVALIDATE_CHANNEL, local_get, local_set
+    from kuulis.core.redis import redis_client
+
+    manager.start()
+    try:
+        await asyncio.sleep(0.1)  # subscribed
+        local_set("probe", {"x": 1})
+        await redis_client.publish(INVALIDATE_CHANNEL, "probe")
+        for _ in range(50):
+            if local_get("probe") is None:
+                break
+            await asyncio.sleep(0.02)
+        assert local_get("probe") is None
+    finally:
+        await manager.stop()

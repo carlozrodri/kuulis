@@ -61,6 +61,7 @@ ALLOWED_ENV = {
     "ARRIVE_S",
     "TRIP_S",
     "SEARCH",
+    "APP_MODEL",
     "P_ACCOUNTS",
     "D_ACCOUNTS",
 }

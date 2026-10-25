@@ -1,7 +1,8 @@
 """Admin-editable app configuration, read through a Redis cache.
 
-Other apps call ``get_app_config(session)``; it is cheap (one Redis GET) and always returns every
-key, falling back to the defaults in ``AppConfig`` for keys that were never edited.
+Other apps call ``get_app_config(session)``; it is cheap (a per-process copy, else one Redis GET)
+and always returns every key, falling back to the defaults in ``AppConfig`` for keys that were
+never edited.
 """
 
 import logging
@@ -13,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.config.models import AppSetting
 from apps.config.schemas import AppConfig, AppConfigUpdate, PublicSite
-from kuulis.core.cache import cache_delete, cached
+from kuulis.core.cache import cache_delete, cached, local_get, local_invalidate, local_set
 from kuulis.core.exceptions import AppError
 
 logger = logging.getLogger(__name__)
@@ -54,9 +55,14 @@ async def _load(session: AsyncSession) -> dict:
 
 
 async def get_app_config(session: AsyncSession) -> AppConfig:
-    return AppConfig.model_validate(
-        await cached(CACHE_KEY, lambda: _load(session), ttl=CACHE_TTL_SECONDS)
-    )
+    """Shared read-only object: callers must not change it (``model_copy`` first)."""
+    config = local_get(CACHE_KEY)
+    if config is None:
+        config = AppConfig.model_validate(
+            await cached(CACHE_KEY, lambda: _load(session), ttl=CACHE_TTL_SECONDS)
+        )
+        local_set(CACHE_KEY, config)
+    return config
 
 
 async def preview_app_config(session: AsyncSession, data: AppConfigUpdate) -> AppConfig:
@@ -97,6 +103,7 @@ async def _merge(session: AsyncSession, data: AppConfigUpdate) -> tuple[AppConfi
 
 async def invalidate_cache() -> None:
     await cache_delete(CACHE_KEY)
+    await local_invalidate(CACHE_KEY)
 
 
 async def public_site(session: AsyncSession) -> PublicSite:

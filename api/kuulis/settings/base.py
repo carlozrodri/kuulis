@@ -47,6 +47,9 @@ class BaseAppSettings(BaseSettings):
     REDIS_MAX_CONNECTIONS: int = 100
     REDIS_POOL_TIMEOUT: int = 5
     CACHE_DEFAULT_TTL: int = 60
+    # Hot cache entries (app config, exchange rates) are also kept in each process this long.
+    # Invalidations reach every API process at once through pub/sub; 0 turns the copies off.
+    LOCAL_CACHE_SECONDS: float = 5
 
     # --- Auth -----------------------------------------------------------------
     JWT_ALGORITHM: str = "HS256"
