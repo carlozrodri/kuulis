@@ -37,10 +37,18 @@ async def _role_headers(client, email: str, role: str, permissions) -> dict[str,
     return await _login(client, email)
 
 
-async def _upload(client, headers, bucket, content_id, name="video.mp4", ct="video/mp4") -> dict:
+async def _upload(
+    client, headers, bucket, content_id, name="video.mp4", ct="video/mp4", role="final"
+) -> dict:
     response = await client.post(
         f"{API}/contents/{content_id}/assets",
-        json={"filename": name, "content_type": ct, "size": 1000, "source": "remotion"},
+        json={
+            "filename": name,
+            "content_type": ct,
+            "size": 1000,
+            "source": "remotion",
+            "role": role,
+        },
         headers=headers,
     )
     assert response.status_code == 201, response.text
@@ -182,6 +190,65 @@ async def test_piece_goes_through_the_whole_cycle(client, admin_headers, bucket)
     assert row["code"] == content["code"] and row["snapshots"] == 1
     assert row["latest"]["views"] == 1500
     assert (await client.get(f"{API}/performance?platform=youtube", headers=team)).json() == []
+
+
+async def test_list_previews_the_newest_final_video_and_cover(
+    client, admin_headers, bucket
+) -> None:
+    created = await client.post(f"{API}/contents", json={"title": "Depende"}, headers=admin_headers)
+    cid = created.json()["id"]
+    empty = (await client.get(f"{API}/contents", headers=admin_headers)).json()["items"][0]
+    assert empty["preview"] is None and empty["asset_count"] == 0
+
+    await _upload(client, admin_headers, bucket, cid, "toma.mp4", role="fuente")
+    response = await client.post(
+        f"{API}/contents/{cid}/assets",
+        json={
+            "filename": "toma-b.mp4",
+            "content_type": "video/mp4",
+            "size": 10,
+            "source": "x",
+            "role": "fuente",
+        },
+        headers=admin_headers,
+    )  # registered but never uploaded: ignored
+    assert response.status_code == 201
+    fuente = (await client.get(f"{API}/contents", headers=admin_headers)).json()["items"][0]
+    assert "toma.mp4" in fuente["preview"]["video_url"] and fuente["preview"]["image_url"] is None
+
+    for name in ("final-v1.mp4", "final-v2.mp4"):
+        await client.post(
+            f"{API}/contents/{cid}/assets",
+            json={
+                "filename": name,
+                "content_type": "video/mp4",
+                "size": 10,
+                "source": "higgsfield",
+                "role": "final",
+                "duration_s": 15,
+                "width": 720,
+                "height": 1280,
+            },
+            headers=admin_headers,
+        )
+    detail = (await client.get(f"{API}/contents/{cid}", headers=admin_headers)).json()
+    for asset in detail["assets"]:
+        if asset["role"] == "final":
+            bucket.add(asset["s3_key"])
+            await client.post(
+                f"{API}/contents/{cid}/assets/{asset['id']}/confirm", headers=admin_headers
+            )
+    await _upload(client, admin_headers, bucket, cid, "portada.jpg", "image/jpeg", "portada")
+
+    [item] = (await client.get(f"{API}/contents", headers=admin_headers)).json()["items"]
+    preview = item["preview"]
+    assert "final-v2.mp4" in preview["video_url"] and "portada.jpg" in preview["image_url"]
+    # Inline links (no download name), so the video plays in the list.
+    assert preview["video_url"].endswith("name=None")
+    assert preview["duration_s"] == 15 and (preview["width"], preview["height"]) == (720, 1280)
+    assert item["asset_count"] == 4
+    detail = (await client.get(f"{API}/contents/{cid}", headers=admin_headers)).json()
+    assert detail["preview"] == preview
 
 
 async def test_codes_follow_the_planned_day(client, admin_headers) -> None:

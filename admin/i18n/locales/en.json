@@ -40,7 +40,7 @@
     "closings": "Closings",
     "analytics": "Analytics",
     "referrals": "Referrals",
-    "marketingCalendar": "Calendar",
+    "marketingCalendar": "Pieces",
     "marketingApprove": "Approve content",
     "marketingPublish": "Post",
     "marketingPerformance": "Performance",
@@ -4275,6 +4275,47 @@
       "archivado": "Archived piece",
       "reopenHelp": "It can't be edited or receive files. Move it back to “Idea” to work on it again.",
       "help": "It can't be edited or receive files."
+    },
+    "gallery": {
+      "active": "Active",
+      "filterByStatus": "Filter by status",
+      "view": "View",
+      "galleryView": "Gallery",
+      "calendarView": "Calendar",
+      "count": "no pieces | 1 piece | {n} pieces",
+      "hint": "Hover over a piece to preview its video and click to watch it with sound.",
+      "empty": "No pieces here yet.",
+      "noResults": "No pieces match your search.",
+      "loadMore": "Load more",
+      "noDate": "No date",
+      "noMedia": "No video yet",
+      "duration": "Length",
+      "files": "no files | 1 file | {n} files",
+      "play": "Watch the video of “{title}”",
+      "videoOf": "Video of “{title}”",
+      "previous": "Previous video",
+      "next": "Next video",
+      "openPiece": "Open piece",
+      "thisMonth": "Go to this month",
+      "calendarHelp": "The calendar only shows pieces with a planned date. Pieces without a date are in the gallery."
+    },
+    "viewer": {
+      "empty": "This piece has no videos or images yet.",
+      "others": "All files ({n})",
+      "show": "View {name}"
+    },
+    "scriptView": {
+      "idea": "Idea",
+      "scenes": "Scenes",
+      "voice": "Voice",
+      "onScreen": "On-screen text",
+      "cta": "Call to action",
+      "prompts": "AI prompts ({n})",
+      "prompt": "Prompt {n}",
+      "listCost": "list price: {cost}",
+      "requestId": "Generation id",
+      "facts": "Facts used",
+      "raw": "See the full script (JSON)"
     }
   },
   "serviceTokens": {

@@ -55,7 +55,7 @@ export const NAV: NavEntry[] = [
   { key: 'notifications', icon: 'i-lucide-bell', to: '/notifications', permission: 'notifications.send', group: 'messaging' },
   { key: 'announcements', icon: 'i-lucide-megaphone', to: '/announcements', permission: 'announcements.view', group: 'messaging' },
   { key: 'emailTemplates', icon: 'i-lucide-mail', to: '/email-templates', permission: 'notifications.send', group: 'messaging' },
-  { key: 'marketingCalendar', icon: 'i-lucide-calendar-days', to: '/marketing', permission: 'marketing.view', group: 'marketing' },
+  { key: 'marketingCalendar', icon: 'i-lucide-layout-grid', to: '/marketing', permission: 'marketing.view', group: 'marketing' },
   { key: 'marketingApprove', icon: 'i-lucide-badge-check', to: '/marketing/aprobar', permission: 'marketing.approve', group: 'marketing' },
   { key: 'marketingPublish', icon: 'i-lucide-smartphone-charging', to: '/marketing/publicar', permission: 'marketing.publish', group: 'marketing' },
   { key: 'marketingPerformance', icon: 'i-lucide-chart-column', to: '/marketing/rendimiento', permission: 'marketing.view', group: 'marketing' },

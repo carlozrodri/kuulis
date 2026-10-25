@@ -3,7 +3,7 @@ import type { MarketingAsset, MarketingAssetRole, MarketingAssetUpload, Marketin
 import { MARKETING_ASSET_ROLES } from '~/types/api'
 
 const props = defineProps<{ contentId: string, assets: MarketingAsset[], canUpload: boolean }>()
-const emit = defineEmits<{ updated: [content: MarketingContent] }>()
+const emit = defineEmits<{ updated: [content: MarketingContent], show: [assetId: string] }>()
 
 const { t, locale } = useI18n()
 const { request } = useApi()
@@ -169,7 +169,16 @@ const kindIcon = { video: 'i-lucide-film', imagen: 'i-lucide-image', audio: 'i-l
           {{ t('marketing.assets.notUploaded') }}
         </UBadge>
         <UButton
-          v-else-if="asset.download_url"
+          v-if="asset.uploaded_at && asset.download_url && asset.kind !== 'audio'"
+          size="xs"
+          color="neutral"
+          variant="ghost"
+          icon="i-lucide-eye"
+          :aria-label="t('marketing.viewer.show', { name: asset.filename })"
+          @click="emit('show', asset.id)"
+        />
+        <UButton
+          v-if="asset.uploaded_at && asset.download_url"
           :to="asset.download_url"
           target="_blank"
           rel="noopener"

@@ -2573,6 +2573,18 @@ export interface MarketingContentSummary {
   updated_at: string
   platforms: MarketingPlatform[]
   next_post_at: string | null
+  /** Newest final video and cover, to play in the list; null while the piece has no files. */
+  preview: MarketingPreview | null
+  /** Uploaded files. */
+  asset_count: number
+}
+
+export interface MarketingPreview {
+  video_url: string | null
+  image_url: string | null
+  duration_s: number | null
+  width: number | null
+  height: number | null
 }
 
 export interface MarketingAsset {

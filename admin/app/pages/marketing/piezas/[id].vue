@@ -144,7 +144,23 @@ async function addVariant() {
   }
 }
 
-const scriptText = computed(() => JSON.stringify(content.value?.script ?? {}, null, 2))
+// ---- Layout -----------------------------------------------------------------------------------
+type Section = 'guion' | 'redes' | 'archivos' | 'datos'
+const SECTIONS: Section[] = ['guion', 'redes', 'archivos', 'datos']
+const router = useRouter()
+const section = ref<Section>(SECTIONS.includes(route.query.tab as Section) ? route.query.tab as Section : 'guion')
+watch(section, value => router.replace({ query: value === 'guion' ? {} : { tab: value } }))
+const sectionItems = computed(() => [
+  { label: t('marketing.script'), value: 'guion', icon: 'i-lucide-scroll-text' },
+  { label: t('marketing.variants'), value: 'redes', icon: 'i-lucide-share-2', badge: content.value?.variants.length || undefined },
+  { label: t('marketing.assets.title'), value: 'archivos', icon: 'i-lucide-paperclip', badge: content.value?.assets.length || undefined },
+  { label: t('marketing.details'), value: 'datos', icon: 'i-lucide-settings-2' },
+])
+const shown = ref<string | null>(null)
+function show(assetId: string) {
+  shown.value = assetId
+  if (window.matchMedia('(max-width: 1279px)').matches) window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 </script>
 
 <template>
@@ -257,10 +273,33 @@ const scriptText = computed(() => JSON.stringify(content.value?.script ?? {}, nu
           </template>
         </div>
 
-        <div class="grid gap-6 xl:grid-cols-[1fr_24rem]">
-          <div class="space-y-6">
-            <!-- Network versions -->
-            <section class="space-y-3">
+        <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)]">
+          <div class="min-w-0 xl:sticky xl:top-4">
+            <MarketingMediaViewer
+              v-model="shown"
+              :assets="content.assets"
+            />
+          </div>
+
+          <div class="min-w-0 space-y-4">
+            <UTabs
+              v-model="section"
+              :items="sectionItems"
+              :content="false"
+              variant="link"
+              class="overflow-x-auto"
+            />
+
+            <MarketingScriptView
+              v-if="section === 'guion'"
+              :script="content.script"
+              :notes="content.notes"
+            />
+
+            <section
+              v-else-if="section === 'redes'"
+              class="space-y-3"
+            >
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <h2 class="font-semibold">
                   {{ t('marketing.variants') }}
@@ -302,15 +341,15 @@ const scriptText = computed(() => JSON.stringify(content.value?.script ?? {}, nu
             </section>
 
             <MarketingAssetsCard
+              v-else-if="section === 'archivos'"
               :content-id="content.id"
               :assets="content.assets"
               :can-upload="editable"
               @updated="updated"
+              @show="show"
             />
-          </div>
 
-          <div class="space-y-6">
-            <UCard>
+            <UCard v-else>
               <template #header>
                 <h3 class="font-semibold">
                   {{ t('marketing.details') }}
@@ -399,24 +438,6 @@ const scriptText = computed(() => JSON.stringify(content.value?.script ?? {}, nu
                   />
                 </div>
               </form>
-            </UCard>
-
-            <UCard>
-              <template #header>
-                <h3 class="font-semibold">
-                  {{ t('marketing.script') }}
-                </h3>
-              </template>
-              <pre
-                v-if="Object.keys(content.script).length"
-                class="max-h-96 overflow-auto text-xs whitespace-pre-wrap"
-              >{{ scriptText }}</pre>
-              <p
-                v-else
-                class="text-sm text-(--ui-text-muted)"
-              >
-                {{ t('marketing.noScript') }}
-              </p>
             </UCard>
           </div>
         </div>

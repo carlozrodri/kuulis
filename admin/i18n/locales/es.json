@@ -40,7 +40,7 @@
     "closings": "Cierres",
     "analytics": "Analítica",
     "referrals": "Referidos",
-    "marketingCalendar": "Calendario",
+    "marketingCalendar": "Piezas",
     "marketingApprove": "Aprobar contenido",
     "marketingPublish": "Publicar",
     "marketingPerformance": "Rendimiento",
@@ -4275,6 +4275,47 @@
       "archivado": "Pieza archivada",
       "reopenHelp": "No se puede editar ni subir archivos. Pásala a «Idea» para volver a trabajarla.",
       "help": "No se puede editar ni subir archivos."
+    },
+    "gallery": {
+      "active": "Activas",
+      "filterByStatus": "Filtrar por estado",
+      "view": "Vista",
+      "galleryView": "Galería",
+      "calendarView": "Calendario",
+      "count": "sin piezas | 1 pieza | {n} piezas",
+      "hint": "Pasa el ratón sobre una pieza para ver su video y haz clic para verlo con sonido.",
+      "empty": "Todavía no hay piezas aquí.",
+      "noResults": "Ninguna pieza coincide con la búsqueda.",
+      "loadMore": "Cargar más",
+      "noDate": "Sin fecha",
+      "noMedia": "Sin video todavía",
+      "duration": "Duración",
+      "files": "sin archivos | 1 archivo | {n} archivos",
+      "play": "Ver el video de «{title}»",
+      "videoOf": "Video de «{title}»",
+      "previous": "Video anterior",
+      "next": "Video siguiente",
+      "openPiece": "Abrir pieza",
+      "thisMonth": "Ir a este mes",
+      "calendarHelp": "El calendario muestra solo las piezas con fecha planificada. Las que no tienen fecha están en la galería."
+    },
+    "viewer": {
+      "empty": "Esta pieza todavía no tiene videos ni imágenes.",
+      "others": "Todos los archivos ({n})",
+      "show": "Ver {name}"
+    },
+    "scriptView": {
+      "idea": "Idea",
+      "scenes": "Escenas",
+      "voice": "Voz",
+      "onScreen": "Texto en pantalla",
+      "cta": "Llamado a la acción",
+      "prompts": "Prompts de IA ({n})",
+      "prompt": "Prompt {n}",
+      "listCost": "costo de lista: {cost}",
+      "requestId": "Id de la generación",
+      "facts": "Hechos usados",
+      "raw": "Ver el guion completo (JSON)"
     }
   },
   "serviceTokens": {

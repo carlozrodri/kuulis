@@ -90,6 +90,17 @@ class ChangesRequested(BaseModel):
     note: str = Field(min_length=1, max_length=2000)
 
 
+class ContentPreview(BaseModel):
+    """What the panel's list plays before a piece is opened: its newest final video (or newest
+    video) and its newest cover (or newest image). Links are short-lived, like ``download_url``."""
+
+    video_url: str | None = None
+    image_url: str | None = None
+    duration_s: float | None = None
+    width: int | None = None
+    height: int | None = None
+
+
 class ContentSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -109,6 +120,8 @@ class ContentSummary(BaseModel):
     updated_at: datetime
     platforms: list[str] = []
     next_post_at: datetime | None = None
+    preview: ContentPreview | None = None
+    asset_count: int = 0
 
 
 # --- Assets ----------------------------------------------------------------------------------
