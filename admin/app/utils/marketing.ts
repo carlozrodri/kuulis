@@ -197,3 +197,82 @@ export function shiftMonth(month: string, n: number): string {
   const index = (y ?? 2026) * 12 + (m ?? 1) - 1 + n
   return `${Math.floor(index / 12)}-${pad((index % 12) + 1)}`
 }
+
+/** 15.2 → "0:15", 75 → "1:15". */
+export function formatClock(seconds: number | null | undefined): string {
+  if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0) return ''
+  const total = Math.round(seconds)
+  return `${Math.floor(total / 60)}:${pad(total % 60)}`
+}
+
+/** The list's tabs: "active" is everything still in play (not archived or discarded). */
+export const PIECE_TABS = ['activas', 'idea', 'guion', 'revisado', 'producido', 'aprobado', 'publicado', 'archivado', 'descartado'] as const
+export type PieceTab = typeof PIECE_TABS[number]
+const CLOSED: MarketingStatus[] = ['archivado', 'descartado']
+
+/** Status sent to the API for a tab (none for "active", which is filtered in the browser). */
+export function tabStatus(tab: PieceTab): MarketingStatus | undefined {
+  return tab === 'activas' ? undefined : tab
+}
+
+export function inTab(status: MarketingStatus, tab: PieceTab): boolean {
+  return tab === 'activas' ? !CLOSED.includes(status) : status === tab
+}
+
+export interface ScriptScene {
+  from: number | null
+  to: number | null
+  shot: string
+  voice: string
+  text: string
+}
+
+export interface ScriptPrompt {
+  shot: string
+  model: string
+  prompt: string
+  tool: string
+  costUsd: number | null
+  requestId: string
+}
+
+/** The parts of a script the piece page shows as text (the raw JSON stays one click away). */
+export interface ReadableScript {
+  idea: string
+  cta: string
+  scenes: ScriptScene[]
+  prompts: ScriptPrompt[]
+  facts: string[]
+}
+
+const text = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
+const num = (value: unknown) => (typeof value === 'number' && Number.isFinite(value) ? value : null)
+const records = (value: unknown) =>
+  (Array.isArray(value) ? value : []).filter((v): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v))
+
+/** Reads the agents' script format (docs/marketing/09: idea, cta, escenas, prompts, hechos). */
+export function readableScript(script: Record<string, unknown> | null | undefined): ReadableScript {
+  const s = script ?? {}
+  return {
+    idea: text(s.idea),
+    cta: text(s.cta),
+    scenes: records(s.escenas).map(e => ({ from: num(e.desde_s), to: num(e.hasta_s), shot: text(e.plano), voice: text(e.voz), text: text(e.texto) })),
+    prompts: records(s.prompts).map(p => ({
+      shot: text(p.plano),
+      model: text(p.modelo),
+      prompt: text(p.prompt),
+      tool: text(p.herramienta),
+      costUsd: num(p.costo_lista_usd),
+      requestId: text(p.request_id),
+    })).filter(p => p.prompt),
+    facts: (Array.isArray(s.hechos) ? s.hechos : []).filter((h): h is string => typeof h === 'string'),
+  }
+}
+
+/** Videos and images that can be watched on the piece page, newest first, finals before the rest. */
+export function playableAssets(assets: MarketingAsset[]): MarketingAsset[] {
+  const rank = (a: MarketingAsset) => (a.role === 'final' ? 0 : a.role === 'portada' ? 2 : 1) + (a.kind === 'video' ? 0 : 3)
+  return assets
+    .filter(a => a.uploaded_at && a.download_url && a.kind !== 'audio')
+    .sort((a, b) => rank(a) - rank(b) || b.created_at.localeCompare(a.created_at))
+}

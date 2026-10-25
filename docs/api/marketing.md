@@ -67,7 +67,7 @@ curl -s -X POST "$API/admin/marketing/contents/$ID/assets/$(jq -r .asset.id <<<"
 
 | Método | Ruta | Permiso | Qué hace |
 | --- | --- | --- | --- |
-| GET | `/admin/marketing/contents` | view | `?status&q&from&to&limit&offset` → `Page[ContentSummary]` (`from`/`to` filtran `scheduled_for`; `q` busca título o código) |
+| GET | `/admin/marketing/contents` | view | `?status&q&from&to&limit&offset` → `Page[ContentSummary]` (`from`/`to` filtran `scheduled_for`; `q` busca título o código). Cada pieza trae `asset_count` (archivos subidos) y `preview` (`video_url`, `image_url`, `duration_s`, `width`, `height`, o `null` sin archivos): el video `final` más nuevo (si no hay, el video más nuevo) y la `portada` más nueva (si no, la imagen más nueva), con enlaces firmados que se reproducen en línea |
 | POST | `/admin/marketing/contents` | manage | `{title, pillar?, format?, audience, script, uses_character, production: plantilla|ia|mixto|real, scheduled_for?, notes?, created_by_agent?, status: idea\|guion}` → `ContentRead` |
 | GET | `/admin/marketing/contents/{id}` | view | `ContentRead`: la pieza con `variants` (cada una con `utm_url` y su `publication` con métricas), `assets` (con `download_url`) y `allowed_statuses` |
 | PATCH | `/admin/marketing/contents/{id}` | manage | Campos de la pieza |

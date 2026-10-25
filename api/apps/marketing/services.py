@@ -34,6 +34,7 @@ from apps.marketing.schemas import (
     AssetRead,
     AssetUpload,
     ContentCreate,
+    ContentPreview,
     ContentRead,
     ContentSummary,
     ContentUpdate,
@@ -301,13 +302,54 @@ async def summaries(
                 content_id not in next_post or scheduled_at < next_post[content_id]
             ):
                 next_post[content_id] = scheduled_at
+    files = await _uploaded_media(session, ids)
     result = []
     for content in contents:
         summary = ContentSummary.model_validate(content)
         summary.platforms = platforms[content.id]
         summary.next_post_at = next_post.get(content.id)
+        summary.asset_count = len(files[content.id])
+        summary.preview = _preview(files[content.id])
         result.append(summary)
     return result
+
+
+async def _uploaded_media(
+    session: AsyncSession, ids: list[uuid.UUID]
+) -> dict[uuid.UUID, list[MarketingAsset]]:
+    """Uploaded files per piece, newest first."""
+    files: dict[uuid.UUID, list[MarketingAsset]] = defaultdict(list)
+    if ids:
+        rows = await session.scalars(
+            select(MarketingAsset)
+            .where(MarketingAsset.content_id.in_(ids), MarketingAsset.uploaded_at.is_not(None))
+            .order_by(MarketingAsset.created_at.desc())
+        )
+        for asset in rows:
+            files[asset.content_id].append(asset)
+    return files
+
+
+def _newest(assets: list[MarketingAsset], kind: str, role: str) -> MarketingAsset | None:
+    """The newest file of that kind with that role, else the newest of that kind."""
+    of_kind = [a for a in assets if a.kind == kind]
+    return next((a for a in of_kind if a.role == role), of_kind[0] if of_kind else None)
+
+
+def _preview(assets: list[MarketingAsset]) -> ContentPreview | None:
+    video = _newest(assets, "video", "final")
+    image = _newest(assets, "imagen", "portada")
+    if not video and not image:
+        return None
+    # No filename: the link plays inline instead of downloading.
+    shown = video or image
+    return ContentPreview(
+        video_url=storage.download_url_or_none(video.s3_key) if video else None,
+        image_url=storage.download_url_or_none(image.s3_key) if image else None,
+        duration_s=video.duration_s if video else None,
+        width=shown.width if shown else None,
+        height=shown.height if shown else None,
+    )
 
 
 def utm_url(code: str, platform: str) -> str:
@@ -326,6 +368,7 @@ async def read_content(session: AsyncSession, content: MarketingContent) -> Cont
     read = ContentRead.model_validate(content)
     [summary] = await summaries(session, [content])
     read.platforms, read.next_post_at = summary.platforms, summary.next_post_at
+    read.preview, read.asset_count = summary.preview, summary.asset_count
     read.assets = [asset_read(a) for a in await _assets(session, content.id)]
     variants = await _variants(session, content.id)
     publications = await _publications(session, [v.id for v in variants])

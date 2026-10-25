@@ -4,15 +4,20 @@ import { MARKETING_PLATFORMS, MARKETING_STATUSES } from '../app/types/api'
 import {
   caracasDayOf,
   emptyMetricForm,
+  formatClock,
   formatHashtags,
   fromCaracasInput,
+  inTab,
   marketingStatusColor,
   metricBody,
   parseHashtags,
   performanceTotals,
   platformIcon,
   platformLabel,
+  playableAssets,
+  readableScript,
   shiftMonth,
+  tabStatus,
   toCaracasInput,
   usableAssets,
   variantMissing,
@@ -150,5 +155,52 @@ describe('labels', () => {
   it('moves months across the year', () => {
     expect(shiftMonth('2026-12', 1)).toBe('2027-01')
     expect(shiftMonth('2026-01', -1)).toBe('2025-12')
+  })
+})
+
+describe('marketing list', () => {
+  it('shows lengths as a clock', () => {
+    expect(formatClock(15.2)).toBe('0:15')
+    expect(formatClock(75)).toBe('1:15')
+    expect(formatClock(null)).toBe('')
+  })
+
+  it('hides archived and discarded pieces from the active tab only', () => {
+    expect(inTab('guion', 'activas')).toBe(true)
+    expect(inTab('descartado', 'activas')).toBe(false)
+    expect(inTab('descartado', 'descartado')).toBe(true)
+    expect(inTab('guion', 'producido')).toBe(false)
+    expect(tabStatus('activas')).toBeUndefined()
+    expect(tabStatus('aprobado')).toBe('aprobado')
+  })
+})
+
+describe('piece page', () => {
+  it('reads the agents\' script and ignores malformed parts', () => {
+    const parts = readableScript({
+      idea: ' El regateo de siempre ',
+      cta: 'Descárgala',
+      hechos: ['H7', 3],
+      escenas: [{ desde_s: 0, hasta_s: 5, plano: 'Chacao', voz: '¿Cuánto?', texto: '' }, 'roto'],
+      prompts: [{ plano: '0–5 s', modelo: 'wan-3.0', prompt: 'A woman asks', costo_lista_usd: 0.5, herramienta: 'higgsfield' }, { plano: 'sin prompt' }],
+    })
+    expect(parts.idea).toBe('El regateo de siempre')
+    expect(parts.facts).toEqual(['H7'])
+    expect(parts.scenes).toEqual([{ from: 0, to: 5, shot: 'Chacao', voice: '¿Cuánto?', text: '' }])
+    expect(parts.prompts).toHaveLength(1)
+    expect(parts.prompts[0]).toMatchObject({ model: 'wan-3.0', costUsd: 0.5, tool: 'higgsfield' })
+    expect(readableScript(null)).toEqual({ idea: '', cta: '', scenes: [], prompts: [], facts: [] })
+  })
+
+  it('plays the newest final video first and skips audio and pending uploads', () => {
+    const list = playableAssets([
+      asset({ download_url: 'https://s3.test/f', id: 'cover', kind: 'imagen', role: 'portada' }),
+      asset({ download_url: 'https://s3.test/f', id: 'take', role: 'fuente' }),
+      asset({ download_url: 'https://s3.test/f', id: 'old', created_at: '2026-10-25T09:00:00Z' }),
+      asset({ download_url: 'https://s3.test/f', id: 'new', created_at: '2026-10-25T11:00:00Z' }),
+      asset({ download_url: 'https://s3.test/f', id: 'voice', kind: 'audio' }),
+      asset({ download_url: 'https://s3.test/f', id: 'pending', uploaded_at: null }),
+    ])
+    expect(list.map(a => a.id)).toEqual(['new', 'old', 'take', 'cover'])
   })
 })

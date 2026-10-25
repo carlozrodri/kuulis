@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { MarketingAudience, MarketingContent, MarketingContentSummary, MarketingProduction, MarketingStatus, Page } from '~/types/api'
-import { MARKETING_AUDIENCES, MARKETING_PRODUCTIONS, MARKETING_STATUSES } from '~/types/api'
+import type { MarketingAudience, MarketingContent, MarketingContentSummary, MarketingProduction, Page } from '~/types/api'
+import { MARKETING_AUDIENCES, MARKETING_PRODUCTIONS } from '~/types/api'
 
 definePageMeta({ permission: 'marketing.view' })
 
@@ -12,13 +12,14 @@ const apiError = useApiError()
 const route = useRoute()
 const router = useRouter()
 
-// Month and filters in the URL, so "back" from a piece returns to the same view.
+// View, tab, month and search in the URL, so "back" from a piece returns to the same view.
 const today = caracasToday()
+type View = 'galeria' | 'calendario'
+const view = ref<View>(route.query.view === 'calendario' ? 'calendario' : 'galeria')
+const initialTab = (typeof route.query.status === 'string' ? route.query.status : 'activas') as PieceTab
+const tab = ref<PieceTab>(PIECE_TABS.includes(initialTab) ? initialTab : 'activas')
 const initialMonth = typeof route.query.month === 'string' && /^\d{4}-\d{2}$/.test(route.query.month) ? route.query.month : today.slice(0, 7)
 const month = ref(initialMonth)
-type StatusFilter = MarketingStatus | 'all'
-const initialStatus = (typeof route.query.status === 'string' ? route.query.status : 'all') as StatusFilter
-const status = ref<StatusFilter>(['all', ...MARKETING_STATUSES].includes(initialStatus) ? initialStatus : 'all')
 const search = ref(typeof route.query.q === 'string' ? route.query.q : '')
 const debounced = ref(search.value.trim())
 let timer: ReturnType<typeof setTimeout> | undefined
@@ -26,43 +27,43 @@ watch(search, (value) => {
   clearTimeout(timer)
   timer = setTimeout(() => (debounced.value = value.trim()), 300)
 })
-watch([month, status, debounced], () => {
+watch([view, tab, month, debounced], () => {
   router.replace({
     query: {
-      ...(month.value !== today.slice(0, 7) ? { month: month.value } : {}),
-      ...(status.value !== 'all' ? { status: status.value } : {}),
+      ...(view.value !== 'galeria' ? { view: view.value } : {}),
+      ...(tab.value !== 'activas' ? { status: tab.value } : {}),
+      ...(view.value === 'calendario' && month.value !== today.slice(0, 7) ? { month: month.value } : {}),
       ...(debounced.value ? { q: debounced.value } : {}),
     },
   })
 })
 
-const filters = computed(() => ({
-  ...(status.value !== 'all' ? { status: status.value } : {}),
-  ...(debounced.value ? { q: debounced.value } : {}),
-}))
-const monthQuery = computed(() => ({
-  limit: 100,
-  from: `${month.value}-01`,
-  to: endOfMonth(`${month.value}-01`),
-  ...filters.value,
-}))
+const PAGE = 48
+const pages = ref(1)
+const query = computed(() => {
+  const status = tabStatus(tab.value)
+  const base = {
+    ...(status ? { status } : {}),
+    ...(debounced.value ? { q: debounced.value } : {}),
+  }
+  return view.value === 'calendario'
+    ? { ...base, limit: 100, from: `${month.value}-01`, to: endOfMonth(`${month.value}-01`) }
+    : { ...base, limit: Math.min(100, PAGE * pages.value) }
+})
+watch([view, tab, debounced], () => (pages.value = 1))
 
+// Newest first, pieces without a date (fresh ideas and videos) before the planned ones.
 const { data, status: fetchStatus, error, refresh } = await useAsyncData(
-  'marketing-calendar',
-  () => request<Page<MarketingContentSummary>>('/admin/marketing/contents', { query: monthQuery.value }),
-  { watch: [monthQuery] },
+  'marketing-pieces',
+  () => request<Page<MarketingContentSummary>>('/admin/marketing/contents', { query: query.value }),
+  { watch: [query] },
 )
-// Pieces without a date (ideas, scripts) sort first in the API; the newest 100 cover the backlog.
-const { data: backlog, refresh: refreshBacklog } = await useAsyncData(
-  'marketing-backlog',
-  () => request<Page<MarketingContentSummary>>('/admin/marketing/contents', { query: { limit: 100, ...filters.value } }),
-  { watch: [filters] },
-)
-const unscheduled = computed(() => (backlog.value?.items ?? []).filter(c => !c.scheduled_for))
+const items = computed(() => (data.value?.items ?? []).filter(i => inTab(i.status, tab.value)))
+const canLoadMore = computed(() => view.value === 'galeria' && !!data.value && data.value.items.length < data.value.total && data.value.limit < 100)
 
 const days = computed(() => {
   const groups = new Map<string, MarketingContentSummary[]>()
-  for (const item of data.value?.items ?? []) {
+  for (const item of items.value) {
     if (!item.scheduled_for) continue
     const list = groups.get(item.scheduled_for) ?? []
     list.push(item)
@@ -77,10 +78,16 @@ const monthLabel = computed(() =>
 const dayLabel = (day: string) =>
   new Intl.DateTimeFormat(locale.value, { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${day}T00:00:00Z`))
 
-const statusItems = computed(() => [
-  { label: t('marketing.allStatuses'), value: 'all' },
-  ...MARKETING_STATUSES.map(value => ({ label: t(`marketing.statuses.${value}`), value })),
+const tabItems = computed(() => PIECE_TABS.map(value => ({
+  label: value === 'activas' ? t('marketing.gallery.active') : t(`marketing.statuses.${value}`),
+  value,
+})))
+const viewItems = computed(() => [
+  { label: t('marketing.gallery.galleryView'), value: 'galeria', icon: 'i-lucide-layout-grid' },
+  { label: t('marketing.gallery.calendarView'), value: 'calendario', icon: 'i-lucide-calendar-days' },
 ])
+
+const playing = ref<MarketingContentSummary | null>(null)
 
 // ---- New piece --------------------------------------------------------------------------------
 const creating = ref(false)
@@ -131,12 +138,12 @@ async function create() {
 }
 
 async function reload() {
-  await Promise.all([refresh(), refreshBacklog()])
+  await refresh()
 }
 </script>
 
 <template>
-  <UDashboardPanel id="marketing-calendar">
+  <UDashboardPanel id="marketing-pieces">
     <template #header>
       <UDashboardNavbar :title="t('nav.marketingCalendar')">
         <template #leading>
@@ -147,6 +154,7 @@ async function reload() {
             icon="i-lucide-refresh-cw"
             color="neutral"
             variant="ghost"
+            :loading="fetchStatus === 'pending'"
             :aria-label="t('marketing.refresh')"
             @click="reload"
           />
@@ -158,39 +166,31 @@ async function reload() {
           />
         </template>
       </UDashboardNavbar>
-      <UDashboardToolbar>
+      <UDashboardToolbar :ui="{ root: 'flex-wrap gap-y-2 py-2 h-auto', left: 'min-w-0 max-w-full overflow-x-auto', right: 'w-full sm:w-auto' }">
         <template #left>
-          <div class="flex items-center gap-1">
-            <UButton
-              icon="i-lucide-chevron-left"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              :aria-label="t('marketing.previousMonth')"
-              @click="month = shiftMonth(month, -1)"
-            />
-            <span class="min-w-36 text-center text-sm font-medium capitalize">{{ monthLabel }}</span>
-            <UButton
-              icon="i-lucide-chevron-right"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              :aria-label="t('marketing.nextMonth')"
-              @click="month = shiftMonth(month, 1)"
-            />
-          </div>
+          <UTabs
+            v-model="tab"
+            :items="tabItems"
+            :content="false"
+            size="sm"
+            variant="link"
+            :aria-label="t('marketing.gallery.filterByStatus')"
+          />
         </template>
         <template #right>
-          <USelect
-            v-model="status"
-            :items="statusItems"
-            class="w-40"
-          />
           <UInput
             v-model="search"
             icon="i-lucide-search"
             :placeholder="t('marketing.search')"
-            class="w-56 max-w-full"
+            :aria-label="t('marketing.search')"
+            class="min-w-0 flex-1 sm:w-56 sm:flex-none"
+          />
+          <UTabs
+            v-model="view"
+            :items="viewItems"
+            :content="false"
+            size="sm"
+            :aria-label="t('marketing.gallery.view')"
           />
         </template>
       </UDashboardToolbar>
@@ -205,56 +205,123 @@ async function reload() {
         :title="apiError(error)"
       />
 
-      <div class="grid gap-6 lg:grid-cols-[1fr_20rem]">
-        <section class="space-y-4">
-          <p
-            v-if="fetchStatus !== 'pending' && !days.length"
-            class="rounded-lg border border-dashed border-(--ui-border) p-6 text-center text-sm text-(--ui-text-muted)"
-          >
-            {{ t('marketing.emptyMonth') }}
+      <template v-if="view === 'galeria'">
+        <div
+          v-if="fetchStatus === 'pending' && !data"
+          class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6"
+        >
+          <USkeleton
+            v-for="n in 8"
+            :key="n"
+            class="aspect-[9/16] w-full rounded-xl"
+          />
+        </div>
+        <div
+          v-else-if="!items.length"
+          class="flex flex-col items-center gap-3 rounded-xl border border-dashed border-(--ui-border) p-10 text-center text-sm text-(--ui-text-muted)"
+        >
+          <UIcon
+            name="i-lucide-clapperboard"
+            class="size-8"
+          />
+          {{ debounced ? t('marketing.gallery.noResults') : t('marketing.gallery.empty') }}
+        </div>
+        <template v-else>
+          <p class="text-sm text-(--ui-text-muted)">
+            {{ t('marketing.gallery.count', items.length) }}<span class="hidden sm:inline"> · {{ t('marketing.gallery.hint') }}</span>
           </p>
-          <div
-            v-for="[day, items] in days"
-            :key="day"
-            class="space-y-2"
-          >
-            <h3
-              class="text-sm font-semibold capitalize"
-              :class="day === today ? 'text-(--ui-primary)' : ''"
-            >
-              {{ dayLabel(day) }}
-              <span
-                v-if="day === today"
-                class="text-xs font-normal"
-              > · {{ t('marketing.today') }}</span>
-            </h3>
-            <MarketingContentRow
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+            <MarketingPieceCard
               v-for="item in items"
               :key="item.id"
               :item="item"
+              @play="playing = $event"
+            />
+          </div>
+          <div
+            v-if="canLoadMore"
+            class="flex justify-center"
+          >
+            <UButton
+              color="neutral"
+              variant="outline"
+              :label="t('marketing.gallery.loadMore')"
+              :loading="fetchStatus === 'pending'"
+              @click="pages++"
+            />
+          </div>
+        </template>
+      </template>
+
+      <template v-else>
+        <div class="flex items-center gap-1">
+          <UButton
+            icon="i-lucide-chevron-left"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            :aria-label="t('marketing.previousMonth')"
+            @click="month = shiftMonth(month, -1)"
+          />
+          <h2 class="min-w-40 text-center font-semibold capitalize">
+            {{ monthLabel }}
+          </h2>
+          <UButton
+            icon="i-lucide-chevron-right"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            :aria-label="t('marketing.nextMonth')"
+            @click="month = shiftMonth(month, 1)"
+          />
+          <UButton
+            v-if="month !== today.slice(0, 7)"
+            color="neutral"
+            variant="link"
+            size="sm"
+            :label="t('marketing.gallery.thisMonth')"
+            @click="month = today.slice(0, 7)"
+          />
+        </div>
+        <p
+          v-if="fetchStatus !== 'pending' && !days.length"
+          class="rounded-xl border border-dashed border-(--ui-border) p-6 text-center text-sm text-(--ui-text-muted)"
+        >
+          {{ t('marketing.emptyMonth') }}
+        </p>
+        <section
+          v-for="[day, dayItems] in days"
+          :key="day"
+          class="space-y-3"
+        >
+          <h3
+            class="text-sm font-semibold capitalize"
+            :class="day === today ? 'text-(--ui-primary)' : ''"
+          >
+            {{ dayLabel(day) }}
+            <span
+              v-if="day === today"
+              class="text-xs font-normal"
+            > · {{ t('marketing.today') }}</span>
+          </h3>
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+            <MarketingPieceCard
+              v-for="item in dayItems"
+              :key="item.id"
+              :item="item"
+              @play="playing = $event"
             />
           </div>
         </section>
+        <p class="text-xs text-(--ui-text-muted)">
+          {{ t('marketing.gallery.calendarHelp') }}
+        </p>
+      </template>
 
-        <aside class="space-y-2">
-          <h3 class="text-sm font-semibold">
-            {{ t('marketing.unscheduled') }}
-            <span class="font-normal text-(--ui-text-muted)">({{ unscheduled.length }})</span>
-          </h3>
-          <p
-            v-if="!unscheduled.length"
-            class="text-sm text-(--ui-text-muted)"
-          >
-            {{ t('common.empty') }}
-          </p>
-          <MarketingContentRow
-            v-for="item in unscheduled"
-            :key="item.id"
-            :item="item"
-            compact
-          />
-        </aside>
-      </div>
+      <MarketingPreviewModal
+        v-model="playing"
+        :items="view === 'galeria' ? items : days.flatMap(([, list]) => list)"
+      />
 
       <UModal
         v-model:open="creating"
