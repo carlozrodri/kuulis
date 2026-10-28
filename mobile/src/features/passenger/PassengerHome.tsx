@@ -88,6 +88,9 @@ export function PassengerHome() {
 
   return (
     <MapSheetLayout
+      collapsible
+      // Collapsed, the greeting and "¿Pa' dónde vamos?" stay above the tab bar.
+      peek={196}
       map={(insets) => <RideMap insets={insets} followUser showUser />}
       topBar={
         <View style={{ gap: space.sm }} pointerEvents="box-none">

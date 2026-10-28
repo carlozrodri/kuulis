@@ -5,9 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ErrorState } from '@/components/ErrorState';
-import { BadgePercent, Bike, ChevronLeft, CircleX, Clock, TicketPercent, WifiOff, X, Zap } from '@/components/icons';
+import { BadgePercent, Bike, ChevronLeft, CircleX, Clock, HandCoins, TicketPercent, WifiOff, X, Zap } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
+import { CountUp, Rise } from '@/components/motion';
 import { VesTiles } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, Card, IconButton, Notice, Skeleton, Txt } from '@/components/ui';
@@ -340,9 +341,14 @@ export function QuoteScreen() {
               </Txt>
             ) : null}
             {quote.data ? (
-              <Txt style={[styles.fare, { color: theme.scheme === 'dark' ? theme.primary : theme.primaryPressed }]} tabular>
-                {fare}
-              </Txt>
+              // The price counts up when it arrives (and from the old price when the quote changes).
+              <CountUp value={Number.parseFloat(amountToPay(quote.data))} duration={600}>
+                {(value) => (
+                  <Txt style={[styles.fare, { color: theme.scheme === 'dark' ? theme.primary : theme.primaryPressed }]} tabular>
+                    {formatFare(value)}
+                  </Txt>
+                )}
+              </CountUp>
             ) : (
               <Skeleton height={32} width={80} />
             )}
@@ -385,6 +391,7 @@ export function QuoteScreen() {
               }}
             />
           ) : null}
+          <FullFareNote fare={fare} />
           <VesTiles ves={quote.data.total_ves} />
           {!draft.promoCode && promotionsOn ? <PromoCodeEntry /> : null}
         </>
@@ -411,6 +418,28 @@ export function QuoteScreen() {
 
       {!quoteError && !blocked ? <RideExtras /> : null}
     </MapSheetLayout>
+  );
+}
+
+/**
+ * The model's promise, said where the passenger decides (docs/product/wow/05): the whole fare goes to the
+ * driver and the price is fixed, without haggling.
+ */
+function FullFareNote({ fare }: { fare: string }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  return (
+    <Rise delay={150} style={[styles.fullFare, { backgroundColor: theme.successSoft }]}>
+      <HandCoins size={20} color={theme.success} strokeWidth={2.2} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <Txt variant="bodyStrong" style={{ color: theme.success }}>
+          {t('quote.fullFare.title', { fare })}
+        </Txt>
+        <Txt variant="caption" style={{ color: theme.text }}>
+          {t('quote.fullFare.body')}
+        </Txt>
+      </View>
+    </Rise>
   );
 }
 
@@ -590,6 +619,7 @@ const styles = StyleSheet.create({
   vehicle: { flexDirection: 'row', alignItems: 'center', gap: space.sm, padding: space.md },
   vehicleIcon: { width: 56, height: 56, borderRadius: radius.tile, alignItems: 'center', justifyContent: 'center' },
   eta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  fullFare: { flexDirection: 'row', alignItems: 'flex-start', gap: space.sm, padding: space.sm, borderRadius: radius.field },
   strike: { textDecorationLine: 'line-through' },
   banner: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderRadius: radius.tile, paddingHorizontal: 14, paddingVertical: space.sm },
   bannerRemove: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },

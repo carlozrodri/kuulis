@@ -69,6 +69,7 @@ export function RideDetailScreen() {
   return (
     <MapSheetLayout
       tabBar={false}
+      collapsible
       map={(insets) => (
         <RideMap insets={insets} pickup={ride.pickup} dropoff={ride.dropoff} route={route} showUser={false} fitKey={`${ride.id}-${route.length}`} />
       )}

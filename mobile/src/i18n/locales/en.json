@@ -11,7 +11,9 @@
     "comingSoon": "Coming soon",
     "openSettings": "Open settings",
     "error": "Something went wrong, please try again",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "sheetExpand": "Show details",
+    "sheetCollapse": "Show more map"
   },
   "a11y": {
     "showPassword": "Show password",
@@ -896,6 +898,10 @@
       "placeholder": "I'm at the door of the blue building",
       "count": "{{count}}/{{max}}",
       "save": "Save note"
+    },
+    "fullFare": {
+      "title": "All {{fare}} goes to your driver",
+      "body": "Kuulis takes no commission. A fair price from the start: no haggling, no surprises."
     }
   },
   "ride": {
@@ -930,7 +936,10 @@
     },
     "searching": {
       "title": "Finding your driver",
-      "body": "We're alerting the nearest drivers. We'll let you know as soon as one accepts."
+      "body": "We're alerting the nearest drivers. We'll let you know as soon as one accepts.",
+      "line1": "We're alerting the nearest drivers…",
+      "line2": "Almost there, finding the closest one…",
+      "line3": "We'll let you know as soon as one accepts."
     },
     "assigned": {
       "title": "{{name}} is on the way",
@@ -939,7 +948,8 @@
     },
     "arrived": {
       "title": "{{name}} is here",
-      "body": "Waiting at the pickup point. Check the plate before getting on."
+      "body": "Waiting at the pickup point. Check the plate before getting on.",
+      "lookFor": "Look for this plate"
     },
     "inProgress": {
       "title": "On our way",
@@ -947,7 +957,7 @@
     },
     "completed": {
       "title": "You've arrived!",
-      "body": "Remember to pay {{fare}} to your driver."
+      "body": "Pay {{fare}} to your driver. Every cent is theirs."
     },
     "noDrivers": {
       "title": "No drivers found",
@@ -966,7 +976,7 @@
     },
     "toast": {
       "assigned": "{{name}} accepted your ride!",
-      "arrived": "Your driver is at the pickup point",
+      "arrived": "{{name}} is at the pickup point",
       "driverCancelled": "Your driver cancelled the ride",
       "noDrivers": "No drivers available",
       "adminCancelled": "The Kuulis team cancelled the ride",
@@ -1198,7 +1208,15 @@
       "respectful": "Respectful",
       "ready_at_pickup": "Ready at pickup"
     },
-    "reportLink": "Something went wrong? Report it"
+    "reportLink": "Something went wrong? Report it",
+    "arrival": {
+      "passengerTitle": "You made it!",
+      "passengerTitleName": "You made it, {{name}}!",
+      "passengerPay": "Pay {{fare}} to {{name}}. Every cent is theirs: Kuulis takes no commission.",
+      "passengerPayNoName": "Pay {{fare}} to your driver. Every cent is theirs: Kuulis takes no commission.",
+      "driverLabel": "You earned on this ride",
+      "driverBody": "100% yours. Kuulis doesn't take a cent."
+    }
   },
   "history": {
     "title": "Your rides",

@@ -11,7 +11,9 @@
     "comingSoon": "Próximamente",
     "openSettings": "Abrir ajustes",
     "error": "Algo salió mal, inténtalo de nuevo",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "sheetExpand": "Mostrar detalles",
+    "sheetCollapse": "Ver más mapa"
   },
   "a11y": {
     "showPassword": "Mostrar contraseña",
@@ -72,7 +74,7 @@
     "goodAfternoon": "Buenas tardes",
     "goodEvening": "Buenas noches",
     "greetingName": "{{greeting}}, {{name}}",
-    "whereTo": "¿A dónde vamos?",
+    "whereTo": "¿Pa' dónde vamos?",
     "verifyTitle": "Confirma tu correo",
     "verifyEmail": "Te enviamos un enlace para activar todas las funciones.",
     "verifySent": "Listo, revisa tu bandeja de entrada.",
@@ -790,7 +792,7 @@
     "recenter": "Centrar el mapa"
   },
   "connection": {
-    "offline": "Sin conexión a internet",
+    "offline": "Se fue la señal… apenas vuelva seguimos",
     "reconnecting": "Conexión inestable, reconectando…"
   },
   "location": {
@@ -896,6 +898,10 @@
       "placeholder": "Estoy en la puerta del edificio azul",
       "count": "{{count}}/{{max}}",
       "save": "Guardar nota"
+    },
+    "fullFare": {
+      "title": "Los {{fare}} van completos pa'l motorizado",
+      "body": "Kuulis no le cobra comisión. Precio justo desde el principio: sin regateo, sin sorpresas."
     }
   },
   "ride": {
@@ -929,25 +935,29 @@
       "cancelled_by_admin": "Cancelado por Kuulis"
     },
     "searching": {
-      "title": "Buscando tu motorizado",
-      "body": "Le avisamos a los motorizados más cercanos. Te avisamos apenas uno acepte."
+      "title": "Buscándote una moto",
+      "body": "Le avisamos a los motorizados más cercanos. Te avisamos apenas uno acepte.",
+      "line1": "Le estamos avisando a los motorizados más cerca…",
+      "line2": "Ya casi, buscando al que esté más cerquita…",
+      "line3": "Te avisamos apenas uno acepte."
     },
     "assigned": {
-      "title": "{{name}} va en camino",
+      "title": "¡Listo! {{name}} ya viene pa' allá",
       "eta": "Llega en {{time}} aproximadamente",
       "body": "Espera en el punto de recogida."
     },
     "arrived": {
-      "title": "{{name}} llegó",
-      "body": "Te espera en el punto de recogida. Confirma la placa antes de subir."
+      "title": "{{name}} ya llegó, te está esperando",
+      "body": "Te espera en el punto de recogida. Confirma la placa antes de subir.",
+      "lookFor": "Busca esta placa"
     },
     "inProgress": {
-      "title": "Vamos en camino",
+      "title": "Rodando pa' tu destino",
       "eta": "Llegada estimada a las {{time}}"
     },
     "completed": {
-      "title": "¡Llegaste!",
-      "body": "Recuerda pagar {{fare}} al motorizado."
+      "title": "¡Llegaste fino!",
+      "body": "Págale {{fare}} a tu motorizado. Todito va pa' su bolsillo."
     },
     "noDrivers": {
       "title": "No encontramos motorizados",
@@ -965,8 +975,8 @@
       "retry": "Pedir de nuevo"
     },
     "toast": {
-      "assigned": "¡{{name}} aceptó tu viaje!",
-      "arrived": "Tu motorizado llegó al punto de recogida",
+      "assigned": "¡Épale! {{name}} aceptó tu viaje",
+      "arrived": "{{name}} ya llegó al punto de recogida",
       "driverCancelled": "Tu motorizado canceló el viaje",
       "noDrivers": "No encontramos motorizados disponibles",
       "adminCancelled": "El equipo de Kuulis canceló el viaje",
@@ -1169,7 +1179,7 @@
     }
   },
   "rating": {
-    "titlePassenger": "¿Cómo te fue con {{name}}?",
+    "titlePassenger": "¿Qué tal la rodada con {{name}}?",
     "titleDriver": "¿Cómo te fue con {{name}}?",
     "subtitle": "Tu calificación es anónima y mantiene a Kuulis seguro para todos.",
     "submit": "Enviar calificación",
@@ -1198,13 +1208,21 @@
       "respectful": "Respetuoso",
       "ready_at_pickup": "Listo al llegar"
     },
-    "reportLink": "¿Algo salió mal? Repórtalo"
+    "reportLink": "¿Algo salió mal? Repórtalo",
+    "arrival": {
+      "passengerTitle": "¡Llegaste fino!",
+      "passengerTitleName": "¡Llegaste fino, {{name}}!",
+      "passengerPay": "Págale {{fare}} a {{name}}. Todito va pa' su bolsillo: Kuulis no cobra comisión.",
+      "passengerPayNoName": "Págale {{fare}} a tu motorizado. Todito va pa' su bolsillo: Kuulis no cobra comisión.",
+      "driverLabel": "Ganaste en este viaje",
+      "driverBody": "100 % tuyo. Kuulis no te quita ni un centavo."
+    }
   },
   "history": {
     "title": "Tus viajes",
     "subtitlePassenger": "Los viajes que has pedido",
     "subtitleDriver": "Los viajes que has hecho como motorizado",
-    "empty": "Aún no tienes viajes",
+    "empty": "Todavía no has rodado con nosotros",
     "emptyPassenger": "Cuando pidas tu primera moto, la verás aquí.",
     "emptyDriver": "Conéctate para recibir tu primer viaje.",
     "requestRide": "Pedir una moto"
