@@ -1,6 +1,6 @@
 # Revisión crítica de la app mobile: qué le falta para ser "WOW"
 
-Fecha: 2026-10-28. Base revisada: rama `qa` (commit 12f399b), carpeta `mobile/`, capturas en la carpeta
+Fecha: 2026-10-28. Parte de la carpeta [wow](README.md). Base revisada: rama `qa` (commit 12f399b), carpeta `mobile/`, capturas en la carpeta
 compartida (`app-capturas`, `rediseno-2026-10`, `perfil-2026-10`) y las referencias de Yummy en
 `docs/product/references/yummy/`. No se cambió código de la app.
 
