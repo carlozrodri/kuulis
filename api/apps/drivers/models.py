@@ -154,6 +154,10 @@ class DriverProfile(BaseModel):
     rating_sum: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     rating_count: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     rating_avg: Mapped[Decimal | None] = mapped_column(Numeric(3, 2))
+    # "No mostrar mis viajes en el mapa público" (Caracas en movimiento, docs/product/wow/01).
+    hide_from_public_activity: Mapped[bool] = mapped_column(
+        default=False, server_default=text("false")
+    )
     # Doc 12: when the next live selfie is asked (on going online), induction and who reviews.
     selfie_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     induction_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

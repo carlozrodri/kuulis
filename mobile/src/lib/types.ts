@@ -262,6 +262,8 @@ export interface DriverProfile {
   /** Open checks only. */
   checks?: DriverCheck[];
   induction_completed_at?: string | null;
+  /** "No mostrar mis viajes en el mapa público" (Caracas en movimiento). */
+  hide_from_public_activity?: boolean;
 }
 
 export interface DriverPersonalInput {
@@ -1131,4 +1133,32 @@ export interface SosResult extends SafetyAlert {
   location_seconds: number;
   /** The Kuulis team was told (only when there is someone on call). */
   team_alerted?: boolean;
+}
+
+// ── "Caracas en movimiento" (GET /public/rides/activity, docs/product/wow/01-mapa-vivo.md) ──
+
+/** A real trip in progress: approximate and delayed point, no names or addresses. */
+export interface ActiveTrip {
+  id: string;
+  lat: number;
+  lng: number;
+  distance_m: number;
+  fare: string;
+}
+
+export interface RecentTrip {
+  minutes_ago: number;
+  distance_m: number;
+  fare: string;
+}
+
+export interface PublicActivity {
+  /** False below the admin threshold: show the honest message instead of the layer. */
+  live: boolean;
+  threshold: number;
+  trips_last_hour: number;
+  verified_drivers: number;
+  in_progress: ActiveTrip[];
+  recent: RecentTrip[];
+  updated_at: string;
 }

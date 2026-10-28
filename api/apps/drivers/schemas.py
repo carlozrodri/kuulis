@@ -316,6 +316,12 @@ class Requirements(BaseModel):
     can_submit: bool
 
 
+class DriverPreferences(BaseModel):
+    """Driver-only switches. Only the fields sent change."""
+
+    hide_from_public_activity: bool | None = None
+
+
 class DriverProfileRead(BaseModel):
     id: uuid.UUID
     user_id: uuid.UUID
@@ -341,6 +347,7 @@ class DriverProfileRead(BaseModel):
     verification: VerificationState | None = None
     checks: list[DriverCheckRead] = []  # open ones for the driver; every one for the admin
     induction_completed_at: datetime | None = None
+    hide_from_public_activity: bool = False
 
 
 class DriverAdminRead(DriverProfileRead):

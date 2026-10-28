@@ -119,7 +119,19 @@
     "pendingFeeNoDate": "{{amount}} fee pending. Top up to keep getting rides.",
     "shortcuts": "Saved places",
     "shortcutHint": "See the price to go to {{name}}",
-    "addPlace": "Add place"
+    "addPlace": "Add place",
+    "activity": {
+      "title": "The city in motion",
+      "lastHour": "Last hour: {{n}} trips",
+      "minutesAgo": "{{minutes}} min ago",
+      "recentA11y": "Trip finished {{minutes}} minutes ago, {{distance}}, {{fare}}",
+      "privacy": "Real, anonymous trips: no names or addresses, approximate position and a few minutes late.",
+      "inProgress": "Trip in progress",
+      "allForDriver": "All of it goes to the driver, no commission",
+      "startingTitle": "Kuulis is just getting started",
+      "startingBody": "Verified drivers so far: {{n}}. You will see them riding around soon.",
+      "startingBodyNone": "We are verifying the first drivers. You will see them riding around soon."
+    }
   },
   "notifications": {
     "empty": "No notifications",
@@ -458,6 +470,10 @@
       "paymentHint": "Choose how you usually pay",
       "inviteHint": "Share your code or use the one that invited you",
       "helpLegal": "Help and legal"
+    },
+    "publicActivity": {
+      "title": "Show my trips on the public map",
+      "body": "Your trips appear without your name, plate or addresses, with an approximate position and a few minutes late."
     }
   },
   "driver": {
@@ -1003,6 +1019,10 @@
       "body": "The ride was cancelled because you didn't reach the pickup point in time.",
       "warning": "If it happens several times, your account may be paused for a while.",
       "retry": "Request another ride"
+    },
+    "mapEta": {
+      "pickup": "Arrives in {{time}}",
+      "trip": "You arrive in {{time}}"
     }
   },
   "cancel": {

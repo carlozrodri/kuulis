@@ -63,6 +63,12 @@ function useProfileMutation<TInput>(mutationFn: (input: TInput) => Promise<Drive
 export const useSavePersonal = () =>
   useProfileMutation((input: DriverPersonalInput) => api<DriverProfile>('/drivers/me', { method: 'PUT', body: input }));
 
+/** Driver switches (PATCH /drivers/me/preferences), e.g. hiding their trips from "Caracas en movimiento". */
+export const useSavePreferences = () =>
+  useProfileMutation((input: { hide_from_public_activity?: boolean }) =>
+    api<DriverProfile>('/drivers/me/preferences', { method: 'PATCH', body: input }),
+  );
+
 export const useSaveVehicle = () =>
   useProfileMutation((input: VehicleInput) => api<DriverProfile>('/drivers/me/vehicle', { method: 'PUT', body: input }));
 

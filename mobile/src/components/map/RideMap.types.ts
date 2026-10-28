@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { Coordinate } from '@/lib/ride';
-import type { DriverLocation, LatLng } from '@/lib/types';
+import type { ActiveTrip, DriverLocation, LatLng } from '@/lib/types';
 
 /** A filled polygon under the markers (doc 21: demand cells). */
 export type MapArea = { id: string; coordinates: LatLng[]; fill: string; stroke: string };
@@ -35,6 +35,11 @@ export type RideMapProps = {
   areas?: MapArea[];
   /** Moves the camera there once each time `key` changes (and stops following the user). */
   focus?: { point: LatLng; key: string | number } | null;
+  /** A soft ring grows from the pickup point (the moto is on its way). */
+  pulsePickup?: boolean;
+  /** "Caracas en movimiento": real trips in progress, approximate (they glide like the ride's moto). */
+  activity?: ActiveTrip[];
+  onActivityPress?: (trip: ActiveTrip) => void;
   /** Extra overlays rendered on top of the map (pulsing rings, centre pin). */
   children?: ReactNode;
 };

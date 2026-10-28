@@ -9,7 +9,7 @@ Convención de la carpeta: **Decidido** = Carlos lo aprobó; **Supuesto** = prop
 | Archivo | Qué contiene | Estado |
 | --- | --- | --- |
 | [00-revision.md](00-revision.md) | Diagnóstico completo: debilidades, riesgos y plan priorizado | Hecho |
-| [01-mapa-vivo.md](01-mapa-vivo.md) | Moto que se desliza, cámara, ETA y "Caracas en movimiento" (actividad real) | Supuesto |
+| [01-mapa-vivo.md](01-mapa-vivo.md) | Moto que se desliza, cámara, ETA y "Caracas en movimiento" (actividad real) | Implementado |
 | [02-movimiento.md](02-movimiento.md) | Librerías, hoja arrastrable, transiciones, reglas de animación | Decidido (agregar) |
 | [03-alegria.md](03-alegria.md) | Los momentos de deleite, pantalla por pantalla | Decidido (agregar) |
 | [04-identidad-iconos.md](04-identidad-iconos.md) | Íconos 3D (Thiings y alternativas), la moto Kuulis, sonidos | Supuesto |
@@ -59,5 +59,21 @@ porque cambia el runtime.
 - Voz venezolana en las frases emocionales (es); el inglés sigue neutro.
 - Capturas: `/mnt/project-files/kuulis/wow/capturas-2026-10-28/`.
 
-Pendiente: mapa vivo (01‑A), "Caracas en movimiento" (01‑B, necesita API), la moto Kuulis elegida (04) para
-marcador, estados vacíos y celebración, metas del motorizado y deslizar para conectarse.
+## Implementado (2026-10-28, segunda parte, rama `claude/project-thread-lt9950`)
+
+- **Moto Kuulis A** en la cotización, en la celebración de llegada, en "Todavía no has rodado" y en el viaje
+  terminado (`src/components/illustrations.tsx`, `assets/illustrations/`). Marcador del mapa con una moto
+  vista desde arriba en la misma paleta (dibujada en código; cambiarla por una versión 3D cuando la tengamos).
+- **Mapa vivo (01‑A)**: la moto se desliza entre dos posiciones GPS y gira por el camino corto (rumbo del
+  GPS o dirección del movimiento), la cámara la sigue con calma hasta que la persona mueve el mapa, un anillo
+  suave sale del punto de recogida mientras viene, y una píldora negra "Llega en 4 min" queda visible aunque
+  la hoja esté recogida. Todo se apaga con "Reducir movimiento".
+- **Sin la píldora del logo** en el inicio del pasajero.
+- **Caracas en movimiento (01‑B)**, solo viajes reales: API `GET /public/rides/activity`
+  ([contrato](../../api/actividad-publica.md)), umbral y apagado en el admin, interruptor del motorizado
+  "Mostrar mis viajes en el mapa público". En la app: motos en viaje en el mapa del inicio (al tocar una:
+  precio, distancia aproximada y "Todito pa'l motorizado"), tira de viajes recientes y, por debajo del
+  umbral, "Kuulis está arrancando en Caracas" con el número real de motorizados verificados.
+
+Pendiente: agregar al aviso de privacidad (texto legal, nueva versión) que mostramos viajes anónimos y
+aproximados; metas del motorizado y deslizar para conectarse; moto 3D vista desde arriba.

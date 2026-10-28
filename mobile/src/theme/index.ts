@@ -145,6 +145,9 @@ export const space = {
   xxxl: 40,
 } as const;
 
+/** Text on `nav` fills (dark ink in both modes): white is about 15:1 there. */
+export const ON_NAV = '#FFFFFF';
+
 export const radius = {
   field: 12,
   chip: 12,

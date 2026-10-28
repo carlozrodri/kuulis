@@ -223,6 +223,7 @@ def _base_fields(profile: DriverProfile, config: AppConfig) -> dict:
         ),
         "requirements": requirements(profile, config),
         "induction_completed_at": profile.induction_completed_at,
+        "hide_from_public_activity": profile.hide_from_public_activity,
     }
 
 

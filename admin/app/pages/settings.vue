@@ -727,6 +727,37 @@ const coordFormat = { minimumFractionDigits: 2, maximumFractionDigits: 6, useGro
           </div>
         </UCard>
 
+        <!-- "Caracas en movimiento" (docs/product/wow/01-mapa-vivo.md) -->
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold">
+              {{ t('settings.activity.title') }}
+            </h2>
+            <p class="text-sm text-(--ui-text-muted)">
+              {{ t('settings.activity.help') }}
+            </p>
+          </template>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <USwitch
+              v-model="form.public_activity_enabled"
+              :label="t('settings.activity.enabled')"
+              :description="t('settings.activity.enabledHelp')"
+              :disabled="readOnly"
+            />
+            <UFormField
+              :label="t('settings.activity.threshold')"
+              :help="t('settings.activity.thresholdHelp')"
+            >
+              <UInputNumber
+                v-model="form.public_activity_min_trips_per_hour"
+                :min="ACTIVITY_THRESHOLD_MIN"
+                :max="ACTIVITY_THRESHOLD_MAX"
+                :disabled="readOnly || !form.public_activity_enabled"
+              />
+            </UFormField>
+          </div>
+        </UCard>
+
         <!-- Phase 1D: wallet & subscription -->
         <UCard>
           <template #header>

@@ -550,6 +550,11 @@ class AppConfig(BaseModel):
     promo_pair_alert_threshold: int = Field(default=3, ge=2, le=100)
     promo_pair_alert_days: int = Field(default=30, ge=1, le=365)
 
+    # --- "Caracas en movimiento" (docs/product/wow/01-mapa-vivo.md) ------------------------------
+    # Real trips only: the home map shows them once at least this many started in the last hour.
+    public_activity_enabled: bool = True
+    public_activity_min_trips_per_hour: int = Field(default=3, ge=1, le=500)
+
     # --- Wallet and subscription (phase 1D) ----------------------------------------------------
     topup_min_amount: Money = Decimal("5.00")
     topup_binance_pay_id: str = Field(default="", max_length=30, pattern=r"^\d*$")
@@ -668,6 +673,8 @@ class AppConfigUpdate(BaseModel):
     rates_manual_hold_hours: int | None = Field(default=None, ge=1, le=168)
     promo_pair_alert_threshold: int | None = Field(default=None, ge=2, le=100)
     promo_pair_alert_days: int | None = Field(default=None, ge=1, le=365)
+    public_activity_enabled: bool | None = None
+    public_activity_min_trips_per_hour: int | None = Field(default=None, ge=1, le=500)
     topup_min_amount: Money | None = None
     topup_binance_pay_id: str | None = Field(default=None, max_length=30, pattern=r"^\d*$")
     topup_account_name: str | None = Field(default=None, max_length=60)

@@ -40,7 +40,7 @@ import { SafetySheet, useRideShare } from '@/features/safety/SafetySheet';
 import { shareWithRider } from '@/features/safety/share';
 import { useFirstRideTips } from '@/features/safety/SafetyTips';
 import { SosButton } from '@/features/safety/SosButton';
-import { radius, space, useTheme } from '@/theme';
+import { ON_NAV, radius, space, useTheme } from '@/theme';
 
 import { Avatar, PAYMENT_ICONS, PlaceRows, PlateBadge, PulsingRings, RatingBadge, RoundAction } from './components';
 import { CancelSheet, useNow } from './RideSheets';
@@ -101,8 +101,10 @@ export function RideScreen() {
           driver={driverPoint}
           route={showRoute ? route : undefined}
           showUser
+          pulsePickup={ride.status === 'driver_assigned'}
           fitKey={`${ride.status}-${!!driverPoint}-${route.length}`}>
           {ride.status === 'searching' ? <SearchingOverlay insets={insets} /> : null}
+          <MapEta ride={ride} insets={insets} />
         </RideMap>
       )}
       topBar={
@@ -121,6 +123,32 @@ function SearchingOverlay({ insets }: { insets: MapInsets }) {
   return (
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, { top: insets.top, bottom: insets.bottom, alignItems: 'center', justifyContent: 'center' }]}>
       <PulsingRings size={240} />
+    </View>
+  );
+}
+
+/**
+ * Black pill on the map with the minutes left (doc 01-A, like the "Arriving in" pill of the Godash
+ * reference): still readable when the sheet is pulled down.
+ */
+function MapEta({ ride, insets }: { ride: Ride; insets: MapInsets }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const location = ride.driver_location;
+  if (!location || (ride.status !== 'driver_assigned' && ride.status !== 'in_progress')) return null;
+  const seconds = estimateEtaSeconds(location, ride.status === 'driver_assigned' ? ride.pickup : ride.dropoff);
+  const label =
+    ride.status === 'driver_assigned'
+      ? t('ride.mapEta.pickup', { time: formatDuration(seconds) })
+      : t('ride.mapEta.trip', { time: formatDuration(seconds) });
+  return (
+    <View pointerEvents="none" style={[styles.mapEta, { top: insets.top + space.sm }]}>
+      <Pop trigger={ride.status} style={[styles.mapEtaPill, { backgroundColor: theme.nav }]}>
+        <Clock size={15} color={theme.accent} strokeWidth={2.4} />
+        <Txt variant="bodyStrong" style={{ color: ON_NAV }} tabular>
+          {label}
+        </Txt>
+      </Pop>
     </View>
   );
 }
@@ -422,7 +450,7 @@ function EndedSheet({ ride }: { ride: Ride }) {
   if (ride.status === 'completed') {
     return (
       // The ride navigator opens the (mandatory) rating right after this.
-      <EmptyState icon={ShieldCheck} title={t('ride.completed.title')} body={t('ride.completed.body', { fare: formatFare(amountToPay(ride)) })} />
+      <EmptyState icon={ShieldCheck} illustration="moto" title={t('ride.completed.title')} body={t('ride.completed.body', { fare: formatFare(amountToPay(ride)) })} />
     );
   }
 
@@ -511,6 +539,8 @@ const styles = StyleSheet.create({
   riderCard: { gap: space.xs, borderRadius: radius.tile, padding: space.md },
   waiting: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderRadius: radius.tile, paddingHorizontal: space.md, paddingVertical: space.sm },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  mapEta: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
+  mapEtaPill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.lg, gap: space.md },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
   fareBox: { gap: 4, borderRadius: radius.tile, padding: space.md },
