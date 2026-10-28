@@ -25,6 +25,16 @@ archivo correspondiente y se anota aquí la fecha.
 12. **Fechas especiales** (Navidad, Vinotinto): ⭐ después del lanzamiento / desde ya.
 13. **Capturas de Glovo y Fomo**: Carlos manda 4‑6 de cada una (pendiente).
 
-## Respuestas
+## Respuestas (Carlos, 2026-10-28) — Decidido
 
-(vacío)
+1. **Nada simulado.** "Caracas en movimiento" solo con viajes reales; por debajo del umbral, mensaje honesto.
+2. Umbral: 3 viajes reales en la última hora (valor por defecto, ajustable desde el admin).
+3. Sí se muestra el precio del viaje, **sin nombres y sin dirección**.
+4. **No pagar íconos.** Claude elige fuentes gratuitas pero que se vean únicas (ver 04).
+5. Sí: Claude genera las propuestas de la moto Kuulis.
+6. Sí, voz venezolana (nivel medio).
+7. Sí: "Precio justo, sin regateo".
+8. Sí: build nuevo de QA.
+9. Sí: movimiento y alegría primero, luego el mapa.
+10. Sí: Claude compone los sonidos propios.
+11. Referencias nuevas en `references/carlos-2026-10-28/` (ver 06).

@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
@@ -8,6 +8,7 @@ import { ErrorState } from '@/components/ErrorState';
 import { ChevronDown, CircleX, Clock, MessageCircle, RefreshCw, SearchX, Share2, ShieldCheck, Timer, UserRound, UserX } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { type MapInsets, MapSheetLayout } from '@/components/MapSheetLayout';
+import { Beat, Pop, Rise } from '@/components/motion';
 import { DiscountNote, VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Button, EmptyState, IconButton, Notice, ProgressSteps, StatusPill, Txt } from '@/components/ui';
@@ -90,6 +91,8 @@ export function RideScreen() {
     <MapSheetLayout
       tabBar={false}
       maxSheetRatio={0.66}
+      collapsible
+      expandKey={ride.status}
       map={(insets) => (
         <RideMap
           insets={insets}
@@ -208,7 +211,7 @@ function SearchingSheet({ ride }: { ride: Ride }) {
           </Txt>
           <StatusPill label={formatClock(secondsSince(ride.requested_at, now))} tone="primary" dot />
         </View>
-        <Txt color="muted">{reassigning ? t('ride.reassigning.body') : t('ride.searching.body')}</Txt>
+        {reassigning ? <Txt color="muted">{t('ride.reassigning.body')}</Txt> : <SearchingLine />}
       </View>
       <ProgressSteps total={4} current={1} />
       <PlaceRows pickup={ride.pickup} dropoff={ride.dropoff} compact />
@@ -216,6 +219,41 @@ function SearchingSheet({ ride }: { ride: Ride }) {
       <Button title={t('ride.cancel')} variant="danger" size="sm" loading={cancel.pending} onPress={cancel.open} />
       {cancel.sheet}
     </>
+  );
+}
+
+/** While searching, the line under the title changes every few seconds so the wait feels alive. */
+function SearchingLine() {
+  const { t } = useTranslation();
+  const list = [t('ride.searching.line1'), t('ride.searching.line2'), t('ride.searching.line3')];
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setIndex((i) => (i + 1) % list.length), 4000);
+    return () => clearInterval(timer);
+  }, [list.length]);
+  return (
+    <Rise key={index} distance={6}>
+      <Txt color="muted">{list[index]}</Txt>
+    </Rise>
+  );
+}
+
+/** The driver is downstairs: the plate and the bike big enough to spot from the door. */
+function ArrivedCard({ ride }: { ride: Ride }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const vehicle = ride.driver?.vehicle;
+  if (!vehicle?.plate) return null;
+  return (
+    <Pop style={[styles.arrived, { backgroundColor: theme.accentSoft, borderColor: theme.accent }]}>
+      <Txt variant="overline" style={{ color: theme.onAccentSoft }}>
+        {t('ride.arrived.lookFor')}
+      </Txt>
+      <PlateBadge plate={vehicle.plate} size="lg" />
+      <Txt variant="bodyStrong" align="center">
+        {[vehicle.brand, vehicle.model, vehicle.color].filter(Boolean).join(' · ')}
+      </Txt>
+    </Pop>
   );
 }
 
@@ -255,17 +293,21 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
     <>
       <View style={{ gap: 4 }}>
         {ride.status === 'driver_arrived' ? <StatusPill label={t('ride.status.driver_arrived')} tone="accent" dot /> : null}
-        <Txt variant="heading" accessibilityRole="header">
-          {title}
-        </Txt>
+        <Beat trigger={ride.status} style={{ alignSelf: 'flex-start' }}>
+          <Txt variant="heading" accessibilityRole="header">
+            {title}
+          </Txt>
+        </Beat>
         <Txt color="muted">{subtitle}</Txt>
       </View>
       <ProgressSteps total={4} current={ride.status === 'driver_assigned' ? 2 : ride.status === 'driver_arrived' ? 3 : 4} />
+      {ride.status === 'driver_arrived' ? <ArrivedCard ride={ride} /> : null}
       {ride.status === 'driver_arrived' ? <WaitingCounter ride={ride} /> : null}
       {ride.start_pin && ride.status !== 'in_progress' ? <PinCard pin={ride.start_pin} /> : null}
       {ride.rider_name && ride.rider_phone ? <RiderShareCard ride={ride} /> : null}
 
-      <View style={[styles.driverCard, { backgroundColor: theme.background }]}>
+      {/* The reveal: the driver card springs in when someone accepts (and again if the ride is reassigned). */}
+      <Pop trigger={driver?.first_name} style={[styles.driverCard, { backgroundColor: theme.background }]}>
         <Avatar name={driver?.first_name} photoUrl={driver?.photo_url} size={60} />
         <View style={{ flex: 1, gap: 4 }}>
           <View style={styles.titleRow}>
@@ -279,9 +321,9 @@ function OnTheWaySheet({ ride }: { ride: Ride }) {
               {[vehicle.brand, vehicle.model, vehicle.color].filter(Boolean).join(' · ')}
             </Txt>
           ) : null}
-          <PlateBadge plate={vehicle?.plate} />
+          {ride.status === 'driver_arrived' ? null : <PlateBadge plate={vehicle?.plate} />}
         </View>
-      </View>
+      </Pop>
 
       <View style={styles.actions}>
         {chatOn ? (
@@ -474,5 +516,6 @@ const styles = StyleSheet.create({
   fareBox: { gap: 4, borderRadius: radius.tile, padding: space.md },
   fareRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   driverCard: { flexDirection: 'row', alignItems: 'center', gap: space.md, borderRadius: radius.card, padding: space.md },
+  arrived: { alignItems: 'center', gap: space.xs, borderRadius: radius.card, borderWidth: 2, padding: space.md },
   actions: { flexDirection: 'row', justifyContent: 'space-around' },
 });

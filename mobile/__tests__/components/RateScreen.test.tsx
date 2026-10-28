@@ -52,7 +52,7 @@ describe('RateScreen', () => {
   it('sends the rating once with an Idempotency-Key', async () => {
     routes(async () => ({ ...completed, my_rating: { stars: 5, tags: [] } }));
     await renderScreen(<RateScreen />);
-    expect(await screen.findByText(/Luis/)).toBeTruthy();
+    expect((await screen.findAllByText(/Luis/)).length).toBeGreaterThan(0);
     expect(completed.driver?.id).toBe(DRIVER_ID);
 
     await fireEvent.press(screen.getByLabelText(i18n.t('rating.starN', { count: 5 })));

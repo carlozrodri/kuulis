@@ -25,7 +25,7 @@ import { api } from '@/lib/api';
 import { setBackgroundLocation } from '@/lib/backgroundLocation';
 import { positionBody } from '@/lib/location';
 import { locationIntervalMs } from '@/lib/bootstrap';
-import { confirmHaptic, heavyHaptic, preloadRideSounds, tick } from '@/lib/feedback';
+import { confirmHaptic, heavyHaptic, playRideSound, preloadRideSounds, tick } from '@/lib/feedback';
 import { isActiveStatus, isNoShow, isReassigning, rideRole, rideRoleStrict } from '@/lib/ride';
 import type { DriverLocationEvent, DriverState, Offer, Ride, RideMessage } from '@/lib/types';
 import { useAuth } from '@/providers/AuthProvider';
@@ -85,10 +85,14 @@ export function RideSync() {
         const waited = ride.assigned_at ? (Date.parse(ride.assigned_at) - Date.parse(ride.requested_at)) / 1000 : NaN;
         track('ride_matched', Number.isFinite(waited) ? { wait_s: Math.max(0, Math.round(waited)) } : {});
         confirmHaptic();
+        void playRideSound('accepted');
         showToast(t('ride.toast.assigned', { name: ride.driver?.first_name ?? '' }), 'success');
       } else if (ride.status === 'driver_arrived') {
+        // Two knocks: "it's here".
         heavyHaptic();
-        showToast(t('ride.toast.arrived'), 'success');
+        setTimeout(heavyHaptic, 180);
+        void playRideSound('arrived');
+        showToast(t('ride.toast.arrived', { name: ride.driver?.first_name ?? t('ride.yourDriver') }), 'success');
       } else if (ride.status === 'cancelled_by_driver') {
         heavyHaptic();
         showToast(isNoShow(ride) ? t('ride.toast.noShow') : t('ride.toast.driverCancelled'), 'danger');

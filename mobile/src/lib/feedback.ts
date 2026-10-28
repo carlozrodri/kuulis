@@ -45,6 +45,33 @@ export async function playOfferAlert() {
   }
 }
 
+/** Kuulis' own short ride sounds (docs/product/wow/03). They follow the phone's silent switch. */
+export type RideSound = 'accepted' | 'arrived' | 'completed' | 'earned';
+
+const RIDE_SOUNDS: Record<RideSound, number> = {
+  accepted: require('../../assets/sounds/ride-accepted.wav'),
+  arrived: require('../../assets/sounds/ride-arrived.wav'),
+  completed: require('../../assets/sounds/ride-completed.wav'),
+  earned: require('../../assets/sounds/ride-earned.wav'),
+};
+const ridePlayers: Partial<Record<RideSound, Player>> = {};
+
+export async function playRideSound(sound: RideSound) {
+  if (Platform.OS === 'web') return;
+  try {
+    let player = ridePlayers[sound];
+    if (!player) {
+      const audio = await import('expo-audio');
+      player = audio.createAudioPlayer(RIDE_SOUNDS[sound]) as unknown as Player;
+      ridePlayers[sound] = player;
+    }
+    await player.seekTo(0);
+    player.play();
+  } catch {
+    // ignore: sound is a nice-to-have
+  }
+}
+
 export const tick = () => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
 export const confirmHaptic = () =>
   void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);

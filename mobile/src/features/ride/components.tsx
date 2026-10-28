@@ -170,16 +170,21 @@ export function RatingBadge({ rating }: { rating: number | string | null | undef
 }
 
 /** License plate, large and tabular so it can be read from a distance. */
-export function PlateBadge({ plate }: { plate: string | null | undefined }) {
+export function PlateBadge({ plate, size = 'md' }: { plate: string | null | undefined; size?: 'md' | 'lg' }) {
   const theme = useTheme();
   const { t } = useTranslation();
   if (!plate) return null;
+  const large = size === 'lg';
   return (
     <View
       accessible
       accessibilityLabel={t('ride.plateA11y', { plate: plate.split('').join(' ') })}
-      style={[styles.plate, { borderColor: theme.text, backgroundColor: theme.surface }]}>
-      <Txt style={{ fontFamily: fonts.extrabold, fontSize: 18, letterSpacing: 2, color: theme.text }} tabular>
+      style={[
+        styles.plate,
+        { borderColor: theme.text, backgroundColor: theme.surface },
+        large && { paddingHorizontal: space.lg, paddingVertical: space.xs, borderWidth: 3, alignSelf: 'center' },
+      ]}>
+      <Txt style={{ fontFamily: fonts.extrabold, fontSize: large ? 34 : 18, letterSpacing: large ? 4 : 2, color: theme.text }} tabular>
         {formatPlate(plate)}
       </Txt>
     </View>

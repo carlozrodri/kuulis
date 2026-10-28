@@ -15,7 +15,7 @@ Convención de la carpeta: **Decidido** = Carlos lo aprobó; **Supuesto** = prop
 | [04-identidad-iconos.md](04-identidad-iconos.md) | Íconos 3D (Thiings y alternativas), la moto Kuulis, sonidos | Supuesto |
 | [05-voz-y-mensaje.md](05-voz-y-mensaje.md) | Voz venezolana y el mensaje "100 % para el motorizado" | Supuesto |
 | [06-referencias.md](06-referencias.md) | Qué tomar de Yummy, Glovo y Fomo | Hecho |
-| [07-preguntas.md](07-preguntas.md) | Preguntas abiertas para Carlos, con opción recomendada | Abierto |
+| [07-preguntas.md](07-preguntas.md) | Preguntas y respuestas de Carlos (2026-10-28) | Respondido |
 
 ## Lo decidido el 2026-10-28
 
@@ -37,3 +37,27 @@ Convención de la carpeta: **Decidido** = Carlos lo aprobó; **Supuesto** = prop
 5. Voz venezolana y mensaje del 100 % (05). Es casi solo texto: puede ir en paralelo.
 6. Íconos 3D y moto Kuulis (04), cuando Carlos elija la fuente.
 7. "Caracas en movimiento" (01, parte B), cuando haya viajes reales.
+
+## Implementado (2026-10-28, rama `claude/project-thread-lt9950`, PR #105 a `qa`)
+
+Requiere **APK nuevo** (Reanimated, Worklets y Gesture Handler son nativos); el compilador de QA lo hace solo
+porque cambia el runtime.
+
+- Movimiento base: `src/components/motion.tsx` (`Rise`, `Pop`, `Beat`, `CountUp`, `Confetti`), todo respeta
+  "Reducir movimiento".
+- Botones y tarjetas con resorte y cambio de color animado (`ui.tsx`).
+- Hoja inferior que se recoge tocando o arrastrando la rayita (inicio del pasajero, viaje en curso, detalle
+  del viaje). Se vuelve a abrir sola cuando cambia el estado del viaje.
+- Barra inferior: la burbuja verde se desliza entre pestañas, con háptica.
+- Cotización: el precio cuenta hasta su valor y aparece "Los $X van completos pa'l motorizado… sin regateo".
+- Buscando: la frase de abajo cambia cada 4 s.
+- Motorizado aceptó: la tarjeta del motorizado entra con resorte, sonido propio y vibración.
+- Motorizado llegó: tarjeta "Busca esta placa" con la placa grande, doble vibración y sonido.
+- Fin del viaje (pantalla de calificación): confeti, "¡Llegaste fino, María!" + "Todito va pa' su bolsillo";
+  para el motorizado "+$1.80" que cuenta y "100 % tuyo".
+- Sonidos nuevos en `mobile/assets/sounds/` (aceptado, llegó, llegaste, ganancia), misma familia que la oferta.
+- Voz venezolana en las frases emocionales (es); el inglés sigue neutro.
+- Capturas: `/mnt/project-files/kuulis/wow/capturas-2026-10-28/`.
+
+Pendiente: mapa vivo (01‑A), "Caracas en movimiento" (01‑B, necesita API), la moto Kuulis elegida (04) para
+marcador, estados vacíos y celebración, metas del motorizado y deslizar para conectarse.

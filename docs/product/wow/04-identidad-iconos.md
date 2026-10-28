@@ -21,8 +21,13 @@ pero no tienen personalidad. La propuesta es **dos niveles**:
 
 Antes de comprar, verificar los términos vigentes en cada sitio (cambian).
 
-**Recomendación:** comprar Thiings Indie para el grueso, Fluent Emoji 3D para reacciones y celebraciones, y
-crear la moto Kuulis propia (abajo). Mezclar más de dos estilos 3D se ve desordenado.
+**Decidido (2026-10-28): no se compran íconos.** Para que sean únicos y gratis, generamos nuestro propio set
+3D (misma luz, mismo material, verde Ávila + amarillo mango), empezando por la moto Kuulis. Fluent Emoji 3D
+(MIT) queda como apoyo para reacciones si hace falta. Propuestas de la moto en
+`/mnt/project-files/kuulis/moto-kuulis/`.
+
+~~**Recomendación:** comprar Thiings Indie para el grueso, Fluent Emoji 3D para reacciones y celebraciones, y
+crear la moto Kuulis propia (abajo).~~ Mezclar más de dos estilos 3D se ve desordenado.
 
 ## La moto Kuulis (lo más importante de esta sección)
 

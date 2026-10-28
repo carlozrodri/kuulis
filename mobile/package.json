@@ -42,11 +42,14 @@
     "react-dom": "19.3.0",
     "react-i18next": "^17.0.16",
     "react-native": "0.88.0",
+    "react-native-gesture-handler": "~3.3.0",
     "react-native-maps": "1.29.11",
+    "react-native-reanimated": "4.7.1",
     "react-native-safe-area-context": "~5.10.1",
     "react-native-screens": "~4.30.0",
     "react-native-svg": "15.16.0",
-    "react-native-web": "^0.21.2"
+    "react-native-web": "^0.21.2",
+    "react-native-worklets": "0.13.0"
   },
   "devDependencies": {
     "@testing-library/react-native": "^14.1.0",
@@ -74,6 +77,7 @@
   "private": true,
   "jest": {
     "preset": "jest-expo",
+    "resolver": "react-native-reanimated/jest/resolver",
     "moduleNameMapper": {
       "^lucide-react-native/icons/(.*)$": "<rootDir>/test-utils/iconStub.js",
       "^@/(.*)$": "<rootDir>/src/$1"

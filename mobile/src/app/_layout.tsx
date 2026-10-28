@@ -18,7 +18,8 @@ import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { setAnalyticsEnabled, startAnalytics, track } from '@/lib/analytics';
@@ -118,23 +119,26 @@ export default function RootLayout() {
     return client;
   });
   return (
-    // History, wallet and profile data are kept on the phone and shown when it opens offline (doc 20).
-    <PersistQueryClientProvider
-      client={queryClient}
-      persistOptions={{
-        persister: queryPersister,
-        maxAge: PERSIST_MAX_AGE,
-        buster: PERSIST_BUSTER,
-        dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
-      }}>
-      <AuthProvider>
-        <ModeProvider>
-          <StatusBar style="auto" />
-          {/* A font error falls back to the system font rather than blocking the app. */}
-          <RootNavigator fontsReady={fontsLoaded || !!fontError} />
-        </ModeProvider>
-      </AuthProvider>
-    </PersistQueryClientProvider>
+    // Gestures (the draggable map sheet) need the root view.
+    <GestureHandlerRootView style={StyleSheet.absoluteFill}>
+      {/* History, wallet and profile data are kept on the phone and shown when it opens offline (doc 20). */}
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{
+          persister: queryPersister,
+          maxAge: PERSIST_MAX_AGE,
+          buster: PERSIST_BUSTER,
+          dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
+        }}>
+        <AuthProvider>
+          <ModeProvider>
+            <StatusBar style="auto" />
+            {/* A font error falls back to the system font rather than blocking the app. */}
+            <RootNavigator fontsReady={fontsLoaded || !!fontError} />
+          </ModeProvider>
+        </AuthProvider>
+      </PersistQueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
 

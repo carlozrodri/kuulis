@@ -41,7 +41,20 @@ la idea de ser "tan fácil como Robinhood".
 - **Modo oscuro con colores vivos y tipografía grande en los números.** → Kuulis podría tener un modo oscuro
   más atrevido (el verde menta brillante de la dirección "Noche Ávila" de octubre).
 
+## Capturas que mandó Carlos (2026-10-28)
+
+En `references/carlos-2026-10-28/`:
+
+- `godash-3d-envios.png` (app de envíos conceptual): **mapa isométrico 3D** con el camión siguiendo la ruta,
+  ilustraciones 3D tipo juguete, negro + un acento fuerte (lima), píldora negra "Arriving in 1h 25m" sobre el
+  mapa, **"Slide to confirm delivery"**, pasos del envío con íconos. Es la referencia más cercana a lo que
+  queremos para el viaje en curso.
+- `fomo-barra-vidrio.png`: barra inferior de **vidrio esmerilado** flotando sobre el contenido, ícono central
+  destacado. Mucho más liviana que nuestra barra negra sólida.
+- `cursos-vidrio-oscuro.png` (app de cursos conceptual): modo oscuro con degradados, tarjetas de vidrio,
+  anillos de progreso por día, números grandes. Idea para las metas del motorizado y su modo oscuro.
+
 ## Pendiente
 
-Carlos: si puedes, mándame 4‑6 capturas de Glovo y de Fomo de las pantallas que más te gustan (inicio,
-seguimiento, celebración, perfil). Las guardo en `references/glovo/` y `references/fomo/`.
+Siguen siendo útiles capturas reales de Glovo y de Fomo (inicio, seguimiento, celebración, perfil), para
+`references/glovo/` y `references/fomo/`.

@@ -18,12 +18,42 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import Reanimated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { ChevronRight, CircleCheck, Eye, EyeOff, type Icon, Info, TriangleAlert, X } from '@/components/icons';
 import { LOGO_COLORS, LOGO_K, LOGO_K_NEGATIVE, LOGO_LETTERS, LOGO_RATIO, LOGO_VIEWBOX } from '@/components/logo';
+import { PRESS_SPRING } from '@/components/motion';
 import { elevation, fonts, radius, space, type Theme, type TypeVariant, type, useTheme } from '@/theme';
+
+const AnimatedPressable = Reanimated.createAnimatedComponent(Pressable);
+
+/** Shared press animation: a short spring on the scale and a 0→1 `pressed` value for colors. */
+function usePressAnimation(scaleTo: number) {
+  const reduce = useReducedMotion();
+  const pressed = useSharedValue(0);
+  const scale = useSharedValue(1);
+  return {
+    pressed,
+    scale,
+    onPressIn: () => {
+      pressed.set(withTiming(1, { duration: 90 }));
+      if (!reduce) scale.set(withSpring(scaleTo, PRESS_SPRING));
+    },
+    onPressOut: () => {
+      pressed.set(withTiming(0, { duration: 160 }));
+      scale.set(withSpring(1, PRESS_SPRING));
+    },
+  };
+}
 
 /** Space the floating tab bar takes at the bottom of tab screens (bar + gap). */
 export const TAB_BAR_HEIGHT = 64;
@@ -270,9 +300,14 @@ export function Button({
   // Doc 20: every touch target reaches at least 48 dp (the small button grows its touch area, not its look).
   const hitSlop = height < MIN_TOUCH ? (MIN_TOUCH - height) / 2 : undefined;
   const uppercase = variant === 'primary' || variant === 'accent' || (variant === 'danger' && size !== 'sm');
+  const press = usePressAnimation(0.97);
+  const animated = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(press.pressed.value, [0, 1], [palette.bg, palette.pressed]),
+    transform: [{ scale: press.scale.value }],
+  }));
 
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? title}
       accessibilityHint={accessibilityHint}
@@ -280,16 +315,17 @@ export function Button({
       disabled={inactive}
       hitSlop={hitSlop}
       onPress={onPress}
-      style={({ pressed }) => [
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
+      style={[
         styles.button,
         {
           height,
           paddingHorizontal: size === 'sm' ? space.md : space.xl,
-          backgroundColor: pressed ? palette.pressed : palette.bg,
           borderColor: palette.border,
           borderWidth: palette.border === 'transparent' ? 0 : 1.5,
-          transform: [{ scale: pressed ? 0.98 : 1 }],
         },
+        animated,
         style,
       ]}>
       {loading ? (
@@ -310,7 +346,7 @@ export function Button({
           </Text>
         </>
       )}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -400,16 +436,40 @@ export function Card({
     style,
   ];
   if (!onPress) return <View style={base}>{children}</View>;
+  return <PressableCard base={base} onPress={onPress} accessibilityLabel={accessibilityLabel} accessibilityHint={accessibilityHint} selected={selected}>{children}</PressableCard>;
+}
+
+function PressableCard({
+  base,
+  children,
+  onPress,
+  accessibilityLabel,
+  accessibilityHint,
+  selected,
+}: PropsWithChildren<{
+  base: StyleProp<ViewStyle>;
+  onPress: () => void;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  selected?: boolean;
+}>) {
+  const press = usePressAnimation(0.98);
+  const animated = useAnimatedStyle(() => ({
+    opacity: 1 - press.pressed.value * 0.06,
+    transform: [{ scale: press.scale.value }],
+  }));
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
       accessibilityState={selected !== undefined ? { selected } : undefined}
       onPress={onPress}
-      style={({ pressed }) => [base, { transform: [{ scale: pressed ? 0.985 : 1 }], opacity: pressed ? 0.94 : 1 }]}>
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
+      style={[base, animated]}>
       {children}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
