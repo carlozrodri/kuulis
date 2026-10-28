@@ -25,6 +25,8 @@ export interface SettingsForm {
   rates_manual_hold_hours: number
   promo_pair_alert_threshold: number
   promo_pair_alert_days: number
+  public_activity_enabled: boolean
+  public_activity_min_trips_per_hour: number
   topup_min_amount: number
   topup_binance_pay_id: string
   topup_account_name: string
@@ -58,6 +60,8 @@ export const MANUAL_HOLD_MIN = 1
 export const MANUAL_HOLD_MAX = 168
 export const PAIR_THRESHOLD_MIN = 2
 export const PAIR_THRESHOLD_MAX = 100
+export const ACTIVITY_THRESHOLD_MIN = 1
+export const ACTIVITY_THRESHOLD_MAX = 500
 export const PAIR_DAYS_MIN = 1
 export const PAIR_DAYS_MAX = 365
 /** Phase 1D limits (the contract states the defaults and the Pay ID format; the ranges are panel guard rails). */
@@ -215,6 +219,8 @@ export function defaultSettings(): SettingsForm {
     rates_manual_hold_hours: 6,
     promo_pair_alert_threshold: 3,
     promo_pair_alert_days: 30,
+    public_activity_enabled: true,
+    public_activity_min_trips_per_hour: 3,
     topup_min_amount: 5,
     topup_binance_pay_id: '',
     topup_account_name: 'Kuulis',
@@ -355,6 +361,8 @@ export function settingsFromConfig(config: AppConfig): SettingsForm {
     rates_manual_hold_hours: num(config.rates_manual_hold_hours, d.rates_manual_hold_hours),
     promo_pair_alert_threshold: num(config.promo_pair_alert_threshold, d.promo_pair_alert_threshold),
     promo_pair_alert_days: num(config.promo_pair_alert_days, d.promo_pair_alert_days),
+    public_activity_enabled: config.public_activity_enabled ?? d.public_activity_enabled,
+    public_activity_min_trips_per_hour: num(config.public_activity_min_trips_per_hour, d.public_activity_min_trips_per_hour),
     topup_min_amount: num(config.topup_min_amount, d.topup_min_amount),
     topup_binance_pay_id: config.topup_binance_pay_id ?? d.topup_binance_pay_id,
     topup_account_name: config.topup_account_name ?? d.topup_account_name,
@@ -445,6 +453,8 @@ export function settingsToPayload(form: SettingsForm): Required<AppConfig> {
     rates_manual_hold_hours: form.rates_manual_hold_hours,
     promo_pair_alert_threshold: form.promo_pair_alert_threshold,
     promo_pair_alert_days: form.promo_pair_alert_days,
+    public_activity_enabled: form.public_activity_enabled,
+    public_activity_min_trips_per_hour: form.public_activity_min_trips_per_hour,
     topup_min_amount: money(form.topup_min_amount),
     topup_binance_pay_id: form.topup_binance_pay_id.replace(/\s+/g, ''),
     topup_account_name: form.topup_account_name.trim(),
@@ -552,6 +562,9 @@ export function validateSettings(form: SettingsForm): SettingsIssue[] {
   }
   if (!between(form.promo_pair_alert_threshold, PAIR_THRESHOLD_MIN, PAIR_THRESHOLD_MAX)) {
     issues.push({ key: 'pairThreshold', params: { min: PAIR_THRESHOLD_MIN, max: PAIR_THRESHOLD_MAX } })
+  }
+  if (!between(form.public_activity_min_trips_per_hour, ACTIVITY_THRESHOLD_MIN, ACTIVITY_THRESHOLD_MAX)) {
+    issues.push({ key: 'activityThreshold', params: { min: ACTIVITY_THRESHOLD_MIN, max: ACTIVITY_THRESHOLD_MAX } })
   }
   if (!between(form.promo_pair_alert_days, PAIR_DAYS_MIN, PAIR_DAYS_MAX)) {
     issues.push({ key: 'pairDays', params: { min: PAIR_DAYS_MIN, max: PAIR_DAYS_MAX } })

@@ -7,6 +7,7 @@ import { CircleCheck, Flag, HandCoins } from '@/components/icons';
 import { DiscountNote, VesLine } from '@/components/Money';
 import { showToast } from '@/components/Toast';
 import { Confetti, CountUp, Pop } from '@/components/motion';
+import { Illustration } from '@/components/illustrations';
 import { Button, Card, Chip, EmptyState, Field, Notice, Screen, Txt } from '@/components/ui';
 import { usePendingRating, useRateRide } from '@/hooks/useRides';
 import { apiErrorMessage } from '@/i18n';
@@ -58,6 +59,7 @@ function Arrival({ ride, role, firstName: name }: { ride: Ride; role: 'passenger
           </>
         ) : (
           <>
+            <Illustration name="moto" size={112} />
             <Txt variant="title" align="center" accessibilityRole="header">
               {name ? t('rating.arrival.passengerTitleName', { name }) : t('rating.arrival.passengerTitle')}
             </Txt>

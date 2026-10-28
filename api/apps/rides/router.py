@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Header, Path, Query, Request, Response, 
 from apps.audit.services import audit
 from apps.legal.dependencies import LegalAccepted
 from apps.releases.dependencies import AppUpToDate
-from apps.rides import events, presence, receipt, services, stats
+from apps.rides import activity, events, presence, receipt, services, stats
 from apps.rides.models import Ride, RideStatus
 from apps.rides.schemas import (
     AdminCancelRequest,
@@ -22,6 +22,7 @@ from apps.rides.schemas import (
     OfferAdminRead,
     OnlineDriver,
     PassengerStats,
+    PublicActivity,
     Quote,
     QuoteRequest,
     RatingAdminRead,
@@ -125,6 +126,16 @@ async def ride_receipt(ride_id: uuid.UUID, user: CurrentUser, session: DBSession
     link in the user's language to share."""
     ride = await services.get_for_participant(session, user, ride_id)
     return await receipt.build(session, ride, user.locale)
+
+
+@public_router.get("/activity", response_model=PublicActivity)
+@limiter.limit("60/minute")
+async def public_activity(
+    request: Request, response: Response, session: DBSession
+) -> PublicActivity:
+    """No login: "Caracas en movimiento", real trips only, anonymous and approximate."""
+    response.headers["Cache-Control"] = "public, max-age=30"
+    return await activity.public_activity(session)
 
 
 @public_router.get(

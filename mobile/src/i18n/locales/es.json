@@ -119,7 +119,19 @@
     "pendingFeeNoDate": "Cuota de {{amount}} pendiente. Recarga para seguir recibiendo viajes.",
     "shortcuts": "Lugares guardados",
     "shortcutHint": "Ver el precio para ir a {{name}}",
-    "addPlace": "Agregar lugar"
+    "addPlace": "Agregar lugar",
+    "activity": {
+      "title": "Caracas en movimiento",
+      "lastHour": "Última hora: {{n}} viajes",
+      "minutesAgo": "Hace {{minutes}} min",
+      "recentA11y": "Viaje terminado hace {{minutes}} minutos, {{distance}}, {{fare}}",
+      "privacy": "Viajes reales y anónimos: sin nombres ni direcciones, con la posición aproximada y unos minutos de retraso.",
+      "inProgress": "Viaje en curso",
+      "allForDriver": "Todito pa'l motorizado, sin comisión",
+      "startingTitle": "Kuulis está arrancando en Caracas",
+      "startingBody": "Motorizados verificados hasta hoy: {{n}}. Pronto los verás rodando por aquí.",
+      "startingBodyNone": "Estamos verificando a los primeros motorizados. Pronto los verás rodando por aquí."
+    }
   },
   "notifications": {
     "empty": "No tienes notificaciones",
@@ -458,6 +470,10 @@
       "paymentHint": "Elige cómo pagas normalmente",
       "inviteHint": "Comparte tu código o usa el de quien te invitó",
       "helpLegal": "Ayuda y legal"
+    },
+    "publicActivity": {
+      "title": "Mostrar mis viajes en el mapa público",
+      "body": "En \"Caracas en movimiento\" tus viajes salen sin tu nombre, placa ni direcciones, con la posición aproximada y unos minutos de retraso."
     }
   },
   "driver": {
@@ -1003,6 +1019,10 @@
       "body": "El viaje se canceló porque no llegaste al punto de recogida a tiempo.",
       "warning": "Si pasa varias veces, tu cuenta puede quedar en pausa por un tiempo.",
       "retry": "Pedir otra moto"
+    },
+    "mapEta": {
+      "pickup": "Llega en {{time}}",
+      "trip": "Llegas en {{time}}"
     }
   },
   "cancel": {

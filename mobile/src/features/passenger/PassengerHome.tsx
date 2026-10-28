@@ -6,7 +6,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Bike, ChevronRight, Clock, Mail, Search } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
-import { Button, Card, IconTile, ListRow, Notice, Txt, Wordmark } from '@/components/ui';
+import { Button, Card, IconTile, ListRow, Notice, Txt } from '@/components/ui';
 import { SuspendedPanel } from '@/features/account/SuspendedPanel';
 import { AnnouncementBanners } from '@/features/control/AnnouncementBanners';
 import { ServicePausedPanel } from '@/features/control/ServicePausedPanel';
@@ -15,6 +15,7 @@ import { UpdateBanner } from '@/features/update/UpdateBanner';
 import { LocationPrompt } from '@/features/ride/LocationPrompt';
 import { rideDraft, setDraftPlace } from '@/features/ride/store';
 import { useCurrentPickup } from '@/features/ride/useCurrentPickup';
+import { usePublicActivity } from '@/hooks/useActivity';
 import { useBootstrap } from '@/hooks/useBootstrap';
 import { useUserLocation } from '@/hooks/useLocation';
 import { useQualityPause } from '@/hooks/useQuality';
@@ -23,10 +24,11 @@ import { useSuspension } from '@/hooks/useSuspension';
 import { api } from '@/lib/api';
 import { pauseNotice } from '@/lib/bootstrap';
 import { isActiveStatus, shortAddress } from '@/lib/ride';
-import type { Place } from '@/lib/types';
+import type { ActiveTrip, Place } from '@/lib/types';
 import { useAuth } from '@/providers/AuthProvider';
-import { elevation, radius, space, useTheme } from '@/theme';
+import { space, useTheme } from '@/theme';
 
+import { ActivityStrip, ActivityTripCard } from './CityActivity';
 import { SavedShortcuts } from './SavedShortcuts';
 
 export function greetingKey(date = new Date()) {
@@ -72,6 +74,11 @@ export function PassengerHome() {
   // Doc 15: paused for not showing up at pickups (learned from a refused request or `quality.paused`).
   const qualityPause = useQualityPause('passenger');
   useCurrentPickup();
+  const activity = usePublicActivity();
+  const [pickedTrip, setPickedTrip] = useState<ActiveTrip | null>(null);
+  const liveTrips = activity.data?.live ? activity.data.in_progress : undefined;
+  // The tapped moto can finish its trip between two reads: drop the card when it is gone.
+  const shownTrip = pickedTrip && liveTrips?.some((trip) => trip.id === pickedTrip.id) ? pickedTrip : null;
 
   useEffect(() => {
     // Coming back home starts a fresh request from the current location.
@@ -91,12 +98,17 @@ export function PassengerHome() {
       collapsible
       // Collapsed, the greeting and "¿Pa' dónde vamos?" stay above the tab bar.
       peek={196}
-      map={(insets) => <RideMap insets={insets} followUser showUser />}
+      map={(insets) => (
+        <RideMap insets={insets} followUser showUser activity={liveTrips} onActivityPress={setPickedTrip}>
+          {shownTrip ? (
+            <View pointerEvents="box-none" style={[styles.tripCard, { bottom: insets.bottom + space.md }]}>
+              <ActivityTripCard trip={shownTrip} onClose={() => setPickedTrip(null)} />
+            </View>
+          ) : null}
+        </RideMap>
+      )}
       topBar={
         <View style={{ gap: space.sm }} pointerEvents="box-none">
-          <View style={[styles.brand, { backgroundColor: theme.surface }, elevation(theme)]}>
-            <Wordmark size={22} />
-          </View>
           <AnnouncementBanners />
         </View>
       }>
@@ -166,6 +178,8 @@ export function PassengerHome() {
         </View>
       ) : null}
 
+      {!activeRide ? <ActivityStrip activity={activity.data} /> : null}
+
       {!user?.is_verified ? (
         <Notice tone="warning" icon={Mail} title={t('home.verifyTitle')}>
           <Txt variant="caption" style={{ fontSize: 14, lineHeight: 20 }}>
@@ -191,7 +205,7 @@ export function PassengerHome() {
 }
 
 const styles = StyleSheet.create({
-  brand: { alignSelf: 'flex-start', borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: space.xs },
+  tripCard: { position: 'absolute', left: 0, right: 0 },
   search: {
     flexDirection: 'row',
     alignItems: 'center',

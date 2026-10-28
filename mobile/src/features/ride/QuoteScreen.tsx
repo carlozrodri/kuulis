@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ErrorState } from '@/components/ErrorState';
+import { Illustration } from '@/components/illustrations';
 import { BadgePercent, Bike, ChevronLeft, CircleX, Clock, HandCoins, TicketPercent, WifiOff, X, Zap } from '@/components/icons';
 import { RideMap } from '@/components/map/RideMap';
 import { MapSheetLayout } from '@/components/MapSheetLayout';
@@ -311,7 +312,7 @@ export function QuoteScreen() {
               : t('quote.vehicleA11y', { fare })
           }>
           <View style={[styles.vehicleIcon, { backgroundColor: theme.surface }]}>
-            <Bike size={30} color={theme.primary} strokeWidth={2} />
+            <Illustration name="moto" size={60} />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
             <Txt variant="subtitle">{t('quote.moto')}</Txt>
@@ -617,7 +618,7 @@ function PromoCodeEntry() {
 
 const styles = StyleSheet.create({
   vehicle: { flexDirection: 'row', alignItems: 'center', gap: space.sm, padding: space.md },
-  vehicleIcon: { width: 56, height: 56, borderRadius: radius.tile, alignItems: 'center', justifyContent: 'center' },
+  vehicleIcon: { width: 64, height: 64, borderRadius: radius.tile, alignItems: 'center', justifyContent: 'center' },
   eta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   fullFare: { flexDirection: 'row', alignItems: 'flex-start', gap: space.sm, padding: space.sm, borderRadius: radius.field },
   strike: { textDecorationLine: 'line-through' },

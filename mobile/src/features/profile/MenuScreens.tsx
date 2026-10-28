@@ -35,7 +35,7 @@ import { Card, ListRow, Sheet, Skeleton, Txt } from '@/components/ui';
 import { PaymentChips } from '@/features/ride/components';
 import { loadSavedPayment, rideDraft, setDraftPayment } from '@/features/ride/store';
 import { useSavedPlaces } from '@/hooks/useAccount';
-import { useAppConfig } from '@/hooks/useDriver';
+import { useAppConfig, useDriverProfile, useSavePreferences } from '@/hooks/useDriver';
 import { usePassengerStats } from '@/hooks/useRides';
 import { useTrustedContacts } from '@/hooks/useSafety';
 import { apiErrorMessage, SUPPORTED_LOCALES, type Locale } from '@/i18n';
@@ -87,6 +87,49 @@ function useUsageData() {
   return { value, busy, toggle, theme };
 }
 
+/**
+ * "Mostrar mis viajes en el mapa público" (Caracas en movimiento, docs/product/wow/01): drivers only, on by
+ * default. Off, the API leaves their trips out of the public map and the recent trips.
+ */
+function PublicActivityRow() {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const profile = useDriverProfile();
+  const save = useSavePreferences();
+  if (!profile.data) return null;
+  const shown = !(save.isPending ? save.variables?.hide_from_public_activity : profile.data.hide_from_public_activity);
+  const toggle = (next: boolean) => {
+    if (save.isPending) return;
+    void Haptics.selectionAsync().catch(() => undefined);
+    save.mutate({ hide_from_public_activity: !next }, { onError: (e) => showToast(apiErrorMessage(e), 'danger') });
+  };
+  return (
+    <ListRow
+      icon={MapPinned}
+      iconTone="neutral"
+      title={t('profile.publicActivity.title')}
+      subtitle={t('profile.publicActivity.body')}
+      chevron={false}
+      divider
+      accessibilityRole="switch"
+      accessibilityState={{ checked: shown, disabled: save.isPending }}
+      onPress={() => toggle(!shown)}
+      right={
+        <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+          <Switch
+            value={shown}
+            onValueChange={toggle}
+            disabled={save.isPending}
+            trackColor={{ false: theme.muted, true: theme.primary }}
+            thumbColor={theme.surface}
+            ios_backgroundColor={theme.muted}
+          />
+        </View>
+      }
+    />
+  );
+}
+
 /** Perfil → Ajustes: everything that is not about trips in one page (account, preferences, security, privacy, help and legal). */
 export function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -95,6 +138,7 @@ export function SettingsScreen() {
   const contactCount = useTrustedContacts(!!user).data?.length ?? 0;
   const [confirm, setConfirm] = useState(false);
   const usage = useUsageData();
+  const { mode } = useMode();
 
   async function changeLanguage(locale: Locale) {
     if (locale === i18n.language) return;
@@ -219,6 +263,7 @@ export function SettingsScreen() {
               </View>
             }
           />
+          {mode === 'driver' ? <PublicActivityRow /> : null}
           <ListRow
             icon={Download}
             iconTone="neutral"

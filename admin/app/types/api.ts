@@ -283,6 +283,9 @@ export interface AppConfig {
   rates_manual_hold_hours?: number
   promo_pair_alert_threshold?: number
   promo_pair_alert_days?: number
+  /** "Caracas en movimiento" on the passenger home: real trips only, shown above the threshold. */
+  public_activity_enabled?: boolean
+  public_activity_min_trips_per_hour?: number
   // ---- Phase 1D (docs/api/phase-1d.md). Optional so the panel still loads against an older API. ----
   topup_min_amount?: Decimal
   /** Kuulis' Binance Pay ID shown to drivers ("" = not configured yet). */

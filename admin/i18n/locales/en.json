@@ -637,7 +637,8 @@
       "qualityNumber": "Quality: values must be between {min} and {max}",
       "qualityCancelOrder": "Quality: cancellation thresholds must go up (warning, lower priority, review)",
       "qualityNoShowOrder": "Quality: the no-show warning cannot be higher than the pause",
-      "riskNumber": "Risk: values must be between {min} and {max}"
+      "riskNumber": "Risk: values must be between {min} and {max}",
+      "activityThreshold": "City in motion: between {min} and {max} trips per hour."
     },
     "fares": {
       "title": "Fares",
@@ -939,6 +940,14 @@
         "new_account_days": "Accounts newer than this receiving balance raise an alert. 0 = off. Between {min} and {max}.",
         "rating_ring_rides": "Rides in 30 days where both gave each other 5 stars. Between {min} and {max}."
       }
+    },
+    "activity": {
+      "title": "City in motion",
+      "help": "Shows real trips in progress and recent ones on the passenger home, anonymously: no names or addresses, position delayed 3 minutes and rounded to about 200 m. Trips are never simulated.",
+      "enabled": "Show activity",
+      "enabledHelp": "Off, the home only shows the message with the verified drivers.",
+      "threshold": "Trips per hour to show it",
+      "thresholdHelp": "Real trips started in the last hour (test accounts excluded). Below it the app shows an honest message instead."
     }
   },
   "paymentMethods": {

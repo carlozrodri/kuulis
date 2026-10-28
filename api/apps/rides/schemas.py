@@ -447,3 +447,32 @@ class PassengerStats(BaseModel):
     distance_m: int
     spent: MoneyStr  # what the passenger paid: fare - promo discount
     frequent_places: list[FrequentPlace]  # most visited destinations, most rides first
+
+
+# --- "Caracas en movimiento" (public, anonymous) -------------------------------------------------
+
+
+class ActiveTrip(BaseModel):
+    """A real trip in progress: approximate, delayed point; no names, plates or addresses."""
+
+    id: str  # anonymous, changes every hour
+    lat: float
+    lng: float
+    distance_m: int
+    fare: MoneyStr  # what the passenger pays, all of it for the driver
+
+
+class RecentTrip(BaseModel):
+    minutes_ago: int  # in 5-minute steps
+    distance_m: int
+    fare: MoneyStr
+
+
+class PublicActivity(BaseModel):
+    live: bool  # False below the admin threshold: the app shows the honest message instead
+    threshold: int
+    trips_last_hour: int
+    verified_drivers: int
+    in_progress: list[ActiveTrip] = []
+    recent: list[RecentTrip] = []
+    updated_at: datetime

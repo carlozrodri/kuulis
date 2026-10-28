@@ -18,6 +18,7 @@ from apps.drivers.schemas import (
     DriverAdminRead,
     DriverCheckAdminRead,
     DriverCheckRead,
+    DriverPreferences,
     DriverProfileRead,
     DriverProfileWrite,
     ExpiryUpdate,
@@ -52,6 +53,18 @@ async def upsert_me(
     data: DriverProfileWrite, user: CurrentUser, session: DBSession
 ) -> DriverProfileRead:
     profile = await services.upsert_profile(session, user, data)
+    return await services.read(session, profile, await get_app_config(session))
+
+
+@router.patch("/me/preferences", response_model=DriverProfileRead)
+async def update_preferences(
+    data: DriverPreferences, user: CurrentUser, session: DBSession
+) -> DriverProfileRead:
+    """Driver switches, e.g. "No mostrar mis viajes en el mapa público" (Caracas en movimiento)."""
+    profile = await services.get_for_user_or_404(session, user.id)
+    for field, value in data.model_dump(exclude_none=True).items():
+        setattr(profile, field, value)
+    await session.flush()
     return await services.read(session, profile, await get_app_config(session))
 
 

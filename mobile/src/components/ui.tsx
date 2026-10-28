@@ -30,6 +30,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { ChevronRight, CircleCheck, Eye, EyeOff, type Icon, Info, TriangleAlert, X } from '@/components/icons';
+import { Illustration, type IllustrationName } from '@/components/illustrations';
 import { LOGO_COLORS, LOGO_K, LOGO_K_NEGATIVE, LOGO_LETTERS, LOGO_RATIO, LOGO_VIEWBOX } from '@/components/logo';
 import { PRESS_SPRING } from '@/components/motion';
 import { elevation, fonts, radius, space, type Theme, type TypeVariant, type, useTheme } from '@/theme';
@@ -732,13 +733,28 @@ export function Skeleton({ height = 20, width = '100%', radius: r = radius.field
   return <Animated.View style={[{ height, width, borderRadius: r, backgroundColor: theme.border, opacity }, style]} />;
 }
 
-export function EmptyState({ icon: EmptyIcon, title, body }: { icon: Icon; title: string; body?: string }) {
+export function EmptyState({
+  icon: EmptyIcon,
+  illustration,
+  title,
+  body,
+}: {
+  icon: Icon;
+  /** A 3D illustration replaces the icon circle for the emotional empty states (no trips yet, trip done). */
+  illustration?: IllustrationName;
+  title: string;
+  body?: string;
+}) {
   const theme = useTheme();
   return (
     <View style={styles.empty}>
-      <View style={[styles.emptyIcon, { backgroundColor: theme.surfaceAlt }]}>
-        <EmptyIcon size={30} color={theme.primary} strokeWidth={2} />
-      </View>
+      {illustration ? (
+        <Illustration name={illustration} size={132} />
+      ) : (
+        <View style={[styles.emptyIcon, { backgroundColor: theme.surfaceAlt }]}>
+          <EmptyIcon size={30} color={theme.primary} strokeWidth={2} />
+        </View>
+      )}
       <Txt variant="subtitle" align="center">
         {title}
       </Txt>

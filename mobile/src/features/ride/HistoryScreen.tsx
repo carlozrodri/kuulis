@@ -111,7 +111,7 @@ export function HistoryScreen() {
             <ErrorState error={history.error} onRetry={() => history.refetch()} />
           ) : (
             <View>
-              <EmptyState icon={Route} title={t('history.empty')} body={role === 'driver' ? t('history.emptyDriver') : t('history.emptyPassenger')} />
+              <EmptyState icon={Route} illustration="moto" title={t('history.empty')} body={role === 'driver' ? t('history.emptyDriver') : t('history.emptyPassenger')} />
               {role === 'passenger' ? <Button title={t('history.requestRide')} icon={Bike} onPress={() => router.navigate('/')} /> : null}
             </View>
           )

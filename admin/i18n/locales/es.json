@@ -637,7 +637,8 @@
       "qualityNumber": "Calidad: los valores deben estar entre {min} y {max}",
       "qualityCancelOrder": "Calidad: los umbrales de cancelación deben ir de menor a mayor (aviso, menor prioridad, revisar)",
       "qualityNoShowOrder": "Calidad: el aviso por \"no se presentó\" no puede ser mayor que la pausa",
-      "riskNumber": "Riesgo: los valores deben estar entre {min} y {max}"
+      "riskNumber": "Riesgo: los valores deben estar entre {min} y {max}",
+      "activityThreshold": "Caracas en movimiento: entre {min} y {max} viajes por hora."
     },
     "fares": {
       "title": "Tarifas",
@@ -939,6 +940,14 @@
         "new_account_days": "Cuentas más nuevas que esto que reciben saldo levantan una alerta. 0 = desactivado. Entre {min} y {max}.",
         "rating_ring_rides": "Viajes en 30 días en que los dos se dieron 5 estrellas. Entre {min} y {max}."
       }
+    },
+    "activity": {
+      "title": "Caracas en movimiento",
+      "help": "Muestra en el inicio del pasajero los viajes reales en curso y los recientes, anónimos: sin nombres ni direcciones, con la posición retrasada 3 minutos y aproximada a unos 200 m. Nunca se simulan viajes.",
+      "enabled": "Mostrar la actividad",
+      "enabledHelp": "Apagado, el inicio muestra solo el mensaje con los motorizados verificados.",
+      "threshold": "Viajes por hora para mostrarla",
+      "thresholdHelp": "Viajes reales empezados en la última hora (sin cuentas de prueba). Por debajo, la app muestra un mensaje honesto en su lugar."
     }
   },
   "paymentMethods": {
