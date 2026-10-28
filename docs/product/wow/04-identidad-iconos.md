@@ -26,6 +26,9 @@ Antes de comprar, verificar los términos vigentes en cada sitio (cambian).
 (MIT) queda como apoyo para reacciones si hace falta. Propuestas de la moto en
 `/mnt/project-files/kuulis/moto-kuulis/`.
 
+**Elegida (Carlos, 2026-10-28): propuesta A**, la moto 3D tipo juguete verde Ávila con rines y franja del
+asiento en amarillo mango (`docs/product/references/moto-kuulis-a.png`). Todo el set 3D sigue ese estilo.
+
 ~~**Recomendación:** comprar Thiings Indie para el grueso, Fluent Emoji 3D para reacciones y celebraciones, y
 crear la moto Kuulis propia (abajo).~~ Mezclar más de dos estilos 3D se ve desordenado.
 
