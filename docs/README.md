@@ -15,6 +15,7 @@
 | [produccion/](produccion/README.md) | Lo que falta para producción: un documento por funcionalidad, en orden |
 | [website-redesign/](website-redesign/README.md) | Plan del rediseño de la web pública (aprobado) |
 | [marketing/](marketing/README.md) | Plan de contenido para redes (TikTok, Instagram, YouTube Shorts) y agentes de marketing (propuesto) |
+| [whatsapp/](whatsapp/README.md) | Pedir viajes por WhatsApp (API oficial de Meta): flujos, webhook, plantillas, seguridad y salida (propuesto) |
 | [template.md](template.md) | Tag `template-v1.0.0`: la plantilla para crear otros productos |
 
 Regla: cada cambio relevante actualiza `roadmap.md` / `pending.md`, y cada bloqueo nuevo va a `blockers.md`.
